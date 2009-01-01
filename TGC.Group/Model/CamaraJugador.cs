@@ -2,53 +2,95 @@
 using TGC.Core.Camara;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
+using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Model
 {
     class CamaraJugador
     {
 
-        private TGCVector3 LookAt;
-        private TGCVector3 CameraPosition;
+        public TGCVector3 CameraDirection
+        {
+            get
+            {
+                TGCVector3 cameraDirection = cameraPosition - lookAt;
+                cameraDirection.Normalize();
+                return cameraDirection;
+            }
+        }
+
+        private TGCVector3 lookAt;
+        private TGCVector3 cameraPosition;
         private TgcCamera  camara;
+
+        TgcBoundingAxisAlignBox limites;
 
         private ObjetoJuego jugador;
         private ObjetoJuego pelota;
 
-        public CamaraJugador(ObjetoJuego jugador, ObjetoJuego pelota, TgcCamera camara)
+        public CamaraJugador(ObjetoJuego jugador, ObjetoJuego pelota, TgcCamera camara, TgcBoundingAxisAlignBox limites)
         {
             this.jugador = jugador;
             this.pelota = pelota;
             this.camara = camara;
+            this.limites = limites;
 
-            LookAt = new TGCVector3(TGCVector3.Empty);
-            CameraPosition = new TGCVector3(0, 100, 225);
+            lookAt = new TGCVector3(TGCVector3.Empty);
+            cameraPosition = new TGCVector3(0, 100, 225);
         }
 
         public void Update(float ElapsedTime)
         {
+            TGCVector3 viewDirection = jugador.Translation - pelota.Translation;
+            TGCVector3 jugadorTranslation = jugador.Translation;
 
-            LookAt = pelota.Translation;
-            CameraPosition = jugador.Translation;
-            CameraPosition.Y += 10;
-            CameraPosition.Z += 100;
+            viewDirection.Normalize();
 
-            camara.SetCamera(CameraPosition, LookAt);
+            cameraPosition = jugadorTranslation  + viewDirection * 25f;
+
+            float minTranslateY = jugadorTranslation.Y + 2f;
+
+            if (cameraPosition.Y < minTranslateY)
+            {
+                cameraPosition.Y = minTranslateY;
+            }
+            
+            /*
+            if (cameraPosition.X < limites.PMin.X)
+            {
+                cameraPosition.X = limites.PMin.X;
+            }
+            else if (cameraPosition.X > limites.PMax.X)
+            {
+                cameraPosition.X = limites.PMax.X;
+            }
+            
+            if (cameraPosition.Z < limites.PMin.Z)
+            {
+                cameraPosition.Z = limites.PMin.Z;
+            }
+            else if (cameraPosition.Z > limites.PMax.Z)
+            {
+                cameraPosition.Z = limites.PMax.Z;
+            }
+            */
+
+            camara.SetCamera(cameraPosition, pelota.Translation);
         }
 
         public void HandleInput(TgcD3dInput input, float ElapsedTime)
         {
-            LookAt.X -= input.XposRelative * 3f;
-            LookAt.Y -= input.YposRelative * 3f;
+            lookAt.X -= input.XposRelative * 3f;
+            lookAt.Y -= input.YposRelative * 3f;
 
             if (input.keyDown(Key.W))
             {
-                CameraPosition -= TGCVector3.Normalize(CameraPosition - LookAt) * ElapsedTime * 100f;
+                cameraPosition -= TGCVector3.Normalize(cameraPosition - lookAt) * ElapsedTime * 100f;
                 //CameraPosition.Z -= 100f * ElapsedTime;
             }
             if (input.keyDown(Key.S))
             {
-                CameraPosition += TGCVector3.Normalize(CameraPosition - LookAt) * ElapsedTime * 100f;
+                cameraPosition += TGCVector3.Normalize(cameraPosition - lookAt) * ElapsedTime * 100f;
                 //CameraPosition.Z += 100f * ElapsedTime;
             }
         }
