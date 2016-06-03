@@ -1,8 +1,6 @@
 # tgc-group
 
-Proyecto para realizar el trabajo práctico cuatrimestral.
-
-[Técnicas de Gráficos por Computadora](http://tgc-utn.github.io/)
+Proyecto para realizar el trabajo práctico cuatrimestral de [Técnicas de Gráficos por Computadora](http://tgc-utn.github.io/)
 
 ## Características
 * [Lenguaje C#](https://msdn.microsoft.com/es-ar/library/kx37x362.aspx)
@@ -19,3 +17,6 @@ Proyecto para realizar el trabajo práctico cuatrimestral.
         * [Microsoft .NET Framework 4.5.2 Developer Pack](https://www.microsoft.com/es-ar/download/details.aspx?id=42637) (instalar primero)
         * [GTK# for .NET](http://download.xamarin.com/GTKforWindows/Windows/gtk-sharp-2.12.30.msi) (instalar segundo)
         * [Microsoft Build Tools 2015](https://www.microsoft.com/es-ar/download/details.aspx?id=48159) (instalar para poder generar la solución de tgc-viewer)
+* Para correr el proyecto
+   * Deben bajar la libreria [TGC.Core.dll](https://drive.google.com/open?id=0B8iAMXTVXrJeRlJXcXg3RHo5NWM).
+   * Agregar la libreria en las referencias del proyecto.
