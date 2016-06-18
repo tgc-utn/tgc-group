@@ -30,7 +30,7 @@ namespace TGC.Group.Model
         }
 
         /// <summary>
-        ///     Método que se llama una sola vez, al principio cuando se ejecuta el ejemplo.
+        ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
         ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, modifiers, uservars, etc.
         ///     Borrar todo lo que no haga falta.
         /// </summary>
@@ -42,7 +42,8 @@ namespace TGC.Group.Model
             ///////////////CONFIGURAR CAMARA ROTACIONAL//////////////////
             //Es la camara que viene por default, asi que no hace falta hacerlo siempre
             //Configurar centro al que se mira y distancia desde la que se mira
-            Camara.setCamera(new Vector3(20, 20, 20), new Vector3(0, 0, 0));
+            //Camara.setCamera(new Vector3(20, 20, 20), new Vector3(0, 0, 0));
+			Camara = new TgcRotationalCamera(new Vector3(), 50f);
 
             //Textura de la carperta Media
             var mediaFolder = MediaDir + Game.Default.TexturaCaja;
@@ -56,58 +57,56 @@ namespace TGC.Group.Model
             Box = TgcBox.fromSize(center, size, texture);
         }
 
+		/// <summary>
+		/// Se llama en cada frame.
+		/// Se debe escribir toda la logica de computo del modelo.
+		/// </summary>
         public override void Update()
         {
-            //TODO aca debe ir toda la logica de calculos de lo que fue pasando....
+			base.PreUpdate();
+
+			///////////////INPUT//////////////////
+			//conviene deshabilitar ambas camaras para que no haya interferencia
+
+			//Capturar Input teclado
+			if (TgcD3dInput.Instance.keyPressed(Key.F))
+			{
+				//Tecla F apretada
+			}
+
+			//Capturar Input Mouse
+			if (TgcD3dInput.Instance.buttonPressed(TgcD3dInput.MouseButtons.BUTTON_LEFT))
+			{
+				//Boton izq apretado
+			}
         }
 
         /// <summary>
-        ///     Método que se llama cada vez que hay que refrescar la pantalla.
+        ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aquí todo el código referido al renderizado.
         ///     Borrar todo lo que no haga falta
         /// </summary>
         public override void Render()
         {
             //Inicio el render de la escena
-            IniciarEscena();
-
-			//Ejecuto el render de la super clase
-			base.Render();
+			PreRender();
 
             //Device de DirectX para renderizar
             var d3dDevice = D3DDevice.Instance.Device;
-
-            ///////////////INPUT//////////////////
-            //conviene deshabilitar ambas camaras para que no haya interferencia
-
-            //Capturar Input teclado
-            if (TgcD3dInput.Instance.keyPressed(Key.F))
-            {
-                //Tecla F apretada
-            }
-
-            //Capturar Input Mouse
-            if (TgcD3dInput.Instance.buttonPressed(TgcD3dInput.MouseButtons.BUTTON_LEFT))
-            {
-                //Boton izq apretado
-            }
 
             //Render de la caja
             Box.render();            
 
             //Finaliza el render
-            FinalizarEscena();
+            PostRender();
         }
 
         /// <summary>
-        ///     Método que se llama cuando termina la ejecución del ejemplo.
+        ///     Se llama cuando termina la ejecución del ejemplo.
         ///     Hacer dispose() de todos los objetos creados.
         /// </summary>
-        public override void Close()
+        public override void Dispose()
         {
-            //Elimino los recursos de la super clase
-            base.Close();
-
             //Dispose de la caja
             Box.dispose();
         }

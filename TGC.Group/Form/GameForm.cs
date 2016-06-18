@@ -186,7 +186,7 @@ namespace TGC.Group
         {
             if (Modelo != null)
             {
-                Modelo.Close();
+				Modelo.Dispose();
                 Modelo = null;
             }
         }
