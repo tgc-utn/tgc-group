@@ -6,6 +6,7 @@ using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
 using TGC.Core.Input;
+using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 
 namespace TGC.Group.Model
@@ -17,6 +18,8 @@ namespace TGC.Group.Model
     {
         //Caja que se muestra en el ejemplo
         private TgcBox Box { get; set; }
+
+        private TgcMesh Mesh { get; set; }
 
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
@@ -57,6 +60,11 @@ namespace TGC.Group.Model
             var center = new Vector3(0, 0, 0);
             var size = new Vector3(5, 10, 5);
             Box = TgcBox.fromSize(center, size, texture);
+
+            //Cargo el unico mesh que tiene la escena
+            Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
+            //Escalo el mesh que es muy grande
+            Mesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
         }
 
         /// <summary>
@@ -91,15 +99,19 @@ namespace TGC.Group.Model
             PreRender();
 
             //Dibuja un texto por pantalla
-            DrawText.drawText("Con la tecla F se dibuja el bounding box de la caja.", 0, 20, Color.OrangeRed);
+            DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
 
             //Render de la caja
             Box.render();
+
+            //Render del mesh
+            Mesh.render();
 
             //Render del BoundingBox
             if (BoundingBox)
             {
                 Box.BoundingBox.render();
+                Mesh.BoundingBox.render();
             }
 
             //Finaliza el render
@@ -114,6 +126,8 @@ namespace TGC.Group.Model
         {
             //Dispose de la caja
             Box.dispose();
+            //Dispose del mesh
+            Mesh.dispose();
         }
     }
 }
