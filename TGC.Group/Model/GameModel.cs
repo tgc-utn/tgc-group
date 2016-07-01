@@ -1,14 +1,12 @@
 using Microsoft.DirectX;
 using Microsoft.DirectX.DirectInput;
-using TGC.Core;
+using System.Drawing;
 using TGC.Core.Camara;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Textures;
-using TGC.Core.UserControls;
-using TGC.Core.UserControls.Modifier;
 
 namespace TGC.Group.Model
 {
@@ -18,11 +16,17 @@ namespace TGC.Group.Model
     public class GameModel : TgcExample
     {
         //Caja que se muestra en el ejemplo
-        public TgcBox Box { get; set; }
+        private TgcBox Box { get; set; }
 
-        public GameModel(string mediaDir, string shadersDir, TgcUserVars userVars, TgcModifiers modifiers,
-            TgcAxisLines axisLines, TgcCamera camara)
-            : base(mediaDir, shadersDir, userVars, modifiers, axisLines, camara)
+        //Boleano para ver si dibujamos el boundingbox
+        private bool BoundingBox { get; set; }
+
+        /// <summary>
+        /// Constructor del juego
+        /// </summary>
+        /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
+        /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
+        public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
             Name = Game.Default.Name;
@@ -39,17 +43,15 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas
             var d3dDevice = D3DDevice.Instance.Device;
 
-            ///////////////CONFIGURAR CAMARA ROTACIONAL//////////////////
-            //Es la camara que viene por default, asi que no hace falta hacerlo siempre
+            //Piso la camara que viene por defecto con la que yo quiero usar.
             //Configurar centro al que se mira y distancia desde la que se mira
-            //Camara.setCamera(new Vector3(20, 20, 20), new Vector3(0, 0, 0));
-			Camara = new TgcRotationalCamera(new Vector3(), 50f);
+            Camara = new TgcRotationalCamera(new Vector3(), 50f, Input);
 
             //Textura de la carperta Media
-            var mediaFolder = MediaDir + Game.Default.TexturaCaja;
+            var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
 
             //Cargamos una textura
-            var texture = TgcTexture.createTexture(mediaFolder);
+            var texture = TgcTexture.createTexture(pathTexturaCaja);
 
             //Creamos una caja 3D ubicada en (0, 0, 0), dimensiones (5, 10, 5) y la textura como color.
             var center = new Vector3(0, 0, 0);
@@ -57,45 +59,48 @@ namespace TGC.Group.Model
             Box = TgcBox.fromSize(center, size, texture);
         }
 
-		/// <summary>
-		/// Se llama en cada frame.
-		/// Se debe escribir toda la logica de computo del modelo.
-		/// </summary>
+        /// <summary>
+        /// Se llama en cada frame.
+        /// Se debe escribir toda la logica de computo del modelo.
+        /// </summary>
         public override void Update()
         {
-			base.PreUpdate();
+            PreUpdate();
 
-			///////////////INPUT//////////////////
-			//conviene deshabilitar ambas camaras para que no haya interferencia
+            //Capturar Input teclado
+            if (Input.keyPressed(Key.F))
+            {
+                BoundingBox = !BoundingBox;
+            }
 
-			//Capturar Input teclado
-			if (TgcD3dInput.Instance.keyPressed(Key.F))
-			{
-				//Tecla F apretada
-			}
-
-			//Capturar Input Mouse
-			if (TgcD3dInput.Instance.buttonPressed(TgcD3dInput.MouseButtons.BUTTON_LEFT))
-			{
-				//Boton izq apretado
-			}
+            //Capturar Input Mouse
+            if (Input.buttonPressed(TgcD3dInput.MouseButtons.BUTTON_LEFT))
+            {
+                //Boton izq apretado
+            }
         }
 
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aquí todo el código referido al renderizado.
-        ///     Borrar todo lo que no haga falta
+        ///     Borrar todo lo que no haga falta.
         /// </summary>
         public override void Render()
         {
             //Inicio el render de la escena
-			PreRender();
+            PreRender();
 
-            //Device de DirectX para renderizar
-            var d3dDevice = D3DDevice.Instance.Device;
+            //Dibuja un texto por pantalla
+            DrawText.drawText("Con la tecla F se dibuja el bounding box de la caja.", 0, 20, Color.OrangeRed);
 
             //Render de la caja
-            Box.render();            
+            Box.render();
+
+            //Render del BoundingBox
+            if (BoundingBox)
+            {
+                Box.BoundingBox.render();
+            }
 
             //Finaliza el render
             PostRender();

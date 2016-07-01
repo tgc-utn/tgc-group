@@ -84,8 +84,9 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="TGC.Core">
-      <HintPath>lib\TGC.Core.dll</HintPath>
+    <Reference Include="TGC.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\TGC.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

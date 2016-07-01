@@ -1,4 +1,4 @@
-﻿namespace TGC.Group
+﻿namespace TGC.Group.Form
 {
     partial class GameForm
     {

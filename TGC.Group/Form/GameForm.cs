@@ -1,30 +1,37 @@
 ﻿using System;
 using System.Threading;
 using System.Windows.Forms;
-using TGC.Core;
-using TGC.Core.Camara;
 using TGC.Core.Direct3D;
+using TGC.Core.Example;
 using TGC.Core.Input;
 using TGC.Core.Shaders;
 using TGC.Core.Sound;
 using TGC.Core.Textures;
-using TGC.Core.UserControls;
-using TGC.Core.UserControls.Modifier;
 using TGC.Group.Model;
 
-namespace TGC.Group
+namespace TGC.Group.Form
 {
-    public partial class GameForm : Form
+    public partial class GameForm : System.Windows.Forms.Form
     {
         /// <summary>
         /// Ejemplo del juego a correr
         /// </summary>
-        private GameModel Modelo { get; set; }
+        private TgcExample Modelo { get; set; }
 
         /// <summary>
         /// Obtener o parar el estado del RenderLoop.
         /// </summary>
         private bool ApplicationRunning { get; set; }
+
+        /// <summary>
+        /// Permite manejar el sonido
+        /// </summary>
+        private TgcDirectSound DirectSound { get; set; }
+
+        /// <summary>
+        /// Permite manejar los inputs de la computadora
+        /// </summary>
+        private TgcD3dInput Input { get; set; }
 
         /// <summary>
         /// Constructor de la ventana
@@ -57,41 +64,41 @@ namespace TGC.Group
             }
         }
 
+        /// <summary>
+        /// Inicio todos los objetos necesarios para cargar el ejemplo y directx
+        /// </summary>
         public void InitGraphics()
         {
+            //Se inicio la aplicacion
             ApplicationRunning = true;
-
-            //Configuracion
-            var settings = Game.Default;
-
-            //Directorio actual de ejecucion
-            var currentDirectory = Environment.CurrentDirectory + "\\";
-
-            var mediaDirectory = currentDirectory + settings.MediaDirectory;
-            var shadersDirectory = currentDirectory + settings.ShadersDirectory;
 
             //Inicio Device
             D3DDevice.Instance.InitializeD3DDevice(panel3D);
 
-            //Inicio Input
-            TgcD3dInput.Instance.Initialize(this, panel3D);
+            //Inicio inputs
+            Input = new TgcD3dInput();
+            Input.Initialize(this, panel3D);
 
-            //Inicio Sound
-            TgcDirectSound.Instance.InitializeD3DDevice(this);
+            //Inicio sonido
+            DirectSound = new TgcDirectSound();
+            DirectSound.InitializeD3DDevice(panel3D);
+
+            //Directorio actual de ejecucion
+            var currentDirectory = Environment.CurrentDirectory + "\\";
 
             //Cargar shaders del framework
-            TgcShaders.Instance.loadCommonShaders(currentDirectory + settings.ShadersDirectory);
+            TgcShaders.Instance.loadCommonShaders(currentDirectory + Game.Default.ShadersDirectory);
 
-			//TODO hay que sacar esto del ejemplo... ya que aca no se tiene nada, se los paso para que no explote.
-			var userVars = new TgcUserVars(new DataGridView());
-			var modifiers = new TgcModifiers(new Panel());
-
-			Modelo = new GameModel(mediaDirectory, shadersDirectory, userVars, modifiers, new TgcAxisLines(), new TgcRotationalCamera());
+            //Juego a ejecutar
+            Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory, currentDirectory + Game.Default.ShadersDirectory);
 
             //Cargar juego
             ExecuteModel();
         }
 
+        /// <summary>
+        /// Comienzo el loop del juego
+        /// </summary>
         public void InitRenderLoop()
         {
             while (ApplicationRunning)
@@ -142,13 +149,14 @@ namespace TGC.Group
         ///     Arranca a ejecutar un ejemplo.
         ///     Para el ejemplo anterior, si hay alguno.
         /// </summary>
-        /// <param name="example"></param>
         public void ExecuteModel()
         {
             //Ejecutar Init
             try
             {
                 Modelo.ResetDefaultConfig();
+                Modelo.DirectSound = DirectSound;
+                Modelo.Input = Input;
                 Modelo.Init();
                 panel3D.Focus();
             }
@@ -159,34 +167,13 @@ namespace TGC.Group
         }
 
         /// <summary>
-        ///     Cuando el Direct3D Device se resetea.
-        ///     Se reinica el ejemplo actual, si hay alguno.
-        /// </summary>
-        public void OnResetDevice()
-        {
-            var exampleBackup = Modelo;
-
-            if (exampleBackup != null)
-            {
-                StopCurrentExample();
-            }
-
-            D3DDevice.Instance.DoResetDevice();
-
-            if (exampleBackup != null)
-            {
-                ExecuteModel();
-            }
-        }
-
-        /// <summary>
         ///     Deja de ejecutar el ejemplo actual
         /// </summary>
         public void StopCurrentExample()
         {
             if (Modelo != null)
             {
-				Modelo.Dispose();
+                Modelo.Dispose();
                 Modelo = null;
             }
         }
