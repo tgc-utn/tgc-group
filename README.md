@@ -1,4 +1,10 @@
 # tgc-group
+[![Build status](https://ci.appveyor.com/api/projects/status/uvyboubq91uhwf3v?svg=true)](https://ci.appveyor.com/project/rejurime/tgc-group)
+[![GitHub issues](https://img.shields.io/github/issues/tgc-utn/tgc-group.svg)](https://github.com/tgc-utn/tgc-group/issues)
+[![GitHub stars](https://img.shields.io/github/stars/tgc-utn/tgc-group.svg)](https://github.com/tgc-utn/tgc-group/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/tgc-utn/tgc-group.svg)](https://github.com/tgc-utn/tgc-group/network)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/tgc-utn/tgc-group/master/LICENSE)
+[![GitHub release](https://img.shields.io/github/release/tgc-utn/tgc-group.svg)](https://github.com/tgc-utn/tgc-group/releases)
 
 Proyecto para realizar el trabajo práctico cuatrimestral de [Técnicas de Gráficos por Computadora](http://tgc-utn.github.io/)
 
