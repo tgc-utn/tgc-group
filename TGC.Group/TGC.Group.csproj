@@ -87,6 +87,7 @@
     <Reference Include="TGC.Core">
       <HintPath>..\packages\TGC.Core.1.0.1\lib\TGC.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualC" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Form\GameForm.cs">

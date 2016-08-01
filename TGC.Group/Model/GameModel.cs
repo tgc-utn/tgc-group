@@ -1,7 +1,6 @@
 using Microsoft.DirectX;
 using Microsoft.DirectX.DirectInput;
 using System.Drawing;
-using TGC.Core.Camara;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
@@ -43,14 +42,18 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Init()
         {
-            //Device de DirectX para crear primitivas
+            //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
-            //Piso la camara que viene por defecto con la que yo quiero usar.
-            //Configurar centro al que se mira y distancia desde la que se mira
-            Camara = new TgcRotationalCamera(new Vector3(), 50f, Input);
+			//Posicion de la camara.
+			Vector3 cameraPosition = new Vector3(0, 0, 75);
+			//Quiero que la camara mire hacia el origen (0,0,0).
+			Vector3 lookAt = Vector3.Empty;
 
-            //Textura de la carperta Media
+			//Configuro donde esta la posicion de la camara y hacia donde mira.
+			Camara.setCamera(cameraPosition, lookAt);
+
+			//Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
 
             //Cargamos una textura
@@ -60,11 +63,12 @@ namespace TGC.Group.Model
             var center = new Vector3(0, 0, 0);
             var size = new Vector3(5, 10, 5);
             Box = TgcBox.fromSize(center, size, texture);
+			Box.Transform = Matrix.Translation(-25, 0, 0);
 
-            //Cargo el unico mesh que tiene la escena
+            //Cargo el unico mesh que tiene la escena.
             Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
-            //Escalo el mesh que es muy grande
-            Mesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            //Escalo el mesh que es muy grande.
+			Mesh.Transform = Matrix.Scaling(0.5f, 0.5f, 0.5f);
         }
 
         /// <summary>
