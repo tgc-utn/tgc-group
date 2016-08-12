@@ -12,38 +12,38 @@ using TGC.Group.Model;
 namespace TGC.Group.Form
 {
     /// <summary>
-    ///     GameForm es el formularo de entrada, el mismo invocara a nuestro modelo 
-    ///     que extiende TgcExample, e inicia el render loop.
+    ///     GameForm es el formulario de entrada, el mismo invocara a nuestro modelo  que extiende TgcExample, e inicia el
+    ///     render loop.
     /// </summary>
     public partial class GameForm : System.Windows.Forms.Form
     {
         /// <summary>
-        /// Ejemplo del juego a correr
-        /// </summary>
-        private TgcExample Modelo { get; set; }
-
-        /// <summary>
-        /// Obtener o parar el estado del RenderLoop.
-        /// </summary>
-        private bool ApplicationRunning { get; set; }
-
-        /// <summary>
-        /// Permite manejar el sonido.
-        /// </summary>
-        private TgcDirectSound DirectSound { get; set; }
-
-        /// <summary>
-        /// Permite manejar los inputs de la computadora.
-        /// </summary>
-        private TgcD3dInput Input { get; set; }
-
-        /// <summary>
-        /// Constructor de la ventana.
+        ///     Constructor de la ventana.
         /// </summary>
         public GameForm()
         {
             InitializeComponent();
         }
+
+        /// <summary>
+        ///     Ejemplo del juego a correr
+        /// </summary>
+        private TgcExample Modelo { get; set; }
+
+        /// <summary>
+        ///     Obtener o parar el estado del RenderLoop.
+        /// </summary>
+        private bool ApplicationRunning { get; set; }
+
+        /// <summary>
+        ///     Permite manejar el sonido.
+        /// </summary>
+        private TgcDirectSound DirectSound { get; set; }
+
+        /// <summary>
+        ///     Permite manejar los inputs de la computadora.
+        /// </summary>
+        private TgcD3dInput Input { get; set; }
 
         private void GameForm_Load(object sender, EventArgs e)
         {
@@ -69,11 +69,11 @@ namespace TGC.Group.Form
         }
 
         /// <summary>
-        /// Inicio todos los objetos necesarios para cargar el ejemplo y directx.
+        ///     Inicio todos los objetos necesarios para cargar el ejemplo y directx.
         /// </summary>
         public void InitGraphics()
         {
-            //Se inicio la aplicacion
+            //Se inicio la aplicación
             ApplicationRunning = true;
 
             //Inicio Device
@@ -87,21 +87,22 @@ namespace TGC.Group.Form
             DirectSound = new TgcDirectSound();
             DirectSound.InitializeD3DDevice(panel3D);
 
-            //Directorio actual de ejecucion
+            //Directorio actual de ejecución
             var currentDirectory = Environment.CurrentDirectory + "\\";
 
             //Cargar shaders del framework
             TgcShaders.Instance.loadCommonShaders(currentDirectory + Game.Default.ShadersDirectory);
 
-            //Juego a ejecutar, si quicieramos tener diferentes modelos aqui podemos cambiar la instancia e invocar a otra clase.
-            Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory, currentDirectory + Game.Default.ShadersDirectory);
+            //Juego a ejecutar, si quisiéramos tener diferentes modelos aquí podemos cambiar la instancia e invocar a otra clase.
+            Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory,
+                currentDirectory + Game.Default.ShadersDirectory);
 
             //Cargar juego.
             ExecuteModel();
         }
 
         /// <summary>
-        /// Comienzo el loop del juego.
+        ///     Comienzo el loop del juego.
         /// </summary>
         public void InitRenderLoop()
         {
