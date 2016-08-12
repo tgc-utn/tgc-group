@@ -11,6 +11,10 @@ using TGC.Group.Model;
 
 namespace TGC.Group.Form
 {
+    /// <summary>
+    ///     GameForm es el formularo de entrada, el mismo invocara a nuestro modelo 
+    ///     que extiende TgcExample, e inicia el render loop.
+    /// </summary>
     public partial class GameForm : System.Windows.Forms.Form
     {
         /// <summary>
@@ -24,17 +28,17 @@ namespace TGC.Group.Form
         private bool ApplicationRunning { get; set; }
 
         /// <summary>
-        /// Permite manejar el sonido
+        /// Permite manejar el sonido.
         /// </summary>
         private TgcDirectSound DirectSound { get; set; }
 
         /// <summary>
-        /// Permite manejar los inputs de la computadora
+        /// Permite manejar los inputs de la computadora.
         /// </summary>
         private TgcD3dInput Input { get; set; }
 
         /// <summary>
-        /// Constructor de la ventana
+        /// Constructor de la ventana.
         /// </summary>
         public GameForm()
         {
@@ -43,16 +47,16 @@ namespace TGC.Group.Form
 
         private void GameForm_Load(object sender, EventArgs e)
         {
-            //Iniciar graficos
+            //Iniciar graficos.
             InitGraphics();
 
-            //Titulo de la ventana principal
+            //Titulo de la ventana principal.
             Text = Modelo.Name + " - " + Modelo.Description;
 
-            //Focus panel3D
+            //Focus panel3D.
             panel3D.Focus();
 
-            //Inicio el ciclo de Render
+            //Inicio el ciclo de Render.
             InitRenderLoop();
         }
 
@@ -65,7 +69,7 @@ namespace TGC.Group.Form
         }
 
         /// <summary>
-        /// Inicio todos los objetos necesarios para cargar el ejemplo y directx
+        /// Inicio todos los objetos necesarios para cargar el ejemplo y directx.
         /// </summary>
         public void InitGraphics()
         {
@@ -89,24 +93,24 @@ namespace TGC.Group.Form
             //Cargar shaders del framework
             TgcShaders.Instance.loadCommonShaders(currentDirectory + Game.Default.ShadersDirectory);
 
-            //Juego a ejecutar
+            //Juego a ejecutar, si quicieramos tener diferentes modelos aqui podemos cambiar la instancia e invocar a otra clase.
             Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory, currentDirectory + Game.Default.ShadersDirectory);
 
-            //Cargar juego
+            //Cargar juego.
             ExecuteModel();
         }
 
         /// <summary>
-        /// Comienzo el loop del juego
+        /// Comienzo el loop del juego.
         /// </summary>
         public void InitRenderLoop()
         {
             while (ApplicationRunning)
             {
-                //Renderizo si es que hay un ejemplo activo
+                //Renderizo si es que hay un ejemplo activo.
                 if (Modelo != null)
                 {
-                    //Solo renderizamos si la aplicacion tiene foco, para no consumir recursos innecesarios
+                    //Solo renderizamos si la aplicacion tiene foco, para no consumir recursos innecesarios.
                     if (ApplicationActive())
                     {
                         Modelo.Update();
@@ -114,11 +118,11 @@ namespace TGC.Group.Form
                     }
                     else
                     {
-                        //Si no tenemos el foco, dormir cada tanto para no consumir gran cantidad de CPU
+                        //Si no tenemos el foco, dormir cada tanto para no consumir gran cantidad de CPU.
                         Thread.Sleep(100);
                     }
                 }
-                // Process application messages
+                // Process application messages.
                 Application.DoEvents();
             }
         }
@@ -185,10 +189,7 @@ namespace TGC.Group.Form
         {
             ApplicationRunning = false;
 
-            if (Modelo != null)
-            {
-                StopCurrentExample();
-            }
+            StopCurrentExample();
 
             //Liberar Device al finalizar la aplicacion
             D3DDevice.Instance.Dispose();
