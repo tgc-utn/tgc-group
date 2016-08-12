@@ -45,14 +45,6 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
-			//Posicion de la camara.
-			Vector3 cameraPosition = new Vector3(0, 0, 75);
-			//Quiero que la camara mire hacia el origen (0,0,0).
-			Vector3 lookAt = Vector3.Empty;
-
-			//Configuro donde esta la posicion de la camara y hacia donde mira.
-			Camara.setCamera(cameraPosition, lookAt);
-
 			//Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
 
@@ -63,12 +55,24 @@ namespace TGC.Group.Model
             var center = new Vector3(0, 0, 0);
             var size = new Vector3(5, 10, 5);
             Box = TgcBox.fromSize(center, size, texture);
-			Box.Transform = Matrix.Translation(-25, 0, 0);
+			//Posicion donde quiero que este la caja.
+			Vector3 position = new Vector3(-25, 0, 75);
+			//Translado la caja a otra posicion graficamente.
+			Box.Transform = Matrix.Translation(position);
+			//Si bien con transformaciones muevo el objeto en forma grafica tengo que actualizar la posicion logica del mismo.
+			Box.Position = position;
 
             //Cargo el unico mesh que tiene la escena.
             Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
             //Escalo el mesh que es muy grande.
 			Mesh.Transform = Matrix.Scaling(0.5f, 0.5f, 0.5f);
+
+			//Posicion de la camara.
+			Vector3 cameraPosition = new Vector3(0, 0, 125);
+			//Quiero que la camara mire hacia el origen (0,0,0).
+			Vector3 lookAt = Vector3.Empty;
+			//Configuro donde esta la posicion de la camara y hacia donde mira.
+			Camara.SetCamera(cameraPosition, lookAt);
         }
 
         /// <summary>

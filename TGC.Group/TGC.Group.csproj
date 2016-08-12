@@ -84,10 +84,10 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="TGC.Core">
-      <HintPath>..\packages\TGC.Core.1.0.1\lib\TGC.Core.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.VisualC" />
+    <Reference Include="TGC.Core">
+      <HintPath>..\packages\TGC.Core.2.2.2\lib\TGC.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Form\GameForm.cs">
