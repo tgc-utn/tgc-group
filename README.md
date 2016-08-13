@@ -19,9 +19,11 @@ Proyecto para realizar el trabajo práctico cuatrimestral de [Técnicas de Gráf
     * [DirectX 9 SDK](http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&id=6812)
 * IDEs compatibles
     * [Visual Studio Community Edition](https://www.visualstudio.com/es-ar/products/visual-studio-community-vs)
-    * [MonoDevelop](http://www.monodevelop.com) (instalar despúes de las siguientes dependencias)
-        1. [Microsoft .NET Framework 4.5.2 Developer Pack](https://www.microsoft.com/es-ar/download/details.aspx?id=42637) (instalar primero)
-        2. [GTK# for .NET](http://download.xamarin.com/GTKforWindows/Windows/gtk-sharp-2.12.30.msi) (instalar segundo)
-        3. [Microsoft Build Tools 2015](https://www.microsoft.com/es-ar/download/details.aspx?id=48159) (instalar para poder generar la solución de tgc-group)
+    * [Xamarin Studio](https://www.xamarin.com/studio) (Instalar las siguientes dependencias en orden)
+        1. [Microsoft .NET Framework 4.5.2 Developer Pack](https://www.microsoft.com/es-ar/download/details.aspx?id=42637)
+        2. [GTK# for .NET](http://www.mono-project.com/download/#download-win)
+        3. [Microsoft Build Tools 2013](https://www.microsoft.com/es-ar/download/details.aspx?id=40760)
+        4. [Microsoft Build Tools 2015](https://www.microsoft.com/es-ar/download/details.aspx?id=48159)
+        5. [Xamarin Studio](https://releases.xamarin.com/) (Al final de la página están los Products Released)
 * Dependencia NuGet
     * [TGC.Core](https://www.nuget.org/packages/TGC.Core/) (se baja automáticamente al hacer build por primera vez)
