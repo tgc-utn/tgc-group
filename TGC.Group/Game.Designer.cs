@@ -94,5 +94,29 @@ namespace TGC.Group {
                 this["TexturaCaja"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("TerrainTexture.jpg")]
+        public string TerrainTexture {
+            get {
+                return ((string)(this["TerrainTexture"]));
+            }
+            set {
+                this["TerrainTexture"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Heightmap.jpg")]
+        public string Heighmap {
+            get {
+                return ((string)(this["Heighmap"]));
+            }
+            set {
+                this["Heighmap"] = value;
+            }
+        }
     }
 }
