@@ -1,4 +1,4 @@
-using Microsoft.DirectX;
+/*using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
 using System.Drawing;
@@ -111,7 +111,7 @@ namespace TGC.Group.Model
             Camara.SetCamera(cameraPosition, lookAt);
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
-            */
+            
         }
 
         private void createHeightMapMesh(Microsoft.DirectX.Direct3D.Device d3dDevice)
@@ -295,4 +295,4 @@ namespace TGC.Group.Model
             //Mesh.dispose();
         }
     }
-}
+}*/

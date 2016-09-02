@@ -5,12 +5,6 @@
     <Setting Name="Category" Type="System.String" Scope="User">
       <Value Profile="(Default)">Alumnos</Value>
     </Setting>
-    <Setting Name="Name" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Grupo 99</Value>
-    </Setting>
-    <Setting Name="Description" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Mi idea - Descripción de la idea</Value>
-    </Setting>
     <Setting Name="ShadersDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)">..\..\Shaders\</Value>
     </Setting>
@@ -25,6 +19,12 @@
     </Setting>
     <Setting Name="Heighmap" Type="System.String" Scope="User">
       <Value Profile="(Default)">Heightmap.jpg</Value>
+    </Setting>
+    <Setting Name="Name" Type="System.String" Scope="User">
+      <Value Profile="(Default)">GoogleGroup</Value>
+    </Setting>
+    <Setting Name="Description" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Survival Craft</Value>
     </Setting>
   </Settings>
 </SettingsFile>
