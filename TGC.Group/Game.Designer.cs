@@ -73,7 +73,7 @@ namespace TGC.Group {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\Media\\")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Media/")]
         public string MediaDirectory {
             get {
                 return ((string)(this["MediaDirectory"]));
