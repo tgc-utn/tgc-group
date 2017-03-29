@@ -9,9 +9,8 @@ using TGC.Core.Textures;
 
 namespace TGC.Group.Model.Entities
 {
-    public class Player : Entity
+    public class Player : EntityEntity
     {
-        public Player(TgcMesh mesh) : base(mesh) {}
 
         public override void update()
         {
