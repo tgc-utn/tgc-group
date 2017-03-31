@@ -73,6 +73,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camara\TgcFpsCamera.cs" />
+    <Compile Include="Camara\TgcRotationalCamera.cs" />
+    <Compile Include="Camara\TgcSpringThirdPersonCamera.cs" />
+    <Compile Include="Camara\TgcThirdPersonCamera.cs" />
     <Compile Include="Form\GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -153,6 +157,13 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Media\Twisted_Chano\cajaMadera4.jpg" />
+    <Content Include="Media\Twisted_Chano\MAPA-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Textures\block10d.jpg" />
+    <Content Include="Media\Twisted_Chano\Textures\Grass.JPG" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

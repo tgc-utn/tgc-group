@@ -8,6 +8,7 @@ using TGC.Core.Input;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.Utils;
+using TGC.Camara;
 
 namespace TGC.Group.Model
 {
@@ -68,21 +69,25 @@ namespace TGC.Group.Model
             Box.Position = new Vector3(-25, 0, 0);
 
             //Cargo el unico mesh que tiene la escena.
-            Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
+            Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "MAPA-TgcScene.xml").Meshes[0];
+
             //Defino una escala en el modelo logico del mesh que es muy grande.
-            Mesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            //Mesh.Scale = new Vector3(0.5f, 0.5f, -10);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
             //El framework maneja una cámara estática, pero debe ser inicializada.
             //Posición de la camara.
-            var cameraPosition = new Vector3(0, 0, 125);
+            //var cameraPosition = new Vector3(0, 0, 125);
             //Quiero que la camara mire hacia el origen (0,0,0).
-            var lookAt = Vector3.Empty;
+            //var lookAt = Vector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
-            Camara.SetCamera(cameraPosition, lookAt);
+            //Camara.SetCamera(cameraPosition, lookAt);
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
+            Camara = new TgcRotationalCamera(Mesh.BoundingBox.calculateBoxCenter(),
+                Mesh.BoundingBox.calculateBoxRadius() * 2, Input);
+
         }
 
         /// <summary>
