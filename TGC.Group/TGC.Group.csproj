@@ -87,6 +87,7 @@
     <Compile Include="Model\Cameras\FirstPersonCamera.cs" />
     <Compile Include="Model\Cameras\ThirdPersonCamera.cs" />
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Model\Shooter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
