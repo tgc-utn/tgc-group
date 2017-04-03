@@ -37,7 +37,7 @@ namespace TGC.Group {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Twisted Chano")]
+        [global::System.Configuration.DefaultSettingValueAttribute("TWISTED CHANO")]
         public string Name {
             get {
                 return ((string)(this["Name"]));
@@ -49,7 +49,7 @@ namespace TGC.Group {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Juego de autos chocadores")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Juego estilo Twisted Metal")]
         public string Description {
             get {
                 return ((string)(this["Description"]));
@@ -73,7 +73,7 @@ namespace TGC.Group {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\Media\\")]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\Media\\Twisted_Chano\\")]
         public string MediaDirectory {
             get {
                 return ((string)(this["MediaDirectory"]));

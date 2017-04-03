@@ -8,6 +8,9 @@ using TGC.Core.Input;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.Utils;
+using TGC.Camara;
+using TGC.Core.Collision;
+using System.Collections.Generic;
 
 namespace TGC.Group.Model
 {
@@ -31,14 +34,76 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        //Caja que se muestra en el ejemplo.
-        private TgcBox Box { get; set; }
+        //Velocidad de movimiento del auto
+        private const float MOVEMENT_SPEED = 200f;
 
-        //Mesh de TgcLogo.
+        //Cantidad de filas
+        private const int ROWS = 5;
+
+        //Cantidad de columnas
+        private const int COLUMNS= 5;
+
+        //Tamaño cuadrante
+        private const int CUADRANTE_SIZE = 400;
+
+        //Scene principal
+        private TgcScene ScenePpal;
+
+        //Mesh del auto
         private TgcMesh Mesh { get; set; }
 
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
+
+        //Camara en tercera persona
+        private TgcThirdPersonCamera CamaraInterna;
+
+        //Tipo de cámara
+        private int TipoCamara = 0;
+
+        //Lista de palmeras
+        private List<TgcMesh> MeshPalmeras;
+        private TgcMesh PalmeraOriginal;
+
+        //Lista de pinos
+        private List<TgcMesh> MeshPinos;
+        private TgcMesh PinoOriginal;
+
+        //Lista de rocas
+        private List<TgcMesh> MeshRocas;
+        private TgcMesh RocaOriginal;
+
+        //Lista de rocas
+        private List<TgcMesh> MeshArbolesBananas;
+        private TgcMesh ArbolBananasOriginal;
+
+        //Lista de barriles de polvora
+        private List<TgcMesh> MeshBarrilesPolvora;
+        private TgcMesh BarrilPolvoraOriginal;
+
+        //Lista de carretillas
+        private List<TgcMesh> MeshCarretillas;
+        private TgcMesh CarretillaOriginal;
+
+        //Lista de contenedores
+        private List<TgcMesh> MeshContenedores;
+        private TgcMesh ContenedorOriginal;
+
+        //Lista de fuentes de agua
+        private List<TgcMesh> MeshFuentesAgua;
+        private TgcMesh FuenteAguaOriginal;
+
+        //Lista de lockers
+        private List<TgcMesh> MeshLockers;
+        private TgcMesh LockerOriginal;
+
+        //Lista de expendedores bebidas
+        private List<TgcMesh> MeshExpendedoresBebidas;
+        private TgcMesh ExpendedorBebidaOriginal;
+
+        //Lista de cajas de municiones
+        private List<TgcMesh> MeshCajasMuniciones;
+        private TgcMesh CajaMunicionesOriginal;
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -50,39 +115,131 @@ namespace TGC.Group.Model
         {
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
+            var loader = new TgcSceneLoader();
+            int[,] MatrizPoblacion;
 
-            //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
-            //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
-            var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
+            //Cargo el terreno
+            ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA-TgcScene.xml");
 
-            //Cargamos una textura, tener en cuenta que cargar una textura significa crear una copia en memoria.
-            //Es importante cargar texturas en Init, si se hace en el render loop podemos tener grandes problemas si instanciamos muchas.
-            var texture = TgcTexture.createTexture(pathTexturaCaja);
+            //Cargo el auto
+            var SceneAuto = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto\\Auto-TgcScene.xml");
 
-            //Creamos una caja 3D ubicada de dimensiones (5, 10, 5) y la textura como color.
-            var size = new Vector3(5, 10, 5);
-            //Construimos una caja según los parámetros, por defecto la misma se crea con centro en el origen y se recomienda así para facilitar las transformaciones.
-            Box = TgcBox.fromSize(size, texture);
-            //Posición donde quiero que este la caja, es común que se utilicen estructuras internas para las transformaciones.
-            //Entonces actualizamos la posición lógica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
-            Box.Position = new Vector3(-25, 0, 0);
+            //Movemos el mesh un poco para arriba. Porque sino choca con el piso todo el tiempo y no se puede mover.
+            Mesh = SceneAuto.Meshes[0];
+            Mesh.AutoTransformEnable = true;
+            Mesh.move(0, 0.05f, 0);
 
-            //Cargo el unico mesh que tiene la escena.
-            Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
-            //Defino una escala en el modelo logico del mesh que es muy grande.
-            Mesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            //Camara por defecto
+            CamaraInterna = new TgcThirdPersonCamera (Mesh.Position, 300, 400);
+            Camara = CamaraInterna;
 
-            //Suelen utilizarse objetos que manejan el comportamiento de la camara.
-            //Lo que en realidad necesitamos gráficamente es una matriz de View.
-            //El framework maneja una cámara estática, pero debe ser inicializada.
-            //Posición de la camara.
-            var cameraPosition = new Vector3(0, 0, 125);
-            //Quiero que la camara mire hacia el origen (0,0,0).
-            var lookAt = Vector3.Empty;
-            //Configuro donde esta la posicion de la camara y hacia donde mira.
-            Camara.SetCamera(cameraPosition, lookAt);
-            //Internamente el framework construye la matriz de view con estos dos vectores.
-            //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
+            //Creo palmeras
+            MatrizPoblacion = RandomMatrix();
+            PalmeraOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Palmera\\Palmera-TgcScene.xml").Meshes[0];
+            MeshPalmeras = CrearInstancias(PalmeraOriginal, 0.75f, 0, 2, MatrizPoblacion);
+
+            //Creo pinos
+            MatrizPoblacion = RandomMatrix();
+            PinoOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Pino\\Pino-TgcScene.xml").Meshes[0];
+            MeshPinos = CrearInstancias(PinoOriginal, 0.90f, 0, 1, MatrizPoblacion);
+
+            //Creo rocas
+            MatrizPoblacion = RandomMatrix();
+            RocaOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Roca\\Roca-TgcScene.xml").Meshes[0];
+            MeshRocas = CrearInstancias(RocaOriginal, 0.75f, 0, 1, MatrizPoblacion);
+
+            //Creo arboles bananas
+            MatrizPoblacion = RandomMatrix();
+            ArbolBananasOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\ArbolBananas\\ArbolBananas-TgcScene.xml").Meshes[0];
+            MeshArbolesBananas = CrearInstancias(ArbolBananasOriginal, 1.50f, 0, 2, MatrizPoblacion);
+
+            //Creo barriles de polvora
+            MatrizPoblacion = RandomMatrix();
+            BarrilPolvoraOriginal = loader.loadSceneFromFile(MediaDir + "Objetos\\BarrilPolvora\\BarrilPolvora-TgcScene.xml").Meshes[0];
+            MeshBarrilesPolvora = CrearInstancias(BarrilPolvoraOriginal, 0.75f, 0, 1, MatrizPoblacion);
+
+            //Creo carretillas
+            MatrizPoblacion = RandomMatrix();
+            CarretillaOriginal = loader.loadSceneFromFile(MediaDir + "Objetos\\Carretilla\\Carretilla-TgcScene.xml").Meshes[0];
+            MeshCarretillas = CrearInstancias(CarretillaOriginal, 0.20f, 0, 1, MatrizPoblacion);
+
+            //Creo contenedores
+            MatrizPoblacion = RandomMatrix();
+            ContenedorOriginal = loader.loadSceneFromFile(MediaDir + "Objetos\\Contenedor\\Contenedor-TgcScene.xml").Meshes[0];
+            MeshContenedores = CrearInstancias(ContenedorOriginal, 1.5f, 0, 1, MatrizPoblacion);
+
+            //Creo fuentes de agua
+            MatrizPoblacion = RandomMatrix();
+            FuenteAguaOriginal = loader.loadSceneFromFile(MediaDir + "Objetos\\FuenteAgua\\FuenteAgua-TgcScene.xml").Meshes[0];
+            MeshFuentesAgua = CrearInstancias(FuenteAguaOriginal, 1, 25, 1, MatrizPoblacion);
+
+            //Creo lockers
+            MatrizPoblacion = RandomMatrix();
+            LockerOriginal = loader.loadSceneFromFile(MediaDir + "Muebles\\LockerMetal\\LockerMetal-TgcScene.xml").Meshes[0];
+            MeshLockers = CrearInstancias(LockerOriginal, 1, 0, 1, MatrizPoblacion);
+
+            //Creo expendedores bebidas
+            MatrizPoblacion = RandomMatrix();
+            ExpendedorBebidaOriginal = loader.loadSceneFromFile(MediaDir + "Muebles\\ExpendedorDeBebidas\\ExpendedorDeBebidas-TgcScene.xml").Meshes[0];
+            MeshExpendedoresBebidas = CrearInstancias(ExpendedorBebidaOriginal, 0.50f, 0, 1, MatrizPoblacion);
+
+            //Creo cajas de municiones
+            MatrizPoblacion = RandomMatrix();
+            CajaMunicionesOriginal = loader.loadSceneFromFile(MediaDir + "Armas\\CajaMuniciones\\CajaMuniciones-TgcScene.xml").Meshes[0];
+            MeshCajasMuniciones = CrearInstancias(CajaMunicionesOriginal, 1, 0, 1, MatrizPoblacion);
+
+        }
+
+        private int[,] RandomMatrix()
+        {
+            int[,] MatrizPoblacion = new int[ROWS, COLUMNS];
+            System.Random randomNumber = new System.Random();
+
+            for (int i = 0; i < ROWS; i++)
+            {
+                for (int j = 0; j < COLUMNS; j++)
+                {
+                    MatrizPoblacion [i, j] = randomNumber.Next(0, 2);
+                }
+            }
+
+            return MatrizPoblacion;
+        }
+
+        //Crea instancias de un objeto
+        private List<TgcMesh> CrearInstancias(TgcMesh unObjeto, float scale, float ejeZ, int cantidadObjetos, int[,] MatrizPoblacion)
+        {
+            List<TgcMesh> ListaMesh = new List<TgcMesh>();
+            System.Random randomNumber = new System.Random ();
+
+            for (int i = 0; i < ROWS; i++)
+            {
+                for (int j = 0; j < COLUMNS; j++)
+                {
+                    if (MatrizPoblacion[i, j] == 1)
+                    {
+                        for (int z = 0; z < cantidadObjetos; z++)
+                        {
+                            //Crear instancia de modelo
+                            var instance = unObjeto.createMeshInstance(unObjeto.Name + i + "_" + j);
+
+                            instance.AutoTransformEnable = false;
+
+
+                            instance.Transform = Matrix.Scaling(new Vector3(scale, scale, scale)) *
+                                                                        Matrix.Translation(new Vector3(1000, ejeZ, -1000));
+
+                            instance.Transform = instance.Transform * Matrix.Translation(
+                                                                        new Vector3((-1) * randomNumber.Next (j * CUADRANTE_SIZE, (j + 1) * CUADRANTE_SIZE), 0,
+                                                                                    randomNumber.Next(i * CUADRANTE_SIZE, (i + 1) * CUADRANTE_SIZE)));
+
+                            ListaMesh.Add(instance);
+                        }
+                    }
+                }
+            }
+
+            return ListaMesh;
         }
 
         /// <summary>
@@ -100,6 +257,29 @@ namespace TGC.Group.Model
                 BoundingBox = !BoundingBox;
             }
 
+            //Capturar Input teclado
+            if (Input.keyPressed(Key.F1))
+            {
+                TipoCamara++;
+
+                if (TipoCamara >= 2)
+                    TipoCamara = 0;
+
+                switch (TipoCamara)
+                {
+                    case 0:
+                        {
+                            CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 200, 300);
+                            Camara = CamaraInterna;
+                        } break;
+
+                    case 1:
+                        {
+                            Camara = new TgcRotationalCamera(Mesh.BoundingBox.calculateBoxCenter(), Mesh.BoundingBox.calculateBoxRadius() * 2, Input);
+                        } break;
+                }
+            }
+
             //Capturar Input Mouse
             if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
             {
@@ -114,6 +294,68 @@ namespace TGC.Group.Model
                     Camara.SetCamera(new Vector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
                 }
             }
+
+            //Declaramos un vector de movimiento inicializado en cero.
+            //El movimiento sobre el suelo es sobre el plano XZ.
+            //Sobre XZ nos movemos con las flechas del teclado o con las letas WASD.
+            var movement = new Vector3(0, 0, 0);
+
+            //Movernos de izquierda a derecha, sobre el eje X.
+            if (Input.keyDown(Key.Left) || Input.keyDown(Key.A))
+            {
+                movement.X = 1;
+            }
+            else if (Input.keyDown(Key.Right) || Input.keyDown(Key.D))
+            {
+                movement.X = -1;
+            }
+
+            //Movernos adelante y atras, sobre el eje Z.
+            if (Input.keyDown(Key.Up) || Input.keyDown(Key.W))
+            {
+                movement.Z = -1;
+            }
+            else if (Input.keyDown(Key.Down) || Input.keyDown(Key.S))
+            {
+                movement.Z = 1;
+            }
+
+            //Guardar posicion original antes de cambiarla
+            var originalPos = Mesh.Position;
+
+            //Multiplicar movimiento por velocidad y elapsedTime
+            movement *= MOVEMENT_SPEED * ElapsedTime;
+            Mesh.move(movement);
+
+            //El framework posee la clase TgcCollisionUtils con muchos algoritmos de colisión de distintos tipos de objetos.
+            //Por ejemplo chequear si dos cajas colisionan entre sí, o dos esferas, o esfera con caja, etc.
+            var collisionFound = false;
+
+            foreach (var mesh in ScenePpal.Meshes)
+            {
+                //Los dos BoundingBox que vamos a testear
+                var mainMeshBoundingBox = Mesh.BoundingBox;
+                var sceneMeshBoundingBox = mesh.BoundingBox;
+
+                //Ejecutar algoritmo de detección de colisiones
+                var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
+
+                //Hubo colisión con un objeto. Guardar resultado y abortar loop.
+                if (collisionResult != TgcCollisionUtils.BoxBoxResult.Encerrando)
+                {
+                    collisionFound = true;
+                    break;
+                }
+            }
+
+            //Si hubo alguna colisión, entonces restaurar la posición original del mesh
+            if (collisionFound)
+            {
+                Mesh.Position = originalPos;
+            }
+
+            //Hacer que la camara en 3ra persona se ajuste a la nueva posicion del objeto
+            CamaraInterna.Target = Mesh.Position;
         }
 
         /// <summary>
@@ -128,30 +370,102 @@ namespace TGC.Group.Model
 
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
-            DrawText.drawText(
-                "Con clic izquierdo subimos la camara [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30,
-                Color.OrangeRed);
+            DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.OrangeRed);
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
-            Box.Transform = Matrix.Scaling(Box.Scale) *
+            /*Box.Transform = Matrix.Scaling(Box.Scale) *
                             Matrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) *
                             Matrix.Translation(Box.Position);
             //A modo ejemplo realizamos toda las multiplicaciones, pero aquí solo nos hacia falta la traslación.
             //Finalmente invocamos al render de la caja
             Box.render();
-
+            */
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
             Mesh.UpdateMeshTransform();
+            
             //Render del mesh
             Mesh.render();
+
+            //Dibujamos la escena
+            ScenePpal.renderAll();
 
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (BoundingBox)
             {
-                Box.BoundingBox.render();
                 Mesh.BoundingBox.render();
+            }
+
+            foreach (var mesh in ScenePpal.Meshes)
+            {
+                mesh.BoundingBox.render();
+            }
+
+            //Renderizar palmeras
+            foreach (var mesh in MeshPalmeras)
+            {
+                mesh.render();
+            }
+
+            //Renderizar rocas
+            foreach (var mesh in MeshPinos)
+            {
+                mesh.render();
+            }
+
+            //Renderizar pinos
+            foreach (var mesh in MeshRocas)
+            {
+                mesh.render();
+            }
+
+            //Renderizar pinos
+            foreach (var mesh in MeshArbolesBananas)
+            {
+                mesh.render();
+            }
+
+            //Renderizar barriles de polvora
+            foreach (var mesh in MeshBarrilesPolvora)
+            {
+                mesh.render();
+            }
+
+            //Renderizar Carretillas
+            foreach (var mesh in MeshCarretillas)
+            {
+                mesh.render();
+            }
+
+            //Renderizar Contenedores
+            foreach (var mesh in MeshContenedores)
+            {
+                mesh.render();
+            }
+
+            //Renderizar Fuentes de Agua
+            foreach (var mesh in MeshFuentesAgua)
+            {
+                mesh.render();
+            }
+
+            //Renderizar Lockers
+            foreach (var mesh in MeshLockers)
+            {
+                mesh.render();
+            }
+
+            //Renderizar Expendedores Bebidas
+            foreach (var mesh in MeshExpendedoresBebidas)
+            {
+                mesh.render();
+            }
+
+            //Renderizar Cajas Municiones
+            foreach (var mesh in MeshCajasMuniciones)
+            {
+                mesh.render();
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
@@ -165,10 +479,19 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Dispose()
         {
-            //Dispose de la caja.
-            Box.dispose();
-            //Dispose del mesh.
-            Mesh.dispose();
+            PalmeraOriginal.dispose();
+            PinoOriginal.dispose();
+            RocaOriginal.dispose();
+            ArbolBananasOriginal.dispose();
+            BarrilPolvoraOriginal.dispose();
+            CarretillaOriginal.dispose();
+            ContenedorOriginal.dispose();
+            FuenteAguaOriginal.dispose();
+            LockerOriginal.dispose();
+            ExpendedorBebidaOriginal.dispose();
+            CajaMunicionesOriginal.dispose();
+            ScenePpal.disposeAll();
+            Mesh.dispose();            
         }
     }
 }
