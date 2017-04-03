@@ -255,7 +255,7 @@ namespace TGC.Group.Model
 
             cambiarDeCamara();
 
-            //moverCamaraConMouse();
+            moverCamaraConMouse();
 
             //Declaramos un vector de movimiento inicializado en cero.
             //El movimiento sobre el suelo es sobre el plano XZ.
