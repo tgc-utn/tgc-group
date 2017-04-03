@@ -160,10 +160,40 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="Media\Twisted_Chano\Armas\CajaMuniciones\CajaMuniciones-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Armas\CajaMuniciones\Textures\ammobox.bmp" />
     <Content Include="Media\Twisted_Chano\cajaMadera4.jpg" />
     <Content Include="Media\Twisted_Chano\MAPA-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Muebles\ExpendedorDeBebidas\ExpendedorDeBebidas-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Muebles\ExpendedorDeBebidas\Textures\sodamachine.jpg" />
+    <Content Include="Media\Twisted_Chano\Muebles\LockerMetal\LockerMetal-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Muebles\LockerMetal\Textures\kast.jpg" />
+    <Content Include="Media\Twisted_Chano\Objetos\BarrilPolvora\BarrilPolvora-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Objetos\BarrilPolvora\Textures\gunpowder.bmp" />
+    <Content Include="Media\Twisted_Chano\Objetos\Carretilla\Carretilla-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Objetos\Carretilla\Textures\wagon.bmp" />
+    <Content Include="Media\Twisted_Chano\Objetos\Contenedor\Contenedor-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Objetos\Contenedor\Textures\dumbster.jpg" />
+    <Content Include="Media\Twisted_Chano\Objetos\FuenteAgua\FuenteAgua-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Objetos\FuenteAgua\Textures\fountan1.jpg" />
     <Content Include="Media\Twisted_Chano\Textures\block10d.jpg" />
     <Content Include="Media\Twisted_Chano\Textures\Grass.JPG" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\ArbolBananas\ArbolBananas-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\ArbolBananas\Textures\banana.jpg" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\ArbolSelvatico\ArbolSelvatico-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\ArbolSelvatico\Textures\Hojas_selva.png" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\ArbolSelvatico\Textures\lianas.png" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\ArbolSelvatico\Textures\WoodTexture.jpg" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Palmera\Palmera-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Palmera\Textures\hojaPalmera.jpg" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Palmera\Textures\Palmera_Textura.jpg" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Palmera\Textures\troncoPalmera.jpg" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Pino\Pino-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Pino\Textures\spar.png" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Roca\Roca-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Roca\Textures\Piedra3.jpg" />
+    <Content Include="Media\Twisted_Chano\Vehiculos\Auto\Auto-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Vehiculos\Auto\Textures\car.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
