@@ -25,7 +25,7 @@ namespace TGC.Group {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Alumnos")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Twisted Metal")]
         public string Category {
             get {
                 return ((string)(this["Category"]));

@@ -3,13 +3,20 @@
   <Profiles />
   <Settings>
     <Setting Name="Category" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Alumnos</Value>
+      <Value Profile="(Default)">Twisted Metal</Value>
     </Setting>
     <Setting Name="Name" Type="System.String" Scope="User">
+<<<<<<< HEAD
+      <Value Profile="(Default)">Twisted Chano</Value>
+    </Setting>
+    <Setting Name="Description" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Juego de autos chocadores</Value>
+=======
       <Value Profile="(Default)">TWISTED CHANO</Value>
     </Setting>
     <Setting Name="Description" Type="System.String" Scope="User">
       <Value Profile="(Default)">Juego estilo Twisted Metal</Value>
+>>>>>>> origin/Emma
     </Setting>
     <Setting Name="ShadersDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)">..\..\Shaders\</Value>

@@ -41,7 +41,7 @@ namespace TGC.Group.Model
         private const int ROWS = 5;
 
         //Cantidad de columnas
-        private const int COLUMNS= 5;
+        private const int COLUMNS = 5;
 
         //Tamaño cuadrante
         private const int CUADRANTE_SIZE = 400;
@@ -130,7 +130,7 @@ namespace TGC.Group.Model
             Mesh.move(0, 0.05f, 0);
 
             //Camara por defecto
-            CamaraInterna = new TgcThirdPersonCamera (Mesh.Position, 300, 400);
+            CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 400);
             Camara = CamaraInterna;
 
             //Creo palmeras
@@ -199,7 +199,7 @@ namespace TGC.Group.Model
             {
                 for (int j = 0; j < COLUMNS; j++)
                 {
-                    MatrizPoblacion [i, j] = randomNumber.Next(0, 2);
+                    MatrizPoblacion[i, j] = randomNumber.Next(0, 2);
                 }
             }
 
@@ -210,7 +210,7 @@ namespace TGC.Group.Model
         private List<TgcMesh> CrearInstancias(TgcMesh unObjeto, float scale, float ejeZ, int cantidadObjetos, int[,] MatrizPoblacion)
         {
             List<TgcMesh> ListaMesh = new List<TgcMesh>();
-            System.Random randomNumber = new System.Random ();
+            System.Random randomNumber = new System.Random();
 
             for (int i = 0; i < ROWS; i++)
             {
@@ -230,7 +230,7 @@ namespace TGC.Group.Model
                                                                         Matrix.Translation(new Vector3(1000, ejeZ, -1000));
 
                             instance.Transform = instance.Transform * Matrix.Translation(
-                                                                        new Vector3((-1) * randomNumber.Next (j * CUADRANTE_SIZE, (j + 1) * CUADRANTE_SIZE), 0,
+                                                                        new Vector3((-1) * randomNumber.Next(j * CUADRANTE_SIZE, (j + 1) * CUADRANTE_SIZE), 0,
                                                                                     randomNumber.Next(i * CUADRANTE_SIZE, (i + 1) * CUADRANTE_SIZE)));
 
                             ListaMesh.Add(instance);
@@ -251,49 +251,11 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
-            //Capturar Input teclado
-            if (Input.keyPressed(Key.F))
-            {
-                BoundingBox = !BoundingBox;
-            }
+            activarBoundingBox();
 
-            //Capturar Input teclado
-            if (Input.keyPressed(Key.F1))
-            {
-                TipoCamara++;
+            cambiarDeCamara();
 
-                if (TipoCamara >= 2)
-                    TipoCamara = 0;
-
-                switch (TipoCamara)
-                {
-                    case 0:
-                        {
-                            CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 200, 300);
-                            Camara = CamaraInterna;
-                        } break;
-
-                    case 1:
-                        {
-                            Camara = new TgcRotationalCamera(Mesh.BoundingBox.calculateBoxCenter(), Mesh.BoundingBox.calculateBoxRadius() * 2, Input);
-                        } break;
-                }
-            }
-
-            //Capturar Input Mouse
-            if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
-            {
-                //Como ejemplo podemos hacer un movimiento simple de la cámara.
-                //En este caso le sumamos un valor en Y
-                Camara.SetCamera(Camara.Position + new Vector3(0, 10f, 0), Camara.LookAt);
-                //Ver ejemplos de cámara para otras operaciones posibles.
-
-                //Si superamos cierto Y volvemos a la posición original.
-                if (Camara.Position.Y > 300f)
-                {
-                    Camara.SetCamera(new Vector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
-                }
-            }
+            moverCamaraConMouse();
 
             //Declaramos un vector de movimiento inicializado en cero.
             //El movimiento sobre el suelo es sobre el plano XZ.
@@ -384,7 +346,7 @@ namespace TGC.Group.Model
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
             Mesh.UpdateMeshTransform();
-            
+
             //Render del mesh
             Mesh.render();
 
@@ -491,7 +453,62 @@ namespace TGC.Group.Model
             ExpendedorBebidaOriginal.dispose();
             CajaMunicionesOriginal.dispose();
             ScenePpal.disposeAll();
-            Mesh.dispose();            
+            Mesh.dispose();
         }
+
+        public void activarBoundingBox()
+        {
+            //Capturar Input teclado
+            if (Input.keyPressed(Key.F))
+            {
+                //Activa o desactiva el Bounding Box
+                BoundingBox = !BoundingBox;
+            }
+        }
+
+        public void cambiarDeCamara()
+        {
+            if (Input.keyPressed(Key.F1))
+            {
+                TipoCamara++;
+
+                if (TipoCamara >= 2)
+                    TipoCamara = 0;
+
+                switch (TipoCamara)
+                {
+                    case 0:
+                        {
+                            CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 200, 300);
+                            Camara = CamaraInterna;
+                        }
+                        break;
+
+                    case 1:
+                        {
+                            Camara = new TgcRotationalCamera(Mesh.BoundingBox.calculateBoxCenter(), Mesh.BoundingBox.calculateBoxRadius() * 2, Input);
+                        }
+                        break;
+                }
+            }
+        }
+
+        public void moverCamaraConMouse()
+        {
+            //Capturar Input Mouse
+            if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
+            {
+                //En este caso le sumamos un valor en Y
+                Camara.SetCamera(Camara.Position + new Vector3(0, 10f, 0), Camara.LookAt);
+                //Ver ejemplos de cámara para otras operaciones posibles.
+
+                //Si superamos cierto Y volvemos a la posición original.
+                if (Camara.Position.Y > 300f)
+                {
+                    Camara.SetCamera(new Vector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
+                }
+            }
+        }
+        
     }
 }
