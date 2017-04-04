@@ -84,7 +84,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\Ciudad.cs" />
+    <Compile Include="Model\Ciudad2.cs" />
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Model\TgcFpsCamera.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
