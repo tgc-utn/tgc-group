@@ -1,4 +1,5 @@
-using Microsoft.DirectX;
+/*using Microsoft.DirectX;
+using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
 using System.Drawing;
 using TGC.Core.Direct3D;
@@ -8,6 +9,7 @@ using TGC.Core.Input;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.Utils;
+using TGC.Group.Camera;
 
 namespace TGC.Group.Model
 {
@@ -31,14 +33,22 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        //Caja que se muestra en el ejemplo.
-        private TgcBox Box { get; set; }
+        ////Caja que se muestra en el ejemplo.
+        //private TgcBox Box { get; set; }
 
-        //Mesh de TgcLogo.
-        private TgcMesh Mesh { get; set; }
+        ////Mesh de TgcLogo.
+        //private TgcMesh Mesh { get; set; }
 
-        //Boleano para ver si dibujamos el boundingbox
-        private bool BoundingBox { get; set; }
+        ////Boleano para ver si dibujamos el boundingbox
+        //private bool BoundingBox { get; set; }
+
+        private string terrainHeightMap;
+        private string terrainTexturePath;
+        private float scaleXZ;
+        private float scaleY;
+        private Texture terrainTexture;
+        private int totalVertices;
+        private VertexBuffer vbTerrain;
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -48,6 +58,24 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Init()
         {
+            //Device de DirectX para crear primitivas.
+            var d3dDevice = D3DDevice.Instance.Device;
+
+            //Heighmap del terreno
+            terrainHeightMap = MediaDir + Game.Default.Heighmap;
+            terrainTexturePath = MediaDir + Game.Default.TerrainTexture;
+            scaleXZ = 50f;
+            scaleY = 1.5f;
+
+            //Mesh del mapa
+            createHeightMapMesh(d3dDevice);
+
+            //Textura del terreno
+            loadTerrainTexture(d3dDevice);
+
+            Camara = new FpsCamera(new Vector3(3200f, 450f, 1500f), Input);
+
+            /*
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
@@ -83,6 +111,88 @@ namespace TGC.Group.Model
             Camara.SetCamera(cameraPosition, lookAt);
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
+            
+        }
+
+        private void createHeightMapMesh(Microsoft.DirectX.Direct3D.Device d3dDevice)
+        {
+            //parsear bitmap y cargar matriz de alturas
+            var mHeightMap = loadHeightMap();
+
+            //Crear vertexBuffer
+            totalVertices = 2 * 3 * (mHeightMap.GetLength(0) - 1) * (mHeightMap.GetLength(1) - 1);
+            vbTerrain = new VertexBuffer(typeof(CustomVertex.PositionTextured), totalVertices, d3dDevice,
+                Usage.Dynamic | Usage.WriteOnly, CustomVertex.PositionTextured.Format, Pool.Default);
+
+            //Crear array temporal de vértices
+            var dataIdx = 0;
+            var data = new CustomVertex.PositionTextured[totalVertices];
+
+            //Iterar sobre toda la matriz del Heightmap y crear los triangulos necesarios para el terreno
+            for (var i = 0; i < mHeightMap.GetLength(0) - 1; i++)
+            {
+                for (var j = 0; j < mHeightMap.GetLength(1) - 1; j++)
+                {
+                    //Crear los cuatro vertices que conforman este cuadrante, aplicando la escala correspondiente
+                    var v1 = new Vector3(i * scaleXZ, mHeightMap[i, j] * scaleY, j * scaleXZ);
+                    var v2 = new Vector3(i * scaleXZ, mHeightMap[i, j + 1] * scaleY, (j + 1) * scaleXZ);
+                    var v3 = new Vector3((i + 1) * scaleXZ, mHeightMap[i + 1, j] * scaleY, j * scaleXZ);
+                    var v4 = new Vector3((i + 1) * scaleXZ, mHeightMap[i + 1, j + 1] * scaleY, (j + 1) * scaleXZ);
+
+                    //Crear las coordenadas de textura para los cuatro vertices del cuadrante
+                    var t1 = new Vector2(i / (float)mHeightMap.GetLength(0), j / (float)mHeightMap.GetLength(1));
+                    var t2 = new Vector2(i / (float)mHeightMap.GetLength(0), (j + 1) / (float)mHeightMap.GetLength(1));
+                    var t3 = new Vector2((i + 1) / (float)mHeightMap.GetLength(0), j / (float)mHeightMap.GetLength(1));
+                    var t4 = new Vector2((i + 1) / (float)mHeightMap.GetLength(0), (j + 1) / (float)mHeightMap.GetLength(1));
+
+                    //Cargar triangulo 1
+                    data[dataIdx] = new CustomVertex.PositionTextured(v1, t1.X, t1.Y);
+                    data[dataIdx + 1] = new CustomVertex.PositionTextured(v2, t2.X, t2.Y);
+                    data[dataIdx + 2] = new CustomVertex.PositionTextured(v4, t4.X, t4.Y);
+
+                    //Cargar triangulo 2
+                    data[dataIdx + 3] = new CustomVertex.PositionTextured(v1, t1.X, t1.Y);
+                    data[dataIdx + 4] = new CustomVertex.PositionTextured(v4, t4.X, t4.Y);
+                    data[dataIdx + 5] = new CustomVertex.PositionTextured(v3, t3.X, t3.Y);
+
+                    dataIdx += 6;
+                }
+            }
+
+            //Llenar todo el VertexBuffer con el array temporal
+            vbTerrain.SetData(data, 0, LockFlags.None);
+        }
+
+        private int[,] loadHeightMap()
+        {
+            //Cargar bitmap desde el file system
+            var bmpHeightMap = (Bitmap)Image.FromFile(terrainHeightMap);
+            var iWidth = bmpHeightMap.Size.Width;
+            var iHeight = bmpHeightMap.Size.Height;
+            var mHeightmap = new int[iWidth, iHeight];
+
+            for (var i = 0; i < iWidth; i++)
+            {
+                for (var j = 0; j < iHeight; j++)
+                {
+                    //Obtener color
+                    //(j,i) invertido para primero barrer filas y después columnas
+                    var clrPixel = bmpHeightMap.GetPixel(j, i);
+
+                    //Calcular intensidad en escala de grises
+                    var fIntensity = clrPixel.R * 0.299f + clrPixel.G * 0.587f + clrPixel.B * 0.114f;
+                    mHeightmap[i, j] = (int)fIntensity;
+                }
+            }
+
+            return mHeightmap;
+        }
+
+        private void loadTerrainTexture(Microsoft.DirectX.Direct3D.Device d3dDevice)
+        {
+            var bmpBitmap = (Bitmap)Image.FromFile(terrainTexturePath);
+            bmpBitmap.RotateFlip(RotateFlipType.Rotate90FlipX);
+            terrainTexture = Texture.FromBitmap(d3dDevice, bmpBitmap, Usage.None, Pool.Managed);
         }
 
         /// <summary>
@@ -94,13 +204,13 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
-            //Capturar Input teclado
-            if (Input.keyPressed(Key.F))
-            {
-                BoundingBox = !BoundingBox;
-            }
+            ////Capturar Input teclado
+            //if (Input.keyPressed(Key.F))
+            //{
+            //    BoundingBox = !BoundingBox;
+            //}
 
-            //Capturar Input Mouse
+            ////Capturar Input Mouse
             if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
             {
                 //Como ejemplo podemos hacer un movimiento simple de la cámara.
@@ -125,37 +235,49 @@ namespace TGC.Group.Model
         {
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
+            createHeightMapMesh(D3DDevice.Instance.Device);
 
-            //Dibuja un texto por pantalla
-            DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
-            DrawText.drawText(
-                "Con clic izquierdo subimos la camara [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30,
-                Color.OrangeRed);
+            DrawText.drawText("Camera pos: " + TgcParserUtils.printVector3(Camara.Position), 5, 20, Color.Red);
+            DrawText.drawText("Camera LookAt: " + TgcParserUtils.printVector3(Camara.LookAt), 5, 40, Color.Red);
 
-            //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
-            //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
-            Box.Transform = Matrix.Scaling(Box.Scale) *
-                            Matrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) *
-                            Matrix.Translation(Box.Position);
-            //A modo ejemplo realizamos toda las multiplicaciones, pero aquí solo nos hacia falta la traslación.
-            //Finalmente invocamos al render de la caja
-            Box.render();
+            //Render terrain
+            D3DDevice.Instance.Device.SetTexture(0, terrainTexture);
+            D3DDevice.Instance.Device.VertexFormat = CustomVertex.PositionTextured.Format;
+            D3DDevice.Instance.Device.SetStreamSource(0, vbTerrain, 0);
+            D3DDevice.Instance.Device.DrawPrimitives(PrimitiveType.TriangleList, 0, totalVertices / 3);
 
-            //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
-            //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
-            Mesh.UpdateMeshTransform();
-            //Render del mesh
-            Mesh.render();
-
-            //Render de BoundingBox, muy útil para debug de colisiones.
-            if (BoundingBox)
-            {
-                Box.BoundingBox.render();
-                Mesh.BoundingBox.render();
-            }
-
-            //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
+
+            ////Dibuja un texto por pantalla
+            //DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
+            //DrawText.drawText(
+            //    "Con clic izquierdo subimos la camara [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30,
+            //    Color.OrangeRed);
+
+            ////Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
+            ////Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
+            //Box.Transform = Matrix.Scaling(Box.Scale) *
+            //                Matrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) *
+            //                Matrix.Translation(Box.Position);
+            ////A modo ejemplo realizamos toda las multiplicaciones, pero aquí solo nos hacia falta la traslación.
+            ////Finalmente invocamos al render de la caja
+            //Box.render();
+
+            ////Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
+            ////Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
+            //Mesh.UpdateMeshTransform();
+            ////Render del mesh
+            //Mesh.render();
+
+            ////Render de BoundingBox, muy útil para debug de colisiones.
+            //if (BoundingBox)
+            //{
+            //    Box.BoundingBox.render();
+            //    Mesh.BoundingBox.render();
+            //}
+
+            ////Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
+            //PostRender();
         }
 
         /// <summary>
@@ -165,10 +287,12 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Dispose()
         {
+            vbTerrain.Dispose();
+            terrainTexture.Dispose();
             //Dispose de la caja.
-            Box.dispose();
-            //Dispose del mesh.
-            Mesh.dispose();
+            //Box.dispose();
+            ////Dispose del mesh.
+            //Mesh.dispose();
         }
     }
-}
+}*/
