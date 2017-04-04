@@ -46,10 +46,13 @@ namespace TGC.Group.Model
         ///     procesamiento que podemos pre calcular para nuestro juego.
         ///     Borrar el codigo ejemplo no utilizado.
         /// </summary>
+        /// 
+        private TgcScene scene;
         public override void Init()
         {
-            //Device de DirectX para crear primitivas.
-            var d3dDevice = D3DDevice.Instance.Device;
+           
+        //Device de DirectX para crear primitivas.
+        var d3dDevice = D3DDevice.Instance.Device;
 
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
@@ -72,6 +75,9 @@ namespace TGC.Group.Model
             //Defino una escala en el modelo logico del mesh que es muy grande.
             Mesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
 
+            var loader = new TgcSceneLoader();
+             
+        scene = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Scenes\\Ciudad\\miterreno1-TgcScene.xml");
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
             //El framework maneja una cámara estática, pero debe ser inicializada.
@@ -140,6 +146,7 @@ namespace TGC.Group.Model
             //A modo ejemplo realizamos toda las multiplicaciones, pero aquí solo nos hacia falta la traslación.
             //Finalmente invocamos al render de la caja
             Box.render();
+            scene.renderAll();
 
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
@@ -169,6 +176,7 @@ namespace TGC.Group.Model
             Box.dispose();
             //Dispose del mesh.
             Mesh.dispose();
+            scene.disposeAll();
         }
     }
 }
