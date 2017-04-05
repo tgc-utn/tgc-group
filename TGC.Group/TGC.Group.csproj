@@ -86,6 +86,7 @@
     </Compile>
     <Compile Include="Model\Ciudad.cs" />
     <Compile Include="Model\Ciudad2.cs" />
+    <Compile Include="Model\Ciudad_ediVeredas.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\TgcFpsCamera.cs" />
     <Compile Include="Program.cs" />

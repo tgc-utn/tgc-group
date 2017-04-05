@@ -20,7 +20,7 @@ namespace TGC.Group.Model
     ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
     ///     line 97.
     /// </summary>
-    public class Ciudad : TgcExample
+    public class Ciudad_ediVeredas : TgcExample
     {
 
         private TgcPlane suelo;
@@ -39,7 +39,7 @@ namespace TGC.Group.Model
         /// </summary>
         /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
         /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
-        public Ciudad(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
+        public Ciudad_ediVeredas(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
             Name = Game.Default.Name;
@@ -147,7 +147,7 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             suelo.dispose();
-            calle.dispose();
+            //calle.dispose();
             //Al hacer dispose del original, se hace dispose automaticamente de todas las instancias
             edificio.dispose();
         }
@@ -243,7 +243,9 @@ namespace TGC.Group.Model
                 {
                     if ((((j * 2) + 1) % 2 != 0) && (((i * 2) + 1) % 2 != 0))
                         if (dibujarEdificio(getNMesh(modMesh), i, j, scene))
+                        {
                             modMesh++;
+                        }
                 }
             }
 
@@ -282,40 +284,54 @@ namespace TGC.Group.Model
             float offset_row = 300;
             float offset_Col = 100;
             if (nMesh == 0)
-            { //Edificio Blanco Espejado
-                offset_row = 300 + ((i - 1) * 700);
-                offset_Col = 300 + ((j - 1) * 600);
+            { //Edificio Blanco Espejado - chiquito
+                //offset_row = 300 + ((i - 1) * 900);
+                //offset_Col = 300 + ((j - 1) * 750);
+                offset_row = 220 + ((i - 1) * 900);
+                offset_Col = 300 + ((j - 1) * 750);
             }
             if (nMesh == 2)
             {//Edicio Ladrillos
-                offset_row = -100 + ((i - 1) * 700);
-                offset_Col = 850 + ((j - 1) * 600);
+                //offset_row = -100 + ((i - 1) * 900);
+                //offset_Col = 850 + ((j - 1) * 750);
+                offset_row = -280 + ((i - 1) * 900);
+                offset_Col = 800 + ((j - 1) * 750);
             }
             if (nMesh == 3)
             { //edifcio amarillo
-                offset_row = 1000 + ((i - 1) * 700);
-                offset_Col = 1290 + ((j - 1) * 600);
+                //offset_row = 1000 + ((i - 1) * 900);
+                //offset_Col = 1290 + ((j - 1) * 750);
+                offset_row = 1050 + ((i - 1) * 900);
+                offset_Col = 1300 + ((j - 1) * 750);
             }
 
             if (nMesh == 4)
-            { //Edificio espejado
-                offset_row = 395 + ((i - 1) * 700);
-                offset_Col = 1290 + ((j - 1) * 600);
+            { //Edificio espejado - gris mediano
+                //offset_row = 395 + ((i - 1) * 900);
+                //offset_Col = 1290 + ((j - 1) * 750);
+                offset_row = 300 + ((i - 1) * 900);
+                offset_Col = 1300 + ((j - 1) * 750);
             }
             if (nMesh == 5)
             { //Edificio alto blanco finito espejado
-                offset_row = 1000 + ((i - 1) * 700);
-                offset_Col = -70 + ((j - 1) * 600);
+                //offset_row = 1000 + ((i - 1) * 900);
+                //offset_Col = -70 + ((j - 1) * 750);
+                offset_row = 1020 + ((i - 1) * 900);
+                offset_Col = -100 + ((j - 1) * 750);
             }
             if (nMesh == 6)
-            { //Edificio alto blanco finito espejado
-                offset_row = -100 + ((i - 1) * 700);
-                offset_Col = -70 + ((j - 1) * 600);
+            { //Edificio gris U
+                //offset_row = -100 + ((i - 1) * 900);
+                //offset_Col = -70 + ((j - 1) * 750);
+                offset_row = -130 + ((i - 1) * 900);
+                offset_Col = -100 + ((j - 1) * 750);
             }
             if (nMesh == 7)
-            { //Edificio alto blanco finito espejado
-                offset_row = 1100 + ((i - 1) * 700);
-                offset_Col = 600 + ((j - 1) * 600);
+            { //Edificio alto blanco finito espejado - Rascacielos blanco
+                //offset_row = 1100 + ((i - 1) * 900);
+                //offset_Col = 600 + ((j - 1) * 750);
+                offset_row = 1065 + ((i - 1) * 900);
+                offset_Col = 600 + ((j - 1) * 750);
             }
             edificio = scene.Meshes[nMesh];
             var instance = edificio.createMeshInstance(edificio.Name + i + "_" + j);
@@ -329,11 +345,18 @@ namespace TGC.Group.Model
 
             if (nMesh == 4)
                 instance.Scale = new Vector3(0.40f, 1f, 1f);
-
+            
             meshes.Add(instance);
+
+            var veredaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\piso2.jpg");
+            var posicionX = instance.BoundingBox.calculateBoxCenter().X - (550 / 2);
+            var posicionZ = instance.BoundingBox.calculateBoxCenter().Z - (550 / 2);
+            var posicion = new Vector3(posicionX, 1, posicionZ);
+            veredas.Add(new TgcPlane(posicion, new Vector3(550, 0, 550), TgcPlane.Orientations.XZplane, veredaTexture, 60, 60));
 
             return true;
         }
+        
         private void crearCalles()
         {
 
@@ -368,18 +391,21 @@ namespace TGC.Group.Model
             cordones.Add(new TgcPlane(new Vector3(5445, 0, -445), new Vector3(0, 5, 5890), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
             veredas.Add(new TgcPlane(new Vector3(5450, 5, -450), new Vector3(50, 0, 5900), TgcPlane.Orientations.XZplane, veredaTexture, 1, 60));
 
-			var rows = 10;
-            var cols = 6;
-            for (var i = 0; i <= rows; i++)
-            {
-                for (var j = 0; j <= cols; j++)
-                {
-                    if (((j % 2) == 0) && (i % 2 == 0))
-                    {
-                        veredas.Add(new TgcPlane(new Vector3((150 + (i * 350)), 5, 390+ (j * 350)), new Vector3(550, 0, 550), TgcPlane.Orientations.XZplane, veredaTexture, 60, 60));
-                    }
-                }
-            }
+            //	var rows = 10;
+            //    var cols = 6;
+            //    for (var i = 0; i <= rows; i++)
+            //    {
+            //        for (var j = 0; j <= cols; j++)
+            //        {
+            //            if (((j % 2) == 0) && (i % 2 == 0))
+            //            {
+                        //new Vector3((150 + (i * 350)), 5, 390+ (j * 350)), new Vector3(550, 0, 550)
+                        
+            //            }
+            //        }
+             //   }
+
+            
         }
 
         private void crearParedes()
@@ -406,6 +432,7 @@ namespace TGC.Group.Model
             //  meshes = new System.Collections.Generic.List<TgcMesh>();
             //  generarGrillaCalles(rows, cols, scene);
         }
+        
         /*    private void generarGrillaCalles(int rows, int cols, TgcScene scene)
             {
                 int modMesh = 0;
