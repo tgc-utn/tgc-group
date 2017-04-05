@@ -434,7 +434,7 @@ namespace TGC.Group.Model
                 {
                     case 0:
                         {
-                            CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 400);
+                            //CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 400);
                             Camara = CamaraInterna;
                         }
                         break;
