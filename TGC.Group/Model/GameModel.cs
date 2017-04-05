@@ -7,24 +7,23 @@ using TGC.Core.Example;
 using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.SceneLoader;
+using TGC.Core.SkeletalAnimation;
 using TGC.Core.Textures;
 using TGC.Core.Utils;
 using TGC.Group.Model.Entities;
+using TGC.Group.Model.GameWorld;
 
 namespace TGC.Group.Model
 {
     
-    
-    
-    
-    
-    
     public class GameModel : TgcExample
     {
+
         private World world;
+        
 
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
-        {
+        {            
             Category = Game.Default.Category;
             Name = Game.Default.Name;
             Description = Game.Default.Description;
@@ -34,9 +33,9 @@ namespace TGC.Group.Model
         {
             
             var d3dDevice = D3DDevice.Instance.Device;
-
-            this.world = new World();
-
+                       
+            this.world    = new World(MediaDir, this.Input);
+            this.Camara = this.world.Camera;
         }
 
         
@@ -47,21 +46,15 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
-            this.world.update();
+            
+            this.world.update(ElapsedTime);
         }
 
         
-        
-        
-        
-        
         public override void Render()
         {
-            
             PreRender();
-
             this.world.render();
-
             PostRender();
         }
 

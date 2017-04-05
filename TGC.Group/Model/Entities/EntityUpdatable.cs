@@ -8,14 +8,18 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using Microsoft.DirectX;
 using System.Windows.Forms;
+using TGC.Core.SkeletalAnimation;
 
 namespace TGC.Group.Model.Entities
 {
-    public abstract class EntityUpdatable : IEntity, IUpdateObject
-    {
-        public virtual void render()
+    public abstract class EntityUpdatable : TgcSkeletalMesh, IEntity, IUpdateObject
+    {        
+        public virtual new void render()
         {
-            this.mesh.UpdateMeshTransform();
+            base.render();
+            this.UpdateMeshTransform();
         }
+
+        public abstract void update();
     }
 }

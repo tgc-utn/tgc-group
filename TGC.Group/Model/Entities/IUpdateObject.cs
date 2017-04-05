@@ -10,6 +10,6 @@ namespace TGC.Group.Model.Entities
 {
     public interface IUpdateObject
     {
-        public void update();
+        void update();
     }
 }
