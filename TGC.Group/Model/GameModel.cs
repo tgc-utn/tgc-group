@@ -45,13 +45,13 @@ namespace TGC.Group.Model
         private const float ROTATION_SPEED = 120f;
 
         //Cantidad de filas
-        private const int ROWS = 5;
+        private const int ROWS = 9;
 
         //Cantidad de columnas
-        private const int COLUMNS = 5;
+        private const int COLUMNS = 9;
 
         //Tamaño cuadrante
-        private const int CUADRANTE_SIZE = 500;
+        private const int CUADRANTE_SIZE = 450;
 
         //Scene principal
         private TgcScene ScenePpal;
@@ -127,20 +127,24 @@ namespace TGC.Group.Model
             //Cargo el terreno
             ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA-TgcScene.xml");
 
+            var ScenePpalMesh = ScenePpal.Meshes[0];
+            ScenePpalMesh.AutoTransformEnable = false;
+            ScenePpalMesh.Transform = ScenePpalMesh.Transform * Matrix.Scaling(new Vector3(3, 1, 3));
+            ScenePpalMesh.AlphaBlendEnable = true;
+            ScenePpalMesh.updateBoundingBox();
+
             //Cargo el auto
             var SceneAuto = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto\\Auto-TgcScene.xml");
-
 
             //Movemos el escenario un poco para arriba para que se pueda mover el auto
             Mesh = SceneAuto.Meshes[0];
         
             Mesh.AutoTransformEnable = true;
-            Mesh.move(0, 0.1f, 0);
+            Mesh.move(0, 0.3f, 0);
 
             //Camara por defecto
             CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 400);
-            Camara = CamaraInterna;
-            
+            Camara = CamaraInterna;           
 
             //Creo los objetos del escenario
             CrearObjetos(loader);           
@@ -154,37 +158,37 @@ namespace TGC.Group.Model
             //Creo palmeras
             MatrizPoblacion = RandomMatrix();
             PalmeraOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Palmera\\Palmera-TgcScene.xml").Meshes[0];
-            MeshPalmeras = CrearInstancias(PalmeraOriginal, 0.75f, 0, 2, MatrizPoblacion);
+            MeshPalmeras = CrearInstancias(PalmeraOriginal, 0.75f, 1.15f, 2, MatrizPoblacion);
 
             //Creo pinos
             MatrizPoblacion = RandomMatrix();
             PinoOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Pino\\Pino-TgcScene.xml").Meshes[0];
-            MeshPinos = CrearInstancias(PinoOriginal, 0.90f, 0, 2, MatrizPoblacion);
+            MeshPinos = CrearInstancias(PinoOriginal, 0.90f, 1.15f, 2, MatrizPoblacion);
 
             //Creo rocas
             MatrizPoblacion = RandomMatrix();
             RocaOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Roca\\Roca-TgcScene.xml").Meshes[0];
-            MeshRocas = CrearInstancias(RocaOriginal, 0.75f, 0, 2, MatrizPoblacion);
+            MeshRocas = CrearInstancias(RocaOriginal, 0.75f, 1.15f, 2, MatrizPoblacion);
 
             //Creo arboles bananas
             MatrizPoblacion = RandomMatrix();
             ArbolBananasOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\ArbolBananas\\ArbolBananas-TgcScene.xml").Meshes[0];
-            MeshArbolesBananas = CrearInstancias(ArbolBananasOriginal, 1.50f, 0, 1, MatrizPoblacion);
+            MeshArbolesBananas = CrearInstancias(ArbolBananasOriginal, 1.50f, 1.15f, 1, MatrizPoblacion);
 
             //Creo barriles de polvora
             MatrizPoblacion = RandomMatrix();
             BarrilPolvoraOriginal = loader.loadSceneFromFile(MediaDir + "Objetos\\BarrilPolvora\\BarrilPolvora-TgcScene.xml").Meshes[0];
-            MeshBarrilesPolvora = CrearInstancias(BarrilPolvoraOriginal, 0.75f, 0, 1, MatrizPoblacion);
+            MeshBarrilesPolvora = CrearInstancias(BarrilPolvoraOriginal, 0.75f, 1.15f, 1, MatrizPoblacion);
 
             //Creo carretillas
             MatrizPoblacion = RandomMatrix();
             CarretillaOriginal = loader.loadSceneFromFile(MediaDir + "Objetos\\Carretilla\\Carretilla-TgcScene.xml").Meshes[0];
-            MeshCarretillas = CrearInstancias(CarretillaOriginal, 0.20f, 0, 1, MatrizPoblacion);
+            MeshCarretillas = CrearInstancias(CarretillaOriginal, 0.20f, 1.15f, 1, MatrizPoblacion);
 
             //Creo contenedores
             MatrizPoblacion = RandomMatrix();
             ContenedorOriginal = loader.loadSceneFromFile(MediaDir + "Objetos\\Contenedor\\Contenedor-TgcScene.xml").Meshes[0];
-            MeshContenedores = CrearInstancias(ContenedorOriginal, 1.5f, 0, 1, MatrizPoblacion);
+            MeshContenedores = CrearInstancias(ContenedorOriginal, 1.5f, 1.15f, 1, MatrizPoblacion);
 
             //Creo fuentes de agua
             //MatrizPoblacion = RandomMatrix();
@@ -194,17 +198,17 @@ namespace TGC.Group.Model
             //Creo lockers
             MatrizPoblacion = RandomMatrix();
             LockerOriginal = loader.loadSceneFromFile(MediaDir + "Muebles\\LockerMetal\\LockerMetal-TgcScene.xml").Meshes[0];
-            MeshLockers = CrearInstancias(LockerOriginal, 1, 0, 1, MatrizPoblacion);
+            MeshLockers = CrearInstancias(LockerOriginal, 1, 1.15f, 1, MatrizPoblacion);
 
             //Creo expendedores bebidas
             MatrizPoblacion = RandomMatrix();
             ExpendedorBebidaOriginal = loader.loadSceneFromFile(MediaDir + "Muebles\\ExpendedorDeBebidas\\ExpendedorDeBebidas-TgcScene.xml").Meshes[0];
-            MeshExpendedoresBebidas = CrearInstancias(ExpendedorBebidaOriginal, 0.50f, 0, 1, MatrizPoblacion);
+            MeshExpendedoresBebidas = CrearInstancias(ExpendedorBebidaOriginal, 0.50f, 1.15f, 1, MatrizPoblacion);
 
             //Creo cajas de municiones
             MatrizPoblacion = RandomMatrix();
             CajaMunicionesOriginal = loader.loadSceneFromFile(MediaDir + "Armas\\CajaMuniciones\\CajaMuniciones-TgcScene.xml").Meshes[0];
-            MeshCajasMuniciones = CrearInstancias(CajaMunicionesOriginal, 1, 0, 1, MatrizPoblacion);
+            MeshCajasMuniciones = CrearInstancias(CajaMunicionesOriginal, 1, 1.15f, 1, MatrizPoblacion);
         }
 
         private int[,] RandomMatrix()
@@ -251,6 +255,8 @@ namespace TGC.Group.Model
                                                                         new Vector3((-1) * randomNumber.Next(j * CUADRANTE_SIZE, (j + 1) * CUADRANTE_SIZE), 0,
                                                                                     randomNumber.Next(i * CUADRANTE_SIZE, (i + 1) * CUADRANTE_SIZE)));
                             instance.Transform = instance.Transform * Matrix.RotationY(randomNumber.Next(1, 360));
+
+                            instance.AlphaBlendEnable = true;
 
                             ListaMesh.Add(instance);
                         }
@@ -320,12 +326,12 @@ namespace TGC.Group.Model
             if (BoundingBox)
             {
                 Mesh.BoundingBox.render();
-            }
 
-            foreach (var mesh in ScenePpal.Meshes)
-            {
-                mesh.BoundingBox.render();
-            }
+                foreach (var mesh in ScenePpal.Meshes)
+                {
+                    mesh.BoundingBox.render();
+                }
+            }            
 
             //Renderizo los objetos cargados de las listas
             RenderizarObjetos();
@@ -426,7 +432,7 @@ namespace TGC.Group.Model
                 {
                     case 0:
                         {
-                            CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 200, 300);
+                            CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 400);
                             Camara = CamaraInterna;
                         }
                         break;
