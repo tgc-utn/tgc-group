@@ -116,7 +116,6 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
             var loader = new TgcSceneLoader();
-            int[,] MatrizPoblacion;
 
             //Cargo el terreno
             ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA-TgcScene.xml");
@@ -124,7 +123,7 @@ namespace TGC.Group.Model
             //Cargo el auto
             var SceneAuto = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto\\Auto-TgcScene.xml");
 
-            //Movemos el mesh un poco para arriba. Porque sino choca con el piso todo el tiempo y no se puede mover.
+            //Movemos el escenario un poco para arriba para que se pueda mover el auto
             Mesh = SceneAuto.Meshes[0];
             Mesh.AutoTransformEnable = true;
             Mesh.move(0, 0.05f, 0);
@@ -132,6 +131,15 @@ namespace TGC.Group.Model
             //Camara por defecto
             CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 400);
             Camara = CamaraInterna;
+
+            //Creo los objetos del escenario
+            CrearObjetos(loader);           
+
+        }
+
+        private void CrearObjetos(TgcSceneLoader loader)
+        {
+            int[,] MatrizPoblacion;
 
             //Creo palmeras
             MatrizPoblacion = RandomMatrix();
@@ -187,7 +195,6 @@ namespace TGC.Group.Model
             MatrizPoblacion = RandomMatrix();
             CajaMunicionesOriginal = loader.loadSceneFromFile(MediaDir + "Armas\\CajaMuniciones\\CajaMuniciones-TgcScene.xml").Meshes[0];
             MeshCajasMuniciones = CrearInstancias(CajaMunicionesOriginal, 1, 0, 1, MatrizPoblacion);
-
         }
 
         private int[,] RandomMatrix()
@@ -251,73 +258,17 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
-            activarBoundingBox();
+            //Activo bounding box para debug
+            ActivarBoundingBox();
 
-            cambiarDeCamara();
+            //Chequea si se solicitó cambiar el tipo de camara
+            CambiarDeCamara();
 
-            moverCamaraConMouse();
+            //Acciona la vista con el movimiento del mouse
+            MoverCamaraConMouse();
 
-            //Declaramos un vector de movimiento inicializado en cero.
-            //El movimiento sobre el suelo es sobre el plano XZ.
-            //Sobre XZ nos movemos con las flechas del teclado o con las letas WASD.
-            var movement = new Vector3(0, 0, 0);
-
-            //Movernos de izquierda a derecha, sobre el eje X.
-            if (Input.keyDown(Key.Left) || Input.keyDown(Key.A))
-            {
-                movement.X = 1;
-            }
-            else if (Input.keyDown(Key.Right) || Input.keyDown(Key.D))
-            {
-                movement.X = -1;
-            }
-
-            //Movernos adelante y atras, sobre el eje Z.
-            if (Input.keyDown(Key.Up) || Input.keyDown(Key.W))
-            {
-                movement.Z = -1;
-            }
-            else if (Input.keyDown(Key.Down) || Input.keyDown(Key.S))
-            {
-                movement.Z = 1;
-            }
-
-            //Guardar posicion original antes de cambiarla
-            var originalPos = Mesh.Position;
-
-            //Multiplicar movimiento por velocidad y elapsedTime
-            movement *= MOVEMENT_SPEED * ElapsedTime;
-            Mesh.move(movement);
-
-            //El framework posee la clase TgcCollisionUtils con muchos algoritmos de colisión de distintos tipos de objetos.
-            //Por ejemplo chequear si dos cajas colisionan entre sí, o dos esferas, o esfera con caja, etc.
-            var collisionFound = false;
-
-            foreach (var mesh in ScenePpal.Meshes)
-            {
-                //Los dos BoundingBox que vamos a testear
-                var mainMeshBoundingBox = Mesh.BoundingBox;
-                var sceneMeshBoundingBox = mesh.BoundingBox;
-
-                //Ejecutar algoritmo de detección de colisiones
-                var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
-
-                //Hubo colisión con un objeto. Guardar resultado y abortar loop.
-                if (collisionResult != TgcCollisionUtils.BoxBoxResult.Encerrando)
-                {
-                    collisionFound = true;
-                    break;
-                }
-            }
-
-            //Si hubo alguna colisión, entonces restaurar la posición original del mesh
-            if (collisionFound)
-            {
-                Mesh.Position = originalPos;
-            }
-
-            //Hacer que la camara en 3ra persona se ajuste a la nueva posicion del objeto
-            CamaraInterna.Target = Mesh.Position;
+            //Maneja el movimiento del auto teniendo en cuenta la posición de los otros objetos
+            MoverAutoConColisiones();            
         }
 
         /// <summary>
@@ -331,8 +282,8 @@ namespace TGC.Group.Model
             PreRender();
 
             //Dibuja un texto por pantalla
-            DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
-            DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.OrangeRed);
+            DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.Red);
+            DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.Red);
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
@@ -364,6 +315,15 @@ namespace TGC.Group.Model
                 mesh.BoundingBox.render();
             }
 
+            //Renderizo los objetos cargados de las listas
+            RenderizarObjetos();
+
+            //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
+            PostRender();
+        }
+
+        private void RenderizarObjetos()
+        {
             //Renderizar palmeras
             foreach (var mesh in MeshPalmeras)
             {
@@ -429,34 +389,9 @@ namespace TGC.Group.Model
             {
                 mesh.render();
             }
-
-            //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
-            PostRender();
         }
 
-        /// <summary>
-        ///     Se llama cuando termina la ejecución del ejemplo.
-        ///     Hacer Dispose() de todos los objetos creados.
-        ///     Es muy importante liberar los recursos, sobretodo los gráficos ya que quedan bloqueados en el device de video.
-        /// </summary>
-        public override void Dispose()
-        {
-            PalmeraOriginal.dispose();
-            PinoOriginal.dispose();
-            RocaOriginal.dispose();
-            ArbolBananasOriginal.dispose();
-            BarrilPolvoraOriginal.dispose();
-            CarretillaOriginal.dispose();
-            ContenedorOriginal.dispose();
-            FuenteAguaOriginal.dispose();
-            LockerOriginal.dispose();
-            ExpendedorBebidaOriginal.dispose();
-            CajaMunicionesOriginal.dispose();
-            ScenePpal.disposeAll();
-            Mesh.dispose();
-        }
-
-        public void activarBoundingBox()
+        public void ActivarBoundingBox()
         {
             //Capturar Input teclado
             if (Input.keyPressed(Key.F))
@@ -466,7 +401,7 @@ namespace TGC.Group.Model
             }
         }
 
-        public void cambiarDeCamara()
+        public void CambiarDeCamara()
         {
             if (Input.keyPressed(Key.F1))
             {
@@ -493,11 +428,13 @@ namespace TGC.Group.Model
             }
         }
 
-        public void moverCamaraConMouse()
+        public void MoverCamaraConMouse()
         {
             //Capturar Input Mouse
             if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
             {
+                //Ver....
+                /*
                 //En este caso le sumamos un valor en Y
                 Camara.SetCamera(Camara.Position + new Vector3(0, 10f, 0), Camara.LookAt);
                 //Ver ejemplos de cámara para otras operaciones posibles.
@@ -507,8 +444,95 @@ namespace TGC.Group.Model
                 {
                     Camara.SetCamera(new Vector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
                 }
+                */
             }
         }
         
+        public void MoverAutoConColisiones()
+        {
+            //Declaramos un vector de movimiento inicializado en cero.
+            //El movimiento sobre el suelo es sobre el plano XZ.
+            //Sobre XZ nos movemos con las flechas del teclado o con las letas WASD.
+            var movement = new Vector3(0, 0, 0);
+
+            //Movernos de izquierda a derecha, sobre el eje X.
+            if (Input.keyDown(Key.Left) || Input.keyDown(Key.A))
+            {
+                movement.X = 1;
+            }
+            else if (Input.keyDown(Key.Right) || Input.keyDown(Key.D))
+            {
+                movement.X = -1;
+            }
+
+            //Movernos adelante y atras, sobre el eje Z.
+            if (Input.keyDown(Key.Up) || Input.keyDown(Key.W))
+            {
+                movement.Z = -1;
+            }
+            else if (Input.keyDown(Key.Down) || Input.keyDown(Key.S))
+            {
+                movement.Z = 1;
+            }
+
+            //Guardar posicion original antes de cambiarla
+            var originalPos = Mesh.Position;
+
+            //Multiplicar movimiento por velocidad y elapsedTime
+            movement *= MOVEMENT_SPEED * ElapsedTime;
+            Mesh.move(movement);
+
+            //El framework posee la clase TgcCollisionUtils con muchos algoritmos de colisión de distintos tipos de objetos.
+            //Por ejemplo chequear si dos cajas colisionan entre sí, o dos esferas, o esfera con caja, etc.
+            var collisionFound = false;
+
+            foreach (var mesh in ScenePpal.Meshes)
+            {
+                //Los dos BoundingBox que vamos a testear
+                var mainMeshBoundingBox = Mesh.BoundingBox;
+                var sceneMeshBoundingBox = mesh.BoundingBox;
+
+                //Ejecutar algoritmo de detección de colisiones
+                var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
+
+                //Hubo colisión con un objeto. Guardar resultado y abortar loop.
+                if (collisionResult != TgcCollisionUtils.BoxBoxResult.Encerrando)
+                {
+                    collisionFound = true;
+                    break;
+                }
+            }
+
+            //Si hubo alguna colisión, entonces restaurar la posición original del mesh
+            if (collisionFound)
+            {
+                Mesh.Position = originalPos;
+            }
+
+            //Hacer que la camara en 3ra persona se ajuste a la nueva posicion del objeto
+            CamaraInterna.Target = Mesh.Position;
+        }
+
+        /// <summary>
+        ///     Se llama cuando termina la ejecución del ejemplo.
+        ///     Hacer Dispose() de todos los objetos creados.
+        ///     Es muy importante liberar los recursos, sobretodo los gráficos ya que quedan bloqueados en el device de video.
+        /// </summary>
+        public override void Dispose()
+        {
+            PalmeraOriginal.dispose();
+            PinoOriginal.dispose();
+            RocaOriginal.dispose();
+            ArbolBananasOriginal.dispose();
+            BarrilPolvoraOriginal.dispose();
+            CarretillaOriginal.dispose();
+            ContenedorOriginal.dispose();
+            FuenteAguaOriginal.dispose();
+            LockerOriginal.dispose();
+            ExpendedorBebidaOriginal.dispose();
+            CajaMunicionesOriginal.dispose();
+            ScenePpal.disposeAll();
+            Mesh.dispose();
+        }
     }
 }
