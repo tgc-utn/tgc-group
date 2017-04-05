@@ -1,3 +1,4 @@
+//"Inclusion de librerias"
 using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
@@ -20,10 +21,7 @@ using System.Collections.Generic;
 namespace TGC.Group.Model
 {
     /// <summary>
-    ///     Ejemplo para implementar el TP.
-    ///     Inicialmente puede ser renombrado o copiado para hacer más ejemplos chicos, en el caso de copiar para que se
-    ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
-    ///     line 97.
+    ///     Twisted Chano, juego de autos chocadores
     /// </summary>
     public class GameModel : TgcExample
     {
@@ -39,9 +37,13 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
+        /// <summary>
+        /// Inicializacion de variables y "definicion" de los objetos
+        /// </summary>
+
         //Velocidad de movimiento del auto
         private const float MOVEMENT_SPEED = 400f;
-
+        //Velocidad de rotación del auto
         private const float ROTATION_SPEED = 120f;
 
         //Cantidad de filas
@@ -542,6 +544,7 @@ namespace TGC.Group.Model
                 //Si hubo alguna colisión, entonces restaurar la posición original del mesh
                 if (collisionFound)
                 {
+                    DrawText.drawText("Chocamos", 50, 50, Color.Blue);
                     Mesh.Position = originalPos;
                 }
 
