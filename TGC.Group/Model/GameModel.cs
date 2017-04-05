@@ -1,5 +1,7 @@
 using Microsoft.DirectX;
+using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
+using System.Collections.Generic;
 using System.Drawing;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
@@ -10,7 +12,10 @@ using TGC.Core.Textures;
 using TGC.Core.Utils;
 using TGC.Camara;
 using TGC.Core.Collision;
+using TGC.Core.UserControls;
+using TGC.Core.UserControls.Modifier;
 using System.Collections.Generic;
+
 
 namespace TGC.Group.Model
 {
@@ -35,7 +40,9 @@ namespace TGC.Group.Model
         }
 
         //Velocidad de movimiento del auto
-        private const float MOVEMENT_SPEED = 200f;
+        private const float MOVEMENT_SPEED = 400f;
+
+        private const float ROTATION_SPEED = 120f;
 
         //Cantidad de filas
         private const int ROWS = 5;
@@ -44,7 +51,7 @@ namespace TGC.Group.Model
         private const int COLUMNS = 5;
 
         //Tamaño cuadrante
-        private const int CUADRANTE_SIZE = 400;
+        private const int CUADRANTE_SIZE = 500;
 
         //Scene principal
         private TgcScene ScenePpal;
@@ -90,8 +97,8 @@ namespace TGC.Group.Model
         private TgcMesh ContenedorOriginal;
 
         //Lista de fuentes de agua
-        private List<TgcMesh> MeshFuentesAgua;
-        private TgcMesh FuenteAguaOriginal;
+        //private List<TgcMesh> MeshFuentesAgua;
+        //private TgcMesh FuenteAguaOriginal;
 
         //Lista de lockers
         private List<TgcMesh> MeshLockers;
@@ -123,14 +130,17 @@ namespace TGC.Group.Model
             //Cargo el auto
             var SceneAuto = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto\\Auto-TgcScene.xml");
 
+
             //Movemos el escenario un poco para arriba para que se pueda mover el auto
             Mesh = SceneAuto.Meshes[0];
+        
             Mesh.AutoTransformEnable = true;
-            Mesh.move(0, 0.05f, 0);
+            Mesh.move(0, 0.1f, 0);
 
             //Camara por defecto
             CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 400);
             Camara = CamaraInterna;
+            
 
             //Creo los objetos del escenario
             CrearObjetos(loader);           
@@ -149,17 +159,17 @@ namespace TGC.Group.Model
             //Creo pinos
             MatrizPoblacion = RandomMatrix();
             PinoOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Pino\\Pino-TgcScene.xml").Meshes[0];
-            MeshPinos = CrearInstancias(PinoOriginal, 0.90f, 0, 1, MatrizPoblacion);
+            MeshPinos = CrearInstancias(PinoOriginal, 0.90f, 0, 2, MatrizPoblacion);
 
             //Creo rocas
             MatrizPoblacion = RandomMatrix();
             RocaOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Roca\\Roca-TgcScene.xml").Meshes[0];
-            MeshRocas = CrearInstancias(RocaOriginal, 0.75f, 0, 1, MatrizPoblacion);
+            MeshRocas = CrearInstancias(RocaOriginal, 0.75f, 0, 2, MatrizPoblacion);
 
             //Creo arboles bananas
             MatrizPoblacion = RandomMatrix();
             ArbolBananasOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\ArbolBananas\\ArbolBananas-TgcScene.xml").Meshes[0];
-            MeshArbolesBananas = CrearInstancias(ArbolBananasOriginal, 1.50f, 0, 2, MatrizPoblacion);
+            MeshArbolesBananas = CrearInstancias(ArbolBananasOriginal, 1.50f, 0, 1, MatrizPoblacion);
 
             //Creo barriles de polvora
             MatrizPoblacion = RandomMatrix();
@@ -177,9 +187,9 @@ namespace TGC.Group.Model
             MeshContenedores = CrearInstancias(ContenedorOriginal, 1.5f, 0, 1, MatrizPoblacion);
 
             //Creo fuentes de agua
-            MatrizPoblacion = RandomMatrix();
-            FuenteAguaOriginal = loader.loadSceneFromFile(MediaDir + "Objetos\\FuenteAgua\\FuenteAgua-TgcScene.xml").Meshes[0];
-            MeshFuentesAgua = CrearInstancias(FuenteAguaOriginal, 1, 25, 1, MatrizPoblacion);
+            //MatrizPoblacion = RandomMatrix();
+            //FuenteAguaOriginal = loader.loadSceneFromFile(MediaDir + "Objetos\\FuenteAgua\\FuenteAgua-TgcScene.xml").Meshes[0];
+            //MeshFuentesAgua = CrearInstancias(FuenteAguaOriginal, 1, 25, 1, MatrizPoblacion);
 
             //Creo lockers
             MatrizPoblacion = RandomMatrix();
@@ -218,6 +228,7 @@ namespace TGC.Group.Model
         {
             List<TgcMesh> ListaMesh = new List<TgcMesh>();
             System.Random randomNumber = new System.Random();
+            
 
             for (int i = 0; i < ROWS; i++)
             {
@@ -239,6 +250,7 @@ namespace TGC.Group.Model
                             instance.Transform = instance.Transform * Matrix.Translation(
                                                                         new Vector3((-1) * randomNumber.Next(j * CUADRANTE_SIZE, (j + 1) * CUADRANTE_SIZE), 0,
                                                                                     randomNumber.Next(i * CUADRANTE_SIZE, (i + 1) * CUADRANTE_SIZE)));
+                            instance.Transform = instance.Transform * Matrix.RotationY(randomNumber.Next(1, 360));
 
                             ListaMesh.Add(instance);
                         }
@@ -367,10 +379,10 @@ namespace TGC.Group.Model
             }
 
             //Renderizar Fuentes de Agua
-            foreach (var mesh in MeshFuentesAgua)
-            {
-                mesh.render();
-            }
+            //foreach (var mesh in MeshFuentesAgua)
+            //{
+                //mesh.render();
+            //}
 
             //Renderizar Lockers
             foreach (var mesh in MeshLockers)
@@ -447,70 +459,89 @@ namespace TGC.Group.Model
                 */
             }
         }
-        
+
         public void MoverAutoConColisiones()
         {
             //Declaramos un vector de movimiento inicializado en cero.
             //El movimiento sobre el suelo es sobre el plano XZ.
             //Sobre XZ nos movemos con las flechas del teclado o con las letas WASD.
             var movement = new Vector3(0, 0, 0);
+            var moveForward = 0f;
+            float rotate = 0;
+            var moving = false;
+            var rotating = false;
+
 
             //Movernos de izquierda a derecha, sobre el eje X.
             if (Input.keyDown(Key.Left) || Input.keyDown(Key.A))
             {
-                movement.X = 1;
+                rotate = -ROTATION_SPEED;
+                rotating = true;
             }
             else if (Input.keyDown(Key.Right) || Input.keyDown(Key.D))
             {
-                movement.X = -1;
+                rotate = ROTATION_SPEED;
+                rotating = true;
             }
 
             //Movernos adelante y atras, sobre el eje Z.
             if (Input.keyDown(Key.Up) || Input.keyDown(Key.W))
             {
-                movement.Z = -1;
+                moveForward = -MOVEMENT_SPEED;
+                moving = true;
             }
             else if (Input.keyDown(Key.Down) || Input.keyDown(Key.S))
             {
-                movement.Z = 1;
+                moveForward = MOVEMENT_SPEED;
+                moving = true;
             }
 
-            //Guardar posicion original antes de cambiarla
-            var originalPos = Mesh.Position;
-
-            //Multiplicar movimiento por velocidad y elapsedTime
-            movement *= MOVEMENT_SPEED * ElapsedTime;
-            Mesh.move(movement);
-
-            //El framework posee la clase TgcCollisionUtils con muchos algoritmos de colisión de distintos tipos de objetos.
-            //Por ejemplo chequear si dos cajas colisionan entre sí, o dos esferas, o esfera con caja, etc.
-            var collisionFound = false;
-
-            foreach (var mesh in ScenePpal.Meshes)
+            if (rotating)
             {
-                //Los dos BoundingBox que vamos a testear
-                var mainMeshBoundingBox = Mesh.BoundingBox;
-                var sceneMeshBoundingBox = mesh.BoundingBox;
+                var rotAngle = (rotate * ElapsedTime) * (FastMath.PI / 180);
+                Mesh.rotateY(rotAngle);
+                CamaraInterna.rotateY(rotAngle);
+            }
+            if (moving)
+            {
+                //Guardar posicion original antes de cambiarla
+                var originalPos = Mesh.Position;
 
-                //Ejecutar algoritmo de detección de colisiones
-                var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
+                //Multiplicar movimiento por velocidad y elapsedTime
+                movement *= MOVEMENT_SPEED * ElapsedTime;
+                Mesh.moveOrientedY(moveForward * ElapsedTime);
 
-                //Hubo colisión con un objeto. Guardar resultado y abortar loop.
-                if (collisionResult != TgcCollisionUtils.BoxBoxResult.Encerrando)
+
+                //El framework posee la clase TgcCollisionUtils con muchos algoritmos de colisión de distintos tipos de objetos.
+                //Por ejemplo chequear si dos cajas colisionan entre sí, o dos esferas, o esfera con caja, etc.
+                var collisionFound = false;
+
+                foreach (var mesh in ScenePpal.Meshes)
                 {
-                    collisionFound = true;
-                    break;
+                    //Los dos BoundingBox que vamos a testear
+                    var mainMeshBoundingBox = Mesh.BoundingBox;
+                    var sceneMeshBoundingBox = mesh.BoundingBox;
+
+                    //Ejecutar algoritmo de detección de colisiones
+                    var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
+
+                    //Hubo colisión con un objeto. Guardar resultado y abortar loop.
+                    if (collisionResult != TgcCollisionUtils.BoxBoxResult.Encerrando)
+                    {
+                        collisionFound = true;
+                        break;
+                    }
                 }
-            }
 
-            //Si hubo alguna colisión, entonces restaurar la posición original del mesh
-            if (collisionFound)
-            {
-                Mesh.Position = originalPos;
-            }
+                //Si hubo alguna colisión, entonces restaurar la posición original del mesh
+                if (collisionFound)
+                {
+                    Mesh.Position = originalPos;
+                }
 
-            //Hacer que la camara en 3ra persona se ajuste a la nueva posicion del objeto
-            CamaraInterna.Target = Mesh.Position;
+                //Hacer que la camara en 3ra persona se ajuste a la nueva posicion del objeto
+                CamaraInterna.Target = Mesh.Position;
+            }
         }
 
         /// <summary>
@@ -527,7 +558,7 @@ namespace TGC.Group.Model
             BarrilPolvoraOriginal.dispose();
             CarretillaOriginal.dispose();
             ContenedorOriginal.dispose();
-            FuenteAguaOriginal.dispose();
+            //FuenteAguaOriginal.dispose();
             LockerOriginal.dispose();
             ExpendedorBebidaOriginal.dispose();
             CajaMunicionesOriginal.dispose();
