@@ -21,7 +21,7 @@ namespace TGC.Group.Model
 {
     /// <summary>
     ///     Ejemplo para implementar el TP.
-    ///     Inicialmente puede ser renombrado o copiado para hacer m·s ejemplos chicos, en el caso de copiar para que se
+    ///     Inicialmente puede ser renombrado o copiado para hacer m√°s ejemplos chicos, en el caso de copiar para que se
     ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
     ///     line 97.
     /// </summary>
@@ -50,7 +50,7 @@ namespace TGC.Group.Model
         //Cantidad de columnas
         private const int COLUMNS = 9;
 
-        //TamaÒo cuadrante
+        //Tama√±o cuadrante
         private const int CUADRANTE_SIZE = 450;
 
         //Scene principal
@@ -65,7 +65,7 @@ namespace TGC.Group.Model
         //Camara en tercera persona
         private TgcThirdPersonCamera CamaraInterna;
 
-        //Tipo de c·mara
+        //Tipo de c√°mara
         private int TipoCamara = 0;
 
         //Lista de palmeras
@@ -114,7 +114,7 @@ namespace TGC.Group.Model
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
-        ///     Escribir aquÌ todo el cÛdigo de inicializaciÛn: cargar modelos, texturas, estructuras de optimizaciÛn, todo
+        ///     Escribir aqu√≠ todo el c√≥digo de inicializaci√≥n: cargar modelos, texturas, estructuras de optimizaci√≥n, todo
         ///     procesamiento que podemos pre calcular para nuestro juego.
         ///     Borrar el codigo ejemplo no utilizado.
         /// </summary>
@@ -269,7 +269,7 @@ namespace TGC.Group.Model
 
         /// <summary>
         ///     Se llama en cada frame.
-        ///     Se debe escribir toda la lÛgica de computo del modelo, asÌ como tambiÈn verificar entradas del usuario y reacciones
+        ///     Se debe escribir toda la l√≥gica de computo del modelo, as√≠ como tambi√©n verificar entradas del usuario y reacciones
         ///     ante ellas.
         /// </summary>
         public override void Update()
@@ -279,24 +279,24 @@ namespace TGC.Group.Model
             //Activo bounding box para debug
             ActivarBoundingBox();
 
-            //Chequea si se solicitÛ cambiar el tipo de camara
+            //Chequea si se solicit√≥ cambiar el tipo de camara
             CambiarDeCamara();
 
             //Acciona la vista con el movimiento del mouse
             MoverCamaraConMouse();
 
-            //Maneja el movimiento del auto teniendo en cuenta la posiciÛn de los otros objetos
+            //Maneja el movimiento del auto teniendo en cuenta la posici√≥n de los otros objetos
             MoverAutoConColisiones();            
         }
 
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
-        ///     Escribir aquÌ todo el cÛdigo referido al renderizado.
+        ///     Escribir aqu√≠ todo el c√≥digo referido al renderizado.
         ///     Borrar todo lo que no haga falta.
         /// </summary>
         public override void Render()
         {
-            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones seg˙n nuestra conveniencia.
+            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones seg√∫n nuestra conveniencia.
             PreRender();
 
             //Dibuja un texto por pantalla
@@ -304,16 +304,16 @@ namespace TGC.Group.Model
             DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.Red);
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
-            //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jer·rquicos, tenemos control total.
+            //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jer√°rquicos, tenemos control total.
             /*Box.Transform = Matrix.Scaling(Box.Scale) *
                             Matrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) *
                             Matrix.Translation(Box.Position);
-            //A modo ejemplo realizamos toda las multiplicaciones, pero aquÌ solo nos hacia falta la traslaciÛn.
+            //A modo ejemplo realizamos toda las multiplicaciones, pero aqu√≠ solo nos hacia falta la traslaci√≥n.
             //Finalmente invocamos al render de la caja
             Box.render();
             */
-            //Cuando tenemos modelos mesh podemos utilizar un mÈtodo que hace la matriz de transformaciÛn est·ndar.
-            //Es ˙til cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jer·rquicas o complicadas.
+            //Cuando tenemos modelos mesh podemos utilizar un m√©todo que hace la matriz de transformaci√≥n est√°ndar.
+            //Es √∫til cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jer√°rquicas o complicadas.
             Mesh.UpdateMeshTransform();
 
             //Render del mesh
@@ -322,7 +322,7 @@ namespace TGC.Group.Model
             //Dibujamos la escena
             ScenePpal.renderAll();
 
-            //Render de BoundingBox, muy ˙til para debug de colisiones.
+            //Render de BoundingBox, muy √∫til para debug de colisiones.
             if (BoundingBox)
             {
                 Mesh.BoundingBox.render();
@@ -455,9 +455,9 @@ namespace TGC.Group.Model
                 /*
                 //En este caso le sumamos un valor en Y
                 Camara.SetCamera(Camara.Position + new Vector3(0, 10f, 0), Camara.LookAt);
-                //Ver ejemplos de c·mara para otras operaciones posibles.
+                //Ver ejemplos de c√°mara para otras operaciones posibles.
 
-                //Si superamos cierto Y volvemos a la posiciÛn original.
+                //Si superamos cierto Y volvemos a la posici√≥n original.
                 if (Camara.Position.Y > 300f)
                 {
                     Camara.SetCamera(new Vector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
@@ -518,8 +518,8 @@ namespace TGC.Group.Model
                 Mesh.moveOrientedY(moveForward * ElapsedTime);
 
 
-                //El framework posee la clase TgcCollisionUtils con muchos algoritmos de colisiÛn de distintos tipos de objetos.
-                //Por ejemplo chequear si dos cajas colisionan entre sÌ, o dos esferas, o esfera con caja, etc.
+                //El framework posee la clase TgcCollisionUtils con muchos algoritmos de colisi√≥n de distintos tipos de objetos.
+                //Por ejemplo chequear si dos cajas colisionan entre s√≠, o dos esferas, o esfera con caja, etc.
                 var collisionFound = false;
 
                 foreach (var mesh in ScenePpal.Meshes)
@@ -528,10 +528,10 @@ namespace TGC.Group.Model
                     var mainMeshBoundingBox = Mesh.BoundingBox;
                     var sceneMeshBoundingBox = mesh.BoundingBox;
 
-                    //Ejecutar algoritmo de detecciÛn de colisiones
+                    //Ejecutar algoritmo de detecci√≥n de colisiones
                     var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
 
-                    //Hubo colisiÛn con un objeto. Guardar resultado y abortar loop.
+                    //Hubo colisi√≥n con un objeto. Guardar resultado y abortar loop.
                     if (collisionResult != TgcCollisionUtils.BoxBoxResult.Encerrando)
                     {
                         collisionFound = true;
@@ -539,7 +539,7 @@ namespace TGC.Group.Model
                     }
                 }
 
-                //Si hubo alguna colisiÛn, entonces restaurar la posiciÛn original del mesh
+                //Si hubo alguna colisi√≥n, entonces restaurar la posici√≥n original del mesh
                 if (collisionFound)
                 {
                     Mesh.Position = originalPos;
@@ -551,9 +551,9 @@ namespace TGC.Group.Model
         }
 
         /// <summary>
-        ///     Se llama cuando termina la ejecuciÛn del ejemplo.
+        ///     Se llama cuando termina la ejecuci√≥n del ejemplo.
         ///     Hacer Dispose() de todos los objetos creados.
-        ///     Es muy importante liberar los recursos, sobretodo los gr·ficos ya que quedan bloqueados en el device de video.
+        ///     Es muy importante liberar los recursos, sobretodo los gr√°ficos ya que quedan bloqueados en el device de video.
         /// </summary>
         public override void Dispose()
         {
