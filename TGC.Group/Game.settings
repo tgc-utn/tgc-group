@@ -17,8 +17,12 @@
     <Setting Name="MediaDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)">Media/</Value>
     </Setting>
-    <Setting Name="TexturaCaja" Type="System.String" Scope="User">
-      <Value Profile="(Default)">cajaMadera4.jpg</Value>
+    <Setting Name="WallMeshIdentifier" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Wall</Value>
     </Setting>
+    <Setting Name="DoorMeshIdentifier" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Door</Value>
+    </Setting>
+
   </Settings>
 </SettingsFile>
