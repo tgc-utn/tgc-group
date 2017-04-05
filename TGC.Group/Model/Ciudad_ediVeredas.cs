@@ -288,21 +288,21 @@ namespace TGC.Group.Model
                 //offset_row = 300 + ((i - 1) * 900);
                 //offset_Col = 300 + ((j - 1) * 750);
                 offset_row = 220 + ((i - 1) * 900);
-                offset_Col = 300 + ((j - 1) * 750);
+                offset_Col = 10 + ((j - 1) * 900);
             }
             if (nMesh == 2)
             {//Edicio Ladrillos
                 //offset_row = -100 + ((i - 1) * 900);
                 //offset_Col = 850 + ((j - 1) * 750);
                 offset_row = -280 + ((i - 1) * 900);
-                offset_Col = 800 + ((j - 1) * 750);
+                offset_Col = 480 + ((j - 1) * 900);
             }
             if (nMesh == 3)
             { //edifcio amarillo
                 //offset_row = 1000 + ((i - 1) * 900);
                 //offset_Col = 1290 + ((j - 1) * 750);
                 offset_row = 1050 + ((i - 1) * 900);
-                offset_Col = 1300 + ((j - 1) * 750);
+                offset_Col = 900 + ((j - 1) * 900);
             }
 
             if (nMesh == 4)
@@ -310,28 +310,28 @@ namespace TGC.Group.Model
                 //offset_row = 395 + ((i - 1) * 900);
                 //offset_Col = 1290 + ((j - 1) * 750);
                 offset_row = 300 + ((i - 1) * 900);
-                offset_Col = 1300 + ((j - 1) * 750);
+                offset_Col = 1000 + ((j - 1) * 900);
             }
             if (nMesh == 5)
             { //Edificio alto blanco finito espejado
                 //offset_row = 1000 + ((i - 1) * 900);
                 //offset_Col = -70 + ((j - 1) * 750);
                 offset_row = 1020 + ((i - 1) * 900);
-                offset_Col = -100 + ((j - 1) * 750);
+                offset_Col = -400 + ((j - 1) * 900);
             }
             if (nMesh == 6)
             { //Edificio gris U
                 //offset_row = -100 + ((i - 1) * 900);
                 //offset_Col = -70 + ((j - 1) * 750);
                 offset_row = -130 + ((i - 1) * 900);
-                offset_Col = -100 + ((j - 1) * 750);
+                offset_Col = -380 + ((j - 1) * 900);
             }
             if (nMesh == 7)
             { //Edificio alto blanco finito espejado - Rascacielos blanco
                 //offset_row = 1100 + ((i - 1) * 900);
                 //offset_Col = 600 + ((j - 1) * 750);
                 offset_row = 1065 + ((i - 1) * 900);
-                offset_Col = 600 + ((j - 1) * 750);
+                offset_Col = 200 + ((j - 1) * 900);
             }
             edificio = scene.Meshes[nMesh];
             var instance = edificio.createMeshInstance(edificio.Name + i + "_" + j);
