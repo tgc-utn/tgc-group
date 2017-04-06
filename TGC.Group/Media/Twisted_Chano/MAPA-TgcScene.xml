@@ -10,7 +10,7 @@
         <diffuse>[0,0,0,0]</diffuse>
         <specular>[0,0,0,0]</specular>
         <opacity>1</opacity>
-        <alphaBlendEnable>False</alphaBlendEnable>
+        <alphaBlendEnable>True</alphaBlendEnable>
         <bitmap uvTiling="[1,1]" uvOffset="[1,1]">Grass.JPG</bitmap>
       </subM>
       <subM name="Standardmaterial" type="Standardmaterial">
