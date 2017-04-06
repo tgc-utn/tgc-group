@@ -31,8 +31,14 @@ namespace TGC.Group.Model
         private List<TgcPlane> paredes;
         private List<TgcMesh> meshes;
         private TgcSceneLoader loader;
+        //private List<TgcBox> cajas;
+        private TgcTexture manzanaTexture;
+        private TgcTexture cordonTexture;
+        private TgcTexture veredaTexture;
+        private TgcTexture paredTexture;
 
         private int CameraX, CameraY, CameraZ;
+
         List<int> ListaRandom = new List<int>(7);
         /// <summary>
         ///     Constructor del juego.
@@ -65,6 +71,12 @@ namespace TGC.Group.Model
             //Es importante cargar texturas en Init, si se hace en el render loop podemos tener grandes problemas si instanciamos muchas.
             //Crea el piso de fondo
 
+            //cajasInicializadas = false;
+            manzanaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Floor.jpg");
+            cordonTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\granito.jpg");
+            veredaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\piso2.jpg");
+            paredTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Textures\\Ladrillo\\brick1_2.jpg");
+
             loader = new TgcSceneLoader();
             crearPisoDeFondo();
             crearCamara();
@@ -72,10 +84,12 @@ namespace TGC.Group.Model
             veredas = new System.Collections.Generic.List<TgcPlane>();
             cordones = new System.Collections.Generic.List<TgcPlane>();
             paredes = new System.Collections.Generic.List<TgcPlane>();
+            //cajas = new System.Collections.Generic.List<TgcBox>();
             crearEdificios();
             crearVeredas();
             crearParedes();
-            //crearCalles();
+            crearManzanas();
+            crearCalles();
         }
 
         /// <summary>
@@ -87,6 +101,7 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
+            //updateCajas();
             //Capturar Input teclado
             //desplazar();
             //Capturar Input Mouse
@@ -94,6 +109,34 @@ namespace TGC.Group.Model
 
         }
 
+
+
+        /// <summary>
+        ///     Actualiza los parametros de la caja en base a lo cargado por el usuario
+        /// </summary>
+        /*private void updateCajas()
+        {
+            //cajasInicializadas = false;
+            //Definir parametros
+            if (!cajasInicializadas)
+            {
+                foreach ( var caja in cajas)
+                {
+                    caja.setTexture(pisoManzana);
+                    caja.Size = new Vector3(800, 5, 800);
+                    float middle;
+                    float.TryParse("2.5", out middle);
+                    caja.Position = new Vector3(0, 10, 0) + new Vector3(15f, 5, 0);
+                    caja.UVOffset = new Vector2(45, 45);
+                    caja.UVTiling = new Vector2(45, 45);
+                    //caja.move(new Vector3(5000, 0, -430));
+                    caja.updateValues();
+                }
+
+                cajasInicializadas = true;
+            }
+        }
+        */
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aquí todo el código referido al renderizado.
@@ -111,6 +154,15 @@ namespace TGC.Group.Model
             //Renderizar suelo
             suelo.render();
             //calle.render();
+
+            renderizarListas();
+
+            //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
+            PostRender();
+        }
+
+        private void renderizarListas()
+        {
             //Renderizar instancias
             foreach (var mesh in meshes)
             {
@@ -135,8 +187,34 @@ namespace TGC.Group.Model
                 p.render();
             }
 
-            //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
-            PostRender();
+            
+        }
+
+        private void disposeListas()
+        {
+            //Renderizar instancias
+            foreach (var mesh in meshes)
+            {
+                mesh.dispose();
+            }
+
+            //Renderizado de cordones
+            foreach (var cordon in cordones)
+            {
+                cordon.dispose();
+            }
+
+            //Renderizado de veredas
+            foreach (var v in veredas)
+            {
+                v.dispose();
+            }
+
+            //Renderizado de paredes
+            foreach (var p in paredes)
+            {
+                p.dispose();
+            }
         }
 
         /// <summary>
@@ -150,6 +228,7 @@ namespace TGC.Group.Model
             calle.dispose();
             //Al hacer dispose del original, se hace dispose automaticamente de todas las instancias
             edificio.dispose();
+            disposeListas();
         }
         private void movimientosCamara()
         {
@@ -216,7 +295,7 @@ namespace TGC.Group.Model
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             //Camara.SetCamera(cameraPosition, lookAt);
             //Camara en 1ra persona
-            Camara = new TgcFpsCamera(new Vector3(-400, 50, -400), Input);
+            Camara = new TgcFpsCamera(new Vector3(400, 50, 400), Input);
         }
         private void crearEdificios()
         {
@@ -281,18 +360,20 @@ namespace TGC.Group.Model
 
             float offset_row = 300;
             float offset_Col = 100;
+            float offset_Y = 0;
             if (nMesh == 0)
             { //Edificio Blanco Espejado
                 offset_row = 300 + ((i - 1) * 700);
                 offset_Col = 300 + ((j - 1) * 350);
             }
             if (nMesh == 2)
-            {//Edicio Ladrillos
+            {//Edificio Ladrillos
                 offset_row = 0 + ((i - 1) * 700);
                 offset_Col = 850 + ((j - 1) * 350);
+                offset_Y = 1000;
             }
             if (nMesh == 3)
-            { //edifcio amarillo
+            { //edificio amarillo
                 offset_row = 1000 + ((i - 1) * 700);
                 offset_Col = 1290 + ((j - 1) * 350);
             }
@@ -323,7 +404,7 @@ namespace TGC.Group.Model
             instance.AutoTransformEnable = true;
             //Desplazarlo
            // instance.move(i * offset_row, 0, j * offset_Col);
-            instance.move( offset_row, 0, offset_Col);
+            instance.move( offset_row, offset_Y, offset_Col);
              if (nMesh == 0)
             instance.Scale = new Vector3(0.70f, 1f, 1f);
            
@@ -349,8 +430,8 @@ namespace TGC.Group.Model
         private void crearVeredas()
         {
 
-            var cordonTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\granito.jpg");
-            var veredaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\piso2.jpg");
+            //var cordonTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\granito.jpg");
+            //var veredaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\piso2.jpg");
 
             cordones.Add( new TgcPlane(new Vector3(-450, 5, -450), new Vector3(5900, 0, 5), TgcPlane.Orientations.XZplane, cordonTexture, 40, 1));
             cordones.Add(new TgcPlane(new Vector3(-450, 0, -445), new Vector3(5895, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
@@ -368,12 +449,15 @@ namespace TGC.Group.Model
             cordones.Add(new TgcPlane(new Vector3(5445, 0, -445), new Vector3(0, 5, 5890), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
             veredas.Add(new TgcPlane(new Vector3(5450, 5, -450), new Vector3(50, 0, 5900), TgcPlane.Orientations.XZplane, veredaTexture, 1, 60));
 
+            var caja = new TgcBox();
+            //cajas.Add(caja);
+
         }
 
         private void crearParedes()
         {
 
-            var paredTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Textures\\Ladrillo\\brick1_2.jpg");
+            //var paredTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Textures\\Ladrillo\\brick1_2.jpg");
             //var veredaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\piso2.jpg");
 
             paredes.Add(new TgcPlane(new Vector3(-500, 0, -500), new Vector3(0, 100, 6000), TgcPlane.Orientations.YZplane, paredTexture, 60, 1));
@@ -386,13 +470,25 @@ namespace TGC.Group.Model
         private void crearManzanas()
         {
 
-            var cordonTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\granito.jpg");
+            //var cordonTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\granito.jpg");
             calle = new TgcPlane(new Vector3(-100, 0, -100), new Vector3(50, 2, 600), TgcPlane.Orientations.XZplane, cordonTexture, 10f, 10f);
             //calle = new TgcPlane();
             //calle.setTexture(CalleTexture);
             //Crear varias instancias del modelo original, pero sin volver a cargar el modelo entero cada vez
             //  meshes = new System.Collections.Generic.List<TgcMesh>();
             //  generarGrillaCalles(rows, cols, scene);
+        }
+
+        private void GenerarManzana(Vector3 vecPos, Vector3 vecSize)
+        {
+            //creo los cordones que rodean la manzana
+            cordones.Add(new TgcPlane(new Vector3(-450, 5, -450), 
+                                      new Vector3(5900, 0, 5), 
+                         TgcPlane.Orientations.XZplane, cordonTexture, 40, 1));
+
+            //creo el TgcPlane de la manzana
+            veredas.Add(new TgcPlane(vecPos, vecSize, TgcPlane.Orientations.XZplane, manzanaTexture, 45, 45));
+
         }
         /*    private void generarGrillaCalles(int rows, int cols, TgcScene scene)
             {
