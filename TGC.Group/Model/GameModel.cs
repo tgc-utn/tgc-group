@@ -135,7 +135,7 @@ namespace TGC.Group.Model
             var ScenePpalMesh = ScenePpal.Meshes[0];
             ScenePpalMesh.AutoTransformEnable = false;
             ScenePpalMesh.Transform = ScenePpalMesh.Transform * Matrix.Scaling(new Vector3(3, 1, 3));
-            //ScenePpalMesh.AlphaBlendEnable = true;
+            ScenePpalMesh.AlphaBlendEnable = true;
             ScenePpalMesh.updateBoundingBox();
 
             //Cargo el auto
