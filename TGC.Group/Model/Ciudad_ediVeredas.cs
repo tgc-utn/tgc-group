@@ -31,6 +31,7 @@ namespace TGC.Group.Model
         private List<TgcPlane> paredes;
         private List<TgcMesh> meshes;
         private TgcSceneLoader loader;
+        
 
         private int CameraX, CameraY, CameraZ;
         List<int> ListaRandom = new List<int>(7);
@@ -75,6 +76,8 @@ namespace TGC.Group.Model
             crearEdificios();
             crearVeredas();
             crearParedes();
+            crearAuto();
+            crearSemaforos();
             //crearCalles();
         }
 
@@ -134,7 +137,6 @@ namespace TGC.Group.Model
             {
                 p.render();
             }
-
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
@@ -150,6 +152,9 @@ namespace TGC.Group.Model
             //calle.dispose();
             //Al hacer dispose del original, se hace dispose automaticamente de todas las instancias
             edificio.dispose();
+            auto.dispose();
+            camion.dispose();
+
         }
         private void movimientosCamara()
         {
@@ -211,12 +216,12 @@ namespace TGC.Group.Model
             //Posición de la camara.
             var cameraPosition = new Vector3(CameraX, CameraY, CameraZ);
             //Quiero que la camara mire hacia el origen (0,0,0).
-            var lookAt = Vector3.Empty;
+            var lookAt = suelo.BoundingBox.calculateBoxCenter();
 
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             //Camara.SetCamera(cameraPosition, lookAt);
             //Camara en 1ra persona
-            Camara = new TgcFpsCamera(new Vector3(-400, 50, -400), Input);
+            Camara = new TgcFpsCamera(new Vector3(300, 600, -600), Input);
         }
         private void crearEdificios()
         {
@@ -432,7 +437,59 @@ namespace TGC.Group.Model
             //  meshes = new System.Collections.Generic.List<TgcMesh>();
             //  generarGrillaCalles(rows, cols, scene);
         }
+        private TgcMesh auto;
+        private TgcMesh camion;
         
+        private void crearAuto()
+        {
+            var sceneAuto = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\Hummer\\Hummer-TgcScene.xml");
+            auto = sceneAuto.Meshes[0];
+            auto.AutoTransformEnable = true;
+            auto.move(0, 5, 0);
+            meshes.Add(auto);
+
+            var sceneCamion = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vehiculos\\CamionCarga\\CamionCarga-TgcScene.xml");
+            camion = sceneCamion.Meshes[0];
+            camion.AutoTransformEnable = true;
+            camion.move(((suelo.Size.X) - 600), 5, 0);
+            meshes.Add(camion);
+
+
+
+        }
+
+
+        private TgcMesh semaforo;
+        private void crearSemaforos()
+        {
+
+            var sceneSemaforo = loader.loadSceneFromFile(MediaDir + "ModelosTgc\\Semaforo\\Semaforo-TgcScene.xml");
+
+            semaforo = sceneSemaforo.Meshes[0];
+
+            for (int i = 0;i < veredas.Count; i++ )
+            {
+
+                var instanciaIda = semaforo.createMeshInstance(semaforo.Name + i);
+                instanciaIda.AutoTransformEnable = true;
+                var posicionX =  (veredas[i].Position.X) + (veredas[i].Size.X) - 20;
+                var posicionY = 30;
+                var posicionZ = veredas[i].Position.Z + 20;
+                instanciaIda.move(posicionX,posicionY,posicionZ);
+                meshes.Add(instanciaIda);
+
+                var instanciaVuelta = semaforo.createMeshInstance(semaforo.Name + i);
+                instanciaVuelta.AutoTransformEnable = true;
+                var posicionX2 = (veredas[i].Position.X) + 20;
+                var posicionY2  = 30;
+                var posicionZ2 = veredas[i].Position.Z + (veredas[i].Size.Z) - 20;
+                instanciaVuelta.move(posicionX2, posicionY2, posicionZ2);
+                instanciaVuelta.rotateY(FastMath.PI);
+                meshes.Add(instanciaVuelta);
+
+
+            }
+        }
         /*    private void generarGrillaCalles(int rows, int cols, TgcScene scene)
             {
                 int modMesh = 0;
