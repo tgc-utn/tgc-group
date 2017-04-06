@@ -1,3 +1,4 @@
+//"Inclusion de librerias"
 using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
@@ -20,10 +21,7 @@ using System.Collections.Generic;
 namespace TGC.Group.Model
 {
     /// <summary>
-    ///     Ejemplo para implementar el TP.
-    ///     Inicialmente puede ser renombrado o copiado para hacer más ejemplos chicos, en el caso de copiar para que se
-    ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
-    ///     line 97.
+    ///     Twisted Chano, juego de autos chocadores
     /// </summary>
     public class GameModel : TgcExample
     {
@@ -39,9 +37,13 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        //Velocidad de movimiento del auto
-        private const float MOVEMENT_SPEED = 400f;
+        /// <summary>
+        /// Inicializacion de variables y "definicion" de los objetos
+        /// </summary>
 
+        //Velocidad de movimiento del auto
+        private const float MOVEMENT_SPEED = 800f;
+        //Velocidad de rotación del auto
         private const float ROTATION_SPEED = 120f;
 
         //Cantidad de filas
@@ -67,6 +69,9 @@ namespace TGC.Group.Model
 
         //Tipo de cámara
         private int TipoCamara = 0;
+
+        //Lista de Autos
+        private List<TgcMesh> MeshAutos;
 
         //Lista de palmeras
         private List<TgcMesh> MeshPalmeras;
@@ -143,11 +148,12 @@ namespace TGC.Group.Model
             Mesh.move(0, 0.3f, 0);
 
             //Camara por defecto
-            CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 400);
+            CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 600);
             Camara = CamaraInterna;           
 
             //Creo los objetos del escenario
-            CrearObjetos(loader);           
+            CrearObjetos(loader);
+            CrearAutos(loader);
 
         }
 
@@ -226,6 +232,28 @@ namespace TGC.Group.Model
 
             return MatrizPoblacion;
         }
+        private void CrearAutos(TgcSceneLoader loader)
+        {
+            System.Random randomNumber = new System.Random();
+
+            var tanque = loader.loadSceneFromFile(MediaDir + "Vehiculos\\TanqueFuturistaRuedas\\TanqueFuturistaRuedas-TgcScene.xml").Meshes[0].createMeshInstance("tanque");
+            var hummer = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Hummer\\Hummer-TgcScene.xml").Meshes[0].createMeshInstance("hummer");
+            var camioneta = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Camioneta\\Camioneta-TgcScene.xml").Meshes[0].createMeshInstance("camioneta");
+            var patrullero = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Patrullero\\Patrullero-TgcScene.xml").Meshes[0].createMeshInstance("buggy");
+
+            tanque.Transform = tanque.Transform * Matrix.Translation(new Vector3(-2000,0,2000));
+            hummer.Transform = hummer.Transform * Matrix.Translation(new Vector3(2000, 0, 2000));
+            camioneta.Transform = camioneta.Transform * Matrix.RotationY(180 * (FastMath.PI / 180));
+            camioneta.Transform = camioneta.Transform * Matrix.Translation(new Vector3(2000,0,-2000));
+            patrullero.Transform = patrullero.Transform * Matrix.RotationY(180 * (FastMath.PI / 180));
+            patrullero.Transform = patrullero.Transform * Matrix.Translation(new Vector3(-2000,0,-2000));
+
+            MeshAutos = new List<TgcMesh>();
+            MeshAutos.Add(tanque);
+            MeshAutos.Add(hummer);
+            MeshAutos.Add(camioneta);
+            MeshAutos.Add(patrullero);
+        }
 
         //Crea instancias de un objeto
         private List<TgcMesh> CrearInstancias(TgcMesh unObjeto, float scale, float ejeZ, int cantidadObjetos, int[,] MatrizPoblacion)
@@ -249,12 +277,13 @@ namespace TGC.Group.Model
 
 
                             instance.Transform = Matrix.Scaling(new Vector3(scale, scale, scale)) *
-                                                                        Matrix.Translation(new Vector3(1000, ejeZ, -1000));
+                                                                       Matrix.Translation(new Vector3(1000, ejeZ, -1000));
+
 
                             instance.Transform = instance.Transform * Matrix.Translation(
                                                                         new Vector3((-1) * randomNumber.Next(j * CUADRANTE_SIZE, (j + 1) * CUADRANTE_SIZE), 0,
                                                                                     randomNumber.Next(i * CUADRANTE_SIZE, (i + 1) * CUADRANTE_SIZE)));
-                            instance.Transform = instance.Transform * Matrix.RotationY(randomNumber.Next(1, 360));
+                            instance.Transform = instance.Transform * Matrix.RotationY((randomNumber.Next(1, 180)) * FastMath.PI / 180);
 
                             instance.AlphaBlendEnable = true;
 
@@ -342,6 +371,11 @@ namespace TGC.Group.Model
 
         private void RenderizarObjetos()
         {
+            //Renderizar Autos
+            foreach (var mesh in MeshAutos)
+            {
+                mesh.render();
+            }
             //Renderizar palmeras
             foreach (var mesh in MeshPalmeras)
             {
@@ -432,7 +466,7 @@ namespace TGC.Group.Model
                 {
                     case 0:
                         {
-                            CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 400);
+                            //CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 400);
                             Camara = CamaraInterna;
                         }
                         break;
@@ -542,6 +576,7 @@ namespace TGC.Group.Model
                 //Si hubo alguna colisión, entonces restaurar la posición original del mesh
                 if (collisionFound)
                 {
+                    DrawText.drawText("Chocamos", 50, 50, Color.Blue);
                     Mesh.Position = originalPos;
                 }
 
