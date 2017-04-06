@@ -33,6 +33,12 @@ namespace TGC.Group.Model
         private TgcSceneLoader loader;
         
 
+        private TgcTexture manzanaTexture;
+        private TgcTexture cordonTexture;
+        private TgcTexture veredaTexture;
+        private TgcTexture paredTexture;
+        private TgcTexture calleTexture;
+
         private int CameraX, CameraY, CameraZ;
         List<int> ListaRandom = new List<int>(7);
         /// <summary>
@@ -64,6 +70,14 @@ namespace TGC.Group.Model
             CameraZ = 110;
             //Cargamos una textura, tener en cuenta que cargar una textura significa crear una copia en memoria.
             //Es importante cargar texturas en Init, si se hace en el render loop podemos tener grandes problemas si instanciamos muchas.
+
+            //Carga Texturas
+            manzanaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Scenes\\Ciudad\\Textures\\Floor.jpg");
+            cordonTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\granito.jpg");
+            veredaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\piso2.jpg");
+            paredTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Textures\\Ladrillo\\brick1_2.jpg");
+            calleTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\f1piso2.png");
+
             //Crea el piso de fondo
 
             loader = new TgcSceneLoader();
@@ -78,6 +92,7 @@ namespace TGC.Group.Model
             crearParedes();
             crearAuto();
             crearSemaforos();
+            crearPlantas();
             //crearCalles();
         }
 
@@ -222,6 +237,7 @@ namespace TGC.Group.Model
             //Camara.SetCamera(cameraPosition, lookAt);
             //Camara en 1ra persona
             Camara = new TgcFpsCamera(new Vector3(300, 600, -600), Input);
+
         }
         private void crearEdificios()
         {
@@ -288,6 +304,7 @@ namespace TGC.Group.Model
 
             float offset_row = 300;
             float offset_Col = 100;
+            float offset_Y = 5;
             if (nMesh == 0)
             { //Edificio Blanco Espejado - chiquito
                 //offset_row = 300 + ((i - 1) * 900);
@@ -316,6 +333,7 @@ namespace TGC.Group.Model
                 //offset_Col = 1290 + ((j - 1) * 750);
                 offset_row = 300 + ((i - 1) * 900);
                 offset_Col = 1000 + ((j - 1) * 900);
+                offset_Y = -65;
             }
             if (nMesh == 5)
             { //Edificio alto blanco finito espejado
@@ -344,7 +362,7 @@ namespace TGC.Group.Model
             instance.AutoTransformEnable = true;
             //Desplazarlo
             // instance.move(i * offset_row, 0, j * offset_Col);
-            instance.move(offset_row, 0, offset_Col);
+            instance.move(offset_row, offset_Y, offset_Col);
             if (nMesh == 0)
                 instance.Scale = new Vector3(0.70f, 1f, 1f);
 
@@ -353,11 +371,14 @@ namespace TGC.Group.Model
             
             meshes.Add(instance);
 
-            var veredaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\piso2.jpg");
             var posicionX = instance.BoundingBox.calculateBoxCenter().X - (550 / 2);
             var posicionZ = instance.BoundingBox.calculateBoxCenter().Z - (550 / 2);
-            var posicion = new Vector3(posicionX, 1, posicionZ);
+            var posicion = new Vector3(posicionX, 5, posicionZ);
             veredas.Add(new TgcPlane(posicion, new Vector3(550, 0, 550), TgcPlane.Orientations.XZplane, veredaTexture, 60, 60));
+            cordones.Add(new TgcPlane(new Vector3(posicion.X, 0, posicion.Z), new Vector3(550, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
+            cordones.Add(new TgcPlane(new Vector3(posicion.X + 550, 0, posicion.Z), new Vector3(0, 5, 550), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
+            cordones.Add(new TgcPlane(new Vector3(posicion.X, 0, posicion.Z + 550), new Vector3(550, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
+            cordones.Add(new TgcPlane(new Vector3(posicion.X , 0, posicion.Z), new Vector3(0, 5, 550), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
 
             return true;
         }
@@ -365,8 +386,8 @@ namespace TGC.Group.Model
         private void crearCalles()
         {
 
-            var CalleTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\f1piso2.png");
-            calle = new TgcPlane(new Vector3(-100, 0, -100), new Vector3(50, 2, 600), TgcPlane.Orientations.XZplane, CalleTexture, 10f, 10f);
+            //var CalleTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\f1\\f1piso2.png");
+            //veredas.Add( new TgcPlane(new Vector3(-445, 1, -445), new Vector3(560, 0, 5890), TgcPlane.Orientations.XZplane, CalleTexture, 10f, 10f));
             //calle = new TgcPlane();
             //calle.setTexture(CalleTexture);
             //Crear varias instancias del modelo original, pero sin volver a cargar el modelo entero cada vez
@@ -377,24 +398,24 @@ namespace TGC.Group.Model
         private void crearVeredas()
         {
 
-            var cordonTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\granito.jpg");
-            var veredaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\piso2.jpg");
+            //var cordonTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\granito.jpg");
+            //var veredaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\piso2.jpg");
 
             cordones.Add(new TgcPlane(new Vector3(-450, 5, -450), new Vector3(5900, 0, 5), TgcPlane.Orientations.XZplane, cordonTexture, 40, 1));
             cordones.Add(new TgcPlane(new Vector3(-450, 0, -445), new Vector3(5895, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
-            veredas.Add(new TgcPlane(new Vector3(-500, 5, -500), new Vector3(6000, 0, 50), TgcPlane.Orientations.XZplane, veredaTexture, 60, 1));
+            cordones.Add(new TgcPlane(new Vector3(-500, 5, -500), new Vector3(6000, 0, 50), TgcPlane.Orientations.XZplane, veredaTexture, 60, 1));
 
             cordones.Add(new TgcPlane(new Vector3(-450, 5, -445), new Vector3(5, 0, 5890), TgcPlane.Orientations.XZplane, cordonTexture, 1, 40));
             cordones.Add(new TgcPlane(new Vector3(-445, 0, -445), new Vector3(0, 5, 5890), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
-            veredas.Add(new TgcPlane(new Vector3(-500, 5, -450), new Vector3(50, 0, 5950), TgcPlane.Orientations.XZplane, veredaTexture, 1, 60));
+            cordones.Add(new TgcPlane(new Vector3(-500, 5, -450), new Vector3(50, 0, 5950), TgcPlane.Orientations.XZplane, veredaTexture, 1, 60));
 
             cordones.Add(new TgcPlane(new Vector3(-450, 5, 5445), new Vector3(5900, 0, 5), TgcPlane.Orientations.XZplane, cordonTexture, 40, 1));
             cordones.Add(new TgcPlane(new Vector3(-450, 0, 5445), new Vector3(5900, 5, 0), TgcPlane.Orientations.XYplane, cordonTexture, 40, 1));
-            veredas.Add(new TgcPlane(new Vector3(-450, 5, 5500), new Vector3(5950, 0, -50), TgcPlane.Orientations.XZplane, veredaTexture, 60, 1));
+            cordones.Add(new TgcPlane(new Vector3(-450, 5, 5500), new Vector3(5950, 0, -50), TgcPlane.Orientations.XZplane, veredaTexture, 60, 1));
 
             cordones.Add(new TgcPlane(new Vector3(5445, 5, -445), new Vector3(5, 0, 5890), TgcPlane.Orientations.XZplane, cordonTexture, 1, 40));
             cordones.Add(new TgcPlane(new Vector3(5445, 0, -445), new Vector3(0, 5, 5890), TgcPlane.Orientations.YZplane, cordonTexture, 1, 40));
-            veredas.Add(new TgcPlane(new Vector3(5450, 5, -450), new Vector3(50, 0, 5900), TgcPlane.Orientations.XZplane, veredaTexture, 1, 60));
+            cordones.Add(new TgcPlane(new Vector3(5450, 5, -450), new Vector3(50, 0, 5900), TgcPlane.Orientations.XZplane, veredaTexture, 1, 60));
 
             //	var rows = 10;
             //    var cols = 6;
@@ -416,7 +437,7 @@ namespace TGC.Group.Model
         private void crearParedes()
         {
 
-            var paredTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Textures\\Ladrillo\\brick1_2.jpg");
+            //var paredTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "MeshCreator\\Textures\\Ladrillo\\brick1_2.jpg");
             //var veredaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\piso2.jpg");
 
             paredes.Add(new TgcPlane(new Vector3(-500, 0, -500), new Vector3(0, 100, 6000), TgcPlane.Orientations.YZplane, paredTexture, 60, 1));
@@ -429,7 +450,7 @@ namespace TGC.Group.Model
         private void crearManzanas()
         {
 
-            var cordonTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\granito.jpg");
+            //var cordonTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\granito.jpg");
             calle = new TgcPlane(new Vector3(-100, 0, -100), new Vector3(50, 2, 600), TgcPlane.Orientations.XZplane, cordonTexture, 10f, 10f);
             //calle = new TgcPlane();
             //calle.setTexture(CalleTexture);
@@ -473,7 +494,7 @@ namespace TGC.Group.Model
                 var instanciaIda = semaforo.createMeshInstance(semaforo.Name + i);
                 instanciaIda.AutoTransformEnable = true;
                 var posicionX =  (veredas[i].Position.X) + (veredas[i].Size.X) - 20;
-                var posicionY = 30;
+                var posicionY = 40;
                 var posicionZ = veredas[i].Position.Z + 20;
                 instanciaIda.move(posicionX,posicionY,posicionZ);
                 meshes.Add(instanciaIda);
@@ -481,7 +502,7 @@ namespace TGC.Group.Model
                 var instanciaVuelta = semaforo.createMeshInstance(semaforo.Name + i);
                 instanciaVuelta.AutoTransformEnable = true;
                 var posicionX2 = (veredas[i].Position.X) + 20;
-                var posicionY2  = 30;
+                var posicionY2  = 40;
                 var posicionZ2 = veredas[i].Position.Z + (veredas[i].Size.Z) - 20;
                 instanciaVuelta.move(posicionX2, posicionY2, posicionZ2);
                 instanciaVuelta.rotateY(FastMath.PI);
@@ -490,6 +511,78 @@ namespace TGC.Group.Model
 
             }
         }
+
+        private TgcMesh Planta;
+        private enum Plantas {Pino = 2, Palmera = 1, Nada = 0, Arbol = 3 };
+        private void crearUnaPlanta(TgcScene unaScene, int i, Vector3 vectorPosicion)
+        {
+            Planta = unaScene.Meshes[0];
+            var instancia = Planta.createMeshInstance(Planta.Name + i);
+            instancia.AutoTransformEnable = true;
+            instancia.move(vectorPosicion.X, vectorPosicion.Y, vectorPosicion.Z);
+            meshes.Add(instancia);
+
+        }
+        private Vector3 vectorFrontalMitadVereda(int i)
+        {
+            var posicionX = (veredas[i].Position.X) + ((veredas[i].Size.X) / 2);
+            var posicionY = 10;
+            var posicionZ = veredas[i].Position.Z + 20;
+            return new Vector3(posicionX, posicionY, posicionZ);
+
+        }
+        private Vector3 vectorTraseroMitadVereda(int i)
+        {
+            var posicionX = (veredas[i].Position.X);
+            var posicionY = 10;
+            var posicionZ = veredas[i].Position.Z + ((veredas[i].Size.Z) / 2);
+            return new Vector3(posicionX, posicionY, posicionZ);
+
+        }
+        private Vector3 vectorLateralDerechoMitadVereda(int i)
+        {
+            var posicionX = (veredas[i].Position.X) + ((veredas[i].Size.X))-20;
+            var posicionY = 10;
+            var posicionZ = veredas[i].Position.Z + ((veredas[i].Size.Z)/2);
+            return new Vector3(posicionX, posicionY, posicionZ);
+
+        }
+        private void crearPlantas()
+        {   
+            for (int i = 0; i < veredas.Count; i++)
+            {
+                var vectorPosicion = new Vector3(0, 0, 0);
+                System.Random generator = new System.Random();
+                int n = generator.Next(1, 3);
+                switch (n)
+                { 
+                    
+                    case (int)Plantas.Nada:
+                        break;
+                    case (int)Plantas.Pino:
+                        var scenePlanta = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vegetacion\\Pino\\Pino-TgcScene.xml");
+                        vectorPosicion = vectorFrontalMitadVereda(i);
+                        crearUnaPlanta(scenePlanta, i, vectorPosicion);
+                        break;
+                    case (int)Plantas.Palmera:
+                        var scenePlanta2 = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vegetacion\\Palmera3\\Palmera3-TgcScene.xml");
+                        vectorPosicion = vectorLateralDerechoMitadVereda(i);
+                        crearUnaPlanta(scenePlanta2, i, vectorPosicion);
+                        break;
+                    case (int)Plantas.Arbol:
+                        var scenePlanta3 = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Vegetacion\\ArbolBosque\\ArbolBosque-TgcScene.xml");
+                        vectorPosicion = vectorTraseroMitadVereda(i);
+                        crearUnaPlanta(scenePlanta3, i, vectorPosicion);
+                        break;
+                }
+                 
+                
+                
+                
+
+            }
+        }
+        
         /*    private void generarGrillaCalles(int rows, int cols, TgcScene scene)
             {
                 int modMesh = 0;
