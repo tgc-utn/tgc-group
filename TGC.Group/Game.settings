@@ -23,6 +23,8 @@
     <Setting Name="DoorMeshIdentifier" Type="System.String" Scope="User">
       <Value Profile="(Default)">Door</Value>
     </Setting>
-
+    <Setting Name="TexturaCaja" Type="System.String" Scope="User">
+      <Value Profile="(Default)">cajaMadera4.jpg</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

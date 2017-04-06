@@ -21,7 +21,7 @@ namespace TGC.Group.Model
 
         private World world;
         
-
+        
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {            
             Category = Game.Default.Category;
@@ -33,7 +33,7 @@ namespace TGC.Group.Model
         {
             
             var d3dDevice = D3DDevice.Instance.Device;
-                       
+            
             this.world    = new World(MediaDir, this.Input);
             this.Camara = this.world.Camera;
         }
