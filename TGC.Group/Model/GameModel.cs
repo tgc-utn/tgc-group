@@ -42,18 +42,18 @@ namespace TGC.Group.Model
         /// </summary>
 
         //Velocidad de movimiento del auto
-        private const float MOVEMENT_SPEED = 800f;
+        private const float MOVEMENT_SPEED = 400f;
         //Velocidad de rotación del auto
         private const float ROTATION_SPEED = 120f;
 
         //Cantidad de filas
-        private const int ROWS = 9;
+        private const int ROWS = 19;
 
         //Cantidad de columnas
-        private const int COLUMNS = 9;
+        private const int COLUMNS = 19;
 
         //Tamaño cuadrante
-        private const int CUADRANTE_SIZE = 450;
+        private const int CUADRANTE_SIZE = 300;
 
         //Scene principal
         private TgcScene ScenePpal;
@@ -149,12 +149,11 @@ namespace TGC.Group.Model
 
             //Camara por defecto
             CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 600);
-            Camara = CamaraInterna;           
+            Camara = CamaraInterna;
 
             //Creo los objetos del escenario
-            CrearObjetos(loader);
             CrearAutos(loader);
-
+            CrearObjetos(loader);
         }
 
         private void CrearObjetos(TgcSceneLoader loader)
@@ -232,6 +231,7 @@ namespace TGC.Group.Model
 
             return MatrizPoblacion;
         }
+
         private void CrearAutos(TgcSceneLoader loader)
         {
             System.Random randomNumber = new System.Random();
@@ -242,13 +242,24 @@ namespace TGC.Group.Model
             var patrullero = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Patrullero\\Patrullero-TgcScene.xml").Meshes[0].createMeshInstance("buggy");
 
             tanque.Transform = tanque.Transform * Matrix.Translation(new Vector3(-2000,0,2000));
+            tanque.BoundingBox.transform(tanque.Transform);
+
             hummer.Transform = hummer.Transform * Matrix.Translation(new Vector3(2000, 0, 2000));
+            hummer.BoundingBox.transform(hummer.Transform);
+
             camioneta.Transform = camioneta.Transform * Matrix.RotationY(180 * (FastMath.PI / 180));
             camioneta.Transform = camioneta.Transform * Matrix.Translation(new Vector3(2000,0,-2000));
+            camioneta.BoundingBox.transform(camioneta.Transform);
+
             patrullero.Transform = patrullero.Transform * Matrix.RotationY(180 * (FastMath.PI / 180));
             patrullero.Transform = patrullero.Transform * Matrix.Translation(new Vector3(-2000,0,-2000));
+            patrullero.BoundingBox.transform(patrullero.Transform);
 
             MeshAutos = new List<TgcMesh>();
+            //Auto principal
+            MeshAutos.Add(Mesh);
+
+            //Otros autos con IA?
             MeshAutos.Add(tanque);
             MeshAutos.Add(hummer);
             MeshAutos.Add(camioneta);
@@ -260,7 +271,6 @@ namespace TGC.Group.Model
         {
             List<TgcMesh> ListaMesh = new List<TgcMesh>();
             System.Random randomNumber = new System.Random();
-            
 
             for (int i = 0; i < ROWS; i++)
             {
@@ -275,18 +285,34 @@ namespace TGC.Group.Model
 
                             instance.AutoTransformEnable = false;
 
+                            //Roto el objeto aleatoriamente
+                            instance.Transform = Matrix.RotationY((randomNumber.Next(1, 180)) * FastMath.PI / 180);
 
-                            instance.Transform = Matrix.Scaling(new Vector3(scale, scale, scale)) *
-                                                                       Matrix.Translation(new Vector3(1000, ejeZ, -1000));
+                            //Lo agrando y traslado al borde del terreno
+                            instance.Transform = instance.Transform * Matrix.Scaling(new Vector3(scale, scale, scale)) *
+                                                                       Matrix.Translation(new Vector3(3000, ejeZ, -3000));
 
 
+                            //Lo posiciono en una posición aleatoria
                             instance.Transform = instance.Transform * Matrix.Translation(
                                                                         new Vector3((-1) * randomNumber.Next(j * CUADRANTE_SIZE, (j + 1) * CUADRANTE_SIZE), 0,
                                                                                     randomNumber.Next(i * CUADRANTE_SIZE, (i + 1) * CUADRANTE_SIZE)));
-                            instance.Transform = instance.Transform * Matrix.RotationY((randomNumber.Next(1, 180)) * FastMath.PI / 180);
 
+                            instance.BoundingBox.transform(instance.Transform);
+                            
+                            //Valido si pisa a otro objeto que ya existe
+                            if (ValidarColisionCrearInstancias(instance, ListaMesh))
+                            {
+                                //Hubo colision, no creo el objeto
+                                instance.dispose();
+                                continue;                                
+                            }
+                            ///////////////////////////////////////////////////////////////////////////////////
+
+                            //Le activo el alpha para que se vea mejor
                             instance.AlphaBlendEnable = true;
 
+                            //Lo agrego a la lista para después renderizarlo
                             ListaMesh.Add(instance);
                         }
                     }
@@ -294,6 +320,29 @@ namespace TGC.Group.Model
             }
 
             return ListaMesh;
+        }
+
+        private bool ValidarColisionCrearInstancias(TgcMesh unaInstancia, List<TgcMesh> ListaMeshActual)
+        {
+            //Valido la colisión para cada lista de objetos que tenga
+            if (AccionarListaMesh(ListaMeshActual, 2, unaInstancia) ||
+                AccionarListaMesh(MeshPalmeras, 2, unaInstancia) ||
+                AccionarListaMesh(MeshPinos, 2, unaInstancia) ||
+                AccionarListaMesh(MeshRocas, 2, unaInstancia) ||
+                AccionarListaMesh(MeshArbolesBananas, 2, unaInstancia) ||
+                AccionarListaMesh(MeshBarrilesPolvora, 2, unaInstancia) ||
+                AccionarListaMesh(MeshCarretillas, 2, unaInstancia) ||
+                AccionarListaMesh(MeshContenedores, 2, unaInstancia) ||
+                AccionarListaMesh(MeshLockers, 2, unaInstancia) ||
+                AccionarListaMesh(MeshExpendedoresBebidas, 2, unaInstancia) ||
+                AccionarListaMesh(MeshCajasMuniciones, 2, unaInstancia) ||
+                AccionarListaMesh(MeshAutos, 2, unaInstancia)
+                )
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -354,93 +403,98 @@ namespace TGC.Group.Model
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (BoundingBox)
             {
-                Mesh.BoundingBox.render();
-
                 foreach (var mesh in ScenePpal.Meshes)
                 {
                     mesh.BoundingBox.render();
                 }
+
+                RenderizarObjetos(1);
             }            
 
             //Renderizo los objetos cargados de las listas
-            RenderizarObjetos();
+            RenderizarObjetos(0);
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
 
-        private void RenderizarObjetos()
+        //0: render
+        //1: render bounding box
+        //2: control de colisiones
+        private bool AccionarListaMesh(List<TgcMesh> unaListaMesh, int unaAccion, TgcMesh unaInstancia)
+        {
+            //Si no está sin inicializar, realizo una acción
+            if (unaListaMesh != null)
+            {
+                foreach (var mesh in unaListaMesh)
+                {
+                    switch (unaAccion)
+                    {
+                        case 0:
+                            {
+                                mesh.render(); 
+                            }
+                            break;
+
+                        case 1:
+                            {
+                                mesh.BoundingBox.render();
+                            }
+                            break;
+
+                        case 2:
+                            {
+                                if (TgcCollisionUtils.classifyBoxBox(mesh.BoundingBox, unaInstancia.BoundingBox) != TgcCollisionUtils.BoxBoxResult.Afuera)
+                                {
+                                    return true;
+                                }
+                            }
+                            break;
+
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private void RenderizarObjetos(int unaAccion)
         {
             //Renderizar Autos
-            foreach (var mesh in MeshAutos)
-            {
-                mesh.render();
-            }
+            AccionarListaMesh(MeshAutos, unaAccion, null);
+
             //Renderizar palmeras
-            foreach (var mesh in MeshPalmeras)
-            {
-                mesh.render();
-            }
+            AccionarListaMesh(MeshPalmeras, unaAccion, null);
+
+            //Renderizar arbol bananas
+            AccionarListaMesh(MeshArbolesBananas, unaAccion, null);
+            
+            //Renderizar pinos
+            AccionarListaMesh(MeshPinos, unaAccion, null);
 
             //Renderizar rocas
-            foreach (var mesh in MeshPinos)
-            {
-                mesh.render();
-            }
-
-            //Renderizar pinos
-            foreach (var mesh in MeshRocas)
-            {
-                mesh.render();
-            }
-
-            //Renderizar pinos
-            foreach (var mesh in MeshArbolesBananas)
-            {
-                mesh.render();
-            }
+            AccionarListaMesh(MeshRocas, unaAccion, null);
 
             //Renderizar barriles de polvora
-            foreach (var mesh in MeshBarrilesPolvora)
-            {
-                mesh.render();
-            }
+            AccionarListaMesh(MeshBarrilesPolvora, unaAccion, null);
 
             //Renderizar Carretillas
-            foreach (var mesh in MeshCarretillas)
-            {
-                mesh.render();
-            }
+            AccionarListaMesh(MeshCarretillas, unaAccion, null);
 
             //Renderizar Contenedores
-            foreach (var mesh in MeshContenedores)
-            {
-                mesh.render();
-            }
+            AccionarListaMesh(MeshContenedores, unaAccion, null);
 
             //Renderizar Fuentes de Agua
-            //foreach (var mesh in MeshFuentesAgua)
-            //{
-                //mesh.render();
-            //}
+            //RenderListaMesh(MeshPinos, unaAccion, null);
 
             //Renderizar Lockers
-            foreach (var mesh in MeshLockers)
-            {
-                mesh.render();
-            }
+            AccionarListaMesh(MeshLockers, unaAccion, null);
 
             //Renderizar Expendedores Bebidas
-            foreach (var mesh in MeshExpendedoresBebidas)
-            {
-                mesh.render();
-            }
+            AccionarListaMesh(MeshExpendedoresBebidas, unaAccion, null);
 
             //Renderizar Cajas Municiones
-            foreach (var mesh in MeshCajasMuniciones)
-            {
-                mesh.render();
-            }
+            AccionarListaMesh(MeshCajasMuniciones, unaAccion, null);
         }
 
         public void ActivarBoundingBox()
@@ -551,7 +605,6 @@ namespace TGC.Group.Model
                 movement *= MOVEMENT_SPEED * ElapsedTime;
                 Mesh.moveOrientedY(moveForward * ElapsedTime);
 
-
                 //El framework posee la clase TgcCollisionUtils con muchos algoritmos de colisión de distintos tipos de objetos.
                 //Por ejemplo chequear si dos cajas colisionan entre sí, o dos esferas, o esfera con caja, etc.
                 var collisionFound = false;
@@ -576,7 +629,6 @@ namespace TGC.Group.Model
                 //Si hubo alguna colisión, entonces restaurar la posición original del mesh
                 if (collisionFound)
                 {
-                    DrawText.drawText("Chocamos", 50, 50, Color.Blue);
                     Mesh.Position = originalPos;
                 }
 
@@ -593,18 +645,24 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             PalmeraOriginal.dispose();
+
+            foreach (var mesh in MeshAutos)
+            {
+                mesh.dispose();
+            }
+               
             PinoOriginal.dispose();
             RocaOriginal.dispose();
             ArbolBananasOriginal.dispose();
             BarrilPolvoraOriginal.dispose();
             CarretillaOriginal.dispose();
             ContenedorOriginal.dispose();
-            //FuenteAguaOriginal.dispose();
             LockerOriginal.dispose();
             ExpendedorBebidaOriginal.dispose();
             CajaMunicionesOriginal.dispose();
+
+            //FuenteAguaOriginal.dispose();
             ScenePpal.disposeAll();
-            Mesh.dispose();
         }
     }
 }
