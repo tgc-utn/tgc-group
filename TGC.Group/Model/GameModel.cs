@@ -64,6 +64,9 @@ namespace TGC.Group.Model
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
 
+        //Nombre del jugador 1 que se dibujara en pantalla
+        public string NombreJugador1 { get;  set; }
+
         //Camara en tercera persona
         private TgcThirdPersonCamera CamaraInterna;
 
@@ -380,6 +383,7 @@ namespace TGC.Group.Model
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.Red);
             DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.Red);
+            DrawText.drawText("Jugador 1: " + this.NombreJugador1, 1200, 10, Color.LightYellow);
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.

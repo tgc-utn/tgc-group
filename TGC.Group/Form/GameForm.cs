@@ -28,7 +28,12 @@ namespace TGC.Group.Form
         /// <summary>
         ///     Ejemplo del juego a correr
         /// </summary>
-        private TgcExample Modelo { get; set; }
+        private GameModel Modelo { get; set; }
+
+        /// <summary>
+        ///   El nombre del jugador1 que se le pasar el modelo para mostrar en pantalla
+        /// </summary>
+        public string NombreJugador1 { get; set; }
 
         /// <summary>
         ///     Obtener o parar el estado del RenderLoop.
@@ -96,6 +101,8 @@ namespace TGC.Group.Form
             //Juego a ejecutar, si quisiéramos tener diferentes modelos aquí podemos cambiar la instancia e invocar a otra clase.
             Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory,
                 currentDirectory + Game.Default.ShadersDirectory);
+
+            Modelo.NombreJugador1 = this.NombreJugador1;
 
             //Cargar juego.
             ExecuteModel();
@@ -195,6 +202,11 @@ namespace TGC.Group.Form
             //Liberar Device al finalizar la aplicacion
             D3DDevice.Instance.Dispose();
             TexturesPool.Instance.clearAll();
+        }
+
+        private void panel3D_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }
