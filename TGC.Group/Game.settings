@@ -6,10 +6,10 @@
       <Value Profile="(Default)">Alumnos</Value>
     </Setting>
     <Setting Name="Name" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Grupo 99</Value>
+      <Value Profile="(Default)">0FPS</Value>
     </Setting>
     <Setting Name="Description" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Mi idea - Descripción de la idea</Value>
+      <Value Profile="(Default)">Survival Horror - 0FPS</Value>
     </Setting>
     <Setting Name="ShadersDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)">..\..\Shaders\</Value>
