@@ -67,6 +67,9 @@ namespace TGC.Group.Model
         //Nombre del jugador 1 que se dibujara en pantalla
         public string NombreJugador1 { get;  set; }
 
+        //Cantidad de autos enemigos
+        public int CantidadDeAutos { get; set; }
+
         //Camara en tercera persona
         private TgcThirdPersonCamera CamaraInterna;
 
@@ -238,6 +241,7 @@ namespace TGC.Group.Model
         private void CrearAutos(TgcSceneLoader loader)
         {
             System.Random randomNumber = new System.Random();
+            var meshEnemigos = new List<TgcMesh>();
 
             var tanque = loader.loadSceneFromFile(MediaDir + "Vehiculos\\TanqueFuturistaRuedas\\TanqueFuturistaRuedas-TgcScene.xml").Meshes[0].createMeshInstance("tanque");
             var hummer = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Hummer\\Hummer-TgcScene.xml").Meshes[0].createMeshInstance("hummer");
@@ -246,27 +250,44 @@ namespace TGC.Group.Model
 
             tanque.Transform = tanque.Transform * Matrix.Translation(new Vector3(-2000,0,2000));
             tanque.BoundingBox.transform(tanque.Transform);
+            meshEnemigos.Add(tanque);
 
             hummer.Transform = hummer.Transform * Matrix.Translation(new Vector3(2000, 0, 2000));
             hummer.BoundingBox.transform(hummer.Transform);
+            meshEnemigos.Add(hummer);
 
             camioneta.Transform = camioneta.Transform * Matrix.RotationY(180 * (FastMath.PI / 180));
             camioneta.Transform = camioneta.Transform * Matrix.Translation(new Vector3(2000,0,-2000));
             camioneta.BoundingBox.transform(camioneta.Transform);
+            meshEnemigos.Add(camioneta);
 
             patrullero.Transform = patrullero.Transform * Matrix.RotationY(180 * (FastMath.PI / 180));
             patrullero.Transform = patrullero.Transform * Matrix.Translation(new Vector3(-2000,0,-2000));
             patrullero.BoundingBox.transform(patrullero.Transform);
+            meshEnemigos.Add(patrullero);
 
             MeshAutos = new List<TgcMesh>();
+           
             //Auto principal
             MeshAutos.Add(Mesh);
 
-            //Otros autos con IA?
-            MeshAutos.Add(tanque);
-            MeshAutos.Add(hummer);
-            MeshAutos.Add(camioneta);
-            MeshAutos.Add(patrullero);
+            //Autos enemigos
+            for (int i = 0; i< CantidadDeAutos; i++)
+            {
+               var autoEnemigo = meshEnemigos[i];
+               MeshAutos.Add(autoEnemigo);
+
+            }
+
+            //hago dispose de cada auto que no se va a dibujar
+            foreach (var meshEnemigo in meshEnemigos)
+            {
+                if (MeshAutos.Contains(meshEnemigo) == false)
+                {
+                    meshEnemigo.dispose();
+                }
+            }
+
         }
 
         //Crea instancias de un objeto

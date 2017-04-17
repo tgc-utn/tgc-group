@@ -116,7 +116,7 @@ namespace TGC.Group.Form
                 currentDirectory + Game.Default.ShadersDirectory);
 
             Modelo.NombreJugador1 = this.NombreJugador1;
-            Modelo.Timer = timer1;
+            Modelo.CantidadDeAutos = this.CantidadAutos;
 
             //Cargar juego.
             ExecuteModel();
