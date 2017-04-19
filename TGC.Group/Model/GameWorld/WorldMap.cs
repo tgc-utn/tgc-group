@@ -1,9 +1,11 @@
 ﻿using Microsoft.DirectX;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using TGC.Core.SceneLoader;
+using TGC.Group.Model.Utils;
 
 namespace TGC.Group.Model.GameWorld
 {
@@ -13,6 +15,18 @@ namespace TGC.Group.Model.GameWorld
         private List<TgcMesh>  walls;
         private List<TgcMesh>  doors;
         private List<TgcMesh>  elements;
+
+        private static float[,,] roomPositions = new float[,,]
+        {
+            {{0f, 0f,     650f},  {0f, (float)Math.PI * 0.5f, 0f}},
+            {{650f, 0f,   650f},  {0f, 0f, 0f}},
+            {{-650f, 0f,  650f},  {0f, 0f, 0f}},
+            {{0f, 0f,    -650f},  {0f, 0f, 0f}},
+            {{650f, 0f,  -650f},  {0f, 0f, 0f}},
+            {{-650f, 0f, -650f},  {0f, 0f, 0f}},            
+            {{650f,  0f,    0f},  {0f, 0f, 0f}},
+            {{-650f, 0f,    0f},  {0f, 0f, 0f}},
+        };
 
         private static float[,,] sofaInstances = new float[,,]
         {
@@ -39,6 +53,19 @@ namespace TGC.Group.Model.GameWorld
             {{605f, 0f, -380f},  {0f, 1f, 0f}},
         };
 
+        private static float[,,] torchInstances = new float[,,]
+        {
+            {{1080f, 50f, 330f},  {-0.5f, 0f, 0f}},
+            {{-1080f, 50f, 330f}, {-0.5f, 1f, 0f}},
+            {{-1080f, 50f, -330f}, {-0.5f, 1f, 0f}},
+            {{1080f, 50f, -330f},  {-0.5f, 0f, 0f}},
+
+            {{330, 50f, 1080f},  {-0.5f, -0.5f, 0f}},
+            {{-330f, 50f, 1080f}, {-0.5f, -0.5f, 0f}},
+            {{330f, 50f, -1080f}, {-0.5f, 0.5f, 0f}},
+            {{-330f, 50f, -1080f},  {-0.5f, +0.5f, 0f}},
+        };
+
         private bool alphaBlendEnable;
 
         public WorldMap(string mediaPath)
@@ -49,54 +76,154 @@ namespace TGC.Group.Model.GameWorld
             this.doors            = new List<TgcMesh>();
             this.elements         = new List<TgcMesh>();
 
-            int meshCount         = this.scene.Meshes.Count;
-            for(int index = 0; index < meshCount; index++)
-            {
-                // WHY THE HELL THE FRAMEWORK WON'T UPDATE BB'S ROTATION AAAAAAAAAAAAA
-                Matrix scaleMatrix    = new Matrix();
-                Matrix rotationMatrix = new Matrix();
-                rotationMatrix.RotateX(-(float)Math.PI / 2);
-                scaleMatrix.Scale(new Vector3(10f, 10f, 10f));
-                scaleMatrix.Multiply(rotationMatrix);
 
-                
-                this.scene.Meshes[index].Scale = new Vector3(10f, 10f, 10f);
-                this.scene.Meshes[index].Rotation = new Vector3(-(float)Math.PI / 2, 0f, 0f);
-                // WHYYYYYYYYYY
-                this.scene.Meshes[index].BoundingBox.transform(scaleMatrix);
-                
-                if (this.scene.Meshes[index].Name.Contains(Game.Default.WallMeshIdentifier))
-                {
-                    this.walls.Add(this.scene.Meshes[index]);
-                }
-                else if(this.scene.Meshes[index].Name.Contains(Game.Default.DoorMeshIdentifier))
-                {
-                    this.doors.Add(this.scene.Meshes[index]);
-                }
-            }
-
+            this.createRoomWallInstances();
+            this.rotateAndScaleScenario();
+            this.createRoomInstances();
 
             this.createElementInstances(loader, mediaPath + "/Sillon-TgcScene.xml",      sofaInstances,     "Sofa",     1.25f);
             this.createElementInstances(loader, mediaPath + "/Mesa-TgcScene.xml",        tableInstances,    "Table",    2.75f);
             this.createElementInstances(loader, mediaPath + "/Placard-TgcScene.xml",     wardrobeInstances, "Wardrobe", 2.5f);
             this.createElementInstances(loader, mediaPath + "/LockerMetal-TgcScene.xml", lockerInstances,   "Locker",   2.5f);
-
+            this.createElementInstances(loader, mediaPath + "/Torch-TgcScene.xml",       torchInstances,    "Torch",    2f);
         }
 
+        protected void createRoomWallInstances()
+        {
+            int meshCount = this.scene.Meshes.Count;
+            for (int index = 0; index < meshCount; index++)
+            {
+                if (this.scene.Meshes[index].Name == "RoomWall01")
+                {
+                    TgcMesh sideWall = this.scene.Meshes[index].createMeshInstance("RoomWall02", new Vector3(0f, 0f, 0f), new Vector3(0f, (float)Math.PI / 2, 0f), new Vector3(1f, 1f, 1f));
+                    TgcMesh frontWall = this.scene.Meshes[index].createMeshInstance("RoomWall03", new Vector3(-10f, 0f, 410f), new Vector3(0f, 0f, 0f), new Vector3(1f, 1f, 1f));
+
+                    sideWall.UpdateMeshTransform();
+                    frontWall.UpdateMeshTransform();
+                    sideWall.updateBoundingBox();
+                    frontWall.updateBoundingBox();
+                    sideWall.BoundingBox.setRenderColor(Color.Red);
+                    frontWall.BoundingBox.setRenderColor(Color.Green);
+                    
+                    this.scene.Meshes.Add(sideWall);
+                    this.scene.Meshes.Add(frontWall);
+                    break;
+                }
+            }
+        }
+
+        protected void rotateAndScaleScenario()
+        {
+
+            int meshCount = this.scene.Meshes.Count;
+            for (int index = 0; index < meshCount; index++)
+            {
+
+                this.scene.Meshes[index].Scale = new Vector3(10f, 10f, 10f);
+                this.scene.Meshes[index].rotateX(-(float)Math.PI / 2);
+
+
+                this.scene.Meshes[index].BoundingBox = TGCUtils.updateMeshBoundingBox(this.scene.Meshes[index]);
+                
+
+                this.scene.Meshes[index].UpdateMeshTransform();
+                if (this.scene.Meshes[index].Name.Contains(Game.Default.WallMeshIdentifier))
+                {
+                    this.walls.Add(this.scene.Meshes[index]);
+                }
+                else if (this.scene.Meshes[index].Name.Contains(Game.Default.DoorMeshIdentifier))
+                {
+                    this.doors.Add(this.scene.Meshes[index]);
+                }
+            }
+        }
+
+        protected void createRoomInstances()
+        {
+            TgcMesh roomFloor  = null;
+            TgcMesh roomWall01 = null;
+            TgcMesh roomWall02 = null;
+            TgcMesh roomWall03 = null;
+            TgcMesh roomWall04 = null;
+            TgcMesh roomWall05 = null;
+            TgcMesh roomDoor   = null;
+
+            int index = 0;
+            while(roomFloor == null || roomWall01 == null || roomWall02 == null || roomWall03 == null || roomWall04 == null || roomWall05 == null || roomDoor == null)
+            {
+                switch(this.scene.Meshes[index].Name)
+                {
+                    case "RoomWall01":
+                        roomWall01 = this.scene.Meshes[index];
+                        break;
+                    case "RoomWall02":
+                        roomWall02 = this.scene.Meshes[index];
+                        break;
+                    case "RoomWall03":
+                        roomWall03 = this.scene.Meshes[index];
+                        break;
+                    case "RoomWall04":
+                        roomWall04 = this.scene.Meshes[index];
+                        break;
+                    case "RoomWall05":
+                        roomWall05 = this.scene.Meshes[index];
+                        break;
+                    case "RoomDoor":
+                        roomDoor = this.scene.Meshes[index];
+                        break;
+                    case "RoomFloor":
+                        roomFloor = this.scene.Meshes[index];
+                        break;
+                }
+                index++;
+            }
+            Vector3 scale = new Vector3(0f, 0f, 0f);
+            
+            
+            for(index = 0; index < roomPositions.GetLength(0); index++)
+            {
+                Vector3 rotations = new Vector3(roomPositions[index,1,0], roomPositions[index,1,1], roomPositions[index,1,2]);
+                Vector3 positions = new Vector3(roomPositions[index,0,0], roomPositions[index,0,1], roomPositions[index,0,2]);
+
+                this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomFloor, roomFloor.Name + index.ToString(), positions, rotations, scale));                
+                this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomWall01, roomWall01.Name + index.ToString(), positions, rotations, scale));
+                this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomWall02, roomWall02.Name + index.ToString(), positions, rotations, scale));
+                this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomWall03, roomWall03.Name + index.ToString(), positions, rotations, scale));
+                this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomWall04, roomWall04.Name + index.ToString(), positions, rotations, scale));
+                this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomWall05, roomWall05.Name + index.ToString(), positions, rotations, scale));
+                this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomDoor, roomDoor.Name + index.ToString(), positions, rotations, scale));
+            }
+            
+        }
+
+        static Predicate<TgcMesh> byName(string name)
+        {
+            return delegate (TgcMesh mesh)
+            {
+                return mesh.Name == name;
+            };
+        }
+        
         protected void createElementInstances(TgcSceneLoader loader, string path, float[,,] instances, string prefix, float scale)
         {
-            TgcMesh element = loader.loadSceneFromFile(path).Meshes[0];
-            element.Scale = new Vector3(scale, scale, scale);
-            int count = instances.GetLength(0);
-            float PI = (float)Math.PI;
-            for(int index = 0; index < count; index++)
+            TgcScene tempScene = loader.loadSceneFromFile(path);
+            int meshCount = tempScene.Meshes.Count;
+            for(int meshIndex = 0; meshIndex < meshCount; meshIndex++)
             {
-                this.elements.Add(element.clone(prefix + (index.ToString())));
-                int elementIndex = this.elements.Count - 1;
-                this.elements.ElementAt(elementIndex).rotateX(PI * instances[index, 1, 0]);
-                this.elements.ElementAt(elementIndex).rotateY(PI * instances[index, 1, 1]);
-                this.elements.ElementAt(elementIndex).rotateZ(PI * instances[index, 1, 2]);
-                this.elements.ElementAt(elementIndex).move(instances[index,0,0], instances[index,0,1], instances[index,0,2]);              
+                TgcMesh element = tempScene.Meshes[meshIndex];
+                element.Scale = new Vector3(scale, scale, scale);
+                int count = instances.GetLength(0);
+                float PI = (float)Math.PI;
+                for (int index = 0; index < count; index++)
+                {
+                    TgcMesh instance = element.createMeshInstance(
+                        prefix + index.ToString(),
+                        new Vector3(instances[index, 0, 0], instances[index, 0, 1], instances[index, 0, 2]),
+                        new Vector3(PI * instances[index, 1, 0], PI * instances[index, 1, 1], PI * instances[index, 1, 2]),
+                        new Vector3(scale, scale, scale));
+                    instance.UpdateMeshTransform();
+                    this.elements.Add(instance);
+                }
             }
         }
 
@@ -126,12 +253,7 @@ namespace TGC.Group.Model.GameWorld
 
         public void render()
         {
-            this.scene.renderAll();
-            for(int i = 0; i < scene.Meshes.Count; i++)
-            {
-                this.scene.Meshes[i].BoundingBox.render();
-            }
-
+            this.scene.renderAll(true);
 
             int elementCount = this.elements.Count;
             for (int index = 0; index < elementCount; index++)

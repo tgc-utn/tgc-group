@@ -86,6 +86,7 @@
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
     <Compile Include="Model\Camera\FirstPersonCamera.cs" />
+    <Compile Include="Model\Entities\EntityMonster.cs" />
     <Compile Include="Model\Entities\EntityPlayer.cs" />
     <Compile Include="Model\Entities\EntityUpdatable.cs" />
     <Compile Include="Model\Entities\IEntity.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="Model\GameWorld\World.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\GameWorld\WorldMap.cs" />
+    <Compile Include="Model\Utils\TGCUtils.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
