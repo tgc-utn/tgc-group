@@ -42,18 +42,22 @@ namespace TGC.Group.Model
         /// </summary>
 
         //Velocidad de movimiento del auto
-        private const float MOVEMENT_SPEED = 400f;
+        private const float MOVEMENT_SPEED = 1000f;
+
         //Velocidad de rotación del auto
         private const float ROTATION_SPEED = 120f;
 
         //Cantidad de filas
-        private const int ROWS = 19;
+        private const int ROWS = 20;
 
         //Cantidad de columnas
-        private const int COLUMNS = 19;
+        private const int COLUMNS = 20;
 
         //Tamaño cuadrante
         private const int CUADRANTE_SIZE = 300;
+
+        //Posicion vertices
+        private const int POSICION_VERTICE = 9000;
 
         //Scene principal
         private TgcScene ScenePpal;
@@ -128,16 +132,17 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
             var loader = new TgcSceneLoader();
-
+            
             //Cargo el terreno
-            ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA-TgcScene.xml");
+            ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA2-TgcScene.xml");
 
-            var ScenePpalMesh = ScenePpal.Meshes[0];
-            ScenePpalMesh.AutoTransformEnable = false;
-            ScenePpalMesh.Transform = ScenePpalMesh.Transform * Matrix.Scaling(new Vector3(3, 1, 3));
-            ScenePpalMesh.AlphaBlendEnable = true;
-            ScenePpalMesh.updateBoundingBox();
-
+            TransformarMeshScenePpal(0, 3, POSICION_VERTICE);
+            TransformarMeshScenePpal(1, 3, POSICION_VERTICE);
+            TransformarMeshScenePpal(2, 3, POSICION_VERTICE);
+            TransformarMeshScenePpal(3, 3, POSICION_VERTICE);
+            TransformarMeshScenePpal(4, 3, POSICION_VERTICE);
+            TransformarMeshScenePpal(5, 3, POSICION_VERTICE);
+            
             //Cargo el auto
             var SceneAuto = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto\\Auto-TgcScene.xml");
 
@@ -154,6 +159,20 @@ namespace TGC.Group.Model
             //Creo los objetos del escenario
             CrearAutos(loader);
             CrearObjetos(loader);
+        }
+
+        private void TransformarMeshScenePpal (int index, float escala, float desplazamiento)
+        {
+            var unMesh = ScenePpal.Meshes[index];
+
+            unMesh.AutoTransformEnable = false;
+
+            unMesh.Transform = unMesh.Transform * Matrix.Scaling(new Vector3(escala, 1, escala))
+                                                                * Matrix.Translation(new Vector3((-1) * desplazamiento, 0, (-1) * desplazamiento));
+            unMesh.BoundingBox.transform(unMesh.Transform);
+
+            unMesh.AlphaBlendEnable = true;
+            //unMesh.updateBoundingBox();
         }
 
         private void CrearObjetos(TgcSceneLoader loader)
@@ -241,18 +260,18 @@ namespace TGC.Group.Model
             var camioneta = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Camioneta\\Camioneta-TgcScene.xml").Meshes[0].createMeshInstance("camioneta");
             var patrullero = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Patrullero\\Patrullero-TgcScene.xml").Meshes[0].createMeshInstance("buggy");
 
-            tanque.Transform = tanque.Transform * Matrix.Translation(new Vector3(-2000,0,2000));
+            tanque.Transform = tanque.Transform * Matrix.Translation(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (POSICION_VERTICE - CUADRANTE_SIZE * 4)));
             tanque.BoundingBox.transform(tanque.Transform);
 
-            hummer.Transform = hummer.Transform * Matrix.Translation(new Vector3(2000, 0, 2000));
+            hummer.Transform = hummer.Transform * Matrix.Translation(new Vector3(POSICION_VERTICE - CUADRANTE_SIZE * 4, 0, POSICION_VERTICE - CUADRANTE_SIZE * 4));
             hummer.BoundingBox.transform(hummer.Transform);
 
             camioneta.Transform = camioneta.Transform * Matrix.RotationY(180 * (FastMath.PI / 180));
-            camioneta.Transform = camioneta.Transform * Matrix.Translation(new Vector3(2000,0,-2000));
+            camioneta.Transform = camioneta.Transform * Matrix.Translation(new Vector3((POSICION_VERTICE - CUADRANTE_SIZE * 4), 0,(-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)));
             camioneta.BoundingBox.transform(camioneta.Transform);
 
             patrullero.Transform = patrullero.Transform * Matrix.RotationY(180 * (FastMath.PI / 180));
-            patrullero.Transform = patrullero.Transform * Matrix.Translation(new Vector3(-2000,0,-2000));
+            patrullero.Transform = patrullero.Transform * Matrix.Translation(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)));
             patrullero.BoundingBox.transform(patrullero.Transform);
 
             MeshAutos = new List<TgcMesh>();
@@ -615,11 +634,16 @@ namespace TGC.Group.Model
                     var mainMeshBoundingBox = Mesh.BoundingBox;
                     var sceneMeshBoundingBox = mesh.BoundingBox;
 
+                    if (mesh.Name == "Room-1-Roof-0")
+                    {
+                        continue;
+                    }
+
                     //Ejecutar algoritmo de detección de colisiones
                     var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
 
                     //Hubo colisión con un objeto. Guardar resultado y abortar loop.
-                    if (collisionResult != TgcCollisionUtils.BoxBoxResult.Encerrando)
+                    if ((collisionResult != TgcCollisionUtils.BoxBoxResult.Encerrando) && (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera))
                     {
                         collisionFound = true;
                         break;
