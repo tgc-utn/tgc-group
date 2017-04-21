@@ -587,8 +587,11 @@ namespace TGC.Group.Model
             var movement = new Vector3(0, 0, 0);
             var moveForward = 0f;
             float rotate = 0;
+            float gravedad = 15.0f;
             var moving = false;
             var rotating = false;
+            var jumping = false;
+            float velocidadY = 0f;
 
 
             //Movernos de izquierda a derecha, sobre el eje X.
@@ -615,12 +618,32 @@ namespace TGC.Group.Model
                 moving = true;
             }
 
+            //Salto
+            if (Input.keyDown(Key.Space))
+            {
+                velocidadY += 200.0f;
+                jumping = true;
+            }
+
             if (rotating)
             {
                 var rotAngle = (rotate * ElapsedTime) * (FastMath.PI / 180);
                 Mesh.rotateY(rotAngle);
                 CamaraInterna.rotateY(rotAngle);
             }
+
+            if (jumping)
+            {
+                //Ascenso
+                //var posicionAntesSalto = Mesh.Position;
+                //Mesh.move(0, distanciaSalto, 0);
+                saltarConMeshOrientado(velocidadY);
+                saltarConMeshOrientado(gravedad);
+                //Descenso
+                //caida(gravedad, posicionAntesSalto);
+                //saltarConMeshOrientado((-gravedad * ElapsedTime));*/
+            }
+
             if (moving)
             {
                 //Guardar posicion original antes de cambiarla
@@ -660,6 +683,24 @@ namespace TGC.Group.Model
                 //Hacer que la camara en 3ra persona se ajuste a la nueva posicion del objeto
                 CamaraInterna.Target = Mesh.Position;
             }
+        }
+        public void saltarConMeshOrientado(float movement)
+        {
+            float y;
+            y = movement * ElapsedTime;
+            Mesh.move(0, y, 0);
+        }
+
+        public void caida(float gravedad, Vector3 originalPosition)
+        {
+            var posicionActual = new Vector3(0, 0, 0);
+            Mesh.getPosition(posicionActual);
+            /*Esto rompe todo por ahora
+             while (posicionActual.Y != originalPosition.Y)
+            {
+                var y = gravedad * ElapsedTime;
+                Mesh.move(0 , y , 0);
+            }*/
         }
 
         /// <summary>
