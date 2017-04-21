@@ -48,13 +48,13 @@ namespace TGC.Group.Model
         private const float ROTATION_SPEED = 120f;
 
         //Cantidad de filas
-        private const int ROWS = 20;
+        private const int ROWS = 30;
 
         //Cantidad de columnas
-        private const int COLUMNS = 20;
+        private const int COLUMNS = 30;
 
         //Tamaño cuadrante
-        private const int CUADRANTE_SIZE = 300;
+        private const int CUADRANTE_SIZE = 600;
 
         //Posicion vertices
         private const int POSICION_VERTICE = 9000;
@@ -134,7 +134,7 @@ namespace TGC.Group.Model
             var loader = new TgcSceneLoader();
             
             //Cargo el terreno
-            ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA2-TgcScene.xml");
+            ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA3-TgcScene.xml");
 
             TransformarMeshScenePpal(0, 3, POSICION_VERTICE);
             TransformarMeshScenePpal(1, 3, POSICION_VERTICE);
@@ -150,7 +150,7 @@ namespace TGC.Group.Model
             Mesh = SceneAuto.Meshes[0];
         
             Mesh.AutoTransformEnable = true;
-            Mesh.move(0, 0.3f, 0);
+            Mesh.move(0, 0.5f, 0);
 
             //Camara por defecto
             CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 600);
@@ -185,7 +185,7 @@ namespace TGC.Group.Model
             MeshPalmeras = CrearInstancias(PalmeraOriginal, 0.75f, 1.15f, 2, MatrizPoblacion);
 
             //Creo pinos
-            MatrizPoblacion = RandomMatrix();
+            /*MatrizPoblacion = RandomMatrix();
             PinoOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Pino\\Pino-TgcScene.xml").Meshes[0];
             MeshPinos = CrearInstancias(PinoOriginal, 0.90f, 1.15f, 2, MatrizPoblacion);
 
@@ -232,7 +232,7 @@ namespace TGC.Group.Model
             //Creo cajas de municiones
             MatrizPoblacion = RandomMatrix();
             CajaMunicionesOriginal = loader.loadSceneFromFile(MediaDir + "Armas\\CajaMuniciones\\CajaMuniciones-TgcScene.xml").Meshes[0];
-            MeshCajasMuniciones = CrearInstancias(CajaMunicionesOriginal, 1, 1.15f, 1, MatrizPoblacion);
+            MeshCajasMuniciones = CrearInstancias(CajaMunicionesOriginal, 1, 1.15f, 1, MatrizPoblacion);*/
         }
 
         private int[,] RandomMatrix()
@@ -309,7 +309,7 @@ namespace TGC.Group.Model
 
                             //Lo agrando y traslado al borde del terreno
                             instance.Transform = instance.Transform * Matrix.Scaling(new Vector3(scale, scale, scale)) *
-                                                                       Matrix.Translation(new Vector3(3000, ejeZ, -3000));
+                                                                       Matrix.Translation(new Vector3(POSICION_VERTICE * 2, ejeZ, (-1) *POSICION_VERTICE * 2));
 
 
                             //Lo posiciono en una posición aleatoria
@@ -485,7 +485,7 @@ namespace TGC.Group.Model
             //Renderizar palmeras
             AccionarListaMesh(MeshPalmeras, unaAccion, null);
 
-            //Renderizar arbol bananas
+            /*//Renderizar arbol bananas
             AccionarListaMesh(MeshArbolesBananas, unaAccion, null);
             
             //Renderizar pinos
@@ -513,7 +513,7 @@ namespace TGC.Group.Model
             AccionarListaMesh(MeshExpendedoresBebidas, unaAccion, null);
 
             //Renderizar Cajas Municiones
-            AccionarListaMesh(MeshCajasMuniciones, unaAccion, null);
+            AccionarListaMesh(MeshCajasMuniciones, unaAccion, null);*/
         }
 
         public void ActivarBoundingBox()
@@ -675,6 +675,7 @@ namespace TGC.Group.Model
                 mesh.dispose();
             }
                
+            /*
             PinoOriginal.dispose();
             RocaOriginal.dispose();
             ArbolBananasOriginal.dispose();
@@ -684,7 +685,7 @@ namespace TGC.Group.Model
             LockerOriginal.dispose();
             ExpendedorBebidaOriginal.dispose();
             CajaMunicionesOriginal.dispose();
-
+            */
             //FuenteAguaOriginal.dispose();
             ScenePpal.disposeAll();
         }
