@@ -23,9 +23,10 @@ namespace TGC.Group.Model.GameWorld
 
         public World(string mediaPath, TgcD3dInput inputManager)
         {
+            this.inputManager         = inputManager;
             this.entities             = new List<IEntity>();
             this.updatableEntities    = new List<EntityUpdatable>();            
-            this.camera               = new FirstPersonCamera(inputManager);
+            this.camera               = new FirstPersonCamera(this.inputManager);
             this.camera.RotationSpeed = 0.01f;
             TgcSkeletalLoader loader  = new TgcSkeletalLoader();
 
@@ -57,6 +58,23 @@ namespace TGC.Group.Model.GameWorld
             foreach(EntityUpdatable currentEntity in this.updatableEntities)
             {
                 currentEntity.update();
+            }
+
+            if(inputManager.keyDown(Microsoft.DirectX.DirectInput.Key.J))
+            {
+                this.worldMap.ShouldShowRoof = false;
+            }
+            else
+            {
+                this.worldMap.ShouldShowRoof = true;
+            }
+            if(inputManager.keyDown(Microsoft.DirectX.DirectInput.Key.K))
+            {
+                this.worldMap.ShouldShowBoundingVolumes = true;
+            }
+            else
+            {
+                this.worldMap.ShouldShowBoundingVolumes = false;
             }
             this.hand.UpdateMeshTransform();
             this.hand.updateAnimation(elapsedTime);

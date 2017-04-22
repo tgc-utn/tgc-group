@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using TGC.Core.Direct3D;
+using TGC.Core.Geometry;
 using TGC.Core.SceneLoader;
+using TGC.Core.Textures;
 using TGC.Group.Model.Utils;
 
 namespace TGC.Group.Model.GameWorld
@@ -15,6 +18,11 @@ namespace TGC.Group.Model.GameWorld
         private List<TgcMesh>  walls;
         private List<TgcMesh>  doors;
         private List<TgcMesh>  elements;
+        private TgcPlane       roof;
+        private bool           shouldShowRoof;
+        private bool           shouldShowBoundingVolumes;
+
+        private static float roomHeight = 16f;
 
         private static float[,,] roomPositions = new float[,,]
         {
@@ -70,16 +78,18 @@ namespace TGC.Group.Model.GameWorld
 
         public WorldMap(string mediaPath)
         {
-            TgcSceneLoader loader = new TgcSceneLoader();
-            this.scene            = loader.loadSceneFromFile(mediaPath + "/Scene-TgcScene.xml");
-            this.walls            = new List<TgcMesh>();
-            this.doors            = new List<TgcMesh>();
-            this.elements         = new List<TgcMesh>();
-
+            TgcSceneLoader loader          = new TgcSceneLoader();
+            this.shouldShowRoof            = true;
+            this.shouldShowBoundingVolumes = false;
+            this.scene                     = loader.loadSceneFromFile(mediaPath + "/Scene-TgcScene.xml");
+            this.walls                     = new List<TgcMesh>();
+            this.doors                     = new List<TgcMesh>();
+            this.elements                  = new List<TgcMesh>();
 
             this.createRoomWallInstances();
             this.rotateAndScaleScenario();
             this.createRoomInstances();
+            this.createRoofFromScene(mediaPath);
 
             this.createElementInstances(loader, mediaPath + "/Sillon-TgcScene.xml",      sofaInstances,     "Sofa",     1.25f);
             this.createElementInstances(loader, mediaPath + "/Mesa-TgcScene.xml",        tableInstances,    "Table",    2.75f);
@@ -114,12 +124,23 @@ namespace TGC.Group.Model.GameWorld
 
         protected void rotateAndScaleScenario()
         {
-
             int meshCount = this.scene.Meshes.Count;
             for (int index = 0; index < meshCount; index++)
             {
-
-                this.scene.Meshes[index].Scale = new Vector3(10f, 10f, 10f);
+                if (this.scene.Meshes[index].Name.Contains(Game.Default.WallMeshIdentifier))
+                {
+                    this.scene.Meshes[index].Scale = new Vector3(10f, 10f, roomHeight);
+                    this.walls.Add(this.scene.Meshes[index]);
+                }
+                else if (this.scene.Meshes[index].Name.Contains(Game.Default.DoorMeshIdentifier))
+                {
+                    this.scene.Meshes[index].Scale = new Vector3(10f, 10f, roomHeight);
+                    this.doors.Add(this.scene.Meshes[index]);
+                }
+                else
+                {
+                    this.scene.Meshes[index].Scale = new Vector3(10f, 10f, 10f);
+                }
                 this.scene.Meshes[index].rotateX(-(float)Math.PI / 2);
 
 
@@ -127,14 +148,7 @@ namespace TGC.Group.Model.GameWorld
                 
 
                 this.scene.Meshes[index].UpdateMeshTransform();
-                if (this.scene.Meshes[index].Name.Contains(Game.Default.WallMeshIdentifier))
-                {
-                    this.walls.Add(this.scene.Meshes[index]);
-                }
-                else if (this.scene.Meshes[index].Name.Contains(Game.Default.DoorMeshIdentifier))
-                {
-                    this.doors.Add(this.scene.Meshes[index]);
-                }
+                
             }
         }
 
@@ -196,6 +210,18 @@ namespace TGC.Group.Model.GameWorld
             
         }
 
+        protected void createRoofFromScene(string mediaPath)
+        {
+            TgcMesh floor = this.scene.Meshes.Find(byName("OuterFloor"));
+            this.roof = new TgcPlane
+            (
+                new Vector3(floor.BoundingBox.PMin.X, roomHeight * 16f + 0.00025f, floor.BoundingBox.PMin.Z), 
+                new Vector3(floor.BoundingBox.PMax.X * 2, 0f, floor.BoundingBox.PMax.Z * 2),
+                TgcPlane.Orientations.XZplane, 
+                TgcTexture.createTexture(D3DDevice.Instance.Device, mediaPath + "Textures/roof.png")
+            );
+        }
+
         static Predicate<TgcMesh> byName(string name)
         {
             return delegate (TgcMesh mesh)
@@ -203,7 +229,21 @@ namespace TGC.Group.Model.GameWorld
                 return mesh.Name == name;
             };
         }
-        
+
+        public bool ShouldShowRoof
+        {
+            get { return this.shouldShowRoof; }
+            set { this.shouldShowRoof = value; }
+        }
+
+
+
+        public bool ShouldShowBoundingVolumes
+        {
+            get { return this.shouldShowBoundingVolumes; }
+            set { this.shouldShowBoundingVolumes = value; }
+        }
+
         protected void createElementInstances(TgcSceneLoader loader, string path, float[,,] instances, string prefix, float scale)
         {
             TgcScene tempScene = loader.loadSceneFromFile(path);
@@ -222,6 +262,9 @@ namespace TGC.Group.Model.GameWorld
                         new Vector3(PI * instances[index, 1, 0], PI * instances[index, 1, 1], PI * instances[index, 1, 2]),
                         new Vector3(scale, scale, scale));
                     instance.UpdateMeshTransform();
+
+                    instance.updateBoundingBox();
+                    TGCUtils.updateMeshBoundingBox(instance);
                     this.elements.Add(instance);
                 }
             }
@@ -253,12 +296,29 @@ namespace TGC.Group.Model.GameWorld
 
         public void render()
         {
-            this.scene.renderAll(true);
+            this.scene.renderAll(this.shouldShowBoundingVolumes);
+            this.renderRoof();
+            this.renderElements();
+        }
 
+        protected void renderElements()
+        {
             int elementCount = this.elements.Count;
             for (int index = 0; index < elementCount; index++)
             {
-                this.elements.ElementAt(index).render();
+                this.elements.ElementAt(index).render();                
+                if(this.shouldShowBoundingVolumes)
+                {
+                    this.elements.ElementAt(index).BoundingBox.render();
+                }
+            }            
+        }
+
+        protected void renderRoof()
+        {
+            if(this.shouldShowRoof)
+            {
+                this.roof.render();
             }
         }
 

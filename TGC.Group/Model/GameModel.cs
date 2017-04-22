@@ -1,4 +1,5 @@
 using Microsoft.DirectX;
+using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
 using System;
 using System.Drawing;
@@ -30,19 +31,16 @@ namespace TGC.Group.Model
         }
 
         public override void Init()
-        {
-            
+        {            
             var d3dDevice = D3DDevice.Instance.Device;
-            
             this.world    = new World(MediaDir, this.Input);
-            this.Camara = this.world.Camera;
+            this.Camara   = this.world.Camera;
         }
 
+
+
         
-        
-        
-        
-        
+
         public override void Update()
         {
             PreUpdate();

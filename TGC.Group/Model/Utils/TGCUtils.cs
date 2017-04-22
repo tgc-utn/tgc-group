@@ -34,7 +34,6 @@ namespace TGC.Group.Model.Utils
             }
             else
             {
-                instance = meshOrigin.ParentInstance.createMeshInstance(instanceName);
                 instance = meshOrigin.ParentInstance.createMeshInstance(instanceName, meshOrigin.Position + translation, meshOrigin.Rotation + rotation, meshOrigin.Scale + scale);                
             }
             instance.UpdateMeshTransform();
