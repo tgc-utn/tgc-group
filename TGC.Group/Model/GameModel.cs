@@ -121,6 +121,9 @@ namespace TGC.Group.Model
         private List<TgcMesh> MeshCajasMuniciones;
         private TgcMesh CajaMunicionesOriginal;
 
+        //Lista de objetos del mesh principal
+        private List<TgcMesh> MeshPrincipal;
+
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
         ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
@@ -132,7 +135,7 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
             var loader = new TgcSceneLoader();
-            
+
             //Cargo el terreno
             ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA3-TgcScene.xml");
 
@@ -142,7 +145,21 @@ namespace TGC.Group.Model
             TransformarMeshScenePpal(3, 3, POSICION_VERTICE);
             TransformarMeshScenePpal(4, 3, POSICION_VERTICE);
             TransformarMeshScenePpal(5, 3, POSICION_VERTICE);
-            
+
+            //Cargo los objetos del mesh en una lista para después poder validar las colisiones
+            MeshPrincipal = new List<TgcMesh>();
+
+            foreach (TgcMesh unMesh in ScenePpal.Meshes)
+            {
+                if (unMesh.Name.IndexOf("Floor") != -1)
+                    continue;
+
+                if (unMesh.Name.IndexOf("Pasto") != -1)
+                    continue;
+
+                MeshPrincipal.Add(unMesh);
+            }
+
             //Cargo el auto
             var SceneAuto = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto\\Auto-TgcScene.xml");
 
@@ -182,23 +199,23 @@ namespace TGC.Group.Model
             //Creo palmeras
             MatrizPoblacion = RandomMatrix();
             PalmeraOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Palmera\\Palmera-TgcScene.xml").Meshes[0];
-            MeshPalmeras = CrearInstancias(PalmeraOriginal, 0.75f, 1.15f, 2, MatrizPoblacion);
+            MeshPalmeras = CrearInstancias(PalmeraOriginal, 0.75f, 0.25f, 2, MatrizPoblacion);
 
             //Creo pinos
-            /*MatrizPoblacion = RandomMatrix();
+            MatrizPoblacion = RandomMatrix();
             PinoOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Pino\\Pino-TgcScene.xml").Meshes[0];
-            MeshPinos = CrearInstancias(PinoOriginal, 0.90f, 1.15f, 2, MatrizPoblacion);
+            MeshPinos = CrearInstancias(PinoOriginal, 0.90f, -0.05f, 2, MatrizPoblacion);
 
             //Creo rocas
             MatrizPoblacion = RandomMatrix();
             RocaOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Roca\\Roca-TgcScene.xml").Meshes[0];
-            MeshRocas = CrearInstancias(RocaOriginal, 0.75f, 1.15f, 2, MatrizPoblacion);
+            MeshRocas = CrearInstancias(RocaOriginal, 0.75f, 0.30f, 2, MatrizPoblacion);
 
             //Creo arboles bananas
             MatrizPoblacion = RandomMatrix();
             ArbolBananasOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\ArbolBananas\\ArbolBananas-TgcScene.xml").Meshes[0];
-            MeshArbolesBananas = CrearInstancias(ArbolBananasOriginal, 1.50f, 1.15f, 1, MatrizPoblacion);
-
+            MeshArbolesBananas = CrearInstancias(ArbolBananasOriginal, 1.50f, 0.15f, 1, MatrizPoblacion);
+            /*
             //Creo barriles de polvora
             MatrizPoblacion = RandomMatrix();
             BarrilPolvoraOriginal = loader.loadSceneFromFile(MediaDir + "Objetos\\BarrilPolvora\\BarrilPolvora-TgcScene.xml").Meshes[0];
@@ -307,16 +324,22 @@ namespace TGC.Group.Model
                             //Roto el objeto aleatoriamente
                             instance.Transform = Matrix.RotationY((randomNumber.Next(1, 180)) * FastMath.PI / 180);
 
+                            /*
+                            instance.Transform = instance.Transform * Matrix.Scaling(new Vector3(scale, scale, scale)) *
+                                                                       Matrix.Translation(new Vector3(200, ejeZ, -10));
+                            */
+                            
                             //Lo agrando y traslado al borde del terreno
                             instance.Transform = instance.Transform * Matrix.Scaling(new Vector3(scale, scale, scale)) *
-                                                                       Matrix.Translation(new Vector3(POSICION_VERTICE * 2, ejeZ, (-1) *POSICION_VERTICE * 2));
+                                                                       Matrix.Translation(new Vector3(POSICION_VERTICE, ejeZ, (-1) * POSICION_VERTICE));
 
 
+                            
                             //Lo posiciono en una posición aleatoria
                             instance.Transform = instance.Transform * Matrix.Translation(
                                                                         new Vector3((-1) * randomNumber.Next(j * CUADRANTE_SIZE, (j + 1) * CUADRANTE_SIZE), 0,
                                                                                     randomNumber.Next(i * CUADRANTE_SIZE, (i + 1) * CUADRANTE_SIZE)));
-
+                            
                             instance.BoundingBox.transform(instance.Transform);
                             
                             //Valido si pisa a otro objeto que ya existe
@@ -355,7 +378,25 @@ namespace TGC.Group.Model
                 AccionarListaMesh(MeshLockers, 2, unaInstancia) ||
                 AccionarListaMesh(MeshExpendedoresBebidas, 2, unaInstancia) ||
                 AccionarListaMesh(MeshCajasMuniciones, 2, unaInstancia) ||
-                AccionarListaMesh(MeshAutos, 2, unaInstancia)
+                AccionarListaMesh(MeshAutos, 2, unaInstancia) ||
+                AccionarListaMesh(MeshPrincipal, 2, unaInstancia)
+                )
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool ValidarColisionObjetos(TgcMesh unaInstancia)
+        {
+            //Valido la colisión para cada lista de objetos que tenga
+            if (AccionarListaMesh(MeshPalmeras, 2, unaInstancia) ||
+                AccionarListaMesh(MeshPinos, 2, unaInstancia) ||
+                AccionarListaMesh(MeshRocas, 2, unaInstancia) ||
+                AccionarListaMesh(MeshArbolesBananas, 2, unaInstancia) ||
+                AccionarListaMesh(MeshAutos, 2, unaInstancia) ||
+                AccionarListaMesh(MeshPrincipal, 2, unaInstancia)
                 )
             {
                 return true;
@@ -463,9 +504,12 @@ namespace TGC.Group.Model
 
                         case 2:
                             {
-                                if (TgcCollisionUtils.classifyBoxBox(mesh.BoundingBox, unaInstancia.BoundingBox) != TgcCollisionUtils.BoxBoxResult.Afuera)
+                                if (mesh != unaInstancia)
                                 {
-                                    return true;
+                                    if (TgcCollisionUtils.classifyBoxBox(mesh.BoundingBox, unaInstancia.BoundingBox) != TgcCollisionUtils.BoxBoxResult.Afuera)
+                                    {
+                                        return true;
+                                    }
                                 }
                             }
                             break;
@@ -485,7 +529,7 @@ namespace TGC.Group.Model
             //Renderizar palmeras
             AccionarListaMesh(MeshPalmeras, unaAccion, null);
 
-            /*//Renderizar arbol bananas
+            //Renderizar arbol bananas
             AccionarListaMesh(MeshArbolesBananas, unaAccion, null);
             
             //Renderizar pinos
@@ -493,7 +537,7 @@ namespace TGC.Group.Model
 
             //Renderizar rocas
             AccionarListaMesh(MeshRocas, unaAccion, null);
-
+            /*
             //Renderizar barriles de polvora
             AccionarListaMesh(MeshBarrilesPolvora, unaAccion, null);
 
@@ -626,6 +670,7 @@ namespace TGC.Group.Model
 
                 //El framework posee la clase TgcCollisionUtils con muchos algoritmos de colisión de distintos tipos de objetos.
                 //Por ejemplo chequear si dos cajas colisionan entre sí, o dos esferas, o esfera con caja, etc.
+                /*
                 var collisionFound = false;
 
                 foreach (var mesh in ScenePpal.Meshes)
@@ -655,6 +700,12 @@ namespace TGC.Group.Model
                 {
                     Mesh.Position = originalPos;
                 }
+                */
+
+                if (ValidarColisionObjetos(Mesh))
+                {
+                    Mesh.Position = originalPos;
+                }
 
                 //Hacer que la camara en 3ra persona se ajuste a la nueva posicion del objeto
                 CamaraInterna.Target = Mesh.Position;
@@ -668,17 +719,16 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Dispose()
         {
-            PalmeraOriginal.dispose();
-
             foreach (var mesh in MeshAutos)
             {
                 mesh.dispose();
             }
-               
-            /*
+
+            PalmeraOriginal.dispose();
             PinoOriginal.dispose();
             RocaOriginal.dispose();
             ArbolBananasOriginal.dispose();
+            /*
             BarrilPolvoraOriginal.dispose();
             CarretillaOriginal.dispose();
             ContenedorOriginal.dispose();
