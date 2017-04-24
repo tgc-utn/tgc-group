@@ -16,7 +16,7 @@ using TGC.Core.Collision;
 using TGC.Core.UserControls;
 using TGC.Core.UserControls.Modifier;
 using System.Collections.Generic;
-
+using System;
 
 namespace TGC.Group.Model
 {
@@ -67,6 +67,12 @@ namespace TGC.Group.Model
 
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
+
+        //Nombre del jugador 1 que se dibujara en pantalla
+        public string NombreJugador1 { get;  set; }
+
+        //Cantidad de autos enemigos
+        public int CantidadDeAutos { get; set; }
 
         //Camara en tercera persona
         private TgcThirdPersonCamera CamaraInterna;
@@ -271,6 +277,7 @@ namespace TGC.Group.Model
         private void CrearAutos(TgcSceneLoader loader)
         {
             System.Random randomNumber = new System.Random();
+            var meshEnemigos = new List<TgcMesh>();
 
             var tanque = loader.loadSceneFromFile(MediaDir + "Vehiculos\\TanqueFuturistaRuedas\\TanqueFuturistaRuedas-TgcScene.xml").Meshes[0].createMeshInstance("tanque");
             var hummer = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Hummer\\Hummer-TgcScene.xml").Meshes[0].createMeshInstance("hummer");
@@ -279,27 +286,44 @@ namespace TGC.Group.Model
 
             tanque.Transform = tanque.Transform * Matrix.Translation(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (POSICION_VERTICE - CUADRANTE_SIZE * 4)));
             tanque.BoundingBox.transform(tanque.Transform);
+            meshEnemigos.Add(tanque);
 
             hummer.Transform = hummer.Transform * Matrix.Translation(new Vector3(POSICION_VERTICE - CUADRANTE_SIZE * 4, 0, POSICION_VERTICE - CUADRANTE_SIZE * 4));
             hummer.BoundingBox.transform(hummer.Transform);
+            meshEnemigos.Add(hummer);
 
             camioneta.Transform = camioneta.Transform * Matrix.RotationY(180 * (FastMath.PI / 180));
             camioneta.Transform = camioneta.Transform * Matrix.Translation(new Vector3((POSICION_VERTICE - CUADRANTE_SIZE * 4), 0,(-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)));
             camioneta.BoundingBox.transform(camioneta.Transform);
+            meshEnemigos.Add(camioneta);
 
             patrullero.Transform = patrullero.Transform * Matrix.RotationY(180 * (FastMath.PI / 180));
             patrullero.Transform = patrullero.Transform * Matrix.Translation(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)));
             patrullero.BoundingBox.transform(patrullero.Transform);
+            meshEnemigos.Add(patrullero);
 
             MeshAutos = new List<TgcMesh>();
+           
             //Auto principal
             MeshAutos.Add(Mesh);
 
-            //Otros autos con IA?
-            MeshAutos.Add(tanque);
-            MeshAutos.Add(hummer);
-            MeshAutos.Add(camioneta);
-            MeshAutos.Add(patrullero);
+            //Autos enemigos
+            for (int i = 0; i< CantidadDeAutos; i++)
+            {
+               var autoEnemigo = meshEnemigos[i];
+               MeshAutos.Add(autoEnemigo);
+
+            }
+
+            //hago dispose de cada auto que no se va a dibujar
+            foreach (var meshEnemigo in meshEnemigos)
+            {
+                if (MeshAutos.Contains(meshEnemigo) == false)
+                {
+                    meshEnemigo.dispose();
+                }
+            }
+
         }
 
         //Crea instancias de un objeto
@@ -440,6 +464,7 @@ namespace TGC.Group.Model
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.Red);
             DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.Red);
+            DrawText.drawText("Jugador 1: " + this.NombreJugador1, 1200, 10, Color.LightYellow);
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
@@ -625,8 +650,11 @@ namespace TGC.Group.Model
             var movement = new Vector3(0, 0, 0);
             var moveForward = 0f;
             float rotate = 0;
+            float gravedad = 15.0f;
             var moving = false;
             var rotating = false;
+            var jumping = false;
+            float velocidadY = 0f;
 
 
             //Movernos de izquierda a derecha, sobre el eje X.
@@ -653,12 +681,32 @@ namespace TGC.Group.Model
                 moving = true;
             }
 
+            //Salto
+            if (Input.keyDown(Key.Space))
+            {
+                velocidadY += 200.0f;
+                jumping = true;
+            }
+
             if (rotating)
             {
                 var rotAngle = (rotate * ElapsedTime) * (FastMath.PI / 180);
                 Mesh.rotateY(rotAngle);
                 CamaraInterna.rotateY(rotAngle);
             }
+
+            if (jumping)
+            {
+                //Ascenso
+                //var posicionAntesSalto = Mesh.Position;
+                //Mesh.move(0, distanciaSalto, 0);
+                saltarConMeshOrientado(velocidadY);
+                saltarConMeshOrientado(gravedad);
+                //Descenso
+                //caida(gravedad, posicionAntesSalto);
+                //saltarConMeshOrientado((-gravedad * ElapsedTime));*/
+            }
+
             if (moving)
             {
                 //Guardar posicion original antes de cambiarla
@@ -710,6 +758,24 @@ namespace TGC.Group.Model
                 //Hacer que la camara en 3ra persona se ajuste a la nueva posicion del objeto
                 CamaraInterna.Target = Mesh.Position;
             }
+        }
+        public void saltarConMeshOrientado(float movement)
+        {
+            float y;
+            y = movement * ElapsedTime;
+            Mesh.move(0, y, 0);
+        }
+
+        public void caida(float gravedad, Vector3 originalPosition)
+        {
+            var posicionActual = new Vector3(0, 0, 0);
+            Mesh.getPosition(posicionActual);
+            /*Esto rompe todo por ahora
+             while (posicionActual.Y != originalPosition.Y)
+            {
+                var y = gravedad * ElapsedTime;
+                Mesh.move(0 , y , 0);
+            }*/
         }
 
         /// <summary>

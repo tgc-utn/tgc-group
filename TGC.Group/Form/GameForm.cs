@@ -28,7 +28,22 @@ namespace TGC.Group.Form
         /// <summary>
         ///     Ejemplo del juego a correr
         /// </summary>
-        private TgcExample Modelo { get; set; }
+        private GameModel Modelo { get; set; }
+
+        /// <summary>
+        ///   El nombre del jugador1 que se le pasar el modelo para mostrar en pantalla
+        /// </summary>
+        public string NombreJugador1 { get; set; }
+
+        /// <summary>
+        ///  El tiempo de juego de la partida
+        /// </summary>
+        public int TiempoDeJuego { get;  set; }
+
+        /// <summary>
+        /// Cantidad de autos que se van a generar en el mapa
+        /// </summary>
+        public int CantidadAutos { get; set; }
 
         /// <summary>
         ///     Obtener o parar el estado del RenderLoop.
@@ -47,6 +62,9 @@ namespace TGC.Group.Form
 
         private void GameForm_Load(object sender, EventArgs e)
         {
+
+            InitializeTimer();
+
             //Iniciar graficos.
             InitGraphics();
 
@@ -96,6 +114,9 @@ namespace TGC.Group.Form
             //Juego a ejecutar, si quisiéramos tener diferentes modelos aquí podemos cambiar la instancia e invocar a otra clase.
             Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory,
                 currentDirectory + Game.Default.ShadersDirectory);
+
+            Modelo.NombreJugador1 = this.NombreJugador1;
+            Modelo.CantidadDeAutos = this.CantidadAutos;
 
             //Cargar juego.
             ExecuteModel();
@@ -196,5 +217,24 @@ namespace TGC.Group.Form
             D3DDevice.Instance.Dispose();
             TexturesPool.Instance.clearAll();
         }
+
+        private void panel3D_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            MessageBox.Show("El juego termino "); //TODO: mostrar estadisticas...
+            this.Close();
+        }
+
+        private void InitializeTimer()
+        {
+            timer1.Interval = TiempoDeJuego* 60000;
+            timer1.Enabled = true;
+
+        }
+
     }
 }
