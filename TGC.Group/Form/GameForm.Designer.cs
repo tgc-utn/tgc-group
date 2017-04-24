@@ -28,7 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.panel3D = new System.Windows.Forms.Panel();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // panel3D
@@ -38,6 +40,8 @@
             this.panel3D.Name = "panel3D";
             this.panel3D.Size = new System.Drawing.Size(784, 561);
             this.panel3D.TabIndex = 0;
+            this.panel3D.Paint += new System.Windows.Forms.PaintEventHandler(this.panel3D_Paint);
+
             // 
             // GameForm
             // 
@@ -47,7 +51,7 @@
             this.Controls.Add(this.panel3D);
             this.Name = "GameForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Form";
+            this.Text = "TWISTED CHANO";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.GameForm_FormClosing);
             this.Load += new System.EventHandler(this.GameForm_Load);
@@ -58,6 +62,7 @@
         #endregion
 
         private System.Windows.Forms.Panel panel3D;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 

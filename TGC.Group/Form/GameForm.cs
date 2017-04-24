@@ -28,7 +28,22 @@ namespace TGC.Group.Form
         /// <summary>
         ///     Ejemplo del juego a correr
         /// </summary>
-        private TgcExample Modelo { get; set; }
+        private GameModel Modelo { get; set; }
+
+        /// <summary>
+        ///   El nombre del jugador1 que se le pasar el modelo para mostrar en pantalla
+        /// </summary>
+        public string NombreJugador1 { get; set; }
+
+        /// <summary>
+        ///  El tiempo de juego de la partida
+        /// </summary>
+        public int TiempoDeJuego { get;  set; }
+
+        /// <summary>
+        /// Cantidad de autos que se van a generar en el mapa
+        /// </summary>
+        public int CantidadOponentes { get; set; }
 
         /// <summary>
         ///     Obtener o parar el estado del RenderLoop.
@@ -97,6 +112,10 @@ namespace TGC.Group.Form
             Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory,
                 currentDirectory + Game.Default.ShadersDirectory);
 
+            Modelo.NombreJugador1 = this.NombreJugador1;
+            Modelo.CantidadDeOponentes = this.CantidadOponentes;
+            Modelo.TiempoDeJuego = this.TiempoDeJuego;
+
             //Cargar juego.
             ExecuteModel();
         }
@@ -116,6 +135,11 @@ namespace TGC.Group.Form
                     {
                         Modelo.Update();
                         Modelo.Render();
+
+                        if (Modelo.finModelo)
+                        {
+                            this.Close();
+                        }
                     }
                     else
                     {
@@ -195,6 +219,11 @@ namespace TGC.Group.Form
             //Liberar Device al finalizar la aplicacion
             D3DDevice.Instance.Dispose();
             TexturesPool.Instance.clearAll();
+        }
+
+        private void panel3D_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }
