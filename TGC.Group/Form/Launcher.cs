@@ -16,15 +16,26 @@ namespace TGC.Group.Form
 
         private void Launchercs_Load(object sender, EventArgs e)
         {
-            cmbAutos.Items.AddRange(new object[] { 1, 2, 3, 4});
+            cmbAutos.Items.AddRange(new object[] { 1, 2, 3, 4 });
             cmbTiempo.Items.AddRange(new object[] { 5, 10, 15 });
+
+            cmbAutos.Text = "4";
+            cmbTiempo.Text = "5";
         }
 
         private void btnStart_Click(object sender, EventArgs e)
         {
             GameForm gameForm = new GameForm();
 
-            gameForm.NombreJugador1 = txtName.Text;
+            if (txtName.Text == "")
+            {
+                gameForm.NombreJugador1 = "Jugador1";
+            }
+            else
+            {
+                gameForm.NombreJugador1 = txtName.Text;
+            }
+
             gameForm.CantidadAutos = Convert.ToInt32(cmbAutos.Text);
             gameForm.TiempoDeJuego = Convert.ToInt32(cmbTiempo.Text);
             this.Hide();
@@ -32,6 +43,9 @@ namespace TGC.Group.Form
             this.Close();
         }
 
-
+        private void btnSalir_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
     }
 }

@@ -1,22 +1,18 @@
 //"Inclusion de librerias"
 using Microsoft.DirectX;
-using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
 using System.Collections.Generic;
 using System.Drawing;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
-using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.Utils;
 using TGC.Camara;
 using TGC.Core.Collision;
-using TGC.Core.UserControls;
-using TGC.Core.UserControls.Modifier;
-using System.Collections.Generic;
-using System;
+using TGC.UtilsGroup;
+using TGC.Core.Example;
 
 namespace TGC.Group.Model
 {
@@ -130,6 +126,14 @@ namespace TGC.Group.Model
         //Lista de objetos del mesh principal
         private List<TgcMesh> MeshPrincipal;
 
+        //Fuente para los jugadores
+        private TgcDrawText letraJugadores;
+
+        //Lista de Sprites
+        private TgcDrawer2D drawerBarras;
+        private TgcSprite spriteBarraJugador1;
+        private TgcSprite spriteBarraJugador1Llena;
+
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
         ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
@@ -138,9 +142,30 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Init()
         {
+
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
             var loader = new TgcSceneLoader();
+            letraJugadores = new TgcDrawText(d3dDevice, "Rock it", 10);
+
+
+
+            ////////////////////////////////////////
+            drawerBarras = new TgcDrawer2D(d3dDevice);
+
+            spriteBarraJugador1 = new TgcSprite(drawerBarras);
+            spriteBarraJugador1.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraVacia.png");
+            spriteBarraJugador1.Position = new Vector2(10f, 12f);
+            spriteBarraJugador1.Scaling = new Vector2(0.75f, 1f);
+
+            
+            spriteBarraJugador1Llena = new TgcSprite(drawerBarras);
+            spriteBarraJugador1Llena.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraLlena.png");
+            spriteBarraJugador1Llena.Position = new Vector2(10f, 12f);
+            spriteBarraJugador1Llena.Scaling = new Vector2(0.75f, 1f);
+            
+            ////////////////////////////////////////
+
 
             //Cargo el terreno
             ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA3-TgcScene.xml");
@@ -464,7 +489,10 @@ namespace TGC.Group.Model
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.Red);
             DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.Red);
-            DrawText.drawText("Jugador 1: " + this.NombreJugador1, 1200, 10, Color.LightYellow);
+
+            //Cargo el nombre del Jugador y de los competidores
+            var width = D3DDevice.Instance.Width;
+            letraJugadores.drawText(this.NombreJugador1, width - 100, 10, Color.DeepSkyBlue);
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
@@ -494,10 +522,33 @@ namespace TGC.Group.Model
                 }
 
                 RenderizarObjetos(1);
-            }            
+            }
 
             //Renderizo los objetos cargados de las listas
             RenderizarObjetos(0);
+
+
+            ////////////////////
+            int cantNitro = 100;
+
+            //spriteBarraJugador1Llena.Scaling = new Vector2(0.73f * cantNitro / 100, 0.50f);
+
+            spriteBarraJugador1Llena.Color = Color.FromArgb(255, (int)((100 - cantNitro) * 2.55), 0, (int)(cantNitro * 2.55));
+
+            //Iniciar dibujado de todos los Sprites de la escena (en este caso es solo uno)
+            drawerBarras.beginDrawSprite();
+
+            //Dibujar sprite (si hubiese mas, deberian ir todos aquí)
+            spriteBarraJugador1.render();
+            spriteBarraJugador1Llena.render();
+
+            //Finalizar el dibujado de Sprites
+            drawerBarras.endDrawSprite();
+            ///////////////////////
+
+
+
+
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
