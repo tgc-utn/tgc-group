@@ -36,6 +36,14 @@ namespace TGC.Group.Model
         /// <summary>
         /// Inicializacion de variables y "definicion" de los objetos
         /// </summary>
+        ///
+
+        //Variables para la caida
+        int G = 20;
+        float Force;
+
+        //Posicion del piso
+        float piso;
 
         //Posición Y de las barras de vida
         private const int POSICION_Y_BARRA_VIDA = 40;
@@ -44,7 +52,13 @@ namespace TGC.Group.Model
         private const int POSICION_X_BARRA_VIDA = 110;
 
         //Velocidad de movimiento del auto
-        private const float MOVEMENT_SPEED = 1000f;
+        private float MOVEMENT_SPEED = 0f;
+
+        //Rozamiento del piso
+        private float ROZAMIENTO = 100f;
+
+        //Velocidad Maxima
+        private const float MAX_SPEED = 3000f;
 
         //Velocidad de rotación del auto
         private const float ROTATION_SPEED = 120f;
@@ -218,6 +232,7 @@ namespace TGC.Group.Model
         
             Mesh.AutoTransformEnable = true;
             Mesh.move(0, 0.5f, 0);
+            piso = Mesh.Position.Y;
 
             //Camara por defecto
             CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 600);
@@ -590,7 +605,10 @@ namespace TGC.Group.Model
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.Red);
             DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.Red);
-             
+
+            DrawText.drawText("Jugador 1: " + this.NombreJugador1, 1200, 10, Color.LightYellow);
+            DrawText.drawText("Velocidad: " + this.MOVEMENT_SPEED, 1200, 20, Color.LightYellow);
+
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
             /*Box.Transform = Matrix.Scaling(Box.Scale) *
@@ -851,12 +869,10 @@ namespace TGC.Group.Model
             var movement = new Vector3(0, 0, 0);
             var moveForward = 0f;
             float rotate = 0;
-            float gravedad = 15.0f;
             var moving = false;
             var rotating = false;
-            var jumping = false;
-            float velocidadY = 0f;
-
+            bool falling = false;
+            var distanciaSalto = 75f;
 
             //Movernos de izquierda a derecha, sobre el eje X.
             if (Input.keyDown(Key.Left) || Input.keyDown(Key.A))
@@ -871,22 +887,22 @@ namespace TGC.Group.Model
             }
 
             //Movernos adelante y atras, sobre el eje Z.
-            if (Input.keyDown(Key.Up) || Input.keyDown(Key.W))
+            if ((Input.keyDown(Key.Up) || Input.keyDown(Key.W)))
             {
-                moveForward = -MOVEMENT_SPEED;
-                moving = true;
+                    moveForward += -Acelerar(200f);
+                    moving = true;  
             }
-            else if (Input.keyDown(Key.Down) || Input.keyDown(Key.S))
+             if ((Input.keyDown(Key.Down) || Input.keyDown(Key.S)))
             {
-                moveForward = MOVEMENT_SPEED;
-                moving = true;
+                    moveForward += -Acelerar(-150f); 
+                    moving = true;
             }
 
-            //Salto
-            if (Input.keyDown(Key.Space))
+            //////////El auto dejo de acelerar e ira frenando de apoco 
+            if (!Input.keyDown(Key.Down) && !Input.keyDown(Key.S) && !Input.keyDown(Key.Up) && !Input.keyDown(Key.W))
             {
-                velocidadY += 200.0f;
-                jumping = true;
+                moveForward = -Acelerar(0f);
+                moving = true;
             }
 
             if (rotating)
@@ -896,16 +912,30 @@ namespace TGC.Group.Model
                 CamaraInterna.rotateY(rotAngle);
             }
 
-            if (jumping)
+            if (!falling)
             {
-                //Ascenso
-                //var posicionAntesSalto = Mesh.Position;
-                //Mesh.move(0, distanciaSalto, 0);
-                saltarConMeshOrientado(velocidadY);
-                saltarConMeshOrientado(gravedad);
-                //Descenso
-                //caida(gravedad, posicionAntesSalto);
-                //saltarConMeshOrientado((-gravedad * ElapsedTime));*/
+                //Salto
+                if (Input.keyPressed(Key.Space))
+                {
+                    falling = true;
+                    Mesh.move(0 , distanciaSalto , 0);
+                    Force = G;
+                }
+            }
+
+            if (!Input.keyDown(Key.Space))
+            {
+                float Y = 0;
+                Y -= Force;
+                Force *= 0.9f;
+                Mesh.move(0, Y, 0);
+            }
+
+            if (Mesh.Position.Y <= piso)
+            {
+                float diferencia = 0.5f - Mesh.Position.Y;
+                Mesh.move(0, diferencia, 0);
+                falling = false;
             }
 
             if (moving)
@@ -914,6 +944,7 @@ namespace TGC.Group.Model
                 var originalPos = Mesh.Position;
 
                 //Multiplicar movimiento por velocidad y elapsedTime
+
                 movement *= MOVEMENT_SPEED * ElapsedTime;
                 Mesh.moveOrientedY(moveForward * ElapsedTime);
 
@@ -959,23 +990,25 @@ namespace TGC.Group.Model
             }
         }
 
-        public void saltarConMeshOrientado(float movement)
+        private float Acelerar(float aceleracion) 
         {
-            float y;
-            y = movement * ElapsedTime;
-            Mesh.move(0, y, 0);
+            if ((MOVEMENT_SPEED < MAX_SPEED))
+                return MOVEMENT_SPEED = MOVEMENT_SPEED + ((aceleracion + ObtenerRozamiento()) * ElapsedTime);
+            else return MOVEMENT_SPEED;
         }
 
-        public void caida(float gravedad, Vector3 originalPosition)
+        private float ObtenerRozamiento()
         {
-            var posicionActual = new Vector3(0, 0, 0);
-            Mesh.getPosition(posicionActual);
-            /*Esto rompe todo por ahora
-             while (posicionActual.Y != originalPosition.Y)
-            {
-                var y = gravedad * ElapsedTime;
-                Mesh.move(0 , y , 0);
-            }*/
+            if (MOVEMENT_SPEED > 0) return (-ROZAMIENTO);
+            if (MOVEMENT_SPEED < 0) return ROZAMIENTO;
+            else return 0;
+        }
+
+        private float Desacelerar()
+        {
+            if (MOVEMENT_SPEED <= 0) return 0;
+            else return MOVEMENT_SPEED -= ROZAMIENTO * ElapsedTime;
+
         }
 
         /// <summary>
