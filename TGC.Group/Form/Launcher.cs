@@ -29,18 +29,18 @@ namespace TGC.Group.Form
 
             if (txtName.Text == "")
             {
-                gameForm.NombreJugador1 = "Jugador1";
+                gameForm.NombreJugador1 = "jugador 1";
             }
             else
             {
                 gameForm.NombreJugador1 = txtName.Text;
             }
 
-            gameForm.CantidadAutos = Convert.ToInt32(cmbAutos.Text);
+            gameForm.CantidadOponentes = Convert.ToInt32(cmbAutos.Text);
             gameForm.TiempoDeJuego = Convert.ToInt32(cmbTiempo.Text);
             this.Hide();
             gameForm.Show();
-            this.Close();
+            this.Show();
         }
 
         private void btnSalir_Click(object sender, EventArgs e)

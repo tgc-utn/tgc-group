@@ -44,7 +44,7 @@
             this.btnStart.Location = new System.Drawing.Point(563, 401);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(93, 34);
-            this.btnStart.TabIndex = 0;
+            this.btnStart.TabIndex = 3;
             this.btnStart.Text = "Jugar";
             this.btnStart.UseVisualStyleBackColor = true;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
@@ -53,53 +53,54 @@
             // 
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Font = new System.Drawing.Font("Rock it", 9.749999F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.749999F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.DeepSkyBlue;
             this.label1.Location = new System.Drawing.Point(12, 260);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(92, 37);
+            this.label1.Size = new System.Drawing.Size(60, 16);
             this.label1.TabIndex = 1;
             this.label1.Text = "Nombre:";
             // 
             // txtName
             // 
-            this.txtName.Font = new System.Drawing.Font("Rock it", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtName.CharacterCasing = System.Windows.Forms.CharacterCasing.Lower;
+            this.txtName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtName.Location = new System.Drawing.Point(177, 255);
             this.txtName.MaxLength = 10;
             this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(173, 39);
+            this.txtName.Size = new System.Drawing.Size(173, 20);
             this.txtName.TabIndex = 1;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.BackColor = System.Drawing.Color.Transparent;
-            this.label2.Font = new System.Drawing.Font("Rock it", 9.749999F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.749999F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.ForeColor = System.Drawing.Color.DeepSkyBlue;
             this.label2.Location = new System.Drawing.Point(12, 303);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(159, 37);
+            this.label2.Size = new System.Drawing.Size(105, 16);
             this.label2.TabIndex = 3;
             this.label2.Text = "Nro. Oponentes:";
             // 
             // cmbAutos
             // 
             this.cmbAutos.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbAutos.Font = new System.Drawing.Font("Rock it", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbAutos.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cmbAutos.FormattingEnabled = true;
             this.cmbAutos.Location = new System.Drawing.Point(177, 300);
             this.cmbAutos.Name = "cmbAutos";
-            this.cmbAutos.Size = new System.Drawing.Size(63, 40);
+            this.cmbAutos.Size = new System.Drawing.Size(63, 21);
             this.cmbAutos.TabIndex = 3;
             // 
             // cmbTiempo
             // 
             this.cmbTiempo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbTiempo.Font = new System.Drawing.Font("Rock it", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbTiempo.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cmbTiempo.FormattingEnabled = true;
             this.cmbTiempo.Location = new System.Drawing.Point(177, 346);
             this.cmbTiempo.Name = "cmbTiempo";
-            this.cmbTiempo.Size = new System.Drawing.Size(63, 40);
+            this.cmbTiempo.Size = new System.Drawing.Size(63, 21);
             this.cmbTiempo.Sorted = true;
             this.cmbTiempo.TabIndex = 2;
             // 
@@ -107,11 +108,11 @@
             // 
             this.label3.AutoSize = true;
             this.label3.BackColor = System.Drawing.Color.Transparent;
-            this.label3.Font = new System.Drawing.Font("Rock it", 9.749999F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.749999F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.ForeColor = System.Drawing.Color.DeepSkyBlue;
             this.label3.Location = new System.Drawing.Point(12, 349);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(83, 37);
+            this.label3.Size = new System.Drawing.Size(58, 16);
             this.label3.TabIndex = 5;
             this.label3.Text = "Tiempo:";
             // 
@@ -120,13 +121,14 @@
             this.btnSalir.Location = new System.Drawing.Point(662, 401);
             this.btnSalir.Name = "btnSalir";
             this.btnSalir.Size = new System.Drawing.Size(93, 34);
-            this.btnSalir.TabIndex = 7;
+            this.btnSalir.TabIndex = 4;
             this.btnSalir.Text = "Salir";
             this.btnSalir.UseVisualStyleBackColor = true;
             this.btnSalir.Click += new System.EventHandler(this.btnSalir_Click);
             // 
             // Launcher
             // 
+            this.AcceptButton = this.btnStart;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(767, 447);

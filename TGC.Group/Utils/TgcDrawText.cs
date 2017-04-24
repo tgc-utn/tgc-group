@@ -1,5 +1,6 @@
 using Microsoft.DirectX.Direct3D;
 using System.Drawing;
+using System.Drawing.Text;
 using Font = System.Drawing.Font;
 
 namespace TGC.UtilsGroup
@@ -11,9 +12,20 @@ namespace TGC.UtilsGroup
     {
         private readonly Microsoft.DirectX.Direct3D.Font dxFont;
 
-        public TgcDrawText(Device d3dDevice, string fuente, int size)
+        public TgcDrawText(Device d3dDevice, string fuente, int size, string MediaDir)
         {
-            Font FUENTE_SIZE = new Font(fuente, size, FontStyle.Regular, GraphicsUnit.Pixel);
+            System.Drawing.Text.PrivateFontCollection privateFonts = new PrivateFontCollection();
+            Font FUENTE_SIZE;
+
+            if (fuente == "Rock it")
+            {
+                privateFonts.AddFontFile(MediaDir + "Font\\Rockit.ttf");
+                FUENTE_SIZE = new Font(privateFonts.Families[0], size);
+            }
+            else
+                FUENTE_SIZE = new Font (fuente, size, FontStyle.Regular, GraphicsUnit.Pixel);
+
+            //Creo el Sprite
             TextSprite = new Sprite(d3dDevice);
 
             //Fuente

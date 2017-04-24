@@ -179,7 +179,6 @@
   <ItemGroup>
     <Content Include="Media\Twisted_Chano\Armas\CajaMuniciones\CajaMuniciones-TgcScene.xml" />
     <Content Include="Media\Twisted_Chano\Armas\CajaMuniciones\Textures\ammobox.bmp" />
-    <Content Include="Media\Twisted_Chano\cajaMadera4.jpg" />
     <Content Include="Media\Twisted_Chano\MAPA-TgcScene.xml" />
     <Content Include="Media\Twisted_Chano\Muebles\ExpendedorDeBebidas\ExpendedorDeBebidas-TgcScene.xml" />
     <Content Include="Media\Twisted_Chano\Muebles\ExpendedorDeBebidas\Textures\sodamachine.jpg" />

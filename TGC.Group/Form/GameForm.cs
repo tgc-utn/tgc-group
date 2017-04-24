@@ -43,7 +43,7 @@ namespace TGC.Group.Form
         /// <summary>
         /// Cantidad de autos que se van a generar en el mapa
         /// </summary>
-        public int CantidadAutos { get; set; }
+        public int CantidadOponentes { get; set; }
 
         /// <summary>
         ///     Obtener o parar el estado del RenderLoop.
@@ -62,9 +62,6 @@ namespace TGC.Group.Form
 
         private void GameForm_Load(object sender, EventArgs e)
         {
-
-            InitializeTimer();
-
             //Iniciar graficos.
             InitGraphics();
 
@@ -116,7 +113,8 @@ namespace TGC.Group.Form
                 currentDirectory + Game.Default.ShadersDirectory);
 
             Modelo.NombreJugador1 = this.NombreJugador1;
-            Modelo.CantidadDeAutos = this.CantidadAutos;
+            Modelo.CantidadDeOponentes = this.CantidadOponentes;
+            Modelo.TiempoDeJuego = this.TiempoDeJuego;
 
             //Cargar juego.
             ExecuteModel();
@@ -137,6 +135,11 @@ namespace TGC.Group.Form
                     {
                         Modelo.Update();
                         Modelo.Render();
+
+                        if (Modelo.finModelo)
+                        {
+                            this.Close();
+                        }
                     }
                     else
                     {
@@ -222,19 +225,5 @@ namespace TGC.Group.Form
         {
 
         }
-
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            MessageBox.Show("El juego termino "); //TODO: mostrar estadisticas...
-            this.Close();
-        }
-
-        private void InitializeTimer()
-        {
-            timer1.Interval = TiempoDeJuego* 60000;
-            timer1.Enabled = true;
-
-        }
-
     }
 }
