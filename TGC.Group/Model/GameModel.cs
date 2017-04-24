@@ -663,12 +663,9 @@ namespace TGC.Group.Model
 
             Tiempo = (TiempoFin - DateTime.Now).Minutes.ToString().PadLeft (2, '0') + ":" + (TiempoFin - DateTime.Now).Seconds.ToString().PadLeft(2, '0');
 
-            if (((TiempoFin - DateTime.Now).Minutes <= 0) || ((TiempoFin - DateTime.Now).Seconds <= 0))
-            {
+            if (((TiempoFin - DateTime.Now).Minutes < 0) || ((TiempoFin - DateTime.Now).Seconds < 0))
                 finReloj = true;
-            }
-
-            letraJugadores.drawText(Tiempo, Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA + 35, POSICION_Y_BARRA_VIDA - 40, Color.OrangeRed);
+                
 
             //Dibujo el nombre del Jugador y de los competidores
             letraJugadores.drawText(this.NombreJugador1, Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA - 10, Color.DeepSkyBlue);
@@ -686,9 +683,7 @@ namespace TGC.Group.Model
 
             //Calculo si ganó alguien o el principal perdió
             if ( (cantVidaJugador1 <= 0) || (cantVidaJugador2 <= 0 && cantVidaJugador3 <= 0 && cantVidaJugador4 <= 0 && cantVidaJugador5 <= 0))
-            {
                 finReloj = true;
-            }
 
             //Iniciar dibujado de todos los Sprites de la escena (en este caso es solo uno)
             drawerBarras.beginDrawSprite();
@@ -715,12 +710,17 @@ namespace TGC.Group.Model
 
             if (finReloj)
             {
+                letraJugadores.drawText("00:00", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA + 35, POSICION_Y_BARRA_VIDA - 40, Color.OrangeRed);
                 TgcDrawText letraGanador = new TgcDrawText(D3DDevice.Instance.Device, "Rock it", 36, MediaDir);
                 letraGanador.drawText("FIN DEL JUEGO", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 200, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - 150, Color.Green);
                 letraGanador.drawText("GANÓ ...", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 200, (Convert.ToInt32(D3DDevice.Instance.Height) / 2), Color.Green);
                 letraJugadores.drawText("Presione la letra X para volver al menú inicial...", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 200, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 150, Color.OrangeRed);
             }
-        }
+            else
+            {
+                letraJugadores.drawText(Tiempo, Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA + 35, POSICION_Y_BARRA_VIDA - 40, Color.OrangeRed);
+            }
+}
 
         //0: render
         //1: render bounding box
