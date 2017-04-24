@@ -40,6 +40,14 @@ namespace TGC.Group.Model
         /// <summary>
         /// Inicializacion de variables y "definicion" de los objetos
         /// </summary>
+        ///
+
+        //Variables para la caida
+        int G = 20;
+        float Force;
+
+        //Posicion del piso
+        float piso;
 
         //Velocidad de movimiento del auto
         private float MOVEMENT_SPEED = 0f;
@@ -180,6 +188,7 @@ namespace TGC.Group.Model
         
             Mesh.AutoTransformEnable = true;
             Mesh.move(0, 0.5f, 0);
+            piso = Mesh.Position.Y;
 
             //Camara por defecto
             CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 600);
@@ -657,11 +666,10 @@ namespace TGC.Group.Model
             var movement = new Vector3(0, 0, 0);
             var moveForward = 0f;
             float rotate = 0;
-            float gravedad = 15.0f;
             var moving = false;
             var rotating = false;
-            var jumping = false;
-            float velocidadY = 0f;
+            bool falling = false;
+            var distanciaSalto = 75f;
 
             //Movernos de izquierda a derecha, sobre el eje X.
             if (Input.keyDown(Key.Left) || Input.keyDown(Key.A))
@@ -694,13 +702,6 @@ namespace TGC.Group.Model
                 moving = true;
             }
 
-            //Salto
-            if (Input.keyDown(Key.Space))
-            {
-                velocidadY += 200.0f;
-                jumping = true;
-            }
-
             if (rotating)
             {
                 var rotAngle = (rotate * ElapsedTime) * (FastMath.PI / 180);
@@ -708,16 +709,30 @@ namespace TGC.Group.Model
                 CamaraInterna.rotateY(rotAngle);
             }
 
-            if (jumping)
+            if (!falling)
             {
-                //Ascenso
-                //var posicionAntesSalto = Mesh.Position;
-                //Mesh.move(0, distanciaSalto, 0);
-                saltarConMeshOrientado(velocidadY);
-                saltarConMeshOrientado(gravedad);
-                //Descenso
-                //caida(gravedad, posicionAntesSalto);
-                //saltarConMeshOrientado((-gravedad * ElapsedTime));*/
+                //Salto
+                if (Input.keyPressed(Key.Space))
+                {
+                    falling = true;
+                    Mesh.move(0 , distanciaSalto , 0);
+                    Force = G;
+                }
+            }
+
+            if (!Input.keyDown(Key.Space))
+            {
+                float Y = 0;
+                Y -= Force;
+                Force *= 0.9f;
+                Mesh.move(0, Y, 0);
+            }
+
+            if (Mesh.Position.Y <= piso)
+            {
+                float diferencia = 0.5f - Mesh.Position.Y;
+                Mesh.move(0, diferencia, 0);
+                falling = false;
             }
 
             if (moving)
@@ -793,25 +808,6 @@ namespace TGC.Group.Model
             if (MOVEMENT_SPEED <= 0) return 0;
             else return MOVEMENT_SPEED -= ROZAMIENTO * ElapsedTime;
 
-        }
-
-        public void saltarConMeshOrientado(float movement)
-        {
-            float y;
-            y = movement * ElapsedTime;
-            Mesh.move(0, y, 0);
-        }
-
-        public void caida(float gravedad, Vector3 originalPosition)
-        {
-            var posicionActual = new Vector3(0, 0, 0);
-            Mesh.getPosition(posicionActual);
-            /*Esto rompe todo por ahora
-             while (posicionActual.Y != originalPosition.Y)
-            {
-                var y = gravedad * ElapsedTime;
-                Mesh.move(0 , y , 0);
-            }*/
         }
 
         /// <summary>
