@@ -17,7 +17,7 @@ namespace TGC.Group.Form
         private void Launchercs_Load(object sender, EventArgs e)
         {
             cmbAutos.Items.AddRange(new object[] { 1, 2, 3, 4 });
-            cmbTiempo.Items.AddRange(new object[] { 5, 10, 15 });
+            cmbTiempo.Items.AddRange(new object[] {5, 10, 15 });
 
             cmbAutos.Text = "4";
             cmbTiempo.Text = "5";
