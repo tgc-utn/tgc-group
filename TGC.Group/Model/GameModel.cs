@@ -45,7 +45,7 @@ namespace TGC.Group.Model
         private float MOVEMENT_SPEED = 0f;
 
         //Rozamiento del piso
-        private float ROZAMIENTO = 300f;
+        private float ROZAMIENTO = 100f;
 
         //Velocidad Maxima
         private const float MAX_SPEED = 3000f;
@@ -64,8 +64,6 @@ namespace TGC.Group.Model
 
         //Posicion vertices
         private const int POSICION_VERTICE = 9000;
-
-        private bool estaAvanzando = true;
 
         //Scene principal
         private TgcScene ScenePpal;
@@ -680,22 +678,19 @@ namespace TGC.Group.Model
             //Movernos adelante y atras, sobre el eje Z.
             if ((Input.keyDown(Key.Up) || Input.keyDown(Key.W)))
             {
-                    estaAvanzando = true;
                     moveForward += -Acelerar(200f);
                     moving = true;  
             }
              if ((Input.keyDown(Key.Down) || Input.keyDown(Key.S)))
             {
-                    estaAvanzando = false;
-                    moveForward += -Acelerar(-400f);
+                    moveForward += -Acelerar(-150f); 
                     moving = true;
             }
 
-            //El auto dejo de acelerar e ira frenando de apoco 
+            //////////El auto dejo de acelerar e ira frenando de apoco 
             if (!Input.keyDown(Key.Down) && !Input.keyDown(Key.S) && !Input.keyDown(Key.Up) && !Input.keyDown(Key.W))
             {
-                if (estaAvanzando == true) moveForward += -Desacelerar();
-                else moveForward += Desacelerar();
+                moveForward = -Acelerar(0f);
                 moving = true;
             }
 
@@ -782,8 +777,15 @@ namespace TGC.Group.Model
         private float Acelerar(float aceleracion) 
         {
             if ((MOVEMENT_SPEED < MAX_SPEED))
-                return MOVEMENT_SPEED += aceleracion * ElapsedTime;
+                return MOVEMENT_SPEED = MOVEMENT_SPEED + ((aceleracion + ObtenerRozamiento()) * ElapsedTime);
             else return MOVEMENT_SPEED;
+        }
+
+        private float ObtenerRozamiento()
+        {
+            if (MOVEMENT_SPEED > 0) return (-ROZAMIENTO);
+            if (MOVEMENT_SPEED < 0) return ROZAMIENTO;
+            else return 0;
         }
 
         private float Desacelerar()
