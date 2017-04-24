@@ -1,21 +1,17 @@
 //"Inclusion de librerias"
 using Microsoft.DirectX;
-using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
 using System.Collections.Generic;
 using System.Drawing;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
-using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.Utils;
 using TGC.Camara;
 using TGC.Core.Collision;
-using TGC.Core.UserControls;
-using TGC.Core.UserControls.Modifier;
-using System.Collections.Generic;
+using TGC.UtilsGroup;
 using System;
 
 namespace TGC.Group.Model
@@ -48,6 +44,12 @@ namespace TGC.Group.Model
 
         //Posicion del piso
         float piso;
+
+        //Posición Y de las barras de vida
+        private const int POSICION_Y_BARRA_VIDA = 40;
+
+        //Posición X de las barras de vida
+        private const int POSICION_X_BARRA_VIDA = 110;
 
         //Velocidad de movimiento del auto
         private float MOVEMENT_SPEED = 0f;
@@ -86,7 +88,10 @@ namespace TGC.Group.Model
         public string NombreJugador1 { get;  set; }
 
         //Cantidad de autos enemigos
-        public int CantidadDeAutos { get; set; }
+        public int CantidadDeOponentes { get; set; }
+
+        //Cantidad de autos enemigos
+        public int TiempoDeJuego { get; set; }
 
         //Camara en tercera persona
         private TgcThirdPersonCamera CamaraInterna;
@@ -144,6 +149,39 @@ namespace TGC.Group.Model
         //Lista de objetos del mesh principal
         private List<TgcMesh> MeshPrincipal;
 
+        //Fuente para los jugadores
+        private TgcDrawText letraJugadores;
+
+        //Sprites para las barras de vida
+        private TgcDrawer2D drawerBarras;
+        private TgcSprite spriteBarraJugador1;
+        private TgcSprite spriteBarraJugador1Llena;
+
+        private TgcSprite spriteBarraJugador2;
+        private TgcSprite spriteBarraJugador2Llena;
+
+        private TgcSprite spriteBarraJugador3;
+        private TgcSprite spriteBarraJugador3Llena;
+
+        private TgcSprite spriteBarraJugador4;
+        private TgcSprite spriteBarraJugador4Llena;
+
+        private TgcSprite spriteBarraJugador5;
+        private TgcSprite spriteBarraJugador5Llena;
+
+        //Vida Inicial de cada jugador
+        private float cantVidaJugador1 = 100;
+        private float cantVidaJugador2 = 100;
+        private float cantVidaJugador3 = 100;
+        private float cantVidaJugador4 = 100;
+        private float cantVidaJugador5 = 100;
+
+        //Tiempo de fin de juego
+        private bool inicioReloj = true;
+        private bool finReloj = false;
+        public bool finModelo = false;
+        private DateTime TiempoFin;
+
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
         ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
@@ -152,9 +190,15 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Init()
         {
+
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
             var loader = new TgcSceneLoader();
+            letraJugadores = new TgcDrawText(d3dDevice, "Rock it", 10, MediaDir);
+            drawerBarras = new TgcDrawer2D(d3dDevice);
+
+            //Cargo las barras de vida
+            CargarBarrasDeVida();
 
             //Cargo el terreno
             ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA3-TgcScene.xml");
@@ -197,6 +241,82 @@ namespace TGC.Group.Model
             //Creo los objetos del escenario
             CrearAutos(loader);
             CrearObjetos(loader);
+        }
+
+        private void CargarBarrasDeVida()
+        {
+            //Jugador 1
+            spriteBarraJugador1 = new TgcSprite(drawerBarras);
+            spriteBarraJugador1.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraVacia.png");
+            spriteBarraJugador1.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA);
+            spriteBarraJugador1.Scaling = new Vector2(0.1f, 0.4f);
+
+            spriteBarraJugador1Llena = new TgcSprite(drawerBarras);
+            spriteBarraJugador1Llena.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraLlena.png");
+            spriteBarraJugador1Llena.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA);
+            spriteBarraJugador1Llena.Scaling = new Vector2(0.1f, 0.4f);
+            spriteBarraJugador1Llena.Color = Color.Blue;
+
+            if (CantidadDeOponentes >= 1)
+            {
+                //Jugador 2
+                spriteBarraJugador2 = new TgcSprite(drawerBarras);
+                spriteBarraJugador2.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraVacia.png");
+                spriteBarraJugador2.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 30);
+                spriteBarraJugador2.Scaling = new Vector2(0.1f, 0.4f);
+
+                spriteBarraJugador2Llena = new TgcSprite(drawerBarras);
+                spriteBarraJugador2Llena.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraLlena.png");
+                spriteBarraJugador2Llena.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 30);
+                spriteBarraJugador2Llena.Scaling = new Vector2(0.1f, 0.4f);
+                spriteBarraJugador2Llena.Color = Color.Blue;
+            }
+
+            if (CantidadDeOponentes >= 2)
+            {
+                //Jugador 3
+                spriteBarraJugador3 = new TgcSprite(drawerBarras);
+                spriteBarraJugador3.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraVacia.png");
+                spriteBarraJugador3.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 60);
+                spriteBarraJugador3.Scaling = new Vector2(0.1f, 0.4f);
+
+                spriteBarraJugador3Llena = new TgcSprite(drawerBarras);
+                spriteBarraJugador3Llena.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraLlena.png");
+                spriteBarraJugador3Llena.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 60);
+                spriteBarraJugador3Llena.Scaling = new Vector2(0.1f, 0.4f);
+                spriteBarraJugador3Llena.Color = Color.Blue;
+            }
+
+            if (CantidadDeOponentes >= 3)
+            {
+                //Jugador 4
+                spriteBarraJugador4 = new TgcSprite(drawerBarras);
+                spriteBarraJugador4.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraVacia.png");
+                spriteBarraJugador4.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 90);
+                spriteBarraJugador4.Scaling = new Vector2(0.1f, 0.4f);
+
+                spriteBarraJugador4Llena = new TgcSprite(drawerBarras);
+                spriteBarraJugador4Llena.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraLlena.png");
+                spriteBarraJugador4Llena.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 90);
+                spriteBarraJugador4Llena.Scaling = new Vector2(0.1f, 0.4f);
+                spriteBarraJugador4Llena.Color = Color.Blue;
+            }
+
+            if (CantidadDeOponentes >= 4)
+            {
+                //Jugador 5
+                spriteBarraJugador5 = new TgcSprite(drawerBarras);
+                spriteBarraJugador5.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraVacia.png");
+                spriteBarraJugador5.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 120);
+                spriteBarraJugador5.Scaling = new Vector2(0.1f, 0.4f);
+
+                spriteBarraJugador5Llena = new TgcSprite(drawerBarras);
+                spriteBarraJugador5Llena.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraLlena.png");
+                spriteBarraJugador5Llena.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 120);
+                spriteBarraJugador5Llena.Scaling = new Vector2(0.1f, 0.4f);
+                spriteBarraJugador5Llena.Color = Color.Blue;
+            }
+
         }
 
         private void TransformarMeshScenePpal (int index, float escala, float desplazamiento)
@@ -323,7 +443,7 @@ namespace TGC.Group.Model
             MeshAutos.Add(Mesh);
 
             //Autos enemigos
-            for (int i = 0; i< CantidadDeAutos; i++)
+            for (int i = 0; i< CantidadDeOponentes; i++)
             {
                var autoEnemigo = meshEnemigos[i];
                MeshAutos.Add(autoEnemigo);
@@ -463,7 +583,13 @@ namespace TGC.Group.Model
             MoverCamaraConMouse();
 
             //Maneja el movimiento del auto teniendo en cuenta la posición de los otros objetos
-            MoverAutoConColisiones();            
+            MoverAutoConColisiones();
+
+            //Salgo
+            if (finReloj && Input.keyDown(Key.X))
+            {
+                this.finModelo = true;
+            }
         }
 
         /// <summary>
@@ -479,6 +605,7 @@ namespace TGC.Group.Model
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.Red);
             DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.Red);
+
             DrawText.drawText("Jugador 1: " + this.NombreJugador1, 1200, 10, Color.LightYellow);
             DrawText.drawText("Velocidad: " + this.MOVEMENT_SPEED, 1200, 20, Color.LightYellow);
 
@@ -510,13 +637,89 @@ namespace TGC.Group.Model
                 }
 
                 RenderizarObjetos(1);
-            }            
+            }
 
             //Renderizo los objetos cargados de las listas
             RenderizarObjetos(0);
 
+            //Dibujo las barras de vida de todos los jugadores
+            DibujarBarrasDeVida();
+
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
+        }
+
+        private void DibujarBarrasDeVida()
+        {
+            //Inicio el tiempo de juego
+            if (inicioReloj)
+            {
+                TiempoFin = DateTime.Now.AddMinutes(this.TiempoDeJuego);
+                inicioReloj = false;
+            }
+
+            //Dibujo el reloj
+            string Tiempo = "";
+
+            Tiempo = (TiempoFin - DateTime.Now).Minutes.ToString().PadLeft (2, '0') + ":" + (TiempoFin - DateTime.Now).Seconds.ToString().PadLeft(2, '0');
+
+            if (((TiempoFin - DateTime.Now).Minutes <= 0) || ((TiempoFin - DateTime.Now).Seconds <= 0))
+            {
+                finReloj = true;
+            }
+
+            letraJugadores.drawText(Tiempo, Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA + 35, POSICION_Y_BARRA_VIDA - 40, Color.OrangeRed);
+
+            //Dibujo el nombre del Jugador y de los competidores
+            letraJugadores.drawText(this.NombreJugador1, Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA - 10, Color.DeepSkyBlue);
+            letraJugadores.drawText("jugador 22", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 20, Color.DeepSkyBlue);
+            letraJugadores.drawText("jugador 33", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 50, Color.DeepSkyBlue);
+            letraJugadores.drawText("jugador 44", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 80, Color.DeepSkyBlue);
+            letraJugadores.drawText("jugador 55", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 110, Color.DeepSkyBlue);
+
+            //Calculo la vida de cada auto
+            spriteBarraJugador1Llena.Scaling = new Vector2(cantVidaJugador1 * 0.001f, 0.4f);
+            spriteBarraJugador2Llena.Scaling = new Vector2(cantVidaJugador2 * 0.001f, 0.4f);
+            spriteBarraJugador3Llena.Scaling = new Vector2(cantVidaJugador3 * 0.001f, 0.4f);
+            spriteBarraJugador4Llena.Scaling = new Vector2(cantVidaJugador4 * 0.001f, 0.4f);
+            spriteBarraJugador5Llena.Scaling = new Vector2(cantVidaJugador5 * 0.001f, 0.4f);
+
+            //Calculo si ganó alguien o el principal perdió
+            if ( (cantVidaJugador1 <= 0) || (cantVidaJugador2 <= 0 && cantVidaJugador3 <= 0 && cantVidaJugador4 <= 0 && cantVidaJugador5 <= 0))
+            {
+                finReloj = true;
+            }
+
+            //Iniciar dibujado de todos los Sprites de la escena (en este caso es solo uno)
+            drawerBarras.beginDrawSprite();
+
+            //Dibujo las barras
+            spriteBarraJugador1.render();
+            spriteBarraJugador1Llena.render();
+
+            spriteBarraJugador2.render();
+            spriteBarraJugador2Llena.render();
+
+            spriteBarraJugador3.render();
+            spriteBarraJugador3Llena.render();
+
+            spriteBarraJugador4.render();
+            spriteBarraJugador4Llena.render();
+
+            spriteBarraJugador5.render();
+            spriteBarraJugador5Llena.render();
+
+            //Finalizar el dibujado de Sprites
+            drawerBarras.endDrawSprite();
+            ///////////////////////
+
+            if (finReloj)
+            {
+                TgcDrawText letraGanador = new TgcDrawText(D3DDevice.Instance.Device, "Rock it", 36, MediaDir);
+                letraGanador.drawText("FIN DEL JUEGO", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 200, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - 150, Color.Green);
+                letraGanador.drawText("GANÓ ...", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 200, (Convert.ToInt32(D3DDevice.Instance.Height) / 2), Color.Green);
+                letraJugadores.drawText("Presione la letra X para volver al menú inicial...", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 200, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 150, Color.OrangeRed);
+            }
         }
 
         //0: render
@@ -747,7 +950,6 @@ namespace TGC.Group.Model
 
                 //El framework posee la clase TgcCollisionUtils con muchos algoritmos de colisión de distintos tipos de objetos.
                 //Por ejemplo chequear si dos cajas colisionan entre sí, o dos esferas, o esfera con caja, etc.
-                /*
                 var collisionFound = false;
 
                 foreach (var mesh in ScenePpal.Meshes)
@@ -777,7 +979,6 @@ namespace TGC.Group.Model
                 {
                     Mesh.Position = originalPos;
                 }
-                */
 
                 if (ValidarColisionObjetos(Mesh))
                 {

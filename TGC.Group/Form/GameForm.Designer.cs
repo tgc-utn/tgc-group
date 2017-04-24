@@ -41,10 +41,7 @@
             this.panel3D.Size = new System.Drawing.Size(784, 561);
             this.panel3D.TabIndex = 0;
             this.panel3D.Paint += new System.Windows.Forms.PaintEventHandler(this.panel3D_Paint);
-            // 
-            // timer1
-            // 
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+
             // 
             // GameForm
             // 

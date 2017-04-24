@@ -61,6 +61,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.Direct3D.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DirectX.Direct3DX, Version=1.0.2909.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2909.0\Microsoft.DirectX.Direct3DX.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.DirectX.DirectInput, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.DirectInput.dll</HintPath>
@@ -98,6 +102,9 @@
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\TgcDrawer2D.cs" />
+    <Compile Include="Utils\TgcDrawText.cs" />
+    <Compile Include="Utils\TgcSprite.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -172,7 +179,6 @@
   <ItemGroup>
     <Content Include="Media\Twisted_Chano\Armas\CajaMuniciones\CajaMuniciones-TgcScene.xml" />
     <Content Include="Media\Twisted_Chano\Armas\CajaMuniciones\Textures\ammobox.bmp" />
-    <Content Include="Media\Twisted_Chano\cajaMadera4.jpg" />
     <Content Include="Media\Twisted_Chano\MAPA-TgcScene.xml" />
     <Content Include="Media\Twisted_Chano\Muebles\ExpendedorDeBebidas\ExpendedorDeBebidas-TgcScene.xml" />
     <Content Include="Media\Twisted_Chano\Muebles\ExpendedorDeBebidas\Textures\sodamachine.jpg" />
