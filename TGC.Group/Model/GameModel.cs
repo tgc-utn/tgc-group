@@ -474,7 +474,6 @@ namespace TGC.Group.Model
             DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.Red);
             DrawText.drawText("Jugador 1: " + this.NombreJugador1, 1200, 10, Color.LightYellow);
             DrawText.drawText("Velocidad: " + this.MOVEMENT_SPEED, 1200, 20, Color.LightYellow);
-    
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
@@ -679,17 +678,17 @@ namespace TGC.Group.Model
             }
 
             //Movernos adelante y atras, sobre el eje Z.
-            if (Input.keyDown(Key.Up) || Input.keyDown(Key.W))
+            if ((Input.keyDown(Key.Up) || Input.keyDown(Key.W)))
             {
-                estaAvanzando = true;
-                moveForward += -Acelerar(200f);
-                moving = true;
+                    estaAvanzando = true;
+                    moveForward += -Acelerar(200f);
+                    moving = true;  
             }
-            else if (Input.keyDown(Key.Down) || Input.keyDown(Key.S))
+             if ((Input.keyDown(Key.Down) || Input.keyDown(Key.S)))
             {
-                estaAvanzando = false;
-                moveForward += Acelerar(100f);
-                moving = true;
+                    estaAvanzando = false;
+                    moveForward += -Acelerar(-400f);
+                    moving = true;
             }
 
             //El auto dejo de acelerar e ira frenando de apoco 
@@ -732,6 +731,7 @@ namespace TGC.Group.Model
                 var originalPos = Mesh.Position;
 
                 //Multiplicar movimiento por velocidad y elapsedTime
+
                 movement *= MOVEMENT_SPEED * ElapsedTime;
                 Mesh.moveOrientedY(moveForward * ElapsedTime);
 
