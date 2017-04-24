@@ -42,7 +42,13 @@ namespace TGC.Group.Model
         /// </summary>
 
         //Velocidad de movimiento del auto
-        private const float MOVEMENT_SPEED = 1000f;
+        private float MOVEMENT_SPEED = 0f;
+
+        //Rozamiento del piso
+        private float ROZAMIENTO = 300f;
+
+        //Velocidad Maxima
+        private const float MAX_SPEED = 3000f;
 
         //Velocidad de rotación del auto
         private const float ROTATION_SPEED = 120f;
@@ -58,6 +64,8 @@ namespace TGC.Group.Model
 
         //Posicion vertices
         private const int POSICION_VERTICE = 9000;
+
+        private bool estaAvanzando = true;
 
         //Scene principal
         private TgcScene ScenePpal;
@@ -465,6 +473,8 @@ namespace TGC.Group.Model
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.Red);
             DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.Red);
             DrawText.drawText("Jugador 1: " + this.NombreJugador1, 1200, 10, Color.LightYellow);
+            DrawText.drawText("Velocidad: " + this.MOVEMENT_SPEED, 1200, 20, Color.LightYellow);
+    
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
@@ -656,7 +666,6 @@ namespace TGC.Group.Model
             var jumping = false;
             float velocidadY = 0f;
 
-
             //Movernos de izquierda a derecha, sobre el eje X.
             if (Input.keyDown(Key.Left) || Input.keyDown(Key.A))
             {
@@ -672,12 +681,22 @@ namespace TGC.Group.Model
             //Movernos adelante y atras, sobre el eje Z.
             if (Input.keyDown(Key.Up) || Input.keyDown(Key.W))
             {
-                moveForward = -MOVEMENT_SPEED;
+                estaAvanzando = true;
+                moveForward += -Acelerar(200f);
                 moving = true;
             }
             else if (Input.keyDown(Key.Down) || Input.keyDown(Key.S))
             {
-                moveForward = MOVEMENT_SPEED;
+                estaAvanzando = false;
+                moveForward += Acelerar(100f);
+                moving = true;
+            }
+
+            //El auto dejo de acelerar e ira frenando de apoco 
+            if (!Input.keyDown(Key.Down) && !Input.keyDown(Key.S) && !Input.keyDown(Key.Up) && !Input.keyDown(Key.W))
+            {
+                if (estaAvanzando == true) moveForward += -Desacelerar();
+                else moveForward += Desacelerar();
                 moving = true;
             }
 
@@ -759,6 +778,21 @@ namespace TGC.Group.Model
                 CamaraInterna.Target = Mesh.Position;
             }
         }
+
+        private float Acelerar(float aceleracion) 
+        {
+            if ((MOVEMENT_SPEED < MAX_SPEED))
+                return MOVEMENT_SPEED += aceleracion * ElapsedTime;
+            else return MOVEMENT_SPEED;
+        }
+
+        private float Desacelerar()
+        {
+            if (MOVEMENT_SPEED <= 0) return 0;
+            else return MOVEMENT_SPEED -= ROZAMIENTO * ElapsedTime;
+
+        }
+
         public void saltarConMeshOrientado(float movement)
         {
             float y;
