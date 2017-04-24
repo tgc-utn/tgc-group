@@ -6,6 +6,9 @@ using TGC.Core.Camara;
 using TGC.Core.SkeletalAnimation;
 using Microsoft.DirectX;
 using System;
+using TGC.Core.Direct3D;
+using Microsoft.DirectX.Direct3D;
+using System.Windows.Forms;
 
 namespace TGC.Group.Model.GameWorld
 {
@@ -15,28 +18,33 @@ namespace TGC.Group.Model.GameWorld
         protected List<EntityUpdatable>  updatableEntities;
         protected EntityPlayer           player;
         protected WorldMap               worldMap;
-        protected FirstPersonCamera      camera;
         protected TgcD3dInput            inputManager;
         protected TgcSkeletalMesh        enemy;
-
-        protected TgcSkeletalMesh hand;
+        protected TgcSkeletalMesh        hand;
+        protected bool                   outsideCamera;
+        protected TgcCamera              camera;
+        
 
         public World(string mediaPath, TgcD3dInput inputManager)
         {
+            this.outsideCamera = false;
             this.inputManager         = inputManager;
             this.entities             = new List<IEntity>();
-            this.updatableEntities    = new List<EntityUpdatable>();            
-            this.camera               = new FirstPersonCamera(this.inputManager);
-            this.camera.RotationSpeed = 0.01f;
-            TgcSkeletalLoader loader  = new TgcSkeletalLoader();
+            this.updatableEntities    = new List<EntityUpdatable>();
+            this.player               = new EntityPlayer(this.inputManager);
+            this.worldMap             = new WorldMap(mediaPath);
+            this.camera               = new TgcCamera();
+            this.camera.SetCamera(new Vector3(0f, 1000f, 0f), new Vector3(10f, 0f, 10f));
 
+
+            TgcSkeletalLoader loader  = new TgcSkeletalLoader();
             enemy                     = loader.loadMeshAndAnimationsFromFile(mediaPath + "/Monster-TgcSkeletalMesh.xml", new string[]{mediaPath + "/Run-TgcSkeletalAnim.xml"});
             enemy.playAnimation("Run");
             enemy.Position            = new Vector3(0f, 0f,0f);
             enemy.Scale = new Vector3(3f, 3f, 3f);
 
-            //this.player             = (EntityPlayer)loader.loadMeshAndAnimationsFromFile(mediaPath + "/SkeletalAnimations/Robot/Robot-TgcSkeletalMesh.xml", new string[] { });
-            this.worldMap             = new WorldMap(mediaPath);
+            
+            
             this.hand = loader.loadMeshAndAnimationsFromFile(mediaPath + "/Hand-TgcSkeletalMesh.xml", new string[] { mediaPath + "/HandAnimation-TgcSkeletalAnim.xml" });
             hand.playAnimation("Animation");
             
@@ -50,14 +58,23 @@ namespace TGC.Group.Model.GameWorld
 
         public TgcCamera Camera
         {
-            get { return this.camera; }
+            get { return (this.outsideCamera) ? this.camera : this.player.Camera; }
         }
 
         public void update(float elapsedTime)
         {
             foreach(EntityUpdatable currentEntity in this.updatableEntities)
             {
-                currentEntity.update();
+                currentEntity.update(elapsedTime);
+            }
+            
+            if(inputManager.keyDown(Microsoft.DirectX.DirectInput.Key.C))
+            {
+                this.outsideCamera = true;                
+            }
+            else
+            {
+                this.outsideCamera = false;
             }
 
             if(inputManager.keyDown(Microsoft.DirectX.DirectInput.Key.J))
@@ -79,8 +96,9 @@ namespace TGC.Group.Model.GameWorld
             this.hand.UpdateMeshTransform();
             this.hand.updateAnimation(elapsedTime);
             this.enemy.UpdateMeshTransform();
-            this.enemy.updateAnimation(elapsedTime);
-            this.camera.UpdateCamera(elapsedTime);
+            this.enemy.updateAnimation(elapsedTime);            
+            this.player.update(elapsedTime);
+
         }
 
         public void render()
@@ -93,6 +111,7 @@ namespace TGC.Group.Model.GameWorld
             this.enemy.render();
             this.worldMap.render();
             this.hand.render();
+            this.player.render();
         }
 
         public void dispose()
@@ -101,6 +120,7 @@ namespace TGC.Group.Model.GameWorld
             {
                 currentEntity.dispose();
             }
+            this.player.dispose();
             this.hand.dispose();
             this.enemy.dispose();
             this.worldMap.dispose();

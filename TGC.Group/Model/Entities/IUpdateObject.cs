@@ -10,6 +10,6 @@ namespace TGC.Group.Model.Entities
 {
     public interface IUpdateObject
     {
-        void update();
+        void update(float elapsedTime);
     }
 }

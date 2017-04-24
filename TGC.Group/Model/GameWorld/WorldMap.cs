@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.Direct3D;
 using TGC.Core.Geometry;
 using TGC.Core.SceneLoader;
@@ -73,6 +74,8 @@ namespace TGC.Group.Model.GameWorld
             {{330f, 50f, -1080f}, {-0.5f, 0.5f, 0f}},
             {{-330f, 50f, -1080f},  {-0.5f, +0.5f, 0f}},
         };
+
+        
 
         private bool alphaBlendEnable;
 
@@ -236,7 +239,7 @@ namespace TGC.Group.Model.GameWorld
             set { this.shouldShowRoof = value; }
         }
 
-
+        
 
         public bool ShouldShowBoundingVolumes
         {
@@ -322,9 +325,9 @@ namespace TGC.Group.Model.GameWorld
             }
         }
 
-        public List<TgcMesh> Walls
+        public List<TgcBoundingAxisAlignBox> Walls
         {
-            get{return this.walls;}
+            get{ return this.walls.Select(mesh => mesh.BoundingBox).ToList();}
         }
 
         public List<TgcMesh> Doors

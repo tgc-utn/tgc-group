@@ -134,16 +134,12 @@ namespace TGC.Group.Model.Camera
             {
                 LockCam = !lockCam;
             }
-
-            //Solo rotar si se esta aprentando el boton izq del mouse
-            if (lockCam || Input.buttonDown(TgcD3dInput.MouseButtons.BUTTON_LEFT))
-            {
-                leftrightRot -= -Input.XposRelative * RotationSpeed;
-                updownRot -= Input.YposRelative * RotationSpeed;
-                //Se actualiza matrix de rotacion, para no hacer este calculo cada vez y solo cuando en verdad es necesario.
-                cameraRotation = Matrix.RotationX(updownRot) * Matrix.RotationY(leftrightRot);
-            }
-
+            
+            leftrightRot -= -Input.XposRelative * RotationSpeed;
+            updownRot -= Input.YposRelative * RotationSpeed;
+            //Se actualiza matrix de rotacion, para no hacer este calculo cada vez y solo cuando en verdad es necesario.
+            cameraRotation = Matrix.RotationX(updownRot) * Matrix.RotationY(leftrightRot);
+           
             if (lockCam)
                 Cursor.Position = mouseCenter;
 
@@ -157,7 +153,7 @@ namespace TGC.Group.Model.Camera
 
             var cameraOriginalUpVector = DEFAULT_UP_VECTOR;
             var cameraRotatedUpVector = Vector3.TransformNormal(cameraOriginalUpVector, cameraRotation);
-
+            
             base.SetCamera(positionEye, cameraFinalTarget, cameraRotatedUpVector);
         }
 

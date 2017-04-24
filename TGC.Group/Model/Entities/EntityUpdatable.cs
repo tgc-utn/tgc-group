@@ -19,7 +19,8 @@ namespace TGC.Group.Model.Entities
             base.render();
             this.UpdateMeshTransform();
         }
+        
 
-        public abstract void update();
+        public abstract void update(float elapsedTime);
     }
 }
