@@ -13,6 +13,8 @@ using TGC.Core.Utils;
 using TGC.Core.Direct3D;
 using Microsoft.DirectX.Direct3D;
 using TGC.Core.Camara;
+using System.Collections.Generic;
+using TGC.Core.Collision;
 
 namespace TGC.Group.Model.Entities
 {
@@ -21,7 +23,7 @@ namespace TGC.Group.Model.Entities
         private new TgcBoundingOrientedBox boundingBox;
         private static float               velocityNormal = 400f;
         private new Vector3                rotation;
-        private Vector2                    velocity;
+        private Vector3                    velocity;
         private TgcD3dInput                inputManager;
         private TgcCamera                  playerLookCamera;
 
@@ -31,7 +33,7 @@ namespace TGC.Group.Model.Entities
         private TgcRay                     lookingRay;
         private TgcArrow arrow;
         private TgcText2D t;
-
+        private List<TgcBoundingAxisAlignBox> colliders;
 
         public EntityPlayer(TgcD3dInput inputManager)
         {
@@ -79,21 +81,25 @@ namespace TGC.Group.Model.Entities
             get { return this.playerLookCamera; }
         }
 
+        public List<TgcBoundingAxisAlignBox> Colliders
+        {
+            set { this.colliders = value; }
+        }
+        
         public override void update(float elapsedTime)
         {            
             this.calculateLookAt();
-            this.calculateVelocities(elapsedTime);
-            this.velocity *= elapsedTime;
-            this.boundingBox.move(this.LookAt * this.velocity.X + this.Side * this.velocity.Y);
+            this.calculateVelocities(elapsedTime);            
             
-            this.boundingBox.setRotation(new Vector3(0f, (float)Math.Atan2(this.rotation.X, this.rotation.Z), 0f));
-            this.lookingRay.Direction = this.LookAt;
+            this.manageCollisions();
 
-            this.arrow.PStart = this.boundingBox.Center;
-            this.arrow.PEnd = this.LookAt * velocityNormal;
-            this.arrow.updateValues();
-            
             this.playerLookCamera.SetCamera(this.HeadPosition, this.rotation + this.HeadPosition);
+            
+            /** DELETE, JUST DEBUG WITH THIS */
+            this.arrow.PStart = this.boundingBox.Center;
+            this.arrow.PEnd = this.boundingBox.Center + this.velocity;
+            this.arrow.updateValues();
+            t.Text = this.LookAt.ToString();
         }
 
         protected void calculateLookAt()
@@ -104,33 +110,69 @@ namespace TGC.Group.Model.Entities
             this.rotation = Vector3.TransformNormal(new Vector3(0f, 0f, -1f), rotationMatrix);            
         }
 
+        protected void manageCollisions()
+        {
+            this.lookingRay.Origin    = this.boundingBox.Center;
+            this.lookingRay.Direction = this.velocity;
+
+            int colliderCount = this.colliders.Count;
+            Vector3 distance = new Vector3(0f, 0f, 0f);
+            float   closestDistance = 1000000f;
+            int     closestColliderIndex = -1;
+            for(int index = 0; index < colliderCount; index++)
+            {
+                if(TgcCollisionUtils.intersectRayAABB(this.lookingRay, this.colliders[index], out distance))
+                {
+                    if(Vector3.Subtract(distance, this.boundingBox.Center).Length() <= closestDistance)
+                    {
+                        closestDistance      = distance.Length();
+                        closestColliderIndex = index;
+                    }
+                }                
+            }
+            
+                
+            if(closestColliderIndex != -1)
+            {
+
+                this.boundingBox.move(this.velocity);
+                this.boundingBox.setRotation(new Vector3(0f, (float)Math.Atan2(this.rotation.X, this.rotation.Z), 0f));
+                if (TgcCollisionUtils.testObbAABB(this.boundingBox, this.colliders[closestColliderIndex]))
+                {
+                    this.boundingBox.move(-this.velocity);
+                    
+                }
+                // TODO handle collition
+            }
+        }
+
         protected void calculateVelocities(float elapsedTime)
-        {            
+        {
+            Vector2 twoDimensionalVelocity = new Vector2(0f, 0f);
+
             if(this.inputManager.keyDown(Key.W))
-            {                
-                this.velocity.X = velocityNormal;
+            {
+                twoDimensionalVelocity.X = this.getTimeBasedVelocity(elapsedTime);
             }
             else if(this.inputManager.keyDown(Key.S))
             {
-                this.velocity.X = -velocityNormal;
-            }
-            else
-            {
-                this.velocity.X = 0;
+                twoDimensionalVelocity.X = -this.getTimeBasedVelocity(elapsedTime);
             }
 
             if(this.inputManager.keyDown(Key.D))
             {
-                this.velocity.Y = velocityNormal;
+                twoDimensionalVelocity.Y = this.getTimeBasedVelocity(elapsedTime);
             }
             else if(this.inputManager.keyDown(Key.A))
             {
-                this.velocity.Y = -velocityNormal;
+                twoDimensionalVelocity.Y = -this.getTimeBasedVelocity(elapsedTime);                
             }
-            else
-            {
-                this.velocity.Y = 0;
-            }
+            this.velocity = this.LookAt * twoDimensionalVelocity.X + this.Side * twoDimensionalVelocity.Y;
+        }
+
+        protected float getTimeBasedVelocity(float elapsedTime)
+        {
+            return velocityNormal * elapsedTime;
         }
 
         public override void render()

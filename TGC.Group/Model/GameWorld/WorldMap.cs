@@ -90,8 +90,9 @@ namespace TGC.Group.Model.GameWorld
             this.elements                  = new List<TgcMesh>();
 
             this.createRoomWallInstances();
-            this.rotateAndScaleScenario();
             this.createRoomInstances();
+            this.rotateAndScaleScenario();
+            
             this.createRoofFromScene(mediaPath);
 
             this.createElementInstances(loader, mediaPath + "/Sillon-TgcScene.xml",      sofaInstances,     "Sofa",     1.25f);
@@ -129,7 +130,7 @@ namespace TGC.Group.Model.GameWorld
         {
             int meshCount = this.scene.Meshes.Count;
             for (int index = 0; index < meshCount; index++)
-            {
+            {                
                 if (this.scene.Meshes[index].Name.Contains(Game.Default.WallMeshIdentifier))
                 {
                     this.scene.Meshes[index].Scale = new Vector3(10f, 10f, roomHeight);
@@ -145,13 +146,10 @@ namespace TGC.Group.Model.GameWorld
                     this.scene.Meshes[index].Scale = new Vector3(10f, 10f, 10f);
                 }
                 this.scene.Meshes[index].rotateX(-(float)Math.PI / 2);
-
-
+                
                 this.scene.Meshes[index].BoundingBox = TGCUtils.updateMeshBoundingBox(this.scene.Meshes[index]);
                 
-
-                this.scene.Meshes[index].UpdateMeshTransform();
-                
+                this.scene.Meshes[index].UpdateMeshTransform();                
             }
         }
 

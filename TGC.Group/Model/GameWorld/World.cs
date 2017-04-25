@@ -31,8 +31,8 @@ namespace TGC.Group.Model.GameWorld
             this.inputManager         = inputManager;
             this.entities             = new List<IEntity>();
             this.updatableEntities    = new List<EntityUpdatable>();
-            this.player               = new EntityPlayer(this.inputManager);
-            this.worldMap             = new WorldMap(mediaPath);
+            this.worldMap = new WorldMap(mediaPath);
+            this.player               = new EntityPlayer(this.inputManager);            
             this.camera               = new TgcCamera();
             this.camera.SetCamera(new Vector3(0f, 1000f, 0f), new Vector3(10f, 0f, 10f));
 
@@ -70,33 +70,22 @@ namespace TGC.Group.Model.GameWorld
             
             if(inputManager.keyDown(Microsoft.DirectX.DirectInput.Key.C))
             {
-                this.outsideCamera = true;                
-            }
-            else
-            {
-                this.outsideCamera = false;
-            }
-
-            if(inputManager.keyDown(Microsoft.DirectX.DirectInput.Key.J))
-            {
+                this.outsideCamera = true;
                 this.worldMap.ShouldShowRoof = false;
-            }
-            else
-            {
-                this.worldMap.ShouldShowRoof = true;
-            }
-            if(inputManager.keyDown(Microsoft.DirectX.DirectInput.Key.K))
-            {
                 this.worldMap.ShouldShowBoundingVolumes = true;
             }
             else
             {
+                this.outsideCamera = false;
+                this.worldMap.ShouldShowRoof = true;
                 this.worldMap.ShouldShowBoundingVolumes = false;
+
             }
             this.hand.UpdateMeshTransform();
             this.hand.updateAnimation(elapsedTime);
             this.enemy.UpdateMeshTransform();
-            this.enemy.updateAnimation(elapsedTime);            
+            this.enemy.updateAnimation(elapsedTime);
+            this.player.Colliders = this.worldMap.Walls;        
             this.player.update(elapsedTime);
 
         }
