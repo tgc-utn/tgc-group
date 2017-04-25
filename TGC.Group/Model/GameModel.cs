@@ -40,12 +40,11 @@ namespace TGC.Group.Model
         /// </summary>
         ///
 
-        //Variables para la caida
-        int G = 20;
-        float Force;
-
         //Posicion del piso
         float piso;
+
+        //Altura del salto
+        private const float ALTURA_SALTO = 225f;
 
         //Posición Y de las barras de vida
         private const int POSICION_Y_BARRA_VIDA = 40;
@@ -60,7 +59,7 @@ namespace TGC.Group.Model
         private float ROZAMIENTO = 100f;
 
         //Velocidad Maxima
-        private const float MAX_SPEED = 3000f;
+        private const float MAX_SPEED = 1200f;
 
         //Velocidad de rotación del auto
         private const float ROTATION_SPEED = 120f;
@@ -186,6 +185,21 @@ namespace TGC.Group.Model
         private bool finReloj = false;
         public bool finModelo = false;
         private DateTime TiempoFin;
+
+        //Ruedas
+        TgcMesh ruedaDerechaDelanteraMesh;
+        TgcMesh ruedaDerechaTraseraMesh;
+        TgcMesh ruedaIzquierdaDelanteraMesh;
+        TgcMesh ruedaIzquierdaTraseraMesh;
+        List<TgcMesh> RuedasJugador1;
+        float rotate = 0;
+        float rotacionVertical = 0;
+        List<float> dx = new List<float> { 23, -23, -23, 23 };
+        List<float> dy = new List<float> { -30, 32, -31, 30 };
+
+
+        private bool falling = false;
+        private bool jumping = false;
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -445,6 +459,40 @@ namespace TGC.Group.Model
             patrullero.BoundingBox.transform(patrullero.Transform);
             meshEnemigos.Add(patrullero);
 
+            //Cargo las ruedas de los autos
+            TgcScene RuedaDerechaDelJ1 = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto_Rueda_Derecha-TgcScene.xml");
+            TgcScene RuedaDerechaTrasJ1 = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto_Rueda_Derecha-TgcScene.xml");
+            TgcScene RuedaIzquierdaDelJ1 = loader.loadSceneFromFile(MediaDir  + "Vehiculos\\Auto_Rueda_Izquierda-TgcScene.xml");
+            TgcScene RuedaIzquierdaTrasJ1 = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto_Rueda_Izquierda-TgcScene.xml");
+
+            ruedaDerechaDelanteraMesh = RuedaDerechaDelJ1.Meshes[0];
+            ruedaDerechaTraseraMesh = RuedaDerechaTrasJ1.Meshes[0];
+            ruedaIzquierdaDelanteraMesh = RuedaIzquierdaDelJ1.Meshes[0];
+            ruedaIzquierdaTraseraMesh = RuedaIzquierdaTrasJ1.Meshes[0];
+            
+            
+            ruedaDerechaDelanteraMesh.AutoTransformEnable = true;
+            //ruedaDerechaDelanteraMesh.move(new Vector3(10f, 100f, 100f));
+            ruedaDerechaDelanteraMesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            
+
+            ruedaDerechaTraseraMesh.AutoTransformEnable = true;
+            ruedaDerechaTraseraMesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+
+            ruedaIzquierdaDelanteraMesh.AutoTransformEnable = true;
+            ruedaIzquierdaDelanteraMesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+
+            ruedaIzquierdaTraseraMesh.AutoTransformEnable = true;
+            ruedaIzquierdaTraseraMesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            /*
+            ruedaDerechaDelanteraMesh.Transform = ruedaDerechaDelanteraMesh.Transform * Matrix.Scaling(new Vector3(1f, 1, 1f))
+                                                                * Matrix.Translation(new Vector3(1f, 20f, 1f));
+            ruedaDerechaDelanteraMesh.BoundingBox.transform(ruedaDerechaDelanteraMesh.Transform);
+            */
+
+            RuedasJugador1 = new List<TgcMesh> { ruedaDerechaDelanteraMesh, ruedaDerechaTraseraMesh, ruedaIzquierdaDelanteraMesh, ruedaIzquierdaTraseraMesh };
+
+            //Inicio la lista de autos
             MeshAutos = new List<TgcMesh>();
            
             //Auto principal
@@ -466,7 +514,6 @@ namespace TGC.Group.Model
                     meshEnemigo.dispose();
                 }
             }
-
         }
 
         //Crea instancias de un objeto
@@ -614,7 +661,8 @@ namespace TGC.Group.Model
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.Red);
             DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.Red);
 
-            DrawText.drawText("Velocidad: " + this.MOVEMENT_SPEED, 1200, 10, Color.LightYellow);
+            DrawText.drawText("Jugador 1: " + this.NombreJugador1, 0, 40, Color.LightYellow);
+            DrawText.drawText("Velocidad: " + this.MOVEMENT_SPEED, 0, 50, Color.LightYellow);
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
@@ -653,8 +701,54 @@ namespace TGC.Group.Model
             //Dibujo las barras de vida de todos los jugadores
             DibujarBarrasDeVida();
 
+            //Dibujo las ruedas
+            DibujarRuedas();
+
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
+        }
+
+        private void DibujarRuedas()
+        {
+            float ro, alfa_rueda, rotacionRueda;
+            float posicion_x;
+            float posicion_y;
+
+            //Posiciono las ruedas
+            for (int i = 0; i < 4; i++)
+            {
+                ro = FastMath.Sqrt(dx[i] * dx[i] + dy[i] * dy[i]);
+
+                alfa_rueda = FastMath.Asin(dx[i] / ro);
+
+                if (i == 0 || i == 2)
+                {
+                    alfa_rueda += FastMath.PI;
+                }
+
+                posicion_x = FastMath.Sin(alfa_rueda + Mesh.Rotation.Y) * ro;
+                posicion_y = FastMath.Cos(alfa_rueda + Mesh.Rotation.Y) * ro;
+
+                RuedasJugador1[i].Position = (new Vector3(posicion_x, 7.5f, posicion_y) + Mesh.Position);
+
+                rotacionRueda = 0;
+
+                if (i == 0 || i == 2)
+                {
+                    rotacionRueda = 0.5f * Math.Sign (rotate);
+                }
+
+                //Si no aprieta para los costados, dejo la rueda derecha (por ahora, esto se puede modificar)
+                if (Input.keyDown(Key.Left) || Input.keyDown(Key.A) || Input.keyDown(Key.Right) || Input.keyDown(Key.D))
+                    RuedasJugador1[i].Rotation = new Vector3(rotacionVertical, Mesh.Rotation.Y + rotacionRueda, 0f);
+                else
+                    RuedasJugador1[i].Rotation = new Vector3(rotacionVertical, Mesh.Rotation.Y, 0f);
+            }
+
+            for (int i = 0; i < 4; i++)
+            {
+                RuedasJugador1[i].render();
+            }
         }
 
         private void DibujarBarrasDeVida()
@@ -876,11 +970,9 @@ namespace TGC.Group.Model
             //Sobre XZ nos movemos con las flechas del teclado o con las letas WASD.
             var movement = new Vector3(0, 0, 0);
             var moveForward = 0f;
-            float rotate = 0;
+            rotate = 0;
             var moving = false;
             var rotating = false;
-            bool falling = false;
-            var distanciaSalto = 75f;
 
             //Movernos de izquierda a derecha, sobre el eje X.
             if (Input.keyDown(Key.Left) || Input.keyDown(Key.A))
@@ -897,13 +989,13 @@ namespace TGC.Group.Model
             //Movernos adelante y atras, sobre el eje Z.
             if ((Input.keyDown(Key.Up) || Input.keyDown(Key.W)))
             {
-                    moveForward += -Acelerar(200f);
-                    moving = true;  
+                moveForward += -Acelerar(200f);
+                moving = true;
             }
-             if ((Input.keyDown(Key.Down) || Input.keyDown(Key.S)))
+            if ((Input.keyDown(Key.Down) || Input.keyDown(Key.S)))
             {
-                    moveForward += -Acelerar(-150f); 
-                    moving = true;
+                moveForward += -Acelerar(-250f);
+                moving = true;
             }
 
             //////////El auto dejo de acelerar e ira frenando de apoco 
@@ -915,36 +1007,37 @@ namespace TGC.Group.Model
 
             if (rotating)
             {
-                var rotAngle = (rotate * ElapsedTime) * (FastMath.PI / 180);
+                var rotAngle = (MOVEMENT_SPEED * 0.2f * Math.Sign (rotate) * ElapsedTime) * (FastMath.PI / 180);
                 Mesh.rotateY(rotAngle);
                 CamaraInterna.rotateY(rotAngle);
                 ObbMesh.rotate(new Vector3(0, rotAngle, 0));
             }
 
-            if (!falling)
+            if (Input.keyPressed(Key.Space) && !falling)
             {
-                //Salto
-                if (Input.keyPressed(Key.Space))
+                jumping = true;
+            }
+
+            if (jumping)
+            {
+                Mesh.move(0, 100 * ElapsedTime * 2, 0);
+
+                if (Mesh.Position.Y >= ALTURA_SALTO)
                 {
+                    jumping = false;
                     falling = true;
-                    Mesh.move(0 , distanciaSalto , 0);
-                    Force = G;
                 }
             }
 
-            if (!Input.keyDown(Key.Space))
+            if (falling)
             {
-                float Y = 0;
-                Y -= Force;
-                Force *= 0.9f;
-                Mesh.move(0, Y, 0);
-            }
+                Mesh.move(0, -100 * ElapsedTime * 3, 0);
 
-            if (Mesh.Position.Y <= piso)
-            {
-                float diferencia = 0.5f - Mesh.Position.Y;
-                Mesh.move(0, diferencia, 0);
-                falling = false;
+                if (Mesh.Position.Y < 0.5f)
+                {
+                    Mesh.move(0, 0.5f - Mesh.Position.Y, 0);
+                    falling = false;
+                }
             }
 
             if (moving)
@@ -955,6 +1048,9 @@ namespace TGC.Group.Model
                 //Multiplicar movimiento por velocidad y elapsedTime
 
                 movement *= MOVEMENT_SPEED * ElapsedTime;
+
+                rotacionVertical -= MOVEMENT_SPEED * ElapsedTime / 60;
+
                 Mesh.moveOrientedY(moveForward * ElapsedTime);
                 ObbMesh.Center = Mesh.Position;
 
@@ -1003,7 +1099,14 @@ namespace TGC.Group.Model
         private float Acelerar(float aceleracion) 
         {
             if ((MOVEMENT_SPEED < MAX_SPEED))
-                return MOVEMENT_SPEED = MOVEMENT_SPEED + ((aceleracion + ObtenerRozamiento()) * ElapsedTime);
+            {
+                MOVEMENT_SPEED = MOVEMENT_SPEED + ((aceleracion + ObtenerRozamiento()) * ElapsedTime);
+
+                if (MOVEMENT_SPEED > MAX_SPEED)
+                    MOVEMENT_SPEED = MAX_SPEED - 1;
+
+                return MOVEMENT_SPEED;
+            }
             else return MOVEMENT_SPEED;
         }
 
@@ -1037,6 +1140,12 @@ namespace TGC.Group.Model
             PinoOriginal.dispose();
             RocaOriginal.dispose();
             ArbolBananasOriginal.dispose();
+
+            foreach (var mesh in RuedasJugador1)
+            {
+                mesh.dispose();
+            }
+
             /*
             BarrilPolvoraOriginal.dispose();
             CarretillaOriginal.dispose();
