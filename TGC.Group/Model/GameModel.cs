@@ -12,7 +12,9 @@ using TGC.Core.Utils;
 using TGC.Camara;
 using TGC.Core.Collision;
 using TGC.UtilsGroup;
+using TGC.Core.Geometry;
 using System;
+using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Model
 {
@@ -79,6 +81,9 @@ namespace TGC.Group.Model
 
         //Mesh del auto
         private TgcMesh Mesh { get; set; }
+
+        //BoudingBox Obb del auto.
+        private TgcBoundingOrientedBox ObbMesh;
 
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
@@ -247,6 +252,9 @@ namespace TGC.Group.Model
             Mesh.AutoTransformEnable = true;
             Mesh.move(0, 0.5f, 0);
             piso = Mesh.Position.Y;
+
+            //Cargo el bouding box obb del auto a partir de su AABB
+            ObbMesh = TgcBoundingOrientedBox.computeFromAABB(Mesh.BoundingBox);
 
             //Camara por defecto
             CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 300, 600);
@@ -680,9 +688,10 @@ namespace TGC.Group.Model
             {
                 foreach (var mesh in ScenePpal.Meshes)
                 {
-                    mesh.BoundingBox.render();
+                    if(mesh.Equals(Mesh) == false) mesh.BoundingBox.render(); //agrego este if asi no dibujamos al bounding box AABB
                 }
 
+                ObbMesh.render();
                 RenderizarObjetos(1);
             }
 
@@ -1001,6 +1010,7 @@ namespace TGC.Group.Model
                 var rotAngle = (MOVEMENT_SPEED * 0.2f * Math.Sign (rotate) * ElapsedTime) * (FastMath.PI / 180);
                 Mesh.rotateY(rotAngle);
                 CamaraInterna.rotateY(rotAngle);
+                ObbMesh.rotate(new Vector3(0, rotAngle, 0));
             }
 
             if (Input.keyPressed(Key.Space) && !falling)
@@ -1042,6 +1052,7 @@ namespace TGC.Group.Model
                 rotacionVertical -= MOVEMENT_SPEED * ElapsedTime / 60;
 
                 Mesh.moveOrientedY(moveForward * ElapsedTime);
+                ObbMesh.Center = Mesh.Position;
 
                 //El framework posee la clase TgcCollisionUtils con muchos algoritmos de colisión de distintos tipos de objetos.
                 //Por ejemplo chequear si dos cajas colisionan entre sí, o dos esferas, o esfera con caja, etc.
