@@ -44,7 +44,7 @@ namespace TGC.Group.Model
         float piso;
 
         //Altura del salto
-        private const float ALTURA_SALTO = 225f;
+        private const float ALTURA_SALTO = 75f;
 
         //Posición Y de las barras de vida
         private const int POSICION_Y_BARRA_VIDA = 40;
@@ -774,10 +774,10 @@ namespace TGC.Group.Model
 
             //Dibujo el nombre del Jugador y de los competidores
             letraJugadores.drawText(this.NombreJugador1, Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA - 10, Color.DeepSkyBlue);
-            letraJugadores.drawText("jugador 22", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 20, Color.DeepSkyBlue);
-            letraJugadores.drawText("jugador 33", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 50, Color.DeepSkyBlue);
-            letraJugadores.drawText("jugador 44", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 80, Color.DeepSkyBlue);
-            letraJugadores.drawText("jugador 55", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 110, Color.DeepSkyBlue);
+            letraJugadores.drawText("jugador 2", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 20, Color.DeepSkyBlue);
+            letraJugadores.drawText("jugador 3", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 50, Color.DeepSkyBlue);
+            letraJugadores.drawText("jugador 4", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 80, Color.DeepSkyBlue);
+            letraJugadores.drawText("jugador 5", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 110, Color.DeepSkyBlue);
 
             //Calculo la vida de cada auto
             spriteBarraJugador1Llena.Scaling = new Vector2(cantVidaJugador1 * 0.001f, 0.4f);
