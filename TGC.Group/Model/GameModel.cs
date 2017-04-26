@@ -850,6 +850,7 @@ namespace TGC.Group.Model
 
                         case 2:
                             {
+
                                 if (mesh != unaInstancia)
                                 {
                                     if (TgcCollisionUtils.classifyBoxBox(mesh.BoundingBox, unaInstancia.BoundingBox) != TgcCollisionUtils.BoxBoxResult.Afuera)
@@ -1074,26 +1075,50 @@ namespace TGC.Group.Model
 
                     //Hubo colisión con un objeto. Guardar resultado y abortar loop.
                     if ((collisionResult != TgcCollisionUtils.BoxBoxResult.Encerrando) && (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera))
-                    {
+                   {
                         collisionFound = true;
                         break;
                     }
                 }
 
-                //Si hubo alguna colisión, entonces restaurar la posición original del mesh
+                ////Si hubo alguna colisión, entonces restaurar la posición original del mesh
                 if (collisionFound)
                 {
                     Mesh.Position = originalPos;
                 }
 
-                if (ValidarColisionObjetos(Mesh))
+                if (DetectarColisionesObb())
                 {
                     Mesh.Position = originalPos;
                 }
 
+
+
                 //Hacer que la camara en 3ra persona se ajuste a la nueva posicion del objeto
                 CamaraInterna.Target = Mesh.Position;
             }
+        }
+
+        private bool DetectarColisionesObb()
+        {
+            List<bool> booleanosColision = new List<bool>();
+            List<TgcMesh> allMesh = new List<TgcMesh>();
+            allMesh.AddRange(MeshPinos);
+            allMesh.AddRange(MeshRocas);
+            allMesh.AddRange(MeshPalmeras);
+            allMesh.AddRange(MeshArbolesBananas);
+        //    allMesh.AddRange(ScenePpal.Meshes);
+            allMesh.AddRange(MeshAutos);
+
+            foreach (var unMesh in allMesh)
+            {
+
+                if ((unMesh != Mesh) && (unMesh.Name != "Room-1-Roof-0")) //siempre que el mesh sea distinto al auto sino colisionara con el mismo
+                booleanosColision.Add(TgcCollisionUtils.testObbAABB(ObbMesh, unMesh.BoundingBox)); //me fijo si hubo alguna colision este booleano lo meto en una lista
+
+            }
+
+            return booleanosColision.Find(valor => valor.Equals(true)); // me fijo si alguno de la lista dio true
         }
 
         private float Acelerar(float aceleracion) 
