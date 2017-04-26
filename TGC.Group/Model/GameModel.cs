@@ -258,6 +258,8 @@ namespace TGC.Group.Model
             Mesh.move(0, 0.5f, 0);
             piso = Mesh.Position.Y;
 
+            Mesh.updateBoundingBox();
+
             //Cargo el bouding box obb del auto a partir de su AABB
             ObbMesh = TgcBoundingOrientedBox.computeFromAABB(Mesh.BoundingBox);
 
@@ -481,7 +483,6 @@ namespace TGC.Group.Model
             
             
             ruedaDerechaDelanteraMesh.AutoTransformEnable = true;
-            //ruedaDerechaDelanteraMesh.move(new Vector3(10f, 100f, 100f));
             ruedaDerechaDelanteraMesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
             
 
@@ -493,11 +494,6 @@ namespace TGC.Group.Model
 
             ruedaIzquierdaTraseraMesh.AutoTransformEnable = true;
             ruedaIzquierdaTraseraMesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
-            /*
-            ruedaDerechaDelanteraMesh.Transform = ruedaDerechaDelanteraMesh.Transform * Matrix.Scaling(new Vector3(1f, 1, 1f))
-                                                                * Matrix.Translation(new Vector3(1f, 20f, 1f));
-            ruedaDerechaDelanteraMesh.BoundingBox.transform(ruedaDerechaDelanteraMesh.Transform);
-            */
 
             RuedasJugador1 = new List<TgcMesh> { ruedaDerechaDelanteraMesh, ruedaDerechaTraseraMesh, ruedaIzquierdaDelanteraMesh, ruedaIzquierdaTraseraMesh };
 
@@ -663,6 +659,9 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Render()
         {
+            Vector3 positionc;
+            Vector3 targetc;
+
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
@@ -672,20 +671,10 @@ namespace TGC.Group.Model
 
             DrawText.drawText("Jugador 1: " + this.NombreJugador1, 0, 40, Color.LightYellow);
             DrawText.drawText("Velocidad: " + this.MOVEMENT_SPEED, 0, 50, Color.LightYellow);
-            Vector3 positionc;
-            Vector3 targetc;
+            
             CamaraInterna.CalculatePositionTarget(out positionc, out targetc);
-            DrawText.drawText("" + positionc + " " + targetc,0,60,Color.DarkGreen );
+            DrawText.drawText("Posición cámara: " + positionc + " " + targetc, 0, 60, Color.DarkGreen );
 
-            //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
-            //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
-            /*Box.Transform = Matrix.Scaling(Box.Scale) *
-                            Matrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) *
-                            Matrix.Translation(Box.Position);
-            //A modo ejemplo realizamos toda las multiplicaciones, pero aquí solo nos hacia falta la traslación.
-            //Finalmente invocamos al render de la caja
-            Box.render();
-            */
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
             Mesh.UpdateMeshTransform();
@@ -699,9 +688,10 @@ namespace TGC.Group.Model
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (BoundingBox)
             {
+                RenderizarObjetos(1);
                 foreach (var mesh in ScenePpal.Meshes)
                 {
-                    if(mesh.Equals(Mesh) == false) mesh.BoundingBox.render(); //agrego este if asi no dibujamos al bounding box AABB
+                    mesh.BoundingBox.render();
                 }
 
                 ObbMesh.render();
@@ -1007,13 +997,14 @@ namespace TGC.Group.Model
                 moveForward += -Acelerar(200f);
                 moving = true;
             }
+
             if ((Input.keyDown(Key.Down) || Input.keyDown(Key.S)))
             {
                 moveForward += -Acelerar(-250f);
                 moving = true;
             }
 
-            //////////El auto dejo de acelerar e ira frenando de apoco 
+            //El auto dejo de acelerar e ira frenando de apoco 
             if (!Input.keyDown(Key.Down) && !Input.keyDown(Key.S) && !Input.keyDown(Key.Up) && !Input.keyDown(Key.W))
             {
                 moveForward = -Acelerar(0f);
@@ -1071,7 +1062,6 @@ namespace TGC.Group.Model
                 var originalPos = Mesh.Position;
 
                 //Multiplicar movimiento por velocidad y elapsedTime
-
                 movement *= MOVEMENT_SPEED * ElapsedTime;
 
                 rotacionVertical -= MOVEMENT_SPEED * ElapsedTime / 60;
@@ -1081,6 +1071,7 @@ namespace TGC.Group.Model
 
                 //El framework posee la clase TgcCollisionUtils con muchos algoritmos de colisión de distintos tipos de objetos.
                 //Por ejemplo chequear si dos cajas colisionan entre sí, o dos esferas, o esfera con caja, etc.
+                /*
                 var collisionFound = false;
 
                 foreach (var mesh in ScenePpal.Meshes)
@@ -1110,13 +1101,15 @@ namespace TGC.Group.Model
                 {
                     Mesh.Position = originalPos;
                 }
+                */
 
                 if (DetectarColisionesObb())
                 {
                     Mesh.Position = originalPos;
+                    MOVEMENT_SPEED = (-1) * Math.Sign(MOVEMENT_SPEED) * Math.Abs(MOVEMENT_SPEED * 0.3f);
+
+                    Mesh.moveOrientedY((-1) * moveForward * ElapsedTime);
                 }
-
-
 
                 //Hacer que la camara en 3ra persona se ajuste a la nueva posicion del objeto
                 CamaraInterna.Target = Mesh.Position;
@@ -1124,6 +1117,7 @@ namespace TGC.Group.Model
                 ajustarPosicionDeCamara();
 
             }
+
             if (stationary)
             {
                 ajustarPosicionDeCamara();
@@ -1132,17 +1126,20 @@ namespace TGC.Group.Model
 
         private void ajustarPosicionDeCamara()
         {
+            Vector3 position;
+            Vector3 target;
+            Vector3 q;
+            float distSq = 0;
 
             CamaraInterna.OffsetHeight = oh-10;
             CamaraInterna.OffsetForward = of;
             CamaraInterna.TargetDisplacement = d;
+            
             //Pedirle a la camara cual va a ser su proxima posicion
-            Vector3 position;
-            Vector3 target;
             CamaraInterna.CalculatePositionTarget(out position, out target);
 
             //Detectar colisiones entre el segmento de recta camara-personaje y todos los objetos del escenario
-            Vector3 q;
+            
             var minDistSq = FastMath.Pow2(of) ;
             foreach (TgcMesh unMesh in ScenePpal.Meshes)
             {
@@ -1150,8 +1147,8 @@ namespace TGC.Group.Model
                 if (TgcCollisionUtils.intersectSegmentAABB(target, position, unMesh.BoundingBox, out q))
                 {
                     //Si hay colision, guardar la que tenga menor distancia
+                    distSq = Vector3.Subtract(q, target).LengthSq();
 
-                   var distSq = Vector3.Subtract(q, target).LengthSq();
                     //Hay dos casos singulares, puede que tengamos mas de una colision hay que quedarse con el menor offset.
                     //Si no dividimos la distancia por 2 se acerca mucho al target.
                     minDistSq = FastMath.Min(distSq/2, minDistSq);
@@ -1180,15 +1177,14 @@ namespace TGC.Group.Model
             allMesh.AddRange(MeshRocas);
             allMesh.AddRange(MeshPalmeras);
             allMesh.AddRange(MeshArbolesBananas);
-        //    allMesh.AddRange(ScenePpal.Meshes);
+            allMesh.AddRange(ScenePpal.Meshes);
             allMesh.AddRange(MeshAutos);
 
             foreach (var unMesh in allMesh)
             {
-
-                if ((unMesh != Mesh) && (unMesh.Name != "Room-1-Roof-0")) //siempre que el mesh sea distinto al auto sino colisionara con el mismo
+                if ((unMesh != Mesh) && (unMesh.Name != "Room-1-Roof-0") && (unMesh.Name != "Room-1-Floor-0") &&
+                    (unMesh.Name != "Pasto") && (unMesh.Name != "Plane_5")) //siempre que el mesh sea distinto al auto sino colisionara con el mismo
                 booleanosColision.Add(TgcCollisionUtils.testObbAABB(ObbMesh, unMesh.BoundingBox)); //me fijo si hubo alguna colision este booleano lo meto en una lista
-
             }
 
             return booleanosColision.Find(valor => valor.Equals(true)); // me fijo si alguno de la lista dio true
@@ -1200,7 +1196,7 @@ namespace TGC.Group.Model
             {
                 MOVEMENT_SPEED = MOVEMENT_SPEED + ((aceleracion + ObtenerRozamiento()) * ElapsedTime);
 
-                if (MOVEMENT_SPEED > MAX_SPEED)
+                if (MOVEMENT_SPEED > Math.Abs (MAX_SPEED))
                     MOVEMENT_SPEED = MAX_SPEED - 1;
 
                 return MOVEMENT_SPEED;
