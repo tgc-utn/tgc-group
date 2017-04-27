@@ -1218,6 +1218,24 @@ namespace TGC.Group.Model
 
         }
 
+        public Vector3 PuntoMedio(TgcMesh mesh)
+        {
+            Vector3[] vertices = mesh.getVertexPositions();
+            long cantidad = vertices.GetLongLength(0);
+            float X = 0, Y = 0, Z = 0;
+            for (int i = 0; i < cantidad; i++)
+            {
+                X += vertices[i].X;
+                Y += vertices[i].Y;
+                Z += vertices[i].Z;
+            }
+            X /= cantidad;
+            Y /= cantidad;
+            Z /= cantidad;
+            var vectorMedio = new Vector3(X , Y , Z);
+            return vectorMedio;
+        }
+
         /// <summary>
         ///     Se llama cuando termina la ejecución del ejemplo.
         ///     Hacer Dispose() de todos los objetos creados.
