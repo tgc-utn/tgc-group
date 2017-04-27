@@ -44,7 +44,7 @@ namespace TGC.Group.Model
         float piso;
 
         //Altura del salto
-        private const float ALTURA_SALTO = 225f;
+        private const float ALTURA_SALTO = 75f;
 
         //Posición Y de las barras de vida
         private const int POSICION_Y_BARRA_VIDA = 40;
@@ -788,10 +788,10 @@ namespace TGC.Group.Model
 
             //Dibujo el nombre del Jugador y de los competidores
             letraJugadores.drawText(this.NombreJugador1, Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA - 10, Color.DeepSkyBlue);
-            letraJugadores.drawText("jugador 22", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 20, Color.DeepSkyBlue);
-            letraJugadores.drawText("jugador 33", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 50, Color.DeepSkyBlue);
-            letraJugadores.drawText("jugador 44", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 80, Color.DeepSkyBlue);
-            letraJugadores.drawText("jugador 55", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 110, Color.DeepSkyBlue);
+            letraJugadores.drawText("jugador 2", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 20, Color.DeepSkyBlue);
+            letraJugadores.drawText("jugador 3", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 50, Color.DeepSkyBlue);
+            letraJugadores.drawText("jugador 4", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 80, Color.DeepSkyBlue);
+            letraJugadores.drawText("jugador 5", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 110, Color.DeepSkyBlue);
 
             //Calculo la vida de cada auto
             spriteBarraJugador1Llena.Scaling = new Vector2(cantVidaJugador1 * 0.001f, 0.4f);
@@ -1232,6 +1232,55 @@ namespace TGC.Group.Model
 
         }
 
+        public Vector3 PuntoMedio(TgcMesh mesh)
+        {
+            Vector3[] vertices = mesh.getVertexPositions();
+            long cantidad = vertices.GetLongLength(0);
+            float X = 0, Y = 0, Z = 0;
+            for (int i = 0; i < cantidad; i++)
+            {
+                X += vertices[i].X;
+                Y += vertices[i].Y;
+                Z += vertices[i].Z;
+            }
+            X /= cantidad;
+            Y /= cantidad;
+            Z /= cantidad;
+            var vectorMedio = new Vector3(X , Y , Z);
+            return vectorMedio;
+        }
+
+        public Vector3 PuntoMedioDeLosExtremos(TgcMesh mesh)
+        {
+            Vector3[] vertices = mesh.getVertexPositions();
+            long cantidad = vertices.GetLongLength(0);
+            float XMinimo = vertices[0].X;
+            float YMinimo = vertices[0].Y;
+            float ZMinimo = vertices[0].Z;
+            float XMaximo = vertices[0].X;
+            float YMaximo = vertices[0].Y;
+            float ZMaximo = vertices[0].Z;
+            for (int i = 0; i < cantidad; i++)
+            {
+                if (vertices[i].X < XMinimo)
+                    XMinimo = vertices[i].X;
+                if (vertices[i].X > XMaximo)
+                    XMaximo = vertices[i].X;
+                if (vertices[i].Y < YMinimo)
+                    YMinimo = vertices[i].X;
+                if (vertices[i].Y > YMaximo)
+                    YMaximo = vertices[i].X;
+                if (vertices[i].Z < ZMinimo)
+                    ZMinimo = vertices[i].X;
+                if (vertices[i].Z > ZMaximo)
+                    ZMaximo = vertices[i].X;
+            }
+            float X = (XMinimo + XMaximo) / 2;
+            float Y = (YMinimo + YMaximo) / 2;
+            float Z = (ZMinimo + ZMaximo) / 2;
+            var vectorMedio = new Vector3(X, Y, Z);
+            return vectorMedio;
+        }
         /// <summary>
         ///     Se llama cuando termina la ejecución del ejemplo.
         ///     Hacer Dispose() de todos los objetos creados.
