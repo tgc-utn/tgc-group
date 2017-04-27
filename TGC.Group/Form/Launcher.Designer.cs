@@ -30,17 +30,19 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Launcher));
             this.btnStart = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
+            this.labelNombre = new System.Windows.Forms.Label();
             this.txtName = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.labelNroOponentes = new System.Windows.Forms.Label();
             this.cmbAutos = new System.Windows.Forms.ComboBox();
             this.cmbTiempo = new System.Windows.Forms.ComboBox();
-            this.label3 = new System.Windows.Forms.Label();
+            this.labelTiempo = new System.Windows.Forms.Label();
             this.btnSalir = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnStart
             // 
+            this.btnStart.Font = new System.Drawing.Font("Rock it", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnStart.ForeColor = System.Drawing.Color.Black;
             this.btnStart.Location = new System.Drawing.Point(563, 401);
             this.btnStart.Name = "btnStart";
             this.btnStart.Size = new System.Drawing.Size(93, 34);
@@ -49,75 +51,76 @@
             this.btnStart.UseVisualStyleBackColor = true;
             this.btnStart.Click += new System.EventHandler(this.btnStart_Click);
             // 
-            // label1
+            // labelNombre
             // 
-            this.label1.AutoSize = true;
-            this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.749999F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.DeepSkyBlue;
-            this.label1.Location = new System.Drawing.Point(12, 260);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(60, 16);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Nombre:";
+            this.labelNombre.AutoSize = true;
+            this.labelNombre.BackColor = System.Drawing.Color.Transparent;
+            this.labelNombre.Font = new System.Drawing.Font("Rock it", 9.749999F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelNombre.ForeColor = System.Drawing.Color.DeepSkyBlue;
+            this.labelNombre.Location = new System.Drawing.Point(3, 219);
+            this.labelNombre.Name = "labelNombre";
+            this.labelNombre.Size = new System.Drawing.Size(92, 37);
+            this.labelNombre.TabIndex = 1;
+            this.labelNombre.Text = "Nombre:";
             // 
             // txtName
             // 
             this.txtName.CharacterCasing = System.Windows.Forms.CharacterCasing.Lower;
-            this.txtName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtName.Location = new System.Drawing.Point(177, 255);
+            this.txtName.Font = new System.Drawing.Font("Rock it", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtName.Location = new System.Drawing.Point(162, 219);
             this.txtName.MaxLength = 10;
             this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(173, 20);
+            this.txtName.Size = new System.Drawing.Size(135, 39);
             this.txtName.TabIndex = 1;
             // 
-            // label2
+            // labelNroOponentes
             // 
-            this.label2.AutoSize = true;
-            this.label2.BackColor = System.Drawing.Color.Transparent;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.749999F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.ForeColor = System.Drawing.Color.DeepSkyBlue;
-            this.label2.Location = new System.Drawing.Point(12, 303);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(105, 16);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "Nro. Oponentes:";
+            this.labelNroOponentes.AutoSize = true;
+            this.labelNroOponentes.BackColor = System.Drawing.Color.Transparent;
+            this.labelNroOponentes.Font = new System.Drawing.Font("Rock it", 9.749999F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelNroOponentes.ForeColor = System.Drawing.Color.DeepSkyBlue;
+            this.labelNroOponentes.Location = new System.Drawing.Point(3, 268);
+            this.labelNroOponentes.Name = "labelNroOponentes";
+            this.labelNroOponentes.Size = new System.Drawing.Size(159, 37);
+            this.labelNroOponentes.TabIndex = 3;
+            this.labelNroOponentes.Text = "Nro. Oponentes:";
             // 
             // cmbAutos
             // 
             this.cmbAutos.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbAutos.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbAutos.Font = new System.Drawing.Font("Rock it", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cmbAutos.FormattingEnabled = true;
-            this.cmbAutos.Location = new System.Drawing.Point(177, 300);
+            this.cmbAutos.Location = new System.Drawing.Point(162, 266);
             this.cmbAutos.Name = "cmbAutos";
-            this.cmbAutos.Size = new System.Drawing.Size(63, 21);
-            this.cmbAutos.TabIndex = 3;
+            this.cmbAutos.Size = new System.Drawing.Size(63, 40);
+            this.cmbAutos.TabIndex = 2;
             // 
             // cmbTiempo
             // 
             this.cmbTiempo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbTiempo.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.cmbTiempo.Font = new System.Drawing.Font("Rock it", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cmbTiempo.FormattingEnabled = true;
-            this.cmbTiempo.Location = new System.Drawing.Point(177, 346);
+            this.cmbTiempo.Location = new System.Drawing.Point(162, 315);
             this.cmbTiempo.Name = "cmbTiempo";
-            this.cmbTiempo.Size = new System.Drawing.Size(63, 21);
+            this.cmbTiempo.Size = new System.Drawing.Size(63, 40);
             this.cmbTiempo.Sorted = true;
-            this.cmbTiempo.TabIndex = 2;
+            this.cmbTiempo.TabIndex = 3;
             // 
-            // label3
+            // labelTiempo
             // 
-            this.label3.AutoSize = true;
-            this.label3.BackColor = System.Drawing.Color.Transparent;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.749999F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.ForeColor = System.Drawing.Color.DeepSkyBlue;
-            this.label3.Location = new System.Drawing.Point(12, 349);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(58, 16);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "Tiempo:";
+            this.labelTiempo.AutoSize = true;
+            this.labelTiempo.BackColor = System.Drawing.Color.Transparent;
+            this.labelTiempo.Font = new System.Drawing.Font("Rock it", 9.749999F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelTiempo.ForeColor = System.Drawing.Color.DeepSkyBlue;
+            this.labelTiempo.Location = new System.Drawing.Point(3, 315);
+            this.labelTiempo.Name = "labelTiempo";
+            this.labelTiempo.Size = new System.Drawing.Size(83, 37);
+            this.labelTiempo.TabIndex = 5;
+            this.labelTiempo.Text = "Tiempo:";
             // 
             // btnSalir
             // 
+            this.btnSalir.Font = new System.Drawing.Font("Rock it", 6F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnSalir.Location = new System.Drawing.Point(662, 401);
             this.btnSalir.Name = "btnSalir";
             this.btnSalir.Size = new System.Drawing.Size(93, 34);
@@ -134,11 +137,11 @@
             this.ClientSize = new System.Drawing.Size(767, 447);
             this.Controls.Add(this.btnSalir);
             this.Controls.Add(this.cmbTiempo);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.labelTiempo);
             this.Controls.Add(this.cmbAutos);
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.labelNroOponentes);
             this.Controls.Add(this.txtName);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.labelNombre);
             this.Controls.Add(this.btnStart);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "Launcher";
@@ -152,12 +155,12 @@
         #endregion
 
         private System.Windows.Forms.Button btnStart;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelNombre;
         private System.Windows.Forms.TextBox txtName;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label labelNroOponentes;
         private System.Windows.Forms.ComboBox cmbAutos;
         private System.Windows.Forms.ComboBox cmbTiempo;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label labelTiempo;
         private System.Windows.Forms.Button btnSalir;
     }
 }

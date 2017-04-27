@@ -479,12 +479,10 @@ namespace TGC.Group.Model
             ruedaDerechaDelanteraMesh = RuedaDerechaDelJ1.Meshes[0];
             ruedaDerechaTraseraMesh = RuedaDerechaTrasJ1.Meshes[0];
             ruedaIzquierdaDelanteraMesh = RuedaIzquierdaDelJ1.Meshes[0];
-            ruedaIzquierdaTraseraMesh = RuedaIzquierdaTrasJ1.Meshes[0];
-            
+            ruedaIzquierdaTraseraMesh = RuedaIzquierdaTrasJ1.Meshes[0];            
             
             ruedaDerechaDelanteraMesh.AutoTransformEnable = true;
-            ruedaDerechaDelanteraMesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
-            
+            ruedaDerechaDelanteraMesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);            
 
             ruedaDerechaTraseraMesh.AutoTransformEnable = true;
             ruedaDerechaTraseraMesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
@@ -495,7 +493,7 @@ namespace TGC.Group.Model
             ruedaIzquierdaTraseraMesh.AutoTransformEnable = true;
             ruedaIzquierdaTraseraMesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
 
-            RuedasJugador1 = new List<TgcMesh> { ruedaDerechaDelanteraMesh, ruedaDerechaTraseraMesh, ruedaIzquierdaDelanteraMesh, ruedaIzquierdaTraseraMesh };
+            RuedasJugador1 = new List<TgcMesh> {ruedaDerechaDelanteraMesh, ruedaDerechaTraseraMesh, ruedaIzquierdaDelanteraMesh, ruedaIzquierdaTraseraMesh};
 
             //Inicio la lista de autos
             MeshAutos = new List<TgcMesh>();
@@ -508,7 +506,6 @@ namespace TGC.Group.Model
             {
                var autoEnemigo = meshEnemigos[i];
                MeshAutos.Add(autoEnemigo);
-
             }
 
             //hago dispose de cada auto que no se va a dibujar
@@ -526,6 +523,8 @@ namespace TGC.Group.Model
         {
             List<TgcMesh> ListaMesh = new List<TgcMesh>();
             System.Random randomNumber = new System.Random();
+            Matrix unaBoundingBoxMatrix;
+            Matrix unaTranslation;
 
             for (int i = 0; i < ROWS; i++)
             {
@@ -539,6 +538,7 @@ namespace TGC.Group.Model
                             var instance = unObjeto.createMeshInstance(unObjeto.Name + i + "_" + j);
 
                             instance.AutoTransformEnable = false;
+                            instance.AutoUpdateBoundingBox = true;
 
                             //Roto el objeto aleatoriamente
                             instance.Transform = Matrix.RotationY((randomNumber.Next(1, 180)) * FastMath.PI / 180);
@@ -547,18 +547,26 @@ namespace TGC.Group.Model
                             instance.Transform = instance.Transform * Matrix.Scaling(new Vector3(scale, scale, scale)) *
                                                                        Matrix.Translation(new Vector3(200, ejeZ, -10));
                             */
-                            
+
+                            //Calculo el tamaño del bounding box
+                            unaBoundingBoxMatrix = instance.Transform * Matrix.Scaling(new Vector3(0.15f, 0.8f, 0.15f)) *
+                                                                       Matrix.Translation(new Vector3(POSICION_VERTICE, ejeZ, (-1) * POSICION_VERTICE));
+
                             //Lo agrando y traslado al borde del terreno
                             instance.Transform = instance.Transform * Matrix.Scaling(new Vector3(scale, scale, scale)) *
                                                                        Matrix.Translation(new Vector3(POSICION_VERTICE, ejeZ, (-1) * POSICION_VERTICE));
 
-
+                            //Calculo la matriz de traslación aleatoria
+                            unaTranslation = Matrix.Translation(new Vector3((-1) * randomNumber.Next(j * CUADRANTE_SIZE, (j + 1) * CUADRANTE_SIZE), 0,
+                                                                 randomNumber.Next(i * CUADRANTE_SIZE, (i + 1) * CUADRANTE_SIZE)));
                             
                             //Lo posiciono en una posición aleatoria
-                            instance.Transform = instance.Transform * Matrix.Translation(
-                                                                        new Vector3((-1) * randomNumber.Next(j * CUADRANTE_SIZE, (j + 1) * CUADRANTE_SIZE), 0,
-                                                                                    randomNumber.Next(i * CUADRANTE_SIZE, (i + 1) * CUADRANTE_SIZE)));
-                            
+                            instance.Transform = instance.Transform * unaTranslation;
+
+                            //Posiciono el bounding box alterado en el mismo lugar que el mesh
+                            unaBoundingBoxMatrix = unaBoundingBoxMatrix * unaTranslation;
+
+                            //Muevo el bounding box
                             instance.BoundingBox.transform(instance.Transform);
                             
                             //Valido si pisa a otro objeto que ya existe
@@ -570,13 +578,10 @@ namespace TGC.Group.Model
                             }
                             ///////////////////////////////////////////////////////////////////////////////////
 
-                            if (unObjeto == PalmeraOriginal)
+                            //Para determinados objetos, le meto el bounding alterado
+                            if ((unObjeto.Name == "Palmera") || (unObjeto.Name == "Pino") || (unObjeto.Name == "ArbolBananas"))
                             {
-                                //Vector3 posicionOriginal = instance.BoundingBox.Position;
-                                Vector3 posicion = new Vector3(0, 0, 0);
-                                Vector3 escala = new Vector3(2000, 1, 2000);
-                                instance.BoundingBox.scaleTranslate(posicion, escala);
-                                instance.BoundingBox.transform(instance.Transform); //Con esto crea el bounding box pero lo hace con las dimensiones del mesh que no queremos
+                                instance.BoundingBox.transform(unaBoundingBoxMatrix);
                             }
 
                             //Le activo el alpha para que se vea mejor
