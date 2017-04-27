@@ -570,6 +570,15 @@ namespace TGC.Group.Model
                             }
                             ///////////////////////////////////////////////////////////////////////////////////
 
+                            if (unObjeto == PalmeraOriginal)
+                            {
+                                //Vector3 posicionOriginal = instance.BoundingBox.Position;
+                                Vector3 posicion = new Vector3(0, 0, 0);
+                                Vector3 escala = new Vector3(2000, 1, 2000);
+                                instance.BoundingBox.scaleTranslate(posicion, escala);
+                                instance.BoundingBox.transform(instance.Transform); //Con esto crea el bounding box pero lo hace con las dimensiones del mesh que no queremos
+                            }
+
                             //Le activo el alpha para que se vea mejor
                             instance.AlphaBlendEnable = true;
 
@@ -1267,7 +1276,6 @@ namespace TGC.Group.Model
             var vectorMedio = new Vector3(X, Y, Z);
             return vectorMedio;
         }
-
         /// <summary>
         ///     Se llama cuando termina la ejecución del ejemplo.
         ///     Hacer Dispose() de todos los objetos creados.
