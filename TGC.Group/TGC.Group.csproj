@@ -91,6 +91,8 @@
     <Compile Include="Model\Entities\EntityUpdatable.cs" />
     <Compile Include="Model\Entities\IEntity.cs" />
     <Compile Include="Model\Entities\IUpdateObject.cs" />
+    <Compile Include="Model\GameWorld\AINode.cs" />
+    <Compile Include="Model\GameWorld\Monster.cs" />
     <Compile Include="Model\GameWorld\World.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\GameWorld\WorldMap.cs" />

@@ -22,6 +22,7 @@ namespace TGC.Group.Model.GameWorld
         private TgcPlane       roof;
         private bool           shouldShowRoof;
         private bool           shouldShowBoundingVolumes;
+        private List<AINode> enemyIA;
 
         private static float roomHeight = 16f;
 
@@ -59,7 +60,6 @@ namespace TGC.Group.Model.GameWorld
         {
             {{-788f, 0f, 0f},   {0f, 3/2f, 0f}},
             {{0f, 0f, -788f},  {0f, 0f, 0f}},
-            {{605f, 0f, -380f},  {0f, 1f, 0f}},
         };
 
         private static float[,,] torchInstances = new float[,,]
@@ -331,6 +331,84 @@ namespace TGC.Group.Model.GameWorld
         public List<TgcMesh> Doors
         {
             get{return this.doors;}
+        }
+
+        public List<AINode> EnemyIA
+        {
+            get { return this.enemyIA; }
+        }
+
+        private void createEnemyIA()
+        {
+
+            enemyIA = new List<AINode>();
+            List<Vector3> direction = new List<Vector3>();
+            direction.Add(new Vector3(0, 0, 1));
+            direction.Add(new Vector3(1, 0, 0));
+            direction.Add(new Vector3(0, 0, -1));
+            direction.Add(new Vector3(-1, 0, 0));
+
+            enemyIA.Add(new AINode(new Vector3(330f, 0, 330f), direction));
+            enemyIA.Add(new AINode(new Vector3(330f, 0, -330f), direction));
+            enemyIA.Add(new AINode(new Vector3(-330f, 0, 330f), direction));
+            enemyIA.Add(new AINode(new Vector3(-330f, 0, -330f), direction));
+
+            direction = new List<Vector3>();
+            direction.Add(new Vector3(0, 0, 1));
+            direction.Add(new Vector3(1, 0, 0));
+            direction.Add(new Vector3(0, 0, -1));
+
+            enemyIA.Add(new AINode(new Vector3(-960f, 0f, 330f), direction));
+            enemyIA.Add(new AINode(new Vector3(-960f, 0f, -330f), direction));
+
+            direction = new List<Vector3>();
+            direction.Add(new Vector3(0, 0, 1));
+            direction.Add(new Vector3(-1, 0, 0));
+            direction.Add(new Vector3(0, 0, -1));
+
+            enemyIA.Add(new AINode(new Vector3(960f, 0f, 330f), direction));
+            enemyIA.Add(new AINode(new Vector3(960f, 0f, -330f), direction));
+
+            direction = new List<Vector3>();
+            direction.Add(new Vector3(-1, 0, 0));
+            direction.Add(new Vector3(1, 0, 0));
+            direction.Add(new Vector3(0, 0, -1));
+
+            enemyIA.Add(new AINode(new Vector3(330f, 0f, 960f), direction));
+            enemyIA.Add(new AINode(new Vector3(-330f, 0f, 960f), direction));
+
+            direction = new List<Vector3>();
+            direction.Add(new Vector3(-1, 0, 0));
+            direction.Add(new Vector3(1, 0, 0));
+            direction.Add(new Vector3(0, 0, 1));
+
+            enemyIA.Add(new AINode(new Vector3(-330f, 0f, -960f), direction));
+            enemyIA.Add(new AINode(new Vector3(330f, 0f, -960f), direction));
+
+            direction = new List<Vector3>();
+            direction.Add(new Vector3(0, 0, -1));
+            direction.Add(new Vector3(-1, 0, 0));
+
+            enemyIA.Add(new AINode(new Vector3(960f, 0f, 960f), direction));
+
+            direction = new List<Vector3>();
+            direction.Add(new Vector3(0, 0, -1));
+            direction.Add(new Vector3(1, 0, 0));
+
+            enemyIA.Add(new AINode(new Vector3(-960f, 0f, 960f), direction));
+
+            direction = new List<Vector3>();
+            direction.Add(new Vector3(0, 0, 1));
+            direction.Add(new Vector3(-1, 0, 0));
+
+            enemyIA.Add(new AINode(new Vector3(960f, 0f, -960f), direction));
+
+            direction = new List<Vector3>();
+            direction.Add(new Vector3(0, 0, 1));
+            direction.Add(new Vector3(1, 0, 0));
+
+            enemyIA.Add(new AINode(new Vector3(-960f, 0f, -960f), direction));
+
         }
 
     }

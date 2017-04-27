@@ -19,11 +19,12 @@ namespace TGC.Group.Model.GameWorld
         protected EntityPlayer           player;
         protected WorldMap               worldMap;
         protected TgcD3dInput            inputManager;
-        protected TgcSkeletalMesh        enemy;
+     //   protected TgcSkeletalMesh        enemy;
         protected TgcSkeletalMesh        hand;
         protected bool                   outsideCamera;
         protected TgcCamera              camera;
-        
+        protected Monster monster;
+
 
         public World(string mediaPath, TgcD3dInput inputManager)
         {
@@ -38,10 +39,10 @@ namespace TGC.Group.Model.GameWorld
 
 
             TgcSkeletalLoader loader  = new TgcSkeletalLoader();
-            enemy                     = loader.loadMeshAndAnimationsFromFile(mediaPath + "/Monster-TgcSkeletalMesh.xml", new string[]{mediaPath + "/Run-TgcSkeletalAnim.xml"});
+          /*  enemy                     = loader.loadMeshAndAnimationsFromFile(mediaPath + "/Monster-TgcSkeletalMesh.xml", new string[]{mediaPath + "/Run-TgcSkeletalAnim.xml"});
             enemy.playAnimation("Run");
             enemy.Position            = new Vector3(0f, 0f,0f);
-            enemy.Scale = new Vector3(3f, 3f, 3f);
+            enemy.Scale = new Vector3(3f, 3f, 3f);*/
 
             
             
@@ -83,8 +84,9 @@ namespace TGC.Group.Model.GameWorld
             }
             this.hand.UpdateMeshTransform();
             this.hand.updateAnimation(elapsedTime);
-            this.enemy.UpdateMeshTransform();
-            this.enemy.updateAnimation(elapsedTime);
+            // this.enemy.UpdateMeshTransform();
+            // this.enemy.updateAnimation(elapsedTime);
+            this.monster.update(this.worldMap.EnemyIA, elapsedTime);
             this.player.Colliders = this.worldMap.Walls;        
             this.player.update(elapsedTime);
 
@@ -97,7 +99,7 @@ namespace TGC.Group.Model.GameWorld
                 currentEntity.render();
             }
             
-            this.enemy.render();
+            this.monster.render();
             this.worldMap.render();
             this.hand.render();
             this.player.render();
@@ -111,7 +113,7 @@ namespace TGC.Group.Model.GameWorld
             }
             this.player.dispose();
             this.hand.dispose();
-            this.enemy.dispose();
+            this.monster.dispose();
             this.worldMap.dispose();
         }
     }
