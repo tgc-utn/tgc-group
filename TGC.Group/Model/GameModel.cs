@@ -1236,6 +1236,38 @@ namespace TGC.Group.Model
             return vectorMedio;
         }
 
+        public Vector3 PuntoMedioDeLosExtremos(TgcMesh mesh)
+        {
+            Vector3[] vertices = mesh.getVertexPositions();
+            long cantidad = vertices.GetLongLength(0);
+            float XMinimo = vertices[0].X;
+            float YMinimo = vertices[0].Y;
+            float ZMinimo = vertices[0].Z;
+            float XMaximo = vertices[0].X;
+            float YMaximo = vertices[0].Y;
+            float ZMaximo = vertices[0].Z;
+            for (int i = 0; i < cantidad; i++)
+            {
+                if (vertices[i].X < XMinimo)
+                    XMinimo = vertices[i].X;
+                if (vertices[i].X > XMaximo)
+                    XMaximo = vertices[i].X;
+                if (vertices[i].Y < YMinimo)
+                    YMinimo = vertices[i].X;
+                if (vertices[i].Y > YMaximo)
+                    YMaximo = vertices[i].X;
+                if (vertices[i].Z < ZMinimo)
+                    ZMinimo = vertices[i].X;
+                if (vertices[i].Z > ZMaximo)
+                    ZMaximo = vertices[i].X;
+            }
+            float X = (XMinimo + XMaximo) / 2;
+            float Y = (YMinimo + YMaximo) / 2;
+            float Z = (ZMinimo + ZMaximo) / 2;
+            var vectorMedio = new Vector3(X, Y, Z);
+            return vectorMedio;
+        }
+
         /// <summary>
         ///     Se llama cuando termina la ejecución del ejemplo.
         ///     Hacer Dispose() de todos los objetos creados.
