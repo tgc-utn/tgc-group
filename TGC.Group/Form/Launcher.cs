@@ -20,19 +20,28 @@ namespace TGC.Group.Form
             System.Drawing.Text.PrivateFontCollection privateFonts = new PrivateFontCollection();
             string fontDir = "";
 
-            fontDir = Environment.CurrentDirectory + @"\..\..\Media\Twisted_Chano\Font\";
-            privateFonts.AddFontFile(fontDir + "Rockit.ttf");
+            try
+            {
+                fontDir = Environment.CurrentDirectory + @"\..\..\Media\Twisted_Chano\Font\";
+                privateFonts.AddFontFile(fontDir + "Rockit.ttf");
 
-            Font FUENTE_SIZE = new Font(privateFonts.Families[0], 10);
+                Font FUENTE_SIZE_10 = new Font(privateFonts.Families[0], 10);
+                Font FUENTE_SIZE_6 = new Font(privateFonts.Families[0], 6);
 
-            this.labelNombre.Font = FUENTE_SIZE;
+                this.labelNombre.Font = FUENTE_SIZE_10;
+                this.labelNroOponentes.Font = FUENTE_SIZE_10;
+                this.labelTiempo.Font = FUENTE_SIZE_10;
+                this.btnStart.Font = FUENTE_SIZE_6;
+                this.btnSalir.Font = FUENTE_SIZE_6;
+            }
+            catch (Exception)
+            { }
+
             cmbAutos.Items.AddRange(new object[] { 1, 2, 3, 4 });
             cmbTiempo.Items.AddRange(new object[] {5, 10, 15 });
 
             cmbAutos.Text = "4";
             cmbTiempo.Text = "5";
-
-
         }
 
         private void btnStart_Click(object sender, EventArgs e)
