@@ -9,6 +9,8 @@ using System;
 using TGC.Core.Direct3D;
 using Microsoft.DirectX.Direct3D;
 using System.Windows.Forms;
+using Microsoft.DirectX.DirectInput;
+using TGC.Core.Shaders;
 
 namespace TGC.Group.Model.GameWorld
 {
@@ -19,40 +21,35 @@ namespace TGC.Group.Model.GameWorld
         protected EntityPlayer           player;
         protected WorldMap               worldMap;
         protected TgcD3dInput            inputManager;
-     //   protected TgcSkeletalMesh        enemy;
-        protected TgcSkeletalMesh        hand;
+     //   protected TgcSkeletalMesh        enemy;        
         protected bool                   outsideCamera;
         protected TgcCamera              camera;
         protected Monster monster;
-
+        protected Microsoft.DirectX.Direct3D.Effect currentShader;
 
         public World(string mediaPath, TgcD3dInput inputManager)
         {
-            this.outsideCamera = false;
+            TgcSkeletalLoader loader = new TgcSkeletalLoader();            
+            this.currentShader        = TgcShaders.Instance.TgcMeshSpotLightShader;
+            this.outsideCamera        = false;
             this.inputManager         = inputManager;
             this.entities             = new List<IEntity>();
             this.updatableEntities    = new List<EntityUpdatable>();
-            this.worldMap = new WorldMap(mediaPath);
-            this.player               = new EntityPlayer(this.inputManager);            
+            this.worldMap             = new WorldMap(mediaPath);
+            this.player               = new EntityPlayer(this.inputManager, loader, mediaPath);            
             this.camera               = new TgcCamera();
             this.camera.SetCamera(new Vector3(0f, 1000f, 0f), new Vector3(10f, 0f, 10f));
+            
 
 
-            TgcSkeletalLoader loader  = new TgcSkeletalLoader();
-          /*  enemy                     = loader.loadMeshAndAnimationsFromFile(mediaPath + "/Monster-TgcSkeletalMesh.xml", new string[]{mediaPath + "/Run-TgcSkeletalAnim.xml"});
+            
+            var enemy                     = loader.loadMeshAndAnimationsFromFile(mediaPath + "/Monster-TgcSkeletalMesh.xml", new string[]{mediaPath + "/Run-TgcSkeletalAnim.xml"});
             enemy.playAnimation("Run");
             enemy.Position            = new Vector3(0f, 0f,0f);
-            enemy.Scale = new Vector3(3f, 3f, 3f);*/
+            enemy.Scale = new Vector3(3f, 3f, 3f);
 
+            this.monster = new GameWorld.Monster(mediaPath);
             
-            
-            this.hand = loader.loadMeshAndAnimationsFromFile(mediaPath + "/Hand-TgcSkeletalMesh.xml", new string[] { mediaPath + "/HandAnimation-TgcSkeletalAnim.xml" });
-            hand.playAnimation("Animation");
-            
-            hand.Position = new Vector3(0f, 500f, 0f);
-            hand.Scale = new Vector3(1 / 6f, 1 / 6f, 1 / 6f);
-            hand.rotateX(-(float)Math.PI / 2);
-
 
 
         }
@@ -82,8 +79,7 @@ namespace TGC.Group.Model.GameWorld
                 this.worldMap.ShouldShowBoundingVolumes = false;
 
             }
-            this.hand.UpdateMeshTransform();
-            this.hand.updateAnimation(elapsedTime);
+            
             // this.enemy.UpdateMeshTransform();
             // this.enemy.updateAnimation(elapsedTime);
             this.monster.update(this.worldMap.EnemyIA, elapsedTime);
@@ -100,8 +96,7 @@ namespace TGC.Group.Model.GameWorld
             }
             
             this.monster.render();
-            this.worldMap.render();
-            this.hand.render();
+            this.worldMap.render();            
             this.player.render();
         }
 
@@ -112,9 +107,20 @@ namespace TGC.Group.Model.GameWorld
                 currentEntity.dispose();
             }
             this.player.dispose();
-            this.hand.dispose();
             this.monster.dispose();
             this.worldMap.dispose();
         }
+        /*
+        protected void createShaders()
+        {
+            
+            //Aplicar a cada mesh el shader actual
+            foreach (var mesh in scene.Meshes)
+            {
+                mesh.Effect = currentShader;
+                //El Technique depende del tipo RenderType del mesh
+                mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
+            }
+        }*/
     }
 }

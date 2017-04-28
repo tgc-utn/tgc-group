@@ -92,6 +92,7 @@ namespace TGC.Group.Model.GameWorld
             this.createRoomWallInstances();
             this.createRoomInstances();
             this.rotateAndScaleScenario();
+            this.createEnemyIA();
             
             this.createRoofFromScene(mediaPath);
 
