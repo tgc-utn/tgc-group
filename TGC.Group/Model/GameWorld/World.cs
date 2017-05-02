@@ -20,11 +20,10 @@ namespace TGC.Group.Model.GameWorld
         protected List<EntityUpdatable>  updatableEntities;
         protected EntityPlayer           player;
         protected WorldMap               worldMap;
-        protected TgcD3dInput            inputManager;
-     //   protected TgcSkeletalMesh        enemy;        
+        protected TgcD3dInput            inputManager;     
         protected bool                   outsideCamera;
         protected TgcCamera              camera;
-        protected Monster monster;
+        protected EntityMonster monster;
         protected Microsoft.DirectX.Direct3D.Effect currentShader;
 
         public World(string mediaPath, TgcD3dInput inputManager)
@@ -36,22 +35,11 @@ namespace TGC.Group.Model.GameWorld
             this.entities             = new List<IEntity>();
             this.updatableEntities    = new List<EntityUpdatable>();
             this.worldMap             = new WorldMap(mediaPath);
-            this.player               = new EntityPlayer(this.inputManager, loader, mediaPath);            
-            this.camera               = new TgcCamera();
-            this.camera.SetCamera(new Vector3(0f, 1000f, 0f), new Vector3(10f, 0f, 10f));
+            this.player               = new EntityPlayer(this.inputManager, loader, mediaPath);
+            this.camera               = new FirstPersonCamera(inputManager);
             
-
-
-            
-            var enemy                     = loader.loadMeshAndAnimationsFromFile(mediaPath + "/Monster-TgcSkeletalMesh.xml", new string[]{mediaPath + "/Run-TgcSkeletalAnim.xml"});
-            enemy.playAnimation("Run");
-            enemy.Position            = new Vector3(0f, 0f,0f);
-            enemy.Scale = new Vector3(3f, 3f, 3f);
-
-            this.monster = new GameWorld.Monster(mediaPath);
-            
-
-
+            this.monster              = new EntityMonster(loader, mediaPath);
+            this.monster.WalkingNodes = this.worldMap.EnemyIA;            
         }
 
         public TgcCamera Camera
@@ -59,30 +47,28 @@ namespace TGC.Group.Model.GameWorld
             get { return (this.outsideCamera) ? this.camera : this.player.Camera; }
         }
 
+        private bool freeCamera = false;
+
+
         public void update(float elapsedTime)
         {
-            foreach(EntityUpdatable currentEntity in this.updatableEntities)
+            foreach (EntityUpdatable currentEntity in this.updatableEntities)
             {
                 currentEntity.update(elapsedTime);
             }
-            
-            if(inputManager.keyDown(Microsoft.DirectX.DirectInput.Key.C))
-            {
-                this.outsideCamera = true;
-                this.worldMap.ShouldShowRoof = false;
-                this.worldMap.ShouldShowBoundingVolumes = true;
-            }
-            else
-            {
-                this.outsideCamera = false;
-                this.worldMap.ShouldShowRoof = true;
-                this.worldMap.ShouldShowBoundingVolumes = false;
 
+            if (inputManager.keyPressed(Microsoft.DirectX.DirectInput.Key.C))
+            {
+                this.freeCamera = !this.freeCamera;
+                this.outsideCamera = freeCamera;
+                this.worldMap.ShouldShowRoof = !freeCamera;
+                this.worldMap.ShouldShowBoundingVolumes = freeCamera;
             }
+
             
             // this.enemy.UpdateMeshTransform();
             // this.enemy.updateAnimation(elapsedTime);
-            this.monster.update(this.worldMap.EnemyIA, elapsedTime);
+            this.monster.update(elapsedTime);
             this.player.Colliders = this.worldMap.Walls;        
             this.player.update(elapsedTime);
 

@@ -52,30 +52,54 @@ namespace TGC.Group.Model.GameWorld
 
         private static float[,,] wardrobeInstances = new float[,,]
         {            
-            {{420f, 0f, 620f},   {0f, 1/2f, 0f}},
+            {{400f, 0f, 620f},   {0f, 1/2f, 0f}},
             {{150f, 0f, -1065f}, {0f, 1f, 0f}},
         };
 
         private static float[,,] tableInstances = new float[,,]
         {
-            {{-788f, 0f, 0f},   {0f, 3/2f, 0f}},
-            {{0f, 0f, -788f},  {0f, 0f, 0f}},
+            {{-768f, 0f, 0f},   {0f, 3/2f, 0f}},
+            {{0f, 0f, -768f},  {0f, 0f, 0f}},
         };
 
         private static float[,,] torchInstances = new float[,,]
         {
-            {{1080f, 50f, 330f},  {-0.5f, 0f, 0f}},
-            {{-1080f, 50f, 330f}, {-0.5f, 1f, 0f}},
-            {{-1080f, 50f, -330f}, {-0.5f, 1f, 0f}},
-            {{1080f, 50f, -330f},  {-0.5f, 0f, 0f}},
+            {{1080f,  120f, 330f},  {-0.5f, 0f, 0f}},
+            {{-1080f, 120f, 330f}, {-0.5f, 1f, 0f}},
+            {{-1080f, 120f, -330f}, {-0.5f, 1f, 0f}},
+            {{1080f,  120f, -330f},  {-0.5f, 0f, 0f}},
 
-            {{330, 50f, 1080f},  {-0.5f, -0.5f, 0f}},
-            {{-330f, 50f, 1080f}, {-0.5f, -0.5f, 0f}},
-            {{330f, 50f, -1080f}, {-0.5f, 0.5f, 0f}},
-            {{-330f, 50f, -1080f},  {-0.5f, +0.5f, 0f}},
+            {{330,   120f, 1080f},  {-0.5f, -0.5f, 0f}},
+            {{-330f, 120f, 1080f}, {-0.5f, -0.5f, 0f}},
+            {{330f,  120f, -1080f}, {-0.5f, 0.5f, 0f}},
+            {{-330f, 120f, -1080f},  {-0.5f, +0.5f, 0f}},
         };
 
-        
+        private static float[,,] batteryInstances = new float[,,]
+        {
+            {{240f, 0f,   80f},    {3/2f, 0f, 0f}},
+            {{-480f, 0f, 160f}, {3/2f, 0f, 0f}},
+            {{700f, 0f, 160f},  {3/2f, 0f, 0f}},
+        };
+
+        private static float[,,] oilBottleInstances = new float[,,]
+        {
+            {{490f, 0f, 620f}, {3/2f, 0f, 0f}},
+            {{-1080f, 0f, 1080f}, {3/2f, 0f, 0f}},
+            {{520f, 0f, -520f}, {3/2f, 0f, 0f}},
+        };
+
+        private static float[,,] candleInstances = new float[,,]
+        {
+            {{-1080f, 3f, -780f}, {0f, 0f, 0f}},
+            {{0f, 3f, 0f}, {0f, 0f, 0f}},
+            {{50f, 3f, 500f}, {0f, 0f, 0f}},
+            {{500f, 3f, 50f}, {0f, 0f, 0f}},
+            {{-240f, 3f, -240f}, {0f, 0f, 0f}},
+        };
+
+
+
 
         private bool alphaBlendEnable;
 
@@ -96,11 +120,14 @@ namespace TGC.Group.Model.GameWorld
             
             this.createRoofFromScene(mediaPath);
 
-            this.createElementInstances(loader, mediaPath + "/Sillon-TgcScene.xml",      sofaInstances,     "Sofa",     1.25f);
-            this.createElementInstances(loader, mediaPath + "/Mesa-TgcScene.xml",        tableInstances,    "Table",    2.75f);
-            this.createElementInstances(loader, mediaPath + "/Placard-TgcScene.xml",     wardrobeInstances, "Wardrobe", 2.5f);
-            this.createElementInstances(loader, mediaPath + "/LockerMetal-TgcScene.xml", lockerInstances,   "Locker",   2.5f);
-            this.createElementInstances(loader, mediaPath + "/Torch-TgcScene.xml",       torchInstances,    "Torch",    2f);
+            this.createElementInstances(loader, mediaPath + "/Sillon-TgcScene.xml",       sofaInstances,      "Sofa",     1.5f);
+            this.createElementInstances(loader, mediaPath + "/Mesa-TgcScene.xml",         tableInstances,     "Table",    3.75f);
+            this.createElementInstances(loader, mediaPath + "/Placard-TgcScene.xml",      wardrobeInstances,  "Wardrobe", 3.5f);
+            this.createElementInstances(loader, mediaPath + "/LockerMetal-TgcScene.xml",  lockerInstances,    "Locker",   3.5f);
+            this.createElementInstances(loader, mediaPath + "/Torch-TgcScene.xml",        torchInstances,     "Torch",    2f);
+            this.createElementInstances(loader, mediaPath + "/Battery-TgcScene.xml",      batteryInstances,   "Battery",  1f);
+            this.createElementInstances(loader, mediaPath + "/Bottle-TgcScene.xml",       oilBottleInstances, "Bottle",   1f);
+            this.createElementInstances(loader, mediaPath + "/SingleCandle-TgcScene.xml", candleInstances,    "Candles",  1f);
         }
 
         protected void createRoomWallInstances()
@@ -253,7 +280,8 @@ namespace TGC.Group.Model.GameWorld
             for(int meshIndex = 0; meshIndex < meshCount; meshIndex++)
             {
                 TgcMesh element = tempScene.Meshes[meshIndex];
-                element.Scale = new Vector3(scale, scale, scale);
+                element.AlphaBlendEnable = true;
+                //element.Scale = new Vector3(scale, scale, scale);
                 int count = instances.GetLength(0);
                 float PI = (float)Math.PI;
                 for (int index = 0; index < count; index++)
@@ -264,6 +292,8 @@ namespace TGC.Group.Model.GameWorld
                         new Vector3(PI * instances[index, 1, 0], PI * instances[index, 1, 1], PI * instances[index, 1, 2]),
                         new Vector3(scale, scale, scale));
                     instance.UpdateMeshTransform();
+                    
+                    instance.AlphaBlendEnable = true;
 
                     instance.updateBoundingBox();
                     TGCUtils.updateMeshBoundingBox(instance);

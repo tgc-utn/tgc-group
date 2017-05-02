@@ -20,73 +20,81 @@ namespace TGC.Group.Model.Entities
 {
     public class EntityPlayer : EntityUpdatable
     {
-        private new TgcBoundingOrientedBox boundingBox;
-        private static float               velocityNormal = 400f;
-        private new Vector3                rotation;
-        private Vector3                    velocity;
-        private TgcD3dInput                inputManager;
-        private TgcCamera                  playerLookCamera;
-        private Matrix                     rotationMatrix;
-        private float                      sideRotation;
-        private float                      nodRotation;
-        private TgcRay                     lookingRay;
+        private new TgcBoundingCylinderFixedY boundingBox;
+        private static float                  velocityNormal = 400f;
+        private new Vector3                   rotation;
+        private Vector3                       velocity;
+        private TgcD3dInput                   inputManager;
+        private TgcCamera                     playerLookCamera;
+        private Matrix                        rotationMatrix;
+        private float                         sideRotation;
+        private float                         nodRotation;
+        private TgcRay                        velocityRay;
         private List<TgcBoundingAxisAlignBox> colliders;
-        private Vector3                    preRotation;
-        private float                      deltaSideRotation;
-        private TgcArrow                   arrow;
-        protected TgcSkeletalMesh          hand;
+        private TgcArrow                      arrow;
+        private TgcArrow                      distanceArrow;        
+        protected TgcSkeletalMesh             hand;
+        protected TgcText2D text;
 
-        private float yRotation;
+            
 
         public EntityPlayer(TgcD3dInput inputManager, TgcSkeletalLoader loader, string mediaPath)
         {
-            TgcBoundingAxisAlignBox alignedBB = new TgcBoundingAxisAlignBox(new Vector3(-40f, 0f, -30f), new Vector3(40f, 200f, 30f));                                                
+            this.text = new TgcText2D();
+            this.text.Color = System.Drawing.Color.Red;
+            this.text.Position = new System.Drawing.Point(500, 500);
+            
             this.inputManager                 = inputManager;
-            this.boundingBox                  = TgcBoundingOrientedBox.computeFromAABB(alignedBB);
+            this.boundingBox                  = new TgcBoundingCylinderFixedY(new Vector3(0f, 100f, 0f), 28f, 100f);
             this.rotation                     = new Vector3(0f, 0f, 0f);
-            this.preRotation                  = new Vector3(0f, 0f, 0f);
-            this.lookingRay                   = new TgcRay(this.boundingBox.Center, this.LookAt);
-            this.arrow                        = new TgcArrow();            
             this.playerLookCamera             = new TgcCamera();
-            this.hand                         = loader.loadMeshAndAnimationsFromFile(mediaPath + "/Hand-TgcSkeletalMesh.xml", new string[] { mediaPath + "/HandAnimation-TgcSkeletalAnim.xml" });
-            this.hand.playAnimation("Animation");
+            this.velocityRay                  = new TgcRay(this.boundingBox.Center, this.LookAt);
+            this.arrow                        = new TgcArrow();            
+            
+            this.hand                         = loader.loadMeshAndAnimationsFromFile(mediaPath + "/Hand-TgcSkeletalMesh.xml", new string[] { mediaPath + "/HandAnimation-TgcSkeletalAnim.xml", mediaPath + "/HandzAnimation-TgcSkeletalAnim.xml" });
+            this.hand.playAnimation("Animation2");
             this.hand.stopAnimation();
             this.hand.rotateX(-(float)Math.PI / 2);
             this.hand.Scale                   = new Vector3(1 / 6f, 1 / 6f, 1 / 6f);
             
             
             this.arrow.Thickness = 1;
-            this.arrow.HeadSize = new Vector2(10, 20);
+            
+            this.arrow.HeadSize = new Vector2(5, 6);
             this.arrow.HeadColor = System.Drawing.Color.Blue;
             this.arrow.BodyColor = System.Drawing.Color.Red;
-            MessageBox.Show(this.boundingBox.Orientation[0].ToString() + "\n" + this.boundingBox.Orientation[1].ToString());
 
+            this.distanceArrow = new TgcArrow();
+            this.distanceArrow.Thickness = 1;
+            this.distanceArrow.HeadSize = new Vector2(7, 7);
+            this.distanceArrow.HeadColor = System.Drawing.Color.Green;
+            this.distanceArrow.BodyColor = System.Drawing.Color.LightGreen;
         }
         
 
-        public TgcBoundingOrientedBox BoundingBox
+        public TgcBoundingCylinderFixedY BoundingBox
         {
             get {return this.boundingBox;}
         }
 
         public Vector3 HeadPosition
         {
-            get { return Vector3.Add(this.boundingBox.Center, new Vector3(0f, 90f, 0f)); }
+            get { return Vector3.Add(this.boundingBox.Center, new Vector3(0f, 85f, 0f)); }
         }
 
         protected Vector3 HandPosition
         {
-            get { return this.boundingBox.Orientation[1] * 20f + this.boundingBox.Orientation[0] * 50f + this.boundingBox.Orientation[2] + this.boundingBox.Center; }
+            get { return this.boundingBox.Center; }
         }
 
         public Vector3 LookAt
         {
-            get {return this.boundingBox.Orientation[2];}
+            get {return new Vector3(this.rotation.X, 0f, this.rotation.Z);}
         }
 
         public Vector3 Side
         {
-            get { return this.boundingBox.Orientation[0]; }
+            get { return new Vector3(this.LookAt.Z, 0f, -this.LookAt.X); }
         }
         
         public TgcCamera Camera
@@ -103,9 +111,10 @@ namespace TGC.Group.Model.Entities
         {            
             this.calculateLookAt();
             this.calculateVelocities(elapsedTime);
-            this.rotateAndMove();
+            this.rotateCamera();
+            this.move();
 
-            this.hand.Rotation = new Vector3(this.hand.Rotation.X, this.yRotation - FastMath.PI_HALF, this.hand.Rotation.Z);
+            this.hand.Rotation = new Vector3(this.hand.Rotation.X, this.Camera.LookAt.Y, this.hand.Rotation.Z);
             this.hand.Position = this.HandPosition - this.LookAt * 60f;
 
             this.hand.getBoneByName("Arm").MatFinal.RotateY(FastMath.PI_HALF);
@@ -114,43 +123,74 @@ namespace TGC.Group.Model.Entities
 
 
             /** DELETE, JUST DEBUG WITH THIS */
-            this.arrow.PStart = this.boundingBox.Center;
-            this.arrow.PEnd = this.boundingBox.Center + this.velocity;
-            this.arrow.updateValues();
+           
+
+            
             
         }
 
         protected void calculateLookAt()
-        {
-            this.preRotation    = new Vector3(this.rotation.X, this.rotation.Y, this.rotation.Z);            
-            this.deltaSideRotation = this.inputManager.XposRelative * 0.01f;
-            if(this.deltaSideRotation < FastMath.QUARTER_PI / 2)
-            {
-                this.sideRotation += this.deltaSideRotation;
-            }
+        {            
+            this.sideRotation += this.inputManager.XposRelative * 0.01f;            
             this.nodRotation   -= this.inputManager.YposRelative * 0.01f;
             this.rotationMatrix = Matrix.RotationX(nodRotation) * Matrix.RotationY(sideRotation);
             this.rotation       = Vector3.TransformNormal(new Vector3(0f, 0f, -1f), rotationMatrix);            
         }
 
-        protected void rotateAndMove()
+        protected void rotateCamera()
         {
-            this.yRotation = FastMath.Atan2(this.rotation.X, this.rotation.Z);
             this.playerLookCamera.SetCamera(this.HeadPosition, this.rotation + this.HeadPosition);
-            this.boundingBox.setRotation(new Vector3(0f, this.yRotation, 0f));
-            this.boundingBox.move(this.velocity);
+        }
 
-            int colliderCount = this.colliders.Count;
+        protected void move()
+        {          
+            if (this.velocity.Length() > 0)
+            {
+                this.velocityRay.Origin = this.boundingBox.Center;
+                this.velocityRay.Direction = this.velocity;
+                Vector3 distanceToClosestCollider = new Vector3();
+                TgcBoundingAxisAlignBox closestCollider = this.getClosestColliderInDirection(this.velocityRay, this.colliders, out distanceToClosestCollider);
+                closestCollider.setRenderColor(System.Drawing.Color.Azure);
+                if((Vector3.Normalize(this.velocity) * this.boundingBox.Radius + this.velocity).Length() < distanceToClosestCollider.Length())
+                {
+                    this.boundingBox.Center += this.velocity;
+                    /*this.boundingBox.Center += this.velocity;
+                    int colliderCount = this.colliders.Count;
+                    for (int index = 0; index < colliderCount; index++)
+                    {
+                        if (TgcCollisionUtils.testAABBCylinder(this.colliders[index], this.boundingBox))
+                        {
+                            this.boundingBox.Center -= this.velocity;
+                            return;
+                        }
+                    }*/
+                }           
+            }
+        }
+
+        protected TgcBoundingAxisAlignBox getClosestColliderInDirection(TgcRay ray, List<TgcBoundingAxisAlignBox> colliders, out Vector3 distanceToClosestCollider)
+        {            
+            int colliderCount = colliders.Count;
+            Vector3 meetingPoint     = new Vector3();
+            Vector3 lastMeetingPoint = new Vector3();
+            float closestDistance = 10000000f;
+            TgcBoundingAxisAlignBox closestCollider = new TgcBoundingAxisAlignBox();
             for(int index = 0; index < colliderCount; index++)
             {
-                if (TgcCollisionUtils.testObbAABB(this.boundingBox, this.colliders[index]))
+                this.colliders[index].setRenderColor(System.Drawing.Color.Yellow);
+                if(TgcCollisionUtils.intersectRayAABB(ray, colliders[index], out meetingPoint))
                 {                    
-                    this.playerLookCamera.SetCamera(this.HeadPosition, this.preRotation + this.HeadPosition);
-                    this.boundingBox.setRotation(new Vector3(0f, (float)Math.Atan2(this.preRotation.X, this.preRotation.Z), 0f));
-                    this.boundingBox.move(-this.velocity);
-                    this.rotation = this.preRotation;
+                    float distanceNormalized = Vector3.Subtract(meetingPoint, ray.Origin).Length();
+                    if (distanceNormalized < closestDistance)
+                    {
+                        lastMeetingPoint = new Vector3(meetingPoint.X, meetingPoint.Y, meetingPoint.Z);
+                        closestDistance = distanceNormalized;
+                        closestCollider = colliders[index];
+                    }                    
                 }
-            }
+            }            
+            distanceToClosestCollider = Vector3.Subtract(lastMeetingPoint, ray.Origin);
+            return closestCollider;
         }
 
         protected void calculateVelocities(float elapsedTime)
@@ -174,6 +214,7 @@ namespace TGC.Group.Model.Entities
             {
                 twoDimensionalVelocity.Y = -this.getTimeBasedVelocity(elapsedTime);                
             }
+            
             this.velocity = this.LookAt * twoDimensionalVelocity.X + this.Side * twoDimensionalVelocity.Y;
         }
 
@@ -188,13 +229,16 @@ namespace TGC.Group.Model.Entities
             this.hand.render();
             this.hand.BoundingBox.render();            
             this.boundingBox.render();
+            this.distanceArrow.render();
+
+            this.text.render();
         }
 
         public new void dispose()
         {
             this.hand.dispose();
             this.boundingBox.dispose();
-            
+                
         }
         
     }
