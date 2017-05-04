@@ -1,4 +1,3 @@
-//"Inclusion de librerias"
 using Microsoft.DirectX;
 using Microsoft.DirectX.DirectInput;
 using System.Collections.Generic;
@@ -18,51 +17,15 @@ using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Model
 {
-    /// <summary>
-    ///     Twisted Chano, juego de autos chocadores
-    /// </summary>
+    //Twisted Chano, juego de autos chocadores
     public class GameModel : TgcExample
     {
-        /// <summary>
-        ///     Constructor del juego.
-        /// </summary>
-        /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
-        /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
             Name = Game.Default.Name;
             Description = Game.Default.Description;
         }
-
-        /// <summary>
-        /// Inicializacion de variables y "definicion" de los objetos
-        /// </summary>
-        ///
-
-        //Posicion del piso
-        float piso;
-
-        //Altura del salto
-        private const float ALTURA_SALTO = 75f;
-
-        //Posición Y de las barras de vida
-        private const int POSICION_Y_BARRA_VIDA = 40;
-
-        //Posición X de las barras de vida
-        private const int POSICION_X_BARRA_VIDA = 110;
-
-        //Velocidad de movimiento del auto
-        private float MOVEMENT_SPEED = 0f;
-
-        //Rozamiento del piso
-        private float ROZAMIENTO = 100f;
-
-        //Velocidad Maxima
-        private const float MAX_SPEED = 1200f;
-
-        //Velocidad de rotación del auto
-        private const float ROTATION_SPEED = 120f;
 
         //Cantidad de filas
         private const int ROWS = 30;
@@ -79,12 +42,6 @@ namespace TGC.Group.Model
         //Scene principal
         private TgcScene ScenePpal;
 
-        //Mesh del auto
-        private TgcMesh Mesh { get; set; }
-
-        //BoudingBox Obb del auto.
-        private TgcBoundingOrientedBox ObbMesh;
-
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
 
@@ -94,7 +51,7 @@ namespace TGC.Group.Model
         //Cantidad de autos enemigos
         public int CantidadDeOponentes { get; set; }
 
-        //Cantidad de autos enemigos
+        //Cantidad de tiempo de juego
         public int TiempoDeJuego { get; set; }
 
         //Camara en tercera persona
@@ -102,6 +59,8 @@ namespace TGC.Group.Model
 
         //Tipo de cámara
         private int TipoCamara = 0;
+
+
 
         //Lista de Autos
         private List<TgcMesh> MeshAutos;
@@ -118,111 +77,38 @@ namespace TGC.Group.Model
         private List<TgcMesh> MeshRocas;
         private TgcMesh RocaOriginal;
 
-        //Lista de rocas
+        //Lista de bananas
         private List<TgcMesh> MeshArbolesBananas;
         private TgcMesh ArbolBananasOriginal;
 
-        //Lista de barriles de polvora
-        private List<TgcMesh> MeshBarrilesPolvora;
-        private TgcMesh BarrilPolvoraOriginal;
-
-        //Lista de carretillas
-        private List<TgcMesh> MeshCarretillas;
-        private TgcMesh CarretillaOriginal;
-
-        //Lista de contenedores
-        private List<TgcMesh> MeshContenedores;
-        private TgcMesh ContenedorOriginal;
-
-        //Lista de fuentes de agua
-        //private List<TgcMesh> MeshFuentesAgua;
-        //private TgcMesh FuenteAguaOriginal;
-
-        //Lista de lockers
-        private List<TgcMesh> MeshLockers;
-        private TgcMesh LockerOriginal;
-
-        //Lista de expendedores bebidas
-        private List<TgcMesh> MeshExpendedoresBebidas;
-        private TgcMesh ExpendedorBebidaOriginal;
-
-        //Lista de cajas de municiones
-        private List<TgcMesh> MeshCajasMuniciones;
-        private TgcMesh CajaMunicionesOriginal;
-
         //Lista de objetos del mesh principal
         private List<TgcMesh> MeshPrincipal;
-
-        //Fuente para los jugadores
-        private TgcDrawText letraJugadores;
-
-        //Sprites para las barras de vida
-        private TgcDrawer2D drawerBarras;
-        private TgcSprite spriteBarraJugador1;
-        private TgcSprite spriteBarraJugador1Llena;
-
-        private TgcSprite spriteBarraJugador2;
-        private TgcSprite spriteBarraJugador2Llena;
-
-        private TgcSprite spriteBarraJugador3;
-        private TgcSprite spriteBarraJugador3Llena;
-
-        private TgcSprite spriteBarraJugador4;
-        private TgcSprite spriteBarraJugador4Llena;
-
-        private TgcSprite spriteBarraJugador5;
-        private TgcSprite spriteBarraJugador5Llena;
-
-        //Vida Inicial de cada jugador
-        private float cantVidaJugador1 = 100;
-        private float cantVidaJugador2 = 100;
-        private float cantVidaJugador3 = 100;
-        private float cantVidaJugador4 = 100;
-        private float cantVidaJugador5 = 100;
-
-        //Tiempo de fin de juego
-        private bool inicioReloj = true;
-        private bool finReloj = false;
-        public bool finModelo = false;
-        private DateTime TiempoFin;
-
-        //Ruedas
-        TgcMesh ruedaDerechaDelanteraMesh;
-        TgcMesh ruedaDerechaTraseraMesh;
-        TgcMesh ruedaIzquierdaDelanteraMesh;
-        TgcMesh ruedaIzquierdaTraseraMesh;
-        List<TgcMesh> RuedasJugador1;
-        float rotate = 0;
-        float rotacionVertical = 0;
-        List<float> dx = new List<float> { 23, -23, -23, 23 };
-        List<float> dy = new List<float> { -30, 32, -31, 30 };
-
-
-        private bool falling = false;
-        private bool jumping = false;
-
+        
         //Seteo de camara
         private float oh;
         private float of;
         private Vector3 d;
 
-        /// <summary>
-        ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
-        ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
-        ///     procesamiento que podemos pre calcular para nuestro juego.
-        ///     Borrar el codigo ejemplo no utilizado.
-        /// </summary>
+        //Jugadores
+        private List <Jugador> listaJugadores;
+
+        //Tiempo
+        private HUDTiempo claseTiempo;
+
+        //Variable de fin de modelo
+        public bool finModelo { get; set; }
+
         public override void Init()
         {
-
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
             var loader = new TgcSceneLoader();
-            letraJugadores = new TgcDrawText(d3dDevice, "Rock it", 10, MediaDir);
-            drawerBarras = new TgcDrawer2D(d3dDevice);
+            
+            //Cargo la clase de Tiempo
+            this.claseTiempo = new HUDTiempo(MediaDir, this.TiempoDeJuego);
 
-            //Cargo las barras de vida
-            CargarBarrasDeVida();
+            //Cargo los jugadores y sus autos
+            
 
             //Cargo el terreno
             ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA3-TgcScene.xml");
@@ -248,23 +134,12 @@ namespace TGC.Group.Model
                 MeshPrincipal.Add(unMesh);
             }
 
-            //Cargo el auto
-            var SceneAuto = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto\\Auto-TgcScene.xml");
+            //Cargo los autos
+            this.CrearAutos(loader);
 
-            //Movemos el escenario un poco para arriba para que se pueda mover el auto
-            Mesh = SceneAuto.Meshes[0];
-        
-            Mesh.AutoTransformEnable = true;
-            Mesh.move(0, 0.5f, 0);
-            piso = Mesh.Position.Y;
-
-            Mesh.updateBoundingBox();
-
-            //Cargo el bouding box obb del auto a partir de su AABB
-            ObbMesh = TgcBoundingOrientedBox.computeFromAABB(Mesh.BoundingBox);
 
             //Camara por defecto
-            CamaraInterna = new TgcThirdPersonCamera(Mesh.Position, 120, 280);
+            CamaraInterna = new TgcThirdPersonCamera(this.listaJugadores[0].claseAuto.GetPosition(), 120, 280);
             
             oh = CamaraInterna.OffsetHeight;
             of = CamaraInterna.OffsetForward;
@@ -272,85 +147,10 @@ namespace TGC.Group.Model
             Camara = CamaraInterna;
 
             //Creo los objetos del escenario
-            CrearAutos(loader);
             CrearObjetos(loader);
         }
 
-        private void CargarBarrasDeVida()
-        {
-            //Jugador 1
-            spriteBarraJugador1 = new TgcSprite(drawerBarras);
-            spriteBarraJugador1.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraVacia.png");
-            spriteBarraJugador1.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA);
-            spriteBarraJugador1.Scaling = new Vector2(0.1f, 0.4f);
-
-            spriteBarraJugador1Llena = new TgcSprite(drawerBarras);
-            spriteBarraJugador1Llena.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraLlena.png");
-            spriteBarraJugador1Llena.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA);
-            spriteBarraJugador1Llena.Scaling = new Vector2(0.1f, 0.4f);
-            spriteBarraJugador1Llena.Color = Color.Blue;
-
-            if (CantidadDeOponentes >= 1)
-            {
-                //Jugador 2
-                spriteBarraJugador2 = new TgcSprite(drawerBarras);
-                spriteBarraJugador2.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraVacia.png");
-                spriteBarraJugador2.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 30);
-                spriteBarraJugador2.Scaling = new Vector2(0.1f, 0.4f);
-
-                spriteBarraJugador2Llena = new TgcSprite(drawerBarras);
-                spriteBarraJugador2Llena.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraLlena.png");
-                spriteBarraJugador2Llena.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 30);
-                spriteBarraJugador2Llena.Scaling = new Vector2(0.1f, 0.4f);
-                spriteBarraJugador2Llena.Color = Color.Blue;
-            }
-
-            if (CantidadDeOponentes >= 2)
-            {
-                //Jugador 3
-                spriteBarraJugador3 = new TgcSprite(drawerBarras);
-                spriteBarraJugador3.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraVacia.png");
-                spriteBarraJugador3.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 60);
-                spriteBarraJugador3.Scaling = new Vector2(0.1f, 0.4f);
-
-                spriteBarraJugador3Llena = new TgcSprite(drawerBarras);
-                spriteBarraJugador3Llena.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraLlena.png");
-                spriteBarraJugador3Llena.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 60);
-                spriteBarraJugador3Llena.Scaling = new Vector2(0.1f, 0.4f);
-                spriteBarraJugador3Llena.Color = Color.Blue;
-            }
-
-            if (CantidadDeOponentes >= 3)
-            {
-                //Jugador 4
-                spriteBarraJugador4 = new TgcSprite(drawerBarras);
-                spriteBarraJugador4.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraVacia.png");
-                spriteBarraJugador4.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 90);
-                spriteBarraJugador4.Scaling = new Vector2(0.1f, 0.4f);
-
-                spriteBarraJugador4Llena = new TgcSprite(drawerBarras);
-                spriteBarraJugador4Llena.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraLlena.png");
-                spriteBarraJugador4Llena.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 90);
-                spriteBarraJugador4Llena.Scaling = new Vector2(0.1f, 0.4f);
-                spriteBarraJugador4Llena.Color = Color.Blue;
-            }
-
-            if (CantidadDeOponentes >= 4)
-            {
-                //Jugador 5
-                spriteBarraJugador5 = new TgcSprite(drawerBarras);
-                spriteBarraJugador5.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraVacia.png");
-                spriteBarraJugador5.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 120);
-                spriteBarraJugador5.Scaling = new Vector2(0.1f, 0.4f);
-
-                spriteBarraJugador5Llena = new TgcSprite(drawerBarras);
-                spriteBarraJugador5Llena.Texture = TgcTexture.createTexture(MediaDir + "Textures\\Sprites\\barraLlena.png");
-                spriteBarraJugador5Llena.Position = new Vector2(D3DDevice.Instance.Width - POSICION_X_BARRA_VIDA, POSICION_Y_BARRA_VIDA + 120);
-                spriteBarraJugador5Llena.Scaling = new Vector2(0.1f, 0.4f);
-                spriteBarraJugador5Llena.Color = Color.Blue;
-            }
-
-        }
+        
 
         private void TransformarMeshScenePpal (int index, float escala, float desplazamiento)
         {
@@ -363,7 +163,6 @@ namespace TGC.Group.Model
             unMesh.BoundingBox.transform(unMesh.Transform);
 
             unMesh.AlphaBlendEnable = true;
-            //unMesh.updateBoundingBox();
         }
 
         private void CrearObjetos(TgcSceneLoader loader)
@@ -442,79 +241,41 @@ namespace TGC.Group.Model
             return MatrizPoblacion;
         }
 
-        private void CrearAutos(TgcSceneLoader loader)
+        private void CrearJugadores(TgcSceneLoader loader)
         {
             System.Random randomNumber = new System.Random();
-            var meshEnemigos = new List<TgcMesh>();
 
-            var tanque = loader.loadSceneFromFile(MediaDir + "Vehiculos\\TanqueFuturistaRuedas\\TanqueFuturistaRuedas-TgcScene.xml").Meshes[0].createMeshInstance("tanque");
-            var hummer = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Hummer\\Hummer-TgcScene.xml").Meshes[0].createMeshInstance("hummer");
-            var camioneta = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Camioneta\\Camioneta-TgcScene.xml").Meshes[0].createMeshInstance("camioneta");
-            var patrullero = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Patrullero\\Patrullero-TgcScene.xml").Meshes[0].createMeshInstance("buggy");
+            //Creo la lista de jugadores y sus autos
+            this.listaJugadores = new List<Jugador>();
+            this.listaJugadores.Add(new Jugador(this.NombreJugador1, MediaDir, 0));
+            this.listaJugadores[0].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto\\Auto-TgcScene.xml").Meshes[0]);
 
-            tanque.Transform = tanque.Transform * Matrix.Translation(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (POSICION_VERTICE - CUADRANTE_SIZE * 4)));
-            tanque.BoundingBox.transform(tanque.Transform);
-            meshEnemigos.Add(tanque);
-
-            hummer.Transform = hummer.Transform * Matrix.Translation(new Vector3(POSICION_VERTICE - CUADRANTE_SIZE * 4, 0, POSICION_VERTICE - CUADRANTE_SIZE * 4));
-            hummer.BoundingBox.transform(hummer.Transform);
-            meshEnemigos.Add(hummer);
-
-            camioneta.Transform = camioneta.Transform * Matrix.RotationY(180 * (FastMath.PI / 180));
-            camioneta.Transform = camioneta.Transform * Matrix.Translation(new Vector3((POSICION_VERTICE - CUADRANTE_SIZE * 4), 0,(-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)));
-            camioneta.BoundingBox.transform(camioneta.Transform);
-            meshEnemigos.Add(camioneta);
-
-            patrullero.Transform = patrullero.Transform * Matrix.RotationY(180 * (FastMath.PI / 180));
-            patrullero.Transform = patrullero.Transform * Matrix.Translation(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)));
-            patrullero.BoundingBox.transform(patrullero.Transform);
-            meshEnemigos.Add(patrullero);
-
-            //Cargo las ruedas de los autos
-            TgcScene RuedaDerechaDelJ1 = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto_Rueda_Derecha-TgcScene.xml");
-            TgcScene RuedaDerechaTrasJ1 = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto_Rueda_Derecha-TgcScene.xml");
-            TgcScene RuedaIzquierdaDelJ1 = loader.loadSceneFromFile(MediaDir  + "Vehiculos\\Auto_Rueda_Izquierda-TgcScene.xml");
-            TgcScene RuedaIzquierdaTrasJ1 = loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto_Rueda_Izquierda-TgcScene.xml");
-
-            ruedaDerechaDelanteraMesh = RuedaDerechaDelJ1.Meshes[0];
-            ruedaDerechaTraseraMesh = RuedaDerechaTrasJ1.Meshes[0];
-            ruedaIzquierdaDelanteraMesh = RuedaIzquierdaDelJ1.Meshes[0];
-            ruedaIzquierdaTraseraMesh = RuedaIzquierdaTrasJ1.Meshes[0];            
-            
-            ruedaDerechaDelanteraMesh.AutoTransformEnable = true;
-            ruedaDerechaDelanteraMesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);            
-
-            ruedaDerechaTraseraMesh.AutoTransformEnable = true;
-            ruedaDerechaTraseraMesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
-
-            ruedaIzquierdaDelanteraMesh.AutoTransformEnable = true;
-            ruedaIzquierdaDelanteraMesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
-
-            ruedaIzquierdaTraseraMesh.AutoTransformEnable = true;
-            ruedaIzquierdaTraseraMesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
-
-            RuedasJugador1 = new List<TgcMesh> {ruedaDerechaDelanteraMesh, ruedaDerechaTraseraMesh, ruedaIzquierdaDelanteraMesh, ruedaIzquierdaTraseraMesh};
-
-            //Inicio la lista de autos
-            MeshAutos = new List<TgcMesh>();
-           
-            //Auto principal
-            MeshAutos.Add(Mesh);
-
-            //Autos enemigos
-            for (int i = 0; i< CantidadDeOponentes; i++)
+            if (CantidadDeOponentes >= 1)
             {
-               var autoEnemigo = meshEnemigos[i];
-               MeshAutos.Add(autoEnemigo);
+                listaJugadores.Add(new Jugador("tanque", MediaDir, 1));
+                this.listaJugadores[1].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\TanqueFuturistaRuedas\\TanqueFuturistaRuedas-TgcScene.xml").Meshes[0]);
+                this.listaJugadores[1].claseAuto.SetPositionMesh(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (POSICION_VERTICE - CUADRANTE_SIZE * 4)), false);
             }
 
-            //hago dispose de cada auto que no se va a dibujar
-            foreach (var meshEnemigo in meshEnemigos)
+            if (CantidadDeOponentes >= 2)
             {
-                if (MeshAutos.Contains(meshEnemigo) == false)
-                {
-                    meshEnemigo.dispose();
-                }
+                listaJugadores.Add(new Jugador("hummer", MediaDir, 2));
+                this.listaJugadores[2].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\Hummer\\Hummer-TgcScene.xml").Meshes[0]);
+                this.listaJugadores[1].claseAuto.SetPositionMesh(new Vector3(POSICION_VERTICE - CUADRANTE_SIZE * 4, 0, POSICION_VERTICE - CUADRANTE_SIZE * 4), false);
+            }
+
+            if (CantidadDeOponentes >= 3)
+            {
+                listaJugadores.Add(new Jugador("camioneta", MediaDir, 3));
+                this.listaJugadores[3].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\Camioneta\\Camioneta-TgcScene.xml").Meshes[0]);
+                this.listaJugadores[1].claseAuto.SetPositionMesh(new Vector3((POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)), true);
+            }
+
+            if (CantidadDeOponentes >= 4)
+            {
+                listaJugadores.Add(new Jugador("patrullero", MediaDir, 4));
+                this.listaJugadores[4].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\Patrullero\\Patrullero-TgcScene.xml").Meshes[0]);
+                this.listaJugadores[1].claseAuto.SetPositionMesh(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)), true);
             }
         }
 
@@ -638,11 +399,6 @@ namespace TGC.Group.Model
             return false;
         }
 
-        /// <summary>
-        ///     Se llama en cada frame.
-        ///     Se debe escribir toda la lógica de computo del modelo, así como también verificar entradas del usuario y reacciones
-        ///     ante ellas.
-        /// </summary>
         public override void Update()
         {
             PreUpdate();
@@ -653,24 +409,25 @@ namespace TGC.Group.Model
             //Chequea si se solicitó cambiar el tipo de camara
             CambiarDeCamara();
 
-            //Acciona la vista con el movimiento del mouse
-            MoverCamaraConMouse();
-
             //Maneja el movimiento del auto teniendo en cuenta la posición de los otros objetos
             MoverAutoConColisiones();
 
-            //Salgo
-            if (finReloj && Input.keyDown(Key.X))
+            //Actualizo los jugadores
+            foreach (var unJugador in this.listaJugadores)
+            {
+                unJugador.Update();
+            }
+
+            //Actualizo el tiempo
+            this.claseTiempo.Update();
+
+            //Chequeo el fin del modelo
+            if (this.claseTiempo.GetFinDeJuego() && Input.keyDown(Key.X))
             {
                 this.finModelo = true;
             }
         }
 
-        /// <summary>
-        ///     Se llama cada vez que hay que refrescar la pantalla.
-        ///     Escribir aquí todo el código referido al renderizado.
-        ///     Borrar todo lo que no haga falta.
-        /// </summary>
         public override void Render()
         {
             Vector3 positionc;
@@ -715,8 +472,14 @@ namespace TGC.Group.Model
             //Renderizo los objetos cargados de las listas
             RenderizarObjetos(0);
 
-            //Dibujo las barras de vida de todos los jugadores
-            DibujarBarrasDeVida();
+            //Dibujo los jugadores
+            foreach (var unJugador in this.listaJugadores)
+            {
+                unJugador.Render();
+            }
+
+            //Dibujo el reloj
+            this.claseTiempo.Render();
 
             //Dibujo las ruedas
             DibujarRuedas();
@@ -767,79 +530,6 @@ namespace TGC.Group.Model
                 RuedasJugador1[i].render();
             }
         }
-
-        private void DibujarBarrasDeVida()
-        {
-            //Inicio el tiempo de juego
-            if (inicioReloj)
-            {
-                TiempoFin = DateTime.Now.AddMinutes(this.TiempoDeJuego);
-                inicioReloj = false;
-            }
-
-            //Dibujo el reloj
-            string Tiempo = "";
-
-            Tiempo = (TiempoFin - DateTime.Now).Minutes.ToString().PadLeft (2, '0') + ":" + (TiempoFin - DateTime.Now).Seconds.ToString().PadLeft(2, '0');
-
-            if (((TiempoFin - DateTime.Now).Minutes < 0) || ((TiempoFin - DateTime.Now).Seconds < 0))
-                finReloj = true;
-                
-
-            //Dibujo el nombre del Jugador y de los competidores
-            letraJugadores.drawText(this.NombreJugador1, Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA - 10, Color.DeepSkyBlue);
-            letraJugadores.drawText("jugador 2", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 20, Color.DeepSkyBlue);
-            letraJugadores.drawText("jugador 3", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 50, Color.DeepSkyBlue);
-            letraJugadores.drawText("jugador 4", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 80, Color.DeepSkyBlue);
-            letraJugadores.drawText("jugador 5", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA + 110, Color.DeepSkyBlue);
-
-            //Calculo la vida de cada auto
-            spriteBarraJugador1Llena.Scaling = new Vector2(cantVidaJugador1 * 0.001f, 0.4f);
-            spriteBarraJugador2Llena.Scaling = new Vector2(cantVidaJugador2 * 0.001f, 0.4f);
-            spriteBarraJugador3Llena.Scaling = new Vector2(cantVidaJugador3 * 0.001f, 0.4f);
-            spriteBarraJugador4Llena.Scaling = new Vector2(cantVidaJugador4 * 0.001f, 0.4f);
-            spriteBarraJugador5Llena.Scaling = new Vector2(cantVidaJugador5 * 0.001f, 0.4f);
-
-            //Calculo si ganó alguien o el principal perdió
-            if ( (cantVidaJugador1 <= 0) || (cantVidaJugador2 <= 0 && cantVidaJugador3 <= 0 && cantVidaJugador4 <= 0 && cantVidaJugador5 <= 0))
-                finReloj = true;
-
-            //Iniciar dibujado de todos los Sprites de la escena (en este caso es solo uno)
-            drawerBarras.beginDrawSprite();
-
-            //Dibujo las barras
-            spriteBarraJugador1.render();
-            spriteBarraJugador1Llena.render();
-
-            spriteBarraJugador2.render();
-            spriteBarraJugador2Llena.render();
-
-            spriteBarraJugador3.render();
-            spriteBarraJugador3Llena.render();
-
-            spriteBarraJugador4.render();
-            spriteBarraJugador4Llena.render();
-
-            spriteBarraJugador5.render();
-            spriteBarraJugador5Llena.render();
-
-            //Finalizar el dibujado de Sprites
-            drawerBarras.endDrawSprite();
-            ///////////////////////
-
-            if (finReloj)
-            {
-                letraJugadores.drawText("00:00", Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA + 35, POSICION_Y_BARRA_VIDA - 40, Color.OrangeRed);
-                TgcDrawText letraGanador = new TgcDrawText(D3DDevice.Instance.Device, "Rock it", 36, MediaDir);
-                letraGanador.drawText("FIN DEL JUEGO", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 200, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - 150, Color.Green);
-                letraGanador.drawText("GANÓ ...", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 200, (Convert.ToInt32(D3DDevice.Instance.Height) / 2), Color.Green);
-                letraJugadores.drawText("Presione la letra X para volver al menú inicial...", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 200, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 150, Color.OrangeRed);
-            }
-            else
-            {
-                letraJugadores.drawText(Tiempo, Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA + 35, POSICION_Y_BARRA_VIDA - 40, Color.OrangeRed);
-            }
-}
 
         //0: render
         //1: render bounding box
@@ -901,27 +591,7 @@ namespace TGC.Group.Model
 
             //Renderizar rocas
             AccionarListaMesh(MeshRocas, unaAccion, null);
-            /*
-            //Renderizar barriles de polvora
-            AccionarListaMesh(MeshBarrilesPolvora, unaAccion, null);
 
-            //Renderizar Carretillas
-            AccionarListaMesh(MeshCarretillas, unaAccion, null);
-
-            //Renderizar Contenedores
-            AccionarListaMesh(MeshContenedores, unaAccion, null);
-
-            //Renderizar Fuentes de Agua
-            //RenderListaMesh(MeshPinos, unaAccion, null);
-
-            //Renderizar Lockers
-            AccionarListaMesh(MeshLockers, unaAccion, null);
-
-            //Renderizar Expendedores Bebidas
-            AccionarListaMesh(MeshExpendedoresBebidas, unaAccion, null);
-
-            //Renderizar Cajas Municiones
-            AccionarListaMesh(MeshCajasMuniciones, unaAccion, null);*/
         }
 
         public void ActivarBoundingBox()
@@ -958,26 +628,6 @@ namespace TGC.Group.Model
                         }
                         break;
                 }
-            }
-        }
-
-        public void MoverCamaraConMouse()
-        {
-            //Capturar Input Mouse
-            if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
-            {
-                //Ver....
-                /*
-                //En este caso le sumamos un valor en Y
-                Camara.SetCamera(Camara.Position + new Vector3(0, 10f, 0), Camara.LookAt);
-                //Ver ejemplos de cámara para otras operaciones posibles.
-
-                //Si superamos cierto Y volvemos a la posición original.
-                if (Camara.Position.Y > 300f)
-                {
-                    Camara.SetCamera(new Vector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
-                }
-                */
             }
         }
 
@@ -1082,40 +732,6 @@ namespace TGC.Group.Model
 
                 Mesh.moveOrientedY(moveForward * ElapsedTime);
                 ObbMesh.Center = Mesh.Position;
-
-                //El framework posee la clase TgcCollisionUtils con muchos algoritmos de colisión de distintos tipos de objetos.
-                //Por ejemplo chequear si dos cajas colisionan entre sí, o dos esferas, o esfera con caja, etc.
-                /*
-                var collisionFound = false;
-
-                foreach (var mesh in ScenePpal.Meshes)
-                {
-                    //Los dos BoundingBox que vamos a testear
-                    var mainMeshBoundingBox = Mesh.BoundingBox;
-                    var sceneMeshBoundingBox = mesh.BoundingBox;
-
-                    if (mesh.Name == "Room-1-Roof-0")
-                    {
-                        continue;
-                    }
-
-                    //Ejecutar algoritmo de detección de colisiones
-                    var collisionResult = TgcCollisionUtils.classifyBoxBox(mainMeshBoundingBox, sceneMeshBoundingBox);
-
-                    //Hubo colisión con un objeto. Guardar resultado y abortar loop.
-                    if ((collisionResult != TgcCollisionUtils.BoxBoxResult.Encerrando) && (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera))
-                   {
-                        collisionFound = true;
-                        break;
-                    }
-                }
-
-                ////Si hubo alguna colisión, entonces restaurar la posición original del mesh
-                if (collisionFound)
-                {
-                    Mesh.Position = originalPos;
-                }
-                */
 
                 if (DetectarColisionesObb())
                 {
@@ -1281,13 +897,15 @@ namespace TGC.Group.Model
             var vectorMedio = new Vector3(X, Y, Z);
             return vectorMedio;
         }
-        /// <summary>
-        ///     Se llama cuando termina la ejecución del ejemplo.
-        ///     Hacer Dispose() de todos los objetos creados.
-        ///     Es muy importante liberar los recursos, sobretodo los gráficos ya que quedan bloqueados en el device de video.
-        /// </summary>
+        
         public override void Dispose()
         {
+            //Borro los objetos de los jugadores
+            foreach (var unJugador in this.listaJugadores)
+            {
+                unJugador.Dispose();
+            }
+
             foreach (var mesh in MeshAutos)
             {
                 mesh.dispose();
@@ -1303,15 +921,6 @@ namespace TGC.Group.Model
                 mesh.dispose();
             }
 
-            /*
-            BarrilPolvoraOriginal.dispose();
-            CarretillaOriginal.dispose();
-            ContenedorOriginal.dispose();
-            LockerOriginal.dispose();
-            ExpendedorBebidaOriginal.dispose();
-            CajaMunicionesOriginal.dispose();
-            */
-            //FuenteAguaOriginal.dispose();
             ScenePpal.disposeAll();
         }
     }
