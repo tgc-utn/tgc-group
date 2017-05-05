@@ -72,7 +72,7 @@ namespace TGC.Group.Model.Entities
         }
         
 
-        public TgcBoundingCylinderFixedY BoundingBox
+        public new TgcBoundingCylinderFixedY BoundingBox
         {
             get {return this.boundingBox;}
         }
@@ -120,12 +120,6 @@ namespace TGC.Group.Model.Entities
             this.hand.getBoneByName("Arm").MatFinal.RotateY(FastMath.PI_HALF);
             this.hand.UpdateMeshTransform();
             this.hand.updateAnimation(elapsedTime);
-
-
-            /** DELETE, JUST DEBUG WITH THIS */
-           
-
-            
             
         }
 
@@ -215,7 +209,7 @@ namespace TGC.Group.Model.Entities
                 twoDimensionalVelocity.Y = -this.getTimeBasedVelocity(elapsedTime);                
             }
             
-            this.velocity = this.LookAt * twoDimensionalVelocity.X + this.Side * twoDimensionalVelocity.Y;
+            this.velocity = Vector3.Normalize(this.LookAt) * twoDimensionalVelocity.X + Vector3.Normalize(this.Side) * twoDimensionalVelocity.Y;
         }
 
         protected float getTimeBasedVelocity(float elapsedTime)

@@ -9,6 +9,7 @@ using TGC.Core.Direct3D;
 using TGC.Core.Geometry;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
+using TGC.Core.Utils;
 using TGC.Group.Model.Utils;
 
 namespace TGC.Group.Model.GameWorld
@@ -28,12 +29,12 @@ namespace TGC.Group.Model.GameWorld
 
         private static float[,,] roomPositions = new float[,,]
         {
-            {{0f, 0f,     650f},  {0f, (float)Math.PI * 0.5f, 0f}},
+            {{0f, 0f,     650f},  {0f, FastMath.PI_HALF, 0f}},
             {{650f, 0f,   650f},  {0f, 0f, 0f}},
             {{-650f, 0f,  650f},  {0f, 0f, 0f}},
-            {{0f, 0f,    -650f},  {0f, 0f, 0f}},
+            {{0f, 0f,    -650f},  {0f, FastMath.PI, 0f}},
             {{650f, 0f,  -650f},  {0f, 0f, 0f}},
-            {{-650f, 0f, -650f},  {0f, 0f, 0f}},            
+            {{-650f, 0f, -650f},  {0f, FastMath.PI * 1.5f, 0f}},            
             {{650f,  0f,    0f},  {0f, 0f, 0f}},
             {{-650f, 0f,    0f},  {0f, 0f, 0f}},
         };
@@ -138,7 +139,8 @@ namespace TGC.Group.Model.GameWorld
                 if (this.scene.Meshes[index].Name == "RoomWall01")
                 {
                     TgcMesh sideWall = this.scene.Meshes[index].createMeshInstance("RoomWall02", new Vector3(0f, 0f, 0f), new Vector3(0f, (float)Math.PI / 2, 0f), new Vector3(1f, 1f, 1f));
-                    TgcMesh frontWall = this.scene.Meshes[index].createMeshInstance("RoomWall03", new Vector3(-10f, 0f, 410f), new Vector3(0f, 0f, 0f), new Vector3(1f, 1f, 1f));
+                    TgcMesh frontWall = this.scene.Meshes[index].createMeshInstance("RoomWall03", new Vector3(0f, 0f, 0f), new Vector3(0f, (float)Math.PI, 0f), new Vector3(1f, 1f, 1f));
+                   
 
                     sideWall.UpdateMeshTransform();
                     frontWall.UpdateMeshTransform();
@@ -228,13 +230,13 @@ namespace TGC.Group.Model.GameWorld
                 Vector3 rotations = new Vector3(roomPositions[index,1,0], roomPositions[index,1,1], roomPositions[index,1,2]);
                 Vector3 positions = new Vector3(roomPositions[index,0,0], roomPositions[index,0,1], roomPositions[index,0,2]);
 
-                this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomFloor, roomFloor.Name + index.ToString(), positions, rotations, scale));                
+                this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomFloor,  roomFloor.Name + index.ToString(), positions, rotations, scale));                
                 this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomWall01, roomWall01.Name + index.ToString(), positions, rotations, scale));
                 this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomWall02, roomWall02.Name + index.ToString(), positions, rotations, scale));
                 this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomWall03, roomWall03.Name + index.ToString(), positions, rotations, scale));
                 this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomWall04, roomWall04.Name + index.ToString(), positions, rotations, scale));
                 this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomWall05, roomWall05.Name + index.ToString(), positions, rotations, scale));
-                this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomDoor, roomDoor.Name + index.ToString(), positions, rotations, scale));
+                this.scene.Meshes.Add(TGCUtils.createInstanceFromMesh(ref roomDoor,   roomDoor.Name + index.ToString(), positions, rotations, scale));
             }
             
         }

@@ -11,6 +11,7 @@ using Microsoft.DirectX.Direct3D;
 using System.Windows.Forms;
 using Microsoft.DirectX.DirectInput;
 using TGC.Core.Shaders;
+using TGC.Core.Text;
 
 namespace TGC.Group.Model.GameWorld
 {
@@ -23,7 +24,7 @@ namespace TGC.Group.Model.GameWorld
         protected TgcD3dInput            inputManager;     
         protected bool                   outsideCamera;
         protected TgcCamera              camera;
-        protected EntityMonster monster;
+        protected EntityMonster          monster;
         protected Microsoft.DirectX.Direct3D.Effect currentShader;
 
         public World(string mediaPath, TgcD3dInput inputManager)
@@ -64,10 +65,8 @@ namespace TGC.Group.Model.GameWorld
                 this.worldMap.ShouldShowRoof = !freeCamera;
                 this.worldMap.ShouldShowBoundingVolumes = freeCamera;
             }
-
             
-            // this.enemy.UpdateMeshTransform();
-            // this.enemy.updateAnimation(elapsedTime);
+            
             this.monster.update(elapsedTime);
             this.player.Colliders = this.worldMap.Walls;        
             this.player.update(elapsedTime);
