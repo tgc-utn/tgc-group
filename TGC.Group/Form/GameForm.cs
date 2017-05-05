@@ -77,6 +77,8 @@ namespace TGC.Group.Form
 
         private void GameForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Modelo.finModelo = true;
+
             if (ApplicationRunning)
             {
                 ShutDown();
