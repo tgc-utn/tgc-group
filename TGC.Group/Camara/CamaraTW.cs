@@ -8,6 +8,7 @@ using TGC.Core.Camara;
 using TGC.Core.Collision;
 using TGC.Core.SceneLoader;
 using TGC.Core.Utils;
+using TGC.Group.Model;
 
 namespace TGC.Camara
 {
@@ -31,7 +32,7 @@ namespace TGC.Camara
             return;
         }
 
-        public void AjustarPosicionDeCamara(List<TgcMesh> listaMesh, Vector3 MeshPosition, float RotationAngle)
+        public void AjustarPosicionDeCamara(Vector3 MeshPosition, float RotationAngle)
         {
             Vector3 position, target, q;
             float distSq = 0, minDistSq = 0, newOffsetForward = 0;
@@ -49,7 +50,7 @@ namespace TGC.Camara
             //Detectar colisiones entre el segmento de recta camara-personaje y todos los objetos del escenario
             minDistSq = FastMath.Pow2(this.OffSetForward);
 
-            foreach (TgcMesh unMesh in listaMesh)
+            foreach (TgcMesh unMesh in GameModel.MeshPrincipal)
             {
                 //Hay colision del segmento camara-personaje y el objeto
                 if (TgcCollisionUtils.intersectSegmentAABB(target, position, unMesh.BoundingBox, out q))
@@ -83,9 +84,9 @@ namespace TGC.Camara
             return this.CamaraInterna;
         }
 
-        public void Update(List<TgcMesh> listaMesh, Vector3 MeshPosition, float RotationAngle)
+        public void Update(Vector3 MeshPosition, float RotationAngle)
         {
-            this.AjustarPosicionDeCamara(listaMesh, MeshPosition, RotationAngle);
+            this.AjustarPosicionDeCamara(MeshPosition, RotationAngle);
         }
 
         public void Render()

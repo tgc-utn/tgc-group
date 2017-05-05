@@ -99,7 +99,7 @@ namespace TGC.Group.Model
             this.Mesh.updateBoundingBox();
 
             //Cargo el bouding box obb del auto a partir de su AABB
-            this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(Mesh.BoundingBox);
+            this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
         }
 
         public float GetRotationAngle ()
@@ -114,12 +114,19 @@ namespace TGC.Group.Model
 
         public void SetPositionMesh(Vector3 unVector, bool rotar)
         {
+            this.Mesh.AutoTransformEnable = false;
+
             if (rotar)
             {
                 this.Mesh.Transform = this.Mesh.Transform * Matrix.RotationY(180 * (FastMath.PI / 180));
             }
 
             this.Mesh.Transform = this.Mesh.Transform * Matrix.Translation(unVector);
+            this.Mesh.BoundingBox.transform(this.Mesh.Transform);
+
+            //Cargo el bouding box obb del auto a partir de su AABB
+            this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
+            this.ObbMesh.Center = this.Mesh.BoundingBox.calculateBoxCenter();
         }
 
         public void SetRuedas(TgcSceneLoader loader)
@@ -163,10 +170,10 @@ namespace TGC.Group.Model
                     alfa_rueda += FastMath.PI;
                 }
 
-                posicion_x = FastMath.Sin(alfa_rueda + Mesh.Rotation.Y) * ro;
-                posicion_y = FastMath.Cos(alfa_rueda + Mesh.Rotation.Y) * ro;
+                posicion_x = FastMath.Sin(alfa_rueda + this.Mesh.Rotation.Y) * ro;
+                posicion_y = FastMath.Cos(alfa_rueda + this.Mesh.Rotation.Y) * ro;
 
-                RuedasJugador[i].Position = (new Vector3(posicion_x, 7.5f, posicion_y) + Mesh.Position);
+                this.RuedasJugador[i].Position = (new Vector3(posicion_x, 7.5f, posicion_y) + this.Mesh.Position);
 
                 rotacionRueda = 0;
 
@@ -177,14 +184,9 @@ namespace TGC.Group.Model
 
                 //Si no aprieta para los costados, dejo la rueda derecha
                 if (MoverRuedas)
-                    RuedasJugador[i].Rotation = new Vector3(rotacionVertical, Mesh.Rotation.Y + rotacionRueda, 0f);
+                    this.RuedasJugador[i].Rotation = new Vector3(rotacionVertical, this.Mesh.Rotation.Y + rotacionRueda, 0f);
                 else
-                    RuedasJugador[i].Rotation = new Vector3(rotacionVertical, Mesh.Rotation.Y, 0f);
-            }
-
-            for (int i = 0; i < 4; i++)
-            {
-                RuedasJugador[i].render();
+                    this.RuedasJugador[i].Rotation = new Vector3(rotacionVertical, this.Mesh.Rotation.Y, 0f);
             }
         }
 
@@ -272,10 +274,11 @@ namespace TGC.Group.Model
 
             rotacionVertical -= this.MOVEMENT_SPEED * ElapsedTime / 60;
 
-            Mesh.moveOrientedY(moveForward * ElapsedTime);
-            ObbMesh.Center = Mesh.Position;
+            this.Mesh.moveOrientedY(moveForward * ElapsedTime);
 
-            if (DetectarColisionesObb())
+            this.ObbMesh.Center = this.Mesh.Position;
+
+            if (this.DetectarColisionesObb())
             {
                 this.Mesh.Position = originalPos;
                 this.MOVEMENT_SPEED = (-1) * Math.Sign(this.MOVEMENT_SPEED) * Math.Abs(this.MOVEMENT_SPEED * 0.3f);
@@ -283,20 +286,51 @@ namespace TGC.Group.Model
             }
         }
 
+        private bool ColisionesObb(List<TgcMesh> ListaMesh)
+        {
+            //Me fijo si colisiona con algo
+            if (ListaMesh != null)
+            {
+                foreach (var unMesh in ListaMesh)
+                {
+                    if ((unMesh != this.Mesh) && (unMesh.Name != "Room-1-Roof-0") && (unMesh.Name != "Room-1-Floor-0") &&
+                        (unMesh.Name != "Pasto") && (unMesh.Name != "Plane_5") &&
+                        unMesh != this.Mesh) //siempre que el mesh sea distinto al auto sino colisionara con el mismo
+                    {
+                        //me fijo si hubo alguna colision vuelvo
+                        if (TgcCollisionUtils.testObbAABB(this.ObbMesh, unMesh.BoundingBox))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            //No colisiono nada
+            return false;
+        }
+
         private bool DetectarColisionesObb()
         {
-            List<bool> booleanosColision = new List<bool>();
+            if (this.ColisionesObb(GameModel.MeshPrincipal))
+                return true;
 
-            /*
-            foreach (var unMesh in allMesh)
-            {
-                if ((unMesh != this.Mesh) && (unMesh.Name != "Room-1-Roof-0") && (unMesh.Name != "Room-1-Floor-0") &&
-                    (unMesh.Name != "Pasto") && (unMesh.Name != "Plane_5")) //siempre que el mesh sea distinto al auto sino colisionara con el mismo
-                    booleanosColision.Add(TgcCollisionUtils.testObbAABB(ObbMesh, unMesh.BoundingBox)); //me fijo si hubo alguna colision este booleano lo meto en una lista
-            }
-            */
+            if (this.ColisionesObb(GameModel.MeshPinos))
+                return true;
 
-            return booleanosColision.Find(valor => valor.Equals(true)); // me fijo si alguno de la lista dio true
+            if (this.ColisionesObb(GameModel.MeshRocas))
+                return true;
+
+            if (this.ColisionesObb(GameModel.MeshPalmeras))
+                return true;
+
+            if (this.ColisionesObb(GameModel.MeshArbolesBananas))
+                return true;
+
+            if (this.ColisionesObb(GameModel.MeshAutos))
+                return true;
+
+            return false;
         }
 
         private float Acelerar(float aceleracion, float ElapsedTime)
@@ -326,8 +360,8 @@ namespace TGC.Group.Model
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
         {
-            this.CalcularPosicionRuedas(MoverRuedas);
             this.MoverAutoConColisiones(Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
+            this.CalcularPosicionRuedas(MoverRuedas);
         }
 
         public void Render()
@@ -336,13 +370,13 @@ namespace TGC.Group.Model
 
             for (int i = 0; i < 4; i++)
             {
-                RuedasJugador[i].render();
+                this.RuedasJugador[i].render();
             }
         }
 
         public void Dispose()
         {
-            foreach (var unaRueda in RuedasJugador)
+            foreach (var unaRueda in this.RuedasJugador)
             {
                 unaRueda.dispose();
             }

@@ -58,7 +58,7 @@ namespace TGC.Group.Model
         private int TipoCamara = 0;
 
         //Lista de Autos
-        private List<TgcMesh> MeshAutos;
+        public static List<TgcMesh> MeshAutos;
 
         //Lista de palmeras
         public static List<TgcMesh> MeshPalmeras;
@@ -97,9 +97,6 @@ namespace TGC.Group.Model
             //Cargo la clase de Tiempo
             this.claseTiempo = new HUDTiempo(MediaDir, this.TiempoDeJuego);
 
-            //Cargo los jugadores y sus autos
-            this.CrearJugadores(loader);
-
             //Cargo el terreno
             ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA3-TgcScene.xml");
 
@@ -116,10 +113,13 @@ namespace TGC.Group.Model
             foreach (TgcMesh unMesh in ScenePpal.Meshes)
             {
                 GameModel.MeshPrincipal.Add(unMesh);
-            }            
+            }
+
+            //Cargo los jugadores y sus autos
+            this.CrearJugadores(loader);
 
             //Creo los objetos del escenario
-            CrearObjetos(loader);
+            this.CrearObjetos(loader);
         }
 
         private void TransformarMeshScenePpal (int index, float escala, float desplazamiento)
@@ -181,13 +181,14 @@ namespace TGC.Group.Model
             System.Random randomNumber = new System.Random();
 
             //Creo la lista de jugadores y sus autos
-            this.MeshAutos = new List<TgcMesh>();
+            GameModel.MeshAutos = new List<TgcMesh>();
             this.listaJugadores = new List<Jugador>();
             this.listaJugadores.Add(new Jugador(this.NombreJugador1, MediaDir, 0));
             this.listaJugadores[0].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto\\Auto-TgcScene.xml").Meshes[0]);
             this.listaJugadores[0].claseAuto.SetRuedas(loader);
             this.listaJugadores[0].CreateCamera();
-            this.MeshAutos.Add(this.listaJugadores[0].claseAuto.GetMesh());
+
+            GameModel.MeshAutos.Add(this.listaJugadores[0].claseAuto.GetMesh());
             Camara = this.listaJugadores[0].claseCamara.GetCamera();
 
             if (CantidadDeOponentes >= 1)
@@ -197,7 +198,7 @@ namespace TGC.Group.Model
                 this.listaJugadores[1].claseAuto.SetPositionMesh(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (POSICION_VERTICE - CUADRANTE_SIZE * 4)), false);
                 this.listaJugadores[1].claseAuto.SetRuedas(loader);
                 this.listaJugadores[1].CreateCamera();
-                this.MeshAutos.Add(this.listaJugadores[1].claseAuto.GetMesh());
+                GameModel.MeshAutos.Add(this.listaJugadores[1].claseAuto.GetMesh());
             }
 
             if (CantidadDeOponentes >= 2)
@@ -207,7 +208,7 @@ namespace TGC.Group.Model
                 this.listaJugadores[2].claseAuto.SetPositionMesh(new Vector3(POSICION_VERTICE - CUADRANTE_SIZE * 4, 0, POSICION_VERTICE - CUADRANTE_SIZE * 4), false);
                 this.listaJugadores[2].claseAuto.SetRuedas(loader);
                 this.listaJugadores[2].CreateCamera();
-                this.MeshAutos.Add(this.listaJugadores[2].claseAuto.GetMesh());
+                GameModel.MeshAutos.Add(this.listaJugadores[2].claseAuto.GetMesh());
             }
 
             if (CantidadDeOponentes >= 3)
@@ -217,7 +218,7 @@ namespace TGC.Group.Model
                 this.listaJugadores[3].claseAuto.SetPositionMesh(new Vector3((POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)), true);
                 this.listaJugadores[3].claseAuto.SetRuedas(loader);
                 this.listaJugadores[3].CreateCamera();
-                this.MeshAutos.Add(this.listaJugadores[3].claseAuto.GetMesh());
+                GameModel.MeshAutos.Add(this.listaJugadores[3].claseAuto.GetMesh());
             }
 
             if (CantidadDeOponentes >= 4)
@@ -227,7 +228,7 @@ namespace TGC.Group.Model
                 this.listaJugadores[4].claseAuto.SetPositionMesh(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)), true);
                 this.listaJugadores[4].claseAuto.SetRuedas(loader);
                 this.listaJugadores[4].CreateCamera();
-                this.MeshAutos.Add(this.listaJugadores[4].claseAuto.GetMesh());
+                GameModel.MeshAutos.Add(this.listaJugadores[4].claseAuto.GetMesh());
             }
         }
 
@@ -324,7 +325,39 @@ namespace TGC.Group.Model
 
         public override void Update()
         {
+            bool MoverRuedas = false, Avanzar = false, Frenar = false, Izquierda = false, Derecha = false, Saltar = false;
+
             PreUpdate();
+
+            //Valido las teclas que se presionaron
+            if ((Input.keyDown(Key.Up) || Input.keyDown(Key.W)))
+            {
+                Avanzar = true;
+            }
+
+            if (Input.keyDown(Key.Left) || Input.keyDown(Key.A))
+            {
+                Izquierda = true;
+                MoverRuedas = true;
+            }
+            else
+            {
+                if (Input.keyDown(Key.Right) || Input.keyDown(Key.D))
+                {
+                    Derecha = true;
+                    MoverRuedas = true;
+                }
+            }
+
+            if ((Input.keyDown(Key.Down) || Input.keyDown(Key.S)))
+            {
+                Frenar = true;
+            }
+
+            if (Input.keyPressed(Key.Space))
+            {
+                Saltar = true;
+            }
 
             //Activo bounding box para debug
             ActivarBoundingBox();
@@ -335,7 +368,16 @@ namespace TGC.Group.Model
             //Actualizo los jugadores
             foreach (var unJugador in this.listaJugadores)
             {
-                //unJugador.Update();
+                if (unJugador.GetNroJugador() == 0)
+                {
+                    unJugador.Update(MoverRuedas, Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
+                }
+                else
+                {
+                    //IA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111
+                    //unJugador.Update(ElapsedTime);
+                    unJugador.Update(false, false, false, false, false, false, ElapsedTime);
+                }
             }
 
             //Actualizo el tiempo

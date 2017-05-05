@@ -52,11 +52,16 @@ namespace TGC.Group.Model
             return this.claseHUD.GetVidaJugador();
         }
 
-        public void Update(bool MoverRuedas, List <TgcMesh> listaMesh, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
+        public int GetNroJugador()
+        {
+            return this.NroJugador;
+        }
+
+        public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
         {
             this.claseHUD.Update();
             this.claseAuto.Update(MoverRuedas, Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
-            this.claseCamara.Update(listaMesh, this.claseAuto.GetPosition(), this.claseAuto.GetRotationAngle());
+            this.claseCamara.Update(this.claseAuto.GetPosition(), this.claseAuto.GetRotationAngle());
         }
 
         public void Render()
