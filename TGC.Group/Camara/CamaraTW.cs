@@ -50,7 +50,7 @@ namespace TGC.Camara
             //Detectar colisiones entre el segmento de recta camara-personaje y todos los objetos del escenario
             minDistSq = FastMath.Pow2(this.OffSetForward);
 
-            foreach (TgcMesh unMesh in GameModel.MeshPrincipal)
+            foreach (TgcMesh unMesh in GameModel.ScenePpal.Meshes)
             {
                 //Hay colision del segmento camara-personaje y el objeto
                 if (TgcCollisionUtils.intersectSegmentAABB(target, position, unMesh.BoundingBox, out q))

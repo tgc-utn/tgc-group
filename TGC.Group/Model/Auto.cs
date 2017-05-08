@@ -26,13 +26,13 @@ namespace TGC.Group.Model
         private const float MAX_SPEED = 1200f;
 
         //Velocidad de rotación del auto
-        private const float ROTATION_SPEED = 120f;
+        private const float ROTATION_SPEED = 0.3f;
 
         //Mesh del auto
         private TgcMesh Mesh { get; set; }
 
         //BoudingBox Obb del auto.
-        private TgcBoundingOrientedBox ObbMesh;
+        public TgcBoundingOrientedBox ObbMesh;
 
         //Ruedas
         TgcMesh ruedaDerechaDelanteraMesh;
@@ -62,10 +62,14 @@ namespace TGC.Group.Model
         //MediaDir
         private string MediaDir;
 
+        //Colisiono
+        public bool colisiono { get; set; }
+
         public Auto(string MediaDir, int NroJugador)
         {
             this.NroJugador = NroJugador;
             this.MediaDir = MediaDir;
+            this.colisiono = false;
         }
 
         public void RenderObb()
@@ -239,7 +243,7 @@ namespace TGC.Group.Model
 
             if (rotating)
             {
-                this.rotAngle = (this.MOVEMENT_SPEED * 0.2f * Math.Sign(rotate) * ElapsedTime) * (FastMath.PI / 180);
+                this.rotAngle = (this.MOVEMENT_SPEED * 0.2f * Math.Sign(rotate) * ElapsedTime) * (FastMath.PI / 180) * Math.Abs(ROTATION_SPEED);
                 this.Mesh.rotateY(rotAngle);
                 this.ObbMesh.rotate(new Vector3(0, rotAngle, 0));
             }
@@ -283,14 +287,16 @@ namespace TGC.Group.Model
 
             this.Mesh.moveOrientedY(moveForward * ElapsedTime);
 
-            this.ObbMesh.Center = this.Mesh.Position;
-
             if (this.DetectarColisionesObb())
             {
                 this.Mesh.Position = originalPos;
-                this.MOVEMENT_SPEED = (-1) * Math.Sign(this.MOVEMENT_SPEED) * Math.Abs(this.MOVEMENT_SPEED * 0.3f);
-                this.Mesh.moveOrientedY((-1) * moveForward * ElapsedTime);
+                this.MOVEMENT_SPEED = (-1) * Math.Sign(this.MOVEMENT_SPEED) * Math.Abs(this.MOVEMENT_SPEED * 0.2f);
+                this.Mesh.moveOrientedY((-3.5f) * moveForward * ElapsedTime);
+
+                this.colisiono = false;
             }
+
+            this.ObbMesh.Center = this.Mesh.Position;
         }
 
         private bool ColisionesObb(List<TgcMesh> ListaMesh)
@@ -339,8 +345,8 @@ namespace TGC.Group.Model
         }        
 
         private bool DetectarColisionesObb()
-        {
-            if (this.ColisionesObb(GameModel.MeshPrincipal))
+        {/*
+            if (this.ColisionesObb(GameModel.ScenePpal.Meshes))
                 return true;
 
             if (this.ColisionesObb(GameModel.MeshPinos))
@@ -354,9 +360,9 @@ namespace TGC.Group.Model
 
             if (this.ColisionesObb(GameModel.MeshArbolesBananas))
                 return true;
-
-            if (this.ColisionesObbObb(GameModel.ListaMeshAutos))
-                return true;
+        */
+            if (this.colisiono || this.ColisionesObbObb(GameModel.ListaMeshAutos))
+               return true;
 
             return false;
         }
