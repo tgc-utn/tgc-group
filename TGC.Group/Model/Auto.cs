@@ -11,7 +11,7 @@ using TGC.Core.Utils;
 
 namespace TGC.Group.Model
 {
-    class Auto
+    public class Auto
     {
         //Altura del salto
         private const float ALTURA_SALTO = 75f;
@@ -97,8 +97,6 @@ namespace TGC.Group.Model
             this.Mesh.AutoTransformEnable = true;
             this.Mesh.move(0, 0.5f, 0);
             this.Mesh.updateBoundingBox();
-
-            //Cargo el bouding box obb del auto a partir de su AABB
             this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
         }
 
@@ -115,6 +113,7 @@ namespace TGC.Group.Model
         public void SetPositionMesh(Vector3 unVector, bool rotar)
         {
             this.Mesh.AutoTransformEnable = false;
+            this.Mesh.AutoUpdateBoundingBox = true;
 
             if (rotar)
             {
@@ -126,7 +125,15 @@ namespace TGC.Group.Model
 
             //Cargo el bouding box obb del auto a partir de su AABB
             this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
-            this.ObbMesh.Center = this.Mesh.BoundingBox.calculateBoxCenter();
+            this.Mesh.Position = unVector;
+            
+            /*this.Mesh.AutoTransformEnable = true;
+            this.Mesh.move(unVector);
+            this.Mesh.UpdateMeshTransform();
+            this.Mesh.updateBoundingBox();
+            this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
+            this.ObbMesh.updateValues();*/
+
         }
 
         public void SetRuedas(TgcSceneLoader loader)
@@ -267,7 +274,7 @@ namespace TGC.Group.Model
             }
 
             //Guardar posicion original antes de cambiarla
-            var originalPos = Mesh.Position;
+            var originalPos = this.Mesh.Position;
 
             //Multiplicar movimiento por velocidad y elapsedTime
             movement *= this.MOVEMENT_SPEED * ElapsedTime;
@@ -293,9 +300,8 @@ namespace TGC.Group.Model
             {
                 foreach (var unMesh in ListaMesh)
                 {
-                    if ((unMesh != this.Mesh) && (unMesh.Name != "Room-1-Roof-0") && (unMesh.Name != "Room-1-Floor-0") &&
-                        (unMesh.Name != "Pasto") && (unMesh.Name != "Plane_5") &&
-                        unMesh != this.Mesh) //siempre que el mesh sea distinto al auto sino colisionara con el mismo
+                    if ((unMesh.Name != "Room-1-Roof-0") && (unMesh.Name != "Room-1-Floor-0") &&
+                        (unMesh.Name != "Pasto") && (unMesh.Name != "Plane_5"))
                     {
                         //me fijo si hubo alguna colision vuelvo
                         if (TgcCollisionUtils.testObbAABB(this.ObbMesh, unMesh.BoundingBox))
@@ -309,6 +315,28 @@ namespace TGC.Group.Model
             //No colisiono nada
             return false;
         }
+
+        private bool ColisionesObbObb(List<Auto> ListaMesh)
+        {
+            //Me fijo si colisiona con algo
+            if (ListaMesh != null)
+            {
+                foreach (var unMesh in ListaMesh)
+                {
+                    if (unMesh.GetMesh() != this.Mesh)
+                    {
+                        //me fijo si hubo alguna colision vuelvo
+                        if (TgcCollisionUtils.testObbObb(this.ObbMesh.toStruct(), unMesh.ObbMesh.toStruct()))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            //No colisiono nada
+            return false;
+        }        
 
         private bool DetectarColisionesObb()
         {
@@ -327,7 +355,7 @@ namespace TGC.Group.Model
             if (this.ColisionesObb(GameModel.MeshArbolesBananas))
                 return true;
 
-            if (this.ColisionesObb(GameModel.MeshAutos))
+            if (this.ColisionesObbObb(GameModel.ListaMeshAutos))
                 return true;
 
             return false;
@@ -360,13 +388,15 @@ namespace TGC.Group.Model
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
         {
-            this.MoverAutoConColisiones(Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
-            this.CalcularPosicionRuedas(MoverRuedas);
+
+                this.MoverAutoConColisiones(Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
+                this.CalcularPosicionRuedas(MoverRuedas);
+            
         }
 
         public void Render()
         {
-            Mesh.render();
+            this.Mesh.render();
 
             for (int i = 0; i < 4; i++)
             {

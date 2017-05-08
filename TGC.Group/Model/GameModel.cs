@@ -43,7 +43,7 @@ namespace TGC.Group.Model
         private bool BoundingBox { get; set; }
 
         //Nombre del jugador 1 que se dibujara en pantalla
-        public string NombreJugador1 { get;  set; }
+        public string NombreJugador1 { get; set; }
 
         //Scene principal
         private TgcScene ScenePpal;
@@ -59,6 +59,7 @@ namespace TGC.Group.Model
 
         //Lista de Autos
         public static List<TgcMesh> MeshAutos;
+        public static List<Auto> ListaMeshAutos;
 
         //Lista de palmeras
         public static List<TgcMesh> MeshPalmeras;
@@ -182,6 +183,7 @@ namespace TGC.Group.Model
 
             //Creo la lista de jugadores y sus autos
             GameModel.MeshAutos = new List<TgcMesh>();
+            GameModel.ListaMeshAutos = new List<Auto>();
             this.listaJugadores = new List<Jugador>();
             this.listaJugadores.Add(new Jugador(this.NombreJugador1, MediaDir, 0));
             this.listaJugadores[0].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto\\Auto-TgcScene.xml").Meshes[0]);
@@ -189,6 +191,7 @@ namespace TGC.Group.Model
             this.listaJugadores[0].CreateCamera();
 
             GameModel.MeshAutos.Add(this.listaJugadores[0].claseAuto.GetMesh());
+            GameModel.ListaMeshAutos.Add(this.listaJugadores[0].claseAuto);
             Camara = this.listaJugadores[0].claseCamara.GetCamera();
 
             if (CantidadDeOponentes >= 1)
@@ -199,6 +202,7 @@ namespace TGC.Group.Model
                 this.listaJugadores[1].claseAuto.SetRuedas(loader);
                 this.listaJugadores[1].CreateCamera();
                 GameModel.MeshAutos.Add(this.listaJugadores[1].claseAuto.GetMesh());
+                GameModel.ListaMeshAutos.Add(this.listaJugadores[1].claseAuto);
             }
 
             if (CantidadDeOponentes >= 2)
@@ -209,6 +213,7 @@ namespace TGC.Group.Model
                 this.listaJugadores[2].claseAuto.SetRuedas(loader);
                 this.listaJugadores[2].CreateCamera();
                 GameModel.MeshAutos.Add(this.listaJugadores[2].claseAuto.GetMesh());
+                GameModel.ListaMeshAutos.Add(this.listaJugadores[2].claseAuto);
             }
 
             if (CantidadDeOponentes >= 3)
@@ -219,6 +224,7 @@ namespace TGC.Group.Model
                 this.listaJugadores[3].claseAuto.SetRuedas(loader);
                 this.listaJugadores[3].CreateCamera();
                 GameModel.MeshAutos.Add(this.listaJugadores[3].claseAuto.GetMesh());
+                GameModel.ListaMeshAutos.Add(this.listaJugadores[3].claseAuto);
             }
 
             if (CantidadDeOponentes >= 4)
@@ -229,6 +235,7 @@ namespace TGC.Group.Model
                 this.listaJugadores[4].claseAuto.SetRuedas(loader);
                 this.listaJugadores[4].CreateCamera();
                 GameModel.MeshAutos.Add(this.listaJugadores[4].claseAuto.GetMesh());
+                GameModel.ListaMeshAutos.Add(this.listaJugadores[4].claseAuto);
             }
         }
 
