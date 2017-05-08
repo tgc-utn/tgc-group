@@ -46,7 +46,7 @@ namespace TGC.Group.Model
         public string NombreJugador1 { get; set; }
 
         //Scene principal
-        private TgcScene ScenePpal;
+        public static TgcScene ScenePpal;
 
         //Cantidad de autos enemigos
         public int CantidadDeOponentes { get; set; }
@@ -77,9 +77,6 @@ namespace TGC.Group.Model
         public static List<TgcMesh> MeshArbolesBananas;
         private TgcMesh ArbolBananasOriginal;
 
-        //Lista de objetos del mesh principal
-        public static List<TgcMesh> MeshPrincipal;
-
         //Jugadores
         private List <Jugador> listaJugadores;
 
@@ -88,6 +85,9 @@ namespace TGC.Group.Model
 
         //Variable de fin de modelo
         public bool finModelo { get; set; }
+
+        //Quadtree
+        private Quadtree quadtree;
 
         public override void Init()
         {
@@ -108,19 +108,23 @@ namespace TGC.Group.Model
             TransformarMeshScenePpal(4, 3, POSICION_VERTICE);
             TransformarMeshScenePpal(5, 3, POSICION_VERTICE);
 
-            //Cargo los objetos del mesh en una lista para después poder validar las colisiones
-            GameModel.MeshPrincipal = new List<TgcMesh>();
-
-            foreach (TgcMesh unMesh in ScenePpal.Meshes)
-            {
-                GameModel.MeshPrincipal.Add(unMesh);
-            }
-
             //Cargo los jugadores y sus autos
             this.CrearJugadores(loader);
 
             //Creo los objetos del escenario
             this.CrearObjetos(loader);
+
+            //Crear Quadtree
+            List<TgcMesh> listaMeshesQ = new List<TgcMesh>();
+            listaMeshesQ.AddRange(MeshPalmeras);
+            listaMeshesQ.AddRange(MeshPinos);
+            listaMeshesQ.AddRange(MeshRocas);
+            listaMeshesQ.AddRange(MeshArbolesBananas);
+            listaMeshesQ.AddRange(GameModel.ScenePpal.Meshes);
+
+            quadtree = new Quadtree();
+            quadtree.create(listaMeshesQ, ScenePpal.BoundingBox);
+            //quadtree.createDebugQuadtreeMeshes();
         }
 
         private void TransformarMeshScenePpal (int index, float escala, float desplazamiento)
@@ -133,7 +137,7 @@ namespace TGC.Group.Model
                                                                 * Matrix.Translation(new Vector3((-1) * desplazamiento, 0, (-1) * desplazamiento));
             unMesh.BoundingBox.transform(unMesh.Transform);
 
-            unMesh.AlphaBlendEnable = true;
+            //unMesh.AlphaBlendEnable = true;
         }
 
         private void CrearObjetos(TgcSceneLoader loader)
@@ -143,17 +147,17 @@ namespace TGC.Group.Model
             //Creo palmeras
             MatrizPoblacion = RandomMatrix();
             PalmeraOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Palmera\\Palmera-TgcScene.xml").Meshes[0];
-            GameModel.MeshPalmeras = CrearInstancias(PalmeraOriginal, 0.75f, 0.25f, 2, MatrizPoblacion);
+            GameModel.MeshPalmeras = CrearInstancias(PalmeraOriginal, 0.75f, 0.25f, 1, MatrizPoblacion);
 
             //Creo pinos
             MatrizPoblacion = RandomMatrix();
             PinoOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Pino\\Pino-TgcScene.xml").Meshes[0];
-            GameModel.MeshPinos = CrearInstancias(PinoOriginal, 0.90f, -0.05f, 2, MatrizPoblacion);
+            GameModel.MeshPinos = CrearInstancias(PinoOriginal, 0.90f, -0.05f, 1, MatrizPoblacion);
 
             //Creo rocas
             MatrizPoblacion = RandomMatrix();
             RocaOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Roca\\Roca-TgcScene.xml").Meshes[0];
-            GameModel.MeshRocas = CrearInstancias(RocaOriginal, 0.75f, 0.30f, 2, MatrizPoblacion);
+            GameModel.MeshRocas = CrearInstancias(RocaOriginal, 0.75f, 0.30f, 1, MatrizPoblacion);
 
             //Creo arboles bananas
             MatrizPoblacion = RandomMatrix();
@@ -297,10 +301,10 @@ namespace TGC.Group.Model
                             if ((unObjeto.Name == "Palmera") || (unObjeto.Name == "Pino") || (unObjeto.Name == "ArbolBananas"))
                             {
                                 instance.BoundingBox.transform(unaBoundingBoxMatrix);
-                            }
-
-                            //Le activo el alpha para que se vea mejor
-                            instance.AlphaBlendEnable = true;
+                                
+                                //Le activo el alpha para que se vea mejor
+                                instance.AlphaBlendEnable = true;
+                            }                            
 
                             //Lo agrego a la lista para después renderizarlo
                             ListaMesh.Add(instance);
@@ -321,7 +325,7 @@ namespace TGC.Group.Model
                 AccionarListaMesh(MeshRocas, 2, unaInstancia) ||
                 AccionarListaMesh(MeshArbolesBananas, 2, unaInstancia) ||
                 AccionarListaMesh(MeshAutos, 2, unaInstancia) ||
-                AccionarListaMesh(MeshPrincipal, 2, unaInstancia)
+                AccionarListaMesh(GameModel.ScenePpal.Meshes, 2, unaInstancia)
                 )
             {
                 return true;
@@ -377,7 +381,7 @@ namespace TGC.Group.Model
             {
                 if (unJugador.GetNroJugador() == 0)
                 {
-                    unJugador.Update(MoverRuedas, Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
+                    unJugador.Update(MoverRuedas, Avanzar, Frenar, Izquierda, Derecha, Saltar, (ElapsedTime + 0.01f));
                 }
                 else
                 {
@@ -406,11 +410,7 @@ namespace TGC.Group.Model
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.Red);
             DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.Red);
 
-            //Dibujamos la escena
-            ScenePpal.renderAll();
-
-            //Renderizo los objetos cargados de las listas
-            //Render de BoundingBox, muy útil para debug de colisiones.
+            //Renderizo los objetos/bounding box cargados de las listas
             if (BoundingBox)
             {
                 RenderizarObjetos(1);
@@ -420,10 +420,9 @@ namespace TGC.Group.Model
                     unJugador.claseAuto.RenderObb();
                 }
             }
-            else
-            {
-                RenderizarObjetos(0);
-            }
+
+            //Renderizo todos los objetos
+            quadtree.render(Frustum, false);
 
             //Dibujo los jugadores
             foreach (var unJugador in this.listaJugadores)
@@ -459,7 +458,6 @@ namespace TGC.Group.Model
 
                         case 1:
                             {
-                                mesh.render();
                                 mesh.BoundingBox.render();
                             }
                             break;
@@ -476,12 +474,6 @@ namespace TGC.Group.Model
                                 }
                             }
                             break;
-                        case 3:
-                            {
-                                mesh.BoundingBox.render();
-                            }
-                            break;
-
                     }
                 }
             }
@@ -492,7 +484,7 @@ namespace TGC.Group.Model
         private void RenderizarObjetos(int unaAccion)
         {
             //Renderizar objetos del escenario
-            AccionarListaMesh(MeshPrincipal, unaAccion, null);
+            AccionarListaMesh(GameModel.ScenePpal.Meshes, unaAccion, null);
 
             //Renderizar palmeras
             AccionarListaMesh(MeshPalmeras, unaAccion, null);
