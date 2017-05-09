@@ -99,7 +99,7 @@ namespace TGC.Group.Model
             this.claseTiempo = new HUDTiempo(MediaDir, this.TiempoDeJuego);
 
             //Cargo el terreno
-            ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA3-TgcScene.xml");
+            ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA-TgcScene.xml");
 
             TransformarMeshScenePpal(0, 3, POSICION_VERTICE);
             TransformarMeshScenePpal(1, 3, POSICION_VERTICE);
@@ -200,8 +200,8 @@ namespace TGC.Group.Model
 
             if (CantidadDeOponentes >= 1)
             {
-                listaJugadores.Add(new Jugador("tanque", MediaDir, 1));
-                this.listaJugadores[1].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\TanqueFuturistaRuedas\\TanqueFuturistaRuedas-TgcScene.xml").Meshes[0]);
+                listaJugadores.Add(new Jugador("Gris", MediaDir, 1));
+                this.listaJugadores[1].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\AutoGris\\Auto-TgcScene.xml").Meshes[0]);
                 this.listaJugadores[1].claseAuto.SetPositionMesh(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (POSICION_VERTICE - CUADRANTE_SIZE * 4)), false);
                 this.listaJugadores[1].claseAuto.SetRuedas(loader);
                 this.listaJugadores[1].CreateCamera();
