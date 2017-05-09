@@ -60,9 +60,11 @@ namespace TGC.UtilsGroup
         {
             var pMax = sceneBounds.PMax;
             var pMin = sceneBounds.PMin;
+            int contador = 0;
+
             findVisibleMeshes(frustum, quadtreeRootNode,
                 pMin.X, pMin.Y, pMin.Z,
-                pMax.X, pMax.Y, pMax.Z);
+                pMax.X, pMax.Y, pMax.Z, contador);
 
             //Renderizar
             foreach (var mesh in modelos)
@@ -71,7 +73,7 @@ namespace TGC.UtilsGroup
                 {
                     mesh.render();
                     mesh.Enabled = false;
-
+                    /*
                     foreach (var unAuto in GameModel.ListaMeshAutos)
                     {
                         if ((mesh.Name != "Room-1-Roof-0") && (mesh.Name != "Room-1-Floor-0") &&
@@ -84,6 +86,7 @@ namespace TGC.UtilsGroup
                             }
                         }
                     }
+                    */
                 }
             }
 
@@ -101,14 +104,16 @@ namespace TGC.UtilsGroup
         /// </summary>
         private void findVisibleMeshes(TgcFrustum frustum, QuadtreeNode node,
             float boxLowerX, float boxLowerY, float boxLowerZ,
-            float boxUpperX, float boxUpperY, float boxUpperZ)
+            float boxUpperX, float boxUpperY, float boxUpperZ,
+            int contador)
         {
             var children = node.children;
 
             //es hoja, cargar todos los meshes
             if (children == null)
             {
-                selectLeafMeshes(node);
+                selectLeafMeshes(node, contador);
+                contador++;
             }
 
             //recursividad sobre hijos
@@ -119,19 +124,19 @@ namespace TGC.UtilsGroup
 
                 //00
                 testChildVisibility(frustum, children[0], boxLowerX + midX, boxLowerY, boxLowerZ + midZ, boxUpperX,
-                    boxUpperY, boxUpperZ);
+                    boxUpperY, boxUpperZ, contador);
 
                 //01
                 testChildVisibility(frustum, children[1], boxLowerX + midX, boxLowerY, boxLowerZ, boxUpperX, boxUpperY,
-                    boxUpperZ - midZ);
+                    boxUpperZ - midZ, contador);
 
                 //10
                 testChildVisibility(frustum, children[2], boxLowerX, boxLowerY, boxLowerZ + midZ, boxUpperX - midX,
-                    boxUpperY, boxUpperZ);
+                    boxUpperY, boxUpperZ, contador);
 
                 //11
                 testChildVisibility(frustum, children[3], boxLowerX, boxLowerY, boxLowerZ, boxUpperX - midX, boxUpperY,
-                    boxUpperZ - midZ);
+                    boxUpperZ - midZ, contador);
             }
         }
 
@@ -139,7 +144,7 @@ namespace TGC.UtilsGroup
         ///     Hacer visible las meshes de un nodo si es visible por el Frustum
         /// </summary>
         private void testChildVisibility(TgcFrustum frustum, QuadtreeNode childNode,
-            float boxLowerX, float boxLowerY, float boxLowerZ, float boxUpperX, float boxUpperY, float boxUpperZ)
+            float boxLowerX, float boxLowerY, float boxLowerZ, float boxUpperX, float boxUpperY, float boxUpperZ, int contador)
         {
             //test frustum-box intersection
             var caja = new TgcBoundingAxisAlignBox(
@@ -150,34 +155,34 @@ namespace TGC.UtilsGroup
             //complementamente adentro: cargar todos los hijos directamente, sin testeos
             if (c == TgcCollisionUtils.FrustumResult.INSIDE)
             {
-                addAllLeafMeshes(childNode);
+                addAllLeafMeshes(childNode, contador);
             }
 
             //parte adentro: seguir haciendo testeos con hijos
             else if (c == TgcCollisionUtils.FrustumResult.INTERSECT)
             {
-                findVisibleMeshes(frustum, childNode, boxLowerX, boxLowerY, boxLowerZ, boxUpperX, boxUpperY, boxUpperZ);
+                findVisibleMeshes(frustum, childNode, boxLowerX, boxLowerY, boxLowerZ, boxUpperX, boxUpperY, boxUpperZ, contador);
             }
         }
 
         /// <summary>
         ///     Hacer visibles todas las meshes de un nodo, buscando recursivamente sus hojas
         /// </summary>
-        private void addAllLeafMeshes(QuadtreeNode node)
+        private void addAllLeafMeshes(QuadtreeNode node, int contador)
         {
             var children = node.children;
 
             //es hoja, cargar todos los meshes
             if (children == null)
             {
-                selectLeafMeshes(node);
+                selectLeafMeshes(node, contador);
             }
             //pedir hojas a hijos
             else
             {
                 for (var i = 0; i < children.Length; i++)
                 {
-                    addAllLeafMeshes(children[i]);
+                    addAllLeafMeshes(children[i], contador);
                 }
             }
         }
@@ -185,12 +190,29 @@ namespace TGC.UtilsGroup
         /// <summary>
         ///     Hacer visibles todas las meshes de un nodo
         /// </summary>
-        private void selectLeafMeshes(QuadtreeNode node)
+        private void selectLeafMeshes(QuadtreeNode node, int contador)
         {
             var models = node.models;
+
             foreach (var m in models)
             {
                 m.Enabled = true;
+
+                if (contador == 0)
+                {
+                    foreach (var unAuto in GameModel.ListaMeshAutos)
+                    {
+                        if ((m.Name != "Room-1-Roof-0") && (m.Name != "Room-1-Floor-0") &&
+                        (m.Name != "Pasto") && (m.Name != "Plane_5"))
+                        {
+                            //me fijo si hubo alguna colision
+                            if (TgcCollisionUtils.testObbAABB(unAuto.ObbMesh, m.BoundingBox))
+                            {
+                                unAuto.colisiono = true;
+                            }
+                        }
+                    }
+                }
             }
         }
     }
