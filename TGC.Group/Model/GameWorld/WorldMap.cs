@@ -69,7 +69,6 @@ namespace TGC.Group.Model.GameWorld
             {{-1080f, 120f, 330f}, {-0.5f, 1f, 0f}},
             {{-1080f, 120f, -330f}, {-0.5f, 1f, 0f}},
             {{1080f,  120f, -330f},  {-0.5f, 0f, 0f}},
-
             {{330,   120f, 1080f},  {-0.5f, -0.5f, 0f}},
             {{-330f, 120f, 1080f}, {-0.5f, -0.5f, 0f}},
             {{330f,  120f, -1080f}, {-0.5f, 0.5f, 0f}},
@@ -100,6 +99,8 @@ namespace TGC.Group.Model.GameWorld
         };
 
 
+        private List<TgcBoundingAxisAlignBox> collidables;
+
 
 
         private bool alphaBlendEnable;
@@ -113,15 +114,15 @@ namespace TGC.Group.Model.GameWorld
             this.walls                     = new List<TgcMesh>();
             this.doors                     = new List<TgcMesh>();
             this.elements                  = new List<TgcMesh>();
+           
 
             this.createRoomWallInstances();
             this.createRoomInstances();
             this.rotateAndScaleScenario();
-            this.createEnemyIA();
-            
+            this.createEnemyIA();            
             this.createRoofFromScene(mediaPath);
 
-            this.createElementInstances(loader, mediaPath + "/Sillon-TgcScene.xml",       sofaInstances,      "Sofa",     1.5f);
+            this.createElementInstances(loader, mediaPath + "/Sillon-TgcScene.xml",       sofaInstances,      "Sillon",     1.5f);
             this.createElementInstances(loader, mediaPath + "/Mesa-TgcScene.xml",         tableInstances,     "Table",    3.75f);
             this.createElementInstances(loader, mediaPath + "/Placard-TgcScene.xml",      wardrobeInstances,  "Wardrobe", 3.5f);
             this.createElementInstances(loader, mediaPath + "/LockerMetal-TgcScene.xml",  lockerInstances,    "Locker",   3.5f);
@@ -129,6 +130,9 @@ namespace TGC.Group.Model.GameWorld
             this.createElementInstances(loader, mediaPath + "/Battery-TgcScene.xml",      batteryInstances,   "Battery",  1f);
             this.createElementInstances(loader, mediaPath + "/Bottle-TgcScene.xml",       oilBottleInstances, "Bottle",   1f);
             this.createElementInstances(loader, mediaPath + "/SingleCandle-TgcScene.xml", candleInstances,    "Candles",  1f);
+
+            this.createCollidables();
+
         }
 
         protected void createRoomWallInstances()
@@ -253,6 +257,23 @@ namespace TGC.Group.Model.GameWorld
             );
         }
 
+        protected void createCollidables()
+        {
+            this.collidables = new List<TgcBoundingAxisAlignBox>();
+            collidables.AddRange(this.scene.Meshes.FindAll(contains("Wall")).Select(collider));
+            //collidables.AddRange(this.scene.Meshes.FindAll(contains("Door")).Select(collider));
+            collidables.AddRange(this.elements.FindAll(contains("Sillon")).Select(collider));
+            collidables.AddRange(this.elements.FindAll(contains("Table")).Select(collider));
+            collidables.AddRange(this.elements.FindAll(contains("Wardrobe")).Select(collider));
+            collidables.AddRange(this.elements.FindAll(contains("Locker")).Select(collider));
+            
+        }
+
+        static TgcBoundingAxisAlignBox collider(TgcMesh mesh)
+        {
+            return mesh.BoundingBox;
+        }
+
         static Predicate<TgcMesh> byName(string name)
         {
             return delegate (TgcMesh mesh)
@@ -260,6 +281,15 @@ namespace TGC.Group.Model.GameWorld
                 return mesh.Name == name;
             };
         }
+
+        static Predicate<TgcMesh> contains(string name)
+        {
+            return delegate(TgcMesh mesh)
+            {
+                return mesh.Name.Contains(name);
+            };
+        }
+
 
         public bool ShouldShowRoof
         {
@@ -316,24 +346,6 @@ namespace TGC.Group.Model.GameWorld
             }
         }
 
-        public void dispose()
-        {
-            this.scene.disposeAll();
-
-            int elementCount = this.elements.Count;
-            for(int index = 0; index < elementCount; index++)
-            {
-                this.elements.ElementAt(index).dispose();
-            }
-        }
-
-
-        public void render()
-        {
-            this.scene.renderAll(this.shouldShowBoundingVolumes);
-            this.renderRoof();
-            this.renderElements();
-        }
 
         protected void renderElements()
         {
@@ -356,9 +368,9 @@ namespace TGC.Group.Model.GameWorld
             }
         }
 
-        public List<TgcBoundingAxisAlignBox> Walls
+        public List<TgcBoundingAxisAlignBox> Collidables
         {
-            get{ return this.walls.Select(mesh => mesh.BoundingBox).ToList();}
+            get { return this.collidables; }
         }
 
         public List<TgcMesh> Doors
@@ -444,5 +456,23 @@ namespace TGC.Group.Model.GameWorld
 
         }
 
+        public void dispose()
+        {
+            this.scene.disposeAll();
+
+            int elementCount = this.elements.Count;
+            for (int index = 0; index < elementCount; index++)
+            {
+                this.elements.ElementAt(index).dispose();
+            }
+        }
+
+
+        public void render()
+        {
+            this.scene.renderAll(this.shouldShowBoundingVolumes);
+            this.renderRoof();
+            this.renderElements();
+        }
     }
 }

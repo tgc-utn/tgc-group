@@ -21,7 +21,7 @@ namespace TGC.Group.Model.Entities
     public class EntityPlayer : EntityUpdatable
     {
         private new TgcBoundingCylinderFixedY boundingBox;
-        private static float                  velocityNormal = 400f;
+        private static float                  velocityNormal = 300f;
         private new Vector3                   rotation;
         private Vector3                       velocity;
         private TgcD3dInput                   inputManager;
@@ -31,25 +31,18 @@ namespace TGC.Group.Model.Entities
         private float                         nodRotation;
         private TgcRay                        velocityRay;
         private List<TgcBoundingAxisAlignBox> colliders;
-        private TgcArrow                      arrow;
-        private TgcArrow                      distanceArrow;        
         protected TgcSkeletalMesh             hand;
-        protected TgcText2D text;
 
             
 
         public EntityPlayer(TgcD3dInput inputManager, TgcSkeletalLoader loader, string mediaPath)
         {
-            this.text = new TgcText2D();
-            this.text.Color = System.Drawing.Color.Red;
-            this.text.Position = new System.Drawing.Point(500, 500);
             
             this.inputManager                 = inputManager;
             this.boundingBox                  = new TgcBoundingCylinderFixedY(new Vector3(0f, 100f, 0f), 28f, 100f);
             this.rotation                     = new Vector3(0f, 0f, 0f);
             this.playerLookCamera             = new TgcCamera();
             this.velocityRay                  = new TgcRay(this.boundingBox.Center, this.LookAt);
-            this.arrow                        = new TgcArrow();            
             
             this.hand                         = loader.loadMeshAndAnimationsFromFile(mediaPath + "/Hand-TgcSkeletalMesh.xml", new string[] { mediaPath + "/HandAnimation-TgcSkeletalAnim.xml", mediaPath + "/HandzAnimation-TgcSkeletalAnim.xml" });
             this.hand.playAnimation("Animation2");
@@ -57,18 +50,6 @@ namespace TGC.Group.Model.Entities
             this.hand.rotateX(-(float)Math.PI / 2);
             this.hand.Scale                   = new Vector3(1 / 6f, 1 / 6f, 1 / 6f);
             
-            
-            this.arrow.Thickness = 1;
-            
-            this.arrow.HeadSize = new Vector2(5, 6);
-            this.arrow.HeadColor = System.Drawing.Color.Blue;
-            this.arrow.BodyColor = System.Drawing.Color.Red;
-
-            this.distanceArrow = new TgcArrow();
-            this.distanceArrow.Thickness = 1;
-            this.distanceArrow.HeadSize = new Vector2(7, 7);
-            this.distanceArrow.HeadColor = System.Drawing.Color.Green;
-            this.distanceArrow.BodyColor = System.Drawing.Color.LightGreen;
         }
         
 
@@ -80,6 +61,11 @@ namespace TGC.Group.Model.Entities
         public Vector3 HeadPosition
         {
             get { return Vector3.Add(this.boundingBox.Center, new Vector3(0f, 85f, 0f)); }
+        }
+
+        public Vector3 FeetPosition
+        {
+            get { return Vector3.Subtract(this.boundingBox.Center, new Vector3(0f, this.boundingBox.HalfHeight.Y / 2, 0f)); }
         }
 
         protected Vector3 HandPosition
@@ -137,10 +123,10 @@ namespace TGC.Group.Model.Entities
         }
 
         protected void move()
-        {          
+        {   
             if (this.velocity.Length() > 0)
             {
-                this.velocityRay.Origin = this.boundingBox.Center;
+                this.velocityRay.Origin = this.FeetPosition;
                 this.velocityRay.Direction = this.velocity;
                 Vector3 distanceToClosestCollider = new Vector3();
                 TgcBoundingAxisAlignBox closestCollider = this.getClosestColliderInDirection(this.velocityRay, this.colliders, out distanceToClosestCollider);
@@ -219,20 +205,12 @@ namespace TGC.Group.Model.Entities
 
         public override void render()
         {
-            this.arrow.render();
             this.hand.render();
-            this.hand.BoundingBox.render();            
-            this.boundingBox.render();
-            this.distanceArrow.render();
-
-            this.text.render();
         }
 
         public new void dispose()
         {
-            this.hand.dispose();
-            this.boundingBox.dispose();
-                
+            this.hand.dispose();                
         }
         
     }

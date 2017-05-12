@@ -68,7 +68,7 @@ namespace TGC.Group.Model.GameWorld
             
             
             this.monster.update(elapsedTime);
-            this.player.Colliders = this.worldMap.Walls;        
+            this.player.Colliders = this.worldMap.Collidables;        
             this.player.update(elapsedTime);
 
         }

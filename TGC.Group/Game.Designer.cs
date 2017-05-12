@@ -37,30 +37,6 @@ namespace TGC.Group {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0FPS")]
-        public string Name {
-            get {
-                return ((string)(this["Name"]));
-            }
-            set {
-                this["Name"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Survival Horror - 0FPS")]
-        public string Description {
-            get {
-                return ((string)(this["Description"]));
-            }
-            set {
-                this["Description"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\Shaders\\")]
         public string ShadersDirectory {
             get {
@@ -73,7 +49,7 @@ namespace TGC.Group {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Media/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\Media\\")]
         public string MediaDirectory {
             get {
                 return ((string)(this["MediaDirectory"]));
@@ -116,6 +92,30 @@ namespace TGC.Group {
             }
             set {
                 this["TexturaCaja"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Grupo 99")]
+        public string Name {
+            get {
+                return ((string)(this["Name"]));
+            }
+            set {
+                this["Name"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Mi idea - Descripción de la idea")]
+        public string Description {
+            get {
+                return ((string)(this["Description"]));
+            }
+            set {
+                this["Description"] = value;
             }
         }
     }
