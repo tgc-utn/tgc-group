@@ -57,6 +57,12 @@ namespace TGC.Group.Model
             return this.NroJugador;
         }
 
+        public void ActualizarNombreJugador(string NombreJugador)
+        {
+            this.NombreJugador = NombreJugador;
+            this.claseHUD.ActualizarNombreJugador(NombreJugador);
+        }
+
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
         {
             this.claseHUD.Update();

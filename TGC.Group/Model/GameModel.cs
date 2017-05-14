@@ -27,6 +27,17 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
+        //Variables de presentación de juego
+        private const float VELOCIDAD_CAMARA_PRESENTACION = 3;
+        private float camaraPosH = 0;
+        private float camaraPosV = 0;
+        private float camaraDireccion = 1;
+        private float camaraActivaH = 1;
+        private float camaraActivaV = 1;
+        private CamaraTW CamaraInit;
+        private bool ModoPresentacion = true;
+        private HUDMenu claseMenu;
+
         //Cantidad de filas
         private const int ROWS = 30;
 
@@ -43,16 +54,16 @@ namespace TGC.Group.Model
         private bool BoundingBox { get; set; }
 
         //Nombre del jugador 1 que se dibujara en pantalla
-        public string NombreJugador1 { get; set; }
+        public string NombreJugador1 = "humano";
 
         //Scene principal
         public static TgcScene ScenePpal;
 
         //Cantidad de autos enemigos
-        public int CantidadDeOponentes { get; set; }
+        public int CantidadDeOponentes = 4;
 
         //Cantidad de tiempo de juego
-        public int TiempoDeJuego { get; set; }
+        public int TiempoDeJuego = 5;
 
         //Tipo de cámara
         private int TipoCamara = 0;
@@ -125,6 +136,13 @@ namespace TGC.Group.Model
             quadtree = new Quadtree();
             quadtree.create(listaMeshesQ, ScenePpal.BoundingBox);
             //quadtree.createDebugQuadtreeMeshes();
+
+            //Inicio camara de presentacion
+            CamaraInit = new CamaraTW (this.listaJugadores[0].claseAuto.GetPosition());
+            Camara = CamaraInit.GetCamera();
+
+            //Inicio clase de menu
+            this.claseMenu = new HUDMenu(MediaDir);
         }
 
         private void TransformarMeshScenePpal (int index, float escala, float desplazamiento)
@@ -196,11 +214,10 @@ namespace TGC.Group.Model
 
             GameModel.MeshAutos.Add(this.listaJugadores[0].claseAuto.GetMesh());
             GameModel.ListaMeshAutos.Add(this.listaJugadores[0].claseAuto);
-            Camara = this.listaJugadores[0].claseCamara.GetCamera();
 
             if (CantidadDeOponentes >= 1)
             {
-                listaJugadores.Add(new Jugador("Gris", MediaDir, 1));
+                listaJugadores.Add(new Jugador("gris", MediaDir, 1));
                 this.listaJugadores[1].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\AutoGris\\Auto-TgcScene.xml").Meshes[0]);
                 this.listaJugadores[1].claseAuto.SetPositionMesh(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (POSICION_VERTICE - CUADRANTE_SIZE * 4)), false);
                 this.listaJugadores[1].claseAuto.SetRuedas(loader);
@@ -211,8 +228,8 @@ namespace TGC.Group.Model
 
             if (CantidadDeOponentes >= 2)
             {
-                listaJugadores.Add(new Jugador("hummer", MediaDir, 2));
-                this.listaJugadores[2].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\Hummer\\Hummer-TgcScene.xml").Meshes[0]);
+                listaJugadores.Add(new Jugador("verde", MediaDir, 2));
+                this.listaJugadores[2].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\AutoVerde\\Auto-TgcScene.xml").Meshes[0]);
                 this.listaJugadores[2].claseAuto.SetPositionMesh(new Vector3(POSICION_VERTICE - CUADRANTE_SIZE * 4, 0, POSICION_VERTICE - CUADRANTE_SIZE * 4), false);
                 this.listaJugadores[2].claseAuto.SetRuedas(loader);
                 this.listaJugadores[2].CreateCamera();
@@ -222,8 +239,8 @@ namespace TGC.Group.Model
 
             if (CantidadDeOponentes >= 3)
             {
-                listaJugadores.Add(new Jugador("camioneta", MediaDir, 3));
-                this.listaJugadores[3].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\Camioneta\\Camioneta-TgcScene.xml").Meshes[0]);
+                listaJugadores.Add(new Jugador("rojo", MediaDir, 3));
+                this.listaJugadores[3].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\AutoRojo\\Auto-TgcScene.xml").Meshes[0]);
                 this.listaJugadores[3].claseAuto.SetPositionMesh(new Vector3((POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)), true);
                 this.listaJugadores[3].claseAuto.SetRuedas(loader);
                 this.listaJugadores[3].CreateCamera();
@@ -233,8 +250,8 @@ namespace TGC.Group.Model
 
             if (CantidadDeOponentes >= 4)
             {
-                listaJugadores.Add(new Jugador("patrullero", MediaDir, 4));
-                this.listaJugadores[4].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\Patrullero\\Patrullero-TgcScene.xml").Meshes[0]);
+                listaJugadores.Add(new Jugador("marrón", MediaDir, 4));
+                this.listaJugadores[4].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\AutoMarron\\Auto-TgcScene.xml").Meshes[0]);
                 this.listaJugadores[4].claseAuto.SetPositionMesh(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)), true);
                 this.listaJugadores[4].claseAuto.SetRuedas(loader);
                 this.listaJugadores[4].CreateCamera();
@@ -340,64 +357,103 @@ namespace TGC.Group.Model
 
             PreUpdate();
 
-            //Valido las teclas que se presionaron
-            if ((Input.keyDown(Key.Up) || Input.keyDown(Key.W)))
+            if (this.ModoPresentacion)
             {
-                Avanzar = true;
-            }
+                if (Input.keyPressed(Key.Up))
+                {
+                    this.claseMenu.SetPosicionMenu(-1);
+                }
 
-            if (Input.keyDown(Key.Left) || Input.keyDown(Key.A))
-            {
-                Izquierda = true;
-                MoverRuedas = true;
+                if (Input.keyPressed(Key.Down))
+                {
+                    this.claseMenu.SetPosicionMenu(1);
+                }
+
+                if (Input.keyPressed(Key.NumPadEnter) || Input.keyPressed(Key.Return))
+                {
+                    if (this.claseMenu.GetEstadoMenu() == "E")
+                    {
+                        this.ModoPresentacion = false;
+                        this.listaJugadores[0].ActualizarNombreJugador(this.claseMenu.GetNombreJugador());
+                        this.NombreJugador1 = this.claseMenu.GetNombreJugador();
+                        Camara = this.listaJugadores[0].claseCamara.GetCamera();
+                    }
+
+                    if (this.claseMenu.GetEstadoMenu() == "S")
+                    {
+                        this.finModelo = true;
+                    }
+
+                    if (this.claseMenu.GetEstadoMenu() == "I")
+                    {
+                        this.claseMenu.SetNroMenu(2);
+                    }
+                }
+
+                this.claseMenu.EscribirTeclasEnPantalla (Input);
             }
             else
             {
-                if (Input.keyDown(Key.Right) || Input.keyDown(Key.D))
+                //Valido las teclas que se presionaron
+                if ((Input.keyDown(Key.Up) || Input.keyDown(Key.W)))
                 {
-                    Derecha = true;
-                    MoverRuedas = true;
+                    Avanzar = true;
                 }
-            }
 
-            if ((Input.keyDown(Key.Down) || Input.keyDown(Key.S)))
-            {
-                Frenar = true;
-            }
-
-            if (Input.keyPressed(Key.Space))
-            {
-                Saltar = true;
-            }
-
-            //Activo bounding box para debug
-            ActivarBoundingBox();
-
-            //Chequea si se solicitó cambiar el tipo de camara
-            CambiarDeCamara();
-
-            //Actualizo los jugadores
-            foreach (var unJugador in this.listaJugadores)
-            {
-                if (unJugador.GetNroJugador() == 0)
+                if (Input.keyDown(Key.Left) || Input.keyDown(Key.A))
                 {
-                    unJugador.Update(MoverRuedas, Avanzar, Frenar, Izquierda, Derecha, Saltar, (ElapsedTime + 0.01f));
+                    Izquierda = true;
+                    MoverRuedas = true;
                 }
                 else
                 {
-                    //IA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111
-                    //unJugador.Update(ElapsedTime);
-                    unJugador.Update(false, false, false, false, false, false, ElapsedTime);
+                    if (Input.keyDown(Key.Right) || Input.keyDown(Key.D))
+                    {
+                        Derecha = true;
+                        MoverRuedas = true;
+                    }
                 }
-            }
 
-            //Actualizo el tiempo
-            this.claseTiempo.Update();
+                if ((Input.keyDown(Key.Down) || Input.keyDown(Key.S)))
+                {
+                    Frenar = true;
+                }
 
-            //Chequeo el fin del modelo
-            if (this.claseTiempo.GetFinDeJuego() && Input.keyDown(Key.X))
-            {
-                this.finModelo = true;
+                if (Input.keyPressed(Key.Space))
+                {
+                    Saltar = true;
+                }
+
+                //Activo bounding box para debug
+                ActivarBoundingBox();
+
+                //Chequea si se solicitó cambiar el tipo de camara
+                CambiarDeCamara();
+
+                //Actualizo los jugadores
+                foreach (var unJugador in this.listaJugadores)
+                {
+                    if (unJugador.GetNroJugador() == 0)
+                    {
+                        unJugador.Update(MoverRuedas, Avanzar, Frenar, Izquierda, Derecha, Saltar, (ElapsedTime + 0.01f));
+                    }
+                    else
+                    {
+                        //IA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111
+                        //unJugador.Update(ElapsedTime);
+                        unJugador.Update(false, false, false, false, false, false, ElapsedTime);
+                    }
+                }
+                
+                //Actualizo el tiempo
+                this.claseTiempo.Update();
+
+                //Chequeo el fin del modelo
+                if (this.claseTiempo.GetFinDeJuego() && Input.keyDown(Key.X))
+                {
+                    this.ModoPresentacion = true;
+                    this.finModelo = true;
+                }
             }
         }
 
@@ -430,11 +486,43 @@ namespace TGC.Group.Model
                 unJugador.Render();
             }
 
-            //Dibujo el reloj
-            this.claseTiempo.Render();
+            //Dibujo el reloj o solo muevo la camara para la presentación del juego
+            if (!this.ModoPresentacion)
+                this.claseTiempo.Render();
+            else
+            {
+                this.ActualizarCamaraPresentacionJuego();
+                this.claseMenu.Render();
+            }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
+        }
+        
+        private void ActualizarCamaraPresentacionJuego()
+        {
+            this.camaraPosH += VELOCIDAD_CAMARA_PRESENTACION * camaraDireccion * camaraActivaH;
+            this.camaraPosV += VELOCIDAD_CAMARA_PRESENTACION * camaraDireccion * camaraActivaV;
+
+            if ((Math.Abs(camaraPosV) > (POSICION_VERTICE - 2500)) || (Math.Abs(camaraPosH) > (POSICION_VERTICE - 2500)))
+            {
+                this.camaraDireccion *= -1;
+                
+                this.camaraActivaV = 0;
+
+                if (camaraPosH > 0)
+                {
+                    this.camaraPosH -= 5;
+                    this.camaraPosV -= 5;
+                }
+                else
+                {
+                    this.camaraPosH += 5;
+                    this.camaraPosV += 5;
+                }
+            }
+
+            this.CamaraInit.AjustarPosicionDeCamara(new Vector3(camaraPosH, 1200, camaraPosV), 0);
         }
 
         //0: render

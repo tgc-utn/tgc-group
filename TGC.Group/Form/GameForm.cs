@@ -31,21 +31,6 @@ namespace TGC.Group.Form
         private GameModel Modelo { get; set; }
 
         /// <summary>
-        ///   El nombre del jugador1 que se le pasar el modelo para mostrar en pantalla
-        /// </summary>
-        public string NombreJugador1 { get; set; }
-
-        /// <summary>
-        ///  El tiempo de juego de la partida
-        /// </summary>
-        public int TiempoDeJuego { get;  set; }
-
-        /// <summary>
-        /// Cantidad de autos que se van a generar en el mapa
-        /// </summary>
-        public int CantidadOponentes { get; set; }
-
-        /// <summary>
         ///     Obtener o parar el estado del RenderLoop.
         /// </summary>
         private bool ApplicationRunning { get; set; }
@@ -113,10 +98,6 @@ namespace TGC.Group.Form
             //Juego a ejecutar, si quisiéramos tener diferentes modelos aquí podemos cambiar la instancia e invocar a otra clase.
             Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory,
                 currentDirectory + Game.Default.ShadersDirectory);
-
-            Modelo.NombreJugador1 = this.NombreJugador1;
-            Modelo.CantidadDeOponentes = this.CantidadOponentes;
-            Modelo.TiempoDeJuego = this.TiempoDeJuego;
 
             //Cargar juego.
             ExecuteModel();

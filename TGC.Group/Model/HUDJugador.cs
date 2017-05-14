@@ -59,6 +59,11 @@ namespace TGC.Group.Model
             return;
         }
 
+        public void ActualizarNombreJugador(string NombreJugador)
+        {
+            this.NombreJugador = NombreJugador;
+        }
+
         private void CargarBarraDeVida()
         {
             spriteBarraJugador = new TgcSprite(drawerBarras);
