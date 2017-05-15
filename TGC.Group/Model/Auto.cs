@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Collision;
+using TGC.Core.Geometry;
 using TGC.Core.SceneLoader;
 using TGC.Core.Utils;
 
@@ -33,6 +34,11 @@ namespace TGC.Group.Model
 
         //BoudingBox Obb del auto.
         public TgcBoundingOrientedBox ObbMesh;
+
+        //Obbs del auto
+        private TgcBoundingOrientedBox ObbArriba;
+        private TgcBoundingOrientedBox ObbMedio;
+        private TgcBoundingOrientedBox ObbAbajo;
 
         //Ruedas
         TgcMesh ruedaDerechaDelanteraMesh;
@@ -76,6 +82,9 @@ namespace TGC.Group.Model
         public void RenderObb()
         {
             this.ObbMesh.render();
+            this.ObbArriba.render();
+            this.ObbMedio.render();
+            this.ObbAbajo.render();
         }
 
         public TgcMesh GetMesh()
@@ -103,6 +112,12 @@ namespace TGC.Group.Model
             this.Mesh.move(0, 0.5f, 0);
             this.Mesh.updateBoundingBox();
             this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
+            this.ObbArriba = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 40)).BoundingBox);
+            this.ObbArriba.setRenderColor(System.Drawing.Color.IndianRed);
+            this.ObbMedio = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 40)).BoundingBox);
+            this.ObbMedio.setRenderColor(System.Drawing.Color.Green);
+            this.ObbAbajo = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 40)).BoundingBox);
+            this.ObbAbajo.setRenderColor(System.Drawing.Color.Blue);
         }
 
         public float GetRotationAngle ()
@@ -200,6 +215,26 @@ namespace TGC.Group.Model
                 else
                     this.RuedasJugador[i].Rotation = new Vector3(rotacionVertical, this.Mesh.Rotation.Y, 0f);
             }
+        }
+
+        public void CalcularPosObb() //funcion medio rara que calcula posicion de los 3 obb meidante cordenadas polares
+        {
+            float distanciaObb = 40;
+            float alfaObbArriba = FastMath.PI;
+            float alfaObbAbajo = 0;
+
+            float posicion_xArriba = FastMath.Sin(alfaObbArriba + this.Mesh.Rotation.Y) * distanciaObb;
+            float posicion_yArriba = FastMath.Cos(alfaObbArriba + this.Mesh.Rotation.Y) * distanciaObb;
+
+            float posicion_xAbajo = FastMath.Sin(alfaObbAbajo + this.Mesh.Rotation.Y) * distanciaObb;
+            float posicion_yAbajo = FastMath.Cos(alfaObbAbajo + this.Mesh.Rotation.Y) * distanciaObb;
+         
+            this.ObbArriba.Center = (new Vector3(posicion_xArriba, 0, posicion_yArriba) + this.Mesh.Position);
+            this.ObbArriba.rotate((new Vector3(0, rotAngle, 0)));
+            this.ObbMedio.Center = (this.Mesh.Position);
+            this.ObbMedio.rotate((new Vector3(0, rotAngle, 0)));
+            this.ObbAbajo.Center = (new Vector3(posicion_xAbajo, 0, posicion_yAbajo) + this.Mesh.Position);
+            this.ObbAbajo.rotate((new Vector3(0, rotAngle, 0)));
         }
 
         public void MoverAutoConColisiones(bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
@@ -395,10 +430,9 @@ namespace TGC.Group.Model
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
         {
-
-                this.MoverAutoConColisiones(Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
-                this.CalcularPosicionRuedas(MoverRuedas);
-            
+            this.MoverAutoConColisiones(Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
+            this.CalcularPosicionRuedas(MoverRuedas);
+            this.CalcularPosObb();     
         }
 
         public void Render()
