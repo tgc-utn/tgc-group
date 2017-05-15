@@ -17,6 +17,10 @@ namespace TGC.Group.Model
         private TgcDrawText letraTitulo;
         private int NroMenu = 1;
         private int PosicionMenu = 1;
+        private int DistanciaSeparacionMenu = 75;
+        private int DistanciaSeparacionTitulo_V = 335;
+        private int DistanciaSeparacionTitulo_H = 0;
+        private int DistanciaSeparacionNombre_H = 0;
         //I: inicio
         //S: Salir
         //C: Controles
@@ -26,15 +30,28 @@ namespace TGC.Group.Model
 
         public HUDMenu(string MediaDir)
         {
+            int fontSizeMenu = 18;
+            int fontSizeTitulo = 36;
+
+            if (D3DDevice.Instance.Width < 1280)
+            {
+                fontSizeMenu = 12;
+                fontSizeTitulo = 28;
+                this.DistanciaSeparacionMenu = 50;
+                this.DistanciaSeparacionTitulo_V = 250;
+                this.DistanciaSeparacionTitulo_H = 70;
+                this.DistanciaSeparacionNombre_H = 115;
+            }
+
             this.MediaDir = MediaDir;
-            this.letraMenu = new TgcDrawText(D3DDevice.Instance.Device, "Rock it", 18, MediaDir);
-            this.letraTitulo = new TgcDrawText(D3DDevice.Instance.Device, "Rock it", 36, MediaDir);
+            this.letraMenu = new TgcDrawText(D3DDevice.Instance.Device, "Rock it", fontSizeMenu, MediaDir);
+            this.letraTitulo = new TgcDrawText(D3DDevice.Instance.Device, "Rock it", fontSizeTitulo, MediaDir);
             this.EstadoMenu = "I";
         }
 
         private void DibujarTitulo()
         {
-            this.letraTitulo.drawText("TWISTED CHANO", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 250, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - 300, Color.DeepSkyBlue);
+            this.letraTitulo.drawText("TWISTED CHANO", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 250 + this.DistanciaSeparacionTitulo_H, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - this.DistanciaSeparacionTitulo_V, Color.DeepSkyBlue);
         }
 
         public void SetPosicionMenu(int Movimiento)
@@ -247,13 +264,13 @@ namespace TGC.Group.Model
                 }
 
                 this.letraMenu.drawText("INICIO", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - 100, colorPosicion1);
-                this.letraMenu.drawText("CONTROLES", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - 25, colorPosicion2);
-                this.letraMenu.drawText("SALIR", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 50, colorPosicion3);
+                this.letraMenu.drawText("CONTROLES", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - 100 + this.DistanciaSeparacionMenu, colorPosicion2);
+                this.letraMenu.drawText("SALIR", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - 100 + (this.DistanciaSeparacionMenu * 2), colorPosicion3);
             }
 
             if (this.NroMenu == 2)
             {
-                this.letraMenu.drawText("Ingrese su nombre y presione Enter", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 325, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - 100, Color.Red);
+                this.letraMenu.drawText("Ingrese su nombre y presione Enter", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 300 + this.DistanciaSeparacionNombre_H, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - 100, Color.Red);
                 this.letraMenu.drawText(this.NombreJugador, (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 100, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - 25, Color.DeepSkyBlue);
             }
         }

@@ -63,7 +63,7 @@ namespace TGC.Group.Model
         public int CantidadDeOponentes = 4;
 
         //Cantidad de tiempo de juego
-        public int TiempoDeJuego = 1;
+        public int TiempoDeJuego = 5;
 
         //Tipo de cámara
         private int TipoCamara = 0;

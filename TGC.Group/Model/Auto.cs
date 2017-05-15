@@ -15,7 +15,7 @@ namespace TGC.Group.Model
     public class Auto
     {
         //Altura del salto
-        private const float ALTURA_SALTO = 75f;
+        private const float ALTURA_SALTO = 95f;
 
         //Velocidad de movimiento del auto
         private float MOVEMENT_SPEED = 0f;
@@ -24,7 +24,7 @@ namespace TGC.Group.Model
         private const float ROZAMIENTO = 100f;
 
         //Velocidad Maxima
-        private const float MAX_SPEED = 1200f;
+        private const float MAX_SPEED = 1000f;
 
         //Velocidad de rotación del auto
         private const float ROTATION_SPEED = 0.3f;
@@ -279,7 +279,11 @@ namespace TGC.Group.Model
 
             if (rotating)
             {
-                this.rotAngle = (this.MOVEMENT_SPEED * 0.2f * Math.Sign(rotate) * ElapsedTime) * (FastMath.PI / 180) * Math.Abs(ROTATION_SPEED);
+                if (this.MOVEMENT_SPEED <= (Auto.MAX_SPEED / 2))
+                    this.rotAngle = (this.MOVEMENT_SPEED * 0.2f * Math.Sign(rotate) * ElapsedTime) * (FastMath.PI / 50) * Math.Abs(ROTATION_SPEED);
+                else
+                    this.rotAngle = (this.MOVEMENT_SPEED * 0.2f * Math.Sign(rotate) * ElapsedTime) * (FastMath.PI / 180) * Math.Abs(ROTATION_SPEED);
+
                 this.Mesh.rotateY(rotAngle);
                 this.ObbMesh.rotate(new Vector3(0, rotAngle, 0));
             }
