@@ -40,8 +40,16 @@ namespace TGC.Group.Model
             //Calculo el tiempo
             Tiempo = (this.TiempoFin - DateTime.Now).Minutes.ToString().PadLeft(2, '0') + ":" + (this.TiempoFin - DateTime.Now).Seconds.ToString().PadLeft(2, '0');
 
-            if (this.finReloj)
+            if (this.finReloj || GameModel.finReloj)
             {
+                TgcDrawText letraGanador = new TgcDrawText(D3DDevice.Instance.Device, "Rock it", 36, MediaDir);
+                letraGanador.drawText("FIN DEL JUEGO", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 200, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - 150, Color.Red);
+
+                if (GameModel.nroGanador == 0)
+                    letraGanador.drawText("GANASTE!!!", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 200, (Convert.ToInt32(D3DDevice.Instance.Height) / 2), Color.Green);
+                else
+                    letraGanador.drawText("PERDISTE...", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 200, (Convert.ToInt32(D3DDevice.Instance.Height) / 2), Color.Red);
+
                 this.letraJugadores.drawText("00:00", Convert.ToInt32(D3DDevice.Instance.Width) - HUDJugador.POSICION_X_BARRA_VIDA + 35, HUDJugador.POSICION_Y_BARRA_VIDA - 40, Color.OrangeRed);
                 this.letraJugadores.drawText("Presione la letra X para volver al menú inicial...", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 200, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 150, Color.OrangeRed);
             }

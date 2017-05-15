@@ -45,6 +45,8 @@ namespace TGC.Group.Form
         /// </summary>
         private TgcD3dInput Input { get; set; }
 
+        private string currentDirectory = "";
+
         private void GameForm_Load(object sender, EventArgs e)
         {
             //Iniciar graficos.
@@ -63,6 +65,7 @@ namespace TGC.Group.Form
         private void GameForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Modelo.finModelo = true;
+            Modelo.restartModelo = false;
 
             if (ApplicationRunning)
             {
@@ -90,7 +93,7 @@ namespace TGC.Group.Form
             DirectSound.InitializeD3DDevice(panel3D);
 
             //Directorio actual de ejecución
-            var currentDirectory = Environment.CurrentDirectory + "\\";
+            currentDirectory = Environment.CurrentDirectory + "\\";
 
             //Cargar shaders del framework
             TgcShaders.Instance.loadCommonShaders(currentDirectory + Game.Default.ShadersDirectory);
@@ -119,9 +122,17 @@ namespace TGC.Group.Form
                         Modelo.Update();
                         Modelo.Render();
 
-                        if (Modelo.finModelo)
+                        if (Modelo.finModelo && !Modelo.restartModelo)
                         {
                             this.Close();
+                            return;
+                        }
+
+                        if (Modelo.finModelo && Modelo.restartModelo)
+                        {
+                            Modelo.Dispose();
+                            Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory, currentDirectory + Game.Default.ShadersDirectory);
+                            this.ExecuteModel();
                         }
                     }
                     else

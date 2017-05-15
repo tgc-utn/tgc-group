@@ -35,7 +35,7 @@ namespace TGC.Group.Model
         private float camaraActivaH = 1;
         private float camaraActivaV = 1;
         private CamaraTW CamaraInit;
-        private bool ModoPresentacion = true;
+        public bool ModoPresentacion = true;
         private HUDMenu claseMenu;
 
         //Cantidad de filas
@@ -63,7 +63,7 @@ namespace TGC.Group.Model
         public int CantidadDeOponentes = 4;
 
         //Cantidad de tiempo de juego
-        public int TiempoDeJuego = 5;
+        public int TiempoDeJuego = 1;
 
         //Tipo de cámara
         private int TipoCamara = 0;
@@ -96,9 +96,14 @@ namespace TGC.Group.Model
 
         //Variable de fin de modelo
         public bool finModelo { get; set; }
+        public bool restartModelo { get; set; }
 
         //Quadtree
         private Quadtree quadtree;
+
+        //Gano alguien
+        public static bool finReloj = false;
+        public static int nroGanador = 0;
 
         public override void Init()
         {
@@ -448,11 +453,15 @@ namespace TGC.Group.Model
                 //Actualizo el tiempo
                 this.claseTiempo.Update();
 
+                //Calculo quien va ganando hasta ahora
+                if (!GameModel.finReloj)
+                    this.CalcularGanador();
+
                 //Chequeo el fin del modelo
                 if (this.claseTiempo.GetFinDeJuego() && Input.keyDown(Key.X))
                 {
-                    this.ModoPresentacion = true;
                     this.finModelo = true;
+                    this.restartModelo = true;
                 }
             }
         }
@@ -497,6 +506,54 @@ namespace TGC.Group.Model
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
+        }
+
+        private void CalcularGanador()
+        {
+            float cantVida = 0, cantVidaTmp = 0, cantVidaTotal_0 = 0, cantVidaTotal_1 = 0, cantVidaTotal_2 = 0, cantVidaTotal_3 = 0, cantVidaTotal_4 = 0;
+            int ganador = 0;
+
+            foreach (Jugador unJugador in this.listaJugadores)
+            {
+                cantVidaTmp = unJugador.claseHUD.GetVidaJugador();
+
+                if (cantVidaTmp > cantVida)
+                {
+                    ganador = unJugador.GetNroJugador();
+                    cantVida = cantVidaTmp;
+                }
+
+                switch (unJugador.GetNroJugador())
+                {
+                    case 0:
+                        cantVidaTotal_0 = cantVidaTmp;
+                        break;
+
+                    case 1:
+                        cantVidaTotal_1 = cantVidaTmp;
+                        break;
+
+                    case 2:
+                        cantVidaTotal_2 = cantVidaTmp;
+                        break;
+
+                    case 3:
+                        cantVidaTotal_3 = cantVidaTmp;
+                        break;
+
+                    case 4:
+                        cantVidaTotal_4 = cantVidaTmp;
+                        break;
+
+                }
+            }
+
+            //Actualizo el ganador actual
+            GameModel.nroGanador = ganador;
+
+            //Calculo si ganó alguien o el principal perdió
+            if ((cantVidaTotal_0 <= 0) || (cantVidaTotal_1 <= 0 && cantVidaTotal_2 <= 0 && cantVidaTotal_3 <= 0 && cantVidaTotal_4 <= 0))
+                GameModel.finReloj = true;
         }
         
         private void ActualizarCamaraPresentacionJuego()

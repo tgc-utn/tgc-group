@@ -73,20 +73,6 @@ namespace TGC.UtilsGroup
                 {
                     mesh.render();
                     mesh.Enabled = false;
-                    /*
-                    foreach (var unAuto in GameModel.ListaMeshAutos)
-                    {
-                        if ((mesh.Name != "Room-1-Roof-0") && (mesh.Name != "Room-1-Floor-0") &&
-                        (mesh.Name != "Pasto") && (mesh.Name != "Plane_5"))
-                        {
-                            //me fijo si hubo alguna colision
-                            if (TgcCollisionUtils.testObbAABB(unAuto.ObbMesh, mesh.BoundingBox))
-                            {
-                                unAuto.colisiono = true;
-                            }
-                        }
-                    }
-                    */
                 }
             }
 
@@ -209,6 +195,12 @@ namespace TGC.UtilsGroup
                             if (TgcCollisionUtils.testObbAABB(unAuto.ObbMesh, m.BoundingBox))
                             {
                                 unAuto.colisiono = true;
+
+                                if ((m.Name.IndexOf ("Palmera") != -1) || (m.Name.IndexOf ("Pino") != -1) || (m.Name.IndexOf("ArbolBananas") != -1))
+                                    unAuto.pesoImpacto = 5;
+
+                                if ((m.Name.IndexOf("Roca") != -1) || (m.Name.IndexOf("Estructura") != -1) || (m.Name.IndexOf("Glorieta") != -1))
+                                    unAuto.pesoImpacto = 2.5f;
                             }
                         }
                     }

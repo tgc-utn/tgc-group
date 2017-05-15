@@ -11,7 +11,7 @@ namespace TGC.Group.Model
     class Jugador
     {
         //HUD
-        private HUDJugador claseHUD;
+        public HUDJugador claseHUD;
 
         //Auto
         public Auto claseAuto;
@@ -65,6 +65,8 @@ namespace TGC.Group.Model
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
         {
+            this.claseHUD.SetVidaJugador(this.claseAuto.pesoImpacto);
+            this.claseAuto.pesoImpacto = 0;
             this.claseHUD.Update();
             this.claseAuto.Update(MoverRuedas, Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
             this.claseCamara.Update(this.claseAuto.GetPosition(), this.claseAuto.GetRotationAngle());

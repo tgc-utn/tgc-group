@@ -64,6 +64,7 @@ namespace TGC.Group.Model
 
         //Colisiono
         public bool colisiono { get; set; }
+        public float pesoImpacto { get; set; }
 
         public Auto(string MediaDir, int NroJugador)
         {
