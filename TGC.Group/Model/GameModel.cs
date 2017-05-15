@@ -458,7 +458,7 @@ namespace TGC.Group.Model
                     this.CalcularGanador();
 
                 //Chequeo el fin del modelo
-                if (this.claseTiempo.GetFinDeJuego() && Input.keyDown(Key.X))
+                if ((GameModel.finReloj || this.claseTiempo.GetFinDeJuego()) && Input.keyDown(Key.X))
                 {
                     this.finModelo = true;
                     this.restartModelo = true;
