@@ -53,10 +53,32 @@ namespace TGC.Group.Model
             //Creo la letra para el texto
             this.letraJugadores = new TgcDrawText(D3DDevice.Instance.Device, "Rock it", 10, MediaDir);
 
+            /*
+            if (MultiplicadorPos == 0)
+                this.cantVidaJugador = 100;
+
+            if (MultiplicadorPos == 1)
+                this.cantVidaJugador = 20;
+
+            if (MultiplicadorPos == 2)
+                this.cantVidaJugador = 20;
+
+            if (MultiplicadorPos == 3)
+                this.cantVidaJugador = 50;
+
+            if (MultiplicadorPos == 4)
+                this.cantVidaJugador = 40;
+            */
+
             //Creo las barras de vida
             this.CargarBarraDeVida();
 
             return;
+        }
+
+        public void ActualizarNombreJugador(string NombreJugador)
+        {
+            this.NombreJugador = NombreJugador;
         }
 
         private void CargarBarraDeVida()
@@ -76,7 +98,7 @@ namespace TGC.Group.Model
         private void DibujarBarraDeVida()
         {
             //Dibujo el nombre del Jugador y de los competidores
-            this.letraJugadores.drawText(this.NombreJugador, Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 115, POSICION_Y_BARRA_VIDA - 10 + (30 * this.MultiplicadorPos), Color.DeepSkyBlue);
+            this.letraJugadores.drawText(this.NombreJugador, Convert.ToInt32(D3DDevice.Instance.Width) - POSICION_X_BARRA_VIDA - 125, POSICION_Y_BARRA_VIDA - 12 + (30 * this.MultiplicadorPos), Color.DeepSkyBlue);
 
             //Calculo la vida de cada auto
             this.spriteBarraJugadorLlena.Scaling = new Vector2(this.cantVidaJugador * 0.001f, 0.4f);
@@ -100,7 +122,10 @@ namespace TGC.Group.Model
 
         public void SetVidaJugador(float modificacion)
         {
-            this.cantVidaJugador -= modificacion;
+            if (this.cantVidaJugador > 0)
+                this.cantVidaJugador -= modificacion;
+            else
+                this.cantVidaJugador = 0;
         }
 
         public void Update()

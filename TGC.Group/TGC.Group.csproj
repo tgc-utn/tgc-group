@@ -89,12 +89,6 @@
     <Compile Include="Form\GameForm.Designer.cs">
       <DependentUpon>GameForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Form\Launcher.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Form\Launcher.Designer.cs">
-      <DependentUpon>Launcher.cs</DependentUpon>
-    </Compile>
     <Compile Include="Game.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -103,6 +97,7 @@
     <Compile Include="Model\Auto.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\HUDJugador.cs" />
+    <Compile Include="Model\HUDMenu.cs" />
     <Compile Include="Model\HUDTiempo.cs" />
     <Compile Include="Model\Jugador.cs" />
     <Compile Include="Program.cs" />
@@ -115,9 +110,6 @@
     <Compile Include="Utils\TgcSprite.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Form\Launcher.resx">
-      <DependentUpon>Launcher.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

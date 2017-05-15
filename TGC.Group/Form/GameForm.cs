@@ -31,21 +31,6 @@ namespace TGC.Group.Form
         private GameModel Modelo { get; set; }
 
         /// <summary>
-        ///   El nombre del jugador1 que se le pasar el modelo para mostrar en pantalla
-        /// </summary>
-        public string NombreJugador1 { get; set; }
-
-        /// <summary>
-        ///  El tiempo de juego de la partida
-        /// </summary>
-        public int TiempoDeJuego { get;  set; }
-
-        /// <summary>
-        /// Cantidad de autos que se van a generar en el mapa
-        /// </summary>
-        public int CantidadOponentes { get; set; }
-
-        /// <summary>
         ///     Obtener o parar el estado del RenderLoop.
         /// </summary>
         private bool ApplicationRunning { get; set; }
@@ -59,6 +44,8 @@ namespace TGC.Group.Form
         ///     Permite manejar los inputs de la computadora.
         /// </summary>
         private TgcD3dInput Input { get; set; }
+
+        private string currentDirectory = "";
 
         private void GameForm_Load(object sender, EventArgs e)
         {
@@ -78,6 +65,7 @@ namespace TGC.Group.Form
         private void GameForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Modelo.finModelo = true;
+            Modelo.restartModelo = false;
 
             if (ApplicationRunning)
             {
@@ -105,7 +93,7 @@ namespace TGC.Group.Form
             DirectSound.InitializeD3DDevice(panel3D);
 
             //Directorio actual de ejecución
-            var currentDirectory = Environment.CurrentDirectory + "\\";
+            currentDirectory = Environment.CurrentDirectory + "\\";
 
             //Cargar shaders del framework
             TgcShaders.Instance.loadCommonShaders(currentDirectory + Game.Default.ShadersDirectory);
@@ -113,10 +101,6 @@ namespace TGC.Group.Form
             //Juego a ejecutar, si quisiéramos tener diferentes modelos aquí podemos cambiar la instancia e invocar a otra clase.
             Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory,
                 currentDirectory + Game.Default.ShadersDirectory);
-
-            Modelo.NombreJugador1 = this.NombreJugador1;
-            Modelo.CantidadDeOponentes = this.CantidadOponentes;
-            Modelo.TiempoDeJuego = this.TiempoDeJuego;
 
             //Cargar juego.
             ExecuteModel();
@@ -138,9 +122,17 @@ namespace TGC.Group.Form
                         Modelo.Update();
                         Modelo.Render();
 
-                        if (Modelo.finModelo)
+                        if (Modelo.finModelo && !Modelo.restartModelo)
                         {
                             this.Close();
+                            return;
+                        }
+
+                        if (Modelo.finModelo && Modelo.restartModelo)
+                        {
+                            Modelo.Dispose();
+                            Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory, currentDirectory + Game.Default.ShadersDirectory);
+                            this.ExecuteModel();
                         }
                     }
                     else
