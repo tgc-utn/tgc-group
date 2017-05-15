@@ -87,12 +87,12 @@ namespace TGC.Group.Model.Entities
             }
         }
 
-        public void render()
+        public override void render()
         {
             this.enemy.render();
         }
 
-        public void dispose()
+        public override void dispose()
         {
             this.enemy.dispose();
         }

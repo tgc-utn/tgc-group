@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using Microsoft.DirectX.DirectInput;
 using TGC.Core.Shaders;
 using TGC.Core.Text;
+using TGC.Core.SceneLoader;
 
 namespace TGC.Group.Model.GameWorld
 {
@@ -24,23 +25,44 @@ namespace TGC.Group.Model.GameWorld
         protected TgcD3dInput            inputManager;     
         protected bool                   outsideCamera;
         protected TgcCamera              camera;
-        protected EntityMonster          monster;
         protected Microsoft.DirectX.Direct3D.Effect currentShader;
 
         public World(string mediaPath, TgcD3dInput inputManager)
         {
-            TgcSkeletalLoader loader = new TgcSkeletalLoader();            
-            this.currentShader        = TgcShaders.Instance.TgcMeshSpotLightShader;
-            this.outsideCamera        = false;
-            this.inputManager         = inputManager;
+            TgcSkeletalLoader loader = new TgcSkeletalLoader();
+            this.inputManager        = inputManager;
+            this.camera = new FirstPersonCamera(inputManager);
+
+            TgcSceneLoader sceneLoader = new TgcSceneLoader();
+
+            List<EntityPlayerItem> items = new List<EntityPlayerItem>();
+            items.Add(new EntityPlayerItemCandle(sceneLoader.loadSceneFromFile(mediaPath + "/Candle-TgcScene.xml").Meshes));
+            items.Add(new EntityPlayerItemFlashLight(sceneLoader.loadSceneFromFile(mediaPath + "/Flashlight-TgcScene.xml").Meshes));
+            items.Add(new EntityPlayerItemLamp(sceneLoader.loadSceneFromFile(mediaPath + "/Lamp-TgcScene.xml").Meshes));
+
+            EntityPlayer player      = new EntityPlayer(this.inputManager, loader, mediaPath, items);
+            EntityMonster monster    = new EntityMonster(loader, mediaPath);
+            this.player = player;
+
+            //this.currentShader        = TgcShaders.Instance.TgcMeshSpotLightShader;
+            this.outsideCamera        = false;            
             this.entities             = new List<IEntity>();
             this.updatableEntities    = new List<EntityUpdatable>();
             this.worldMap             = new WorldMap(mediaPath);
-            this.player               = new EntityPlayer(this.inputManager, loader, mediaPath);
-            this.camera               = new FirstPersonCamera(inputManager);
+
+            List<TgcMesh> itemMeshes = this.worldMap.Items;                        
+            List<EntityItem> itemEntities = itemMeshes.ConvertAll(i => { return new EntityItem(i); });
+                        
+            this.entities.AddRange(itemEntities);
+            this.updatableEntities.AddRange(itemEntities);
             
-            this.monster              = new EntityMonster(loader, mediaPath);
-            this.monster.WalkingNodes = this.worldMap.EnemyIA;            
+            player.Colliders = this.worldMap.Collidables;
+            monster.WalkingNodes = this.worldMap.EnemyIA;
+            
+            this.entities.Add(player);
+            this.entities.Add(monster);
+            this.updatableEntities.Add(player);
+            this.updatableEntities.Add(monster);
         }
 
         public TgcCamera Camera
@@ -65,12 +87,6 @@ namespace TGC.Group.Model.GameWorld
                 this.worldMap.ShouldShowRoof = !freeCamera;
                 this.worldMap.ShouldShowBoundingVolumes = freeCamera;
             }
-            
-            
-            this.monster.update(elapsedTime);
-            this.player.Colliders = this.worldMap.Collidables;        
-            this.player.update(elapsedTime);
-
         }
 
         public void render()
@@ -80,9 +96,7 @@ namespace TGC.Group.Model.GameWorld
                 currentEntity.render();
             }
             
-            this.monster.render();
-            this.worldMap.render();            
-            this.player.render();
+            this.worldMap.render();     
         }
 
         public void dispose()
@@ -91,8 +105,6 @@ namespace TGC.Group.Model.GameWorld
             {
                 currentEntity.dispose();
             }
-            this.player.dispose();
-            this.monster.dispose();
             this.worldMap.dispose();
         }
         /*

@@ -90,6 +90,11 @@
     <Compile Include="Model\Entities\EntityItem.cs" />
     <Compile Include="Model\Entities\EntityMonster.cs" />
     <Compile Include="Model\Entities\EntityPlayer.cs" />
+    <Compile Include="Model\Entities\EntityPlayerItem.cs" />
+    <Compile Include="Model\Entities\EntityPlayerItemCandle.cs" />
+    <Compile Include="Model\Entities\EntityPlayerItemFlashLight.cs" />
+    <Compile Include="Model\Entities\EntityPlayerItemLamp.cs" />
+    <Compile Include="Model\Entities\EntityPlayerItemNightVisionDevice.cs" />
     <Compile Include="Model\Entities\EntityUpdatable.cs" />
     <Compile Include="Model\Entities\IEntity.cs" />
     <Compile Include="Model\Entities\IUpdateObject.cs" />

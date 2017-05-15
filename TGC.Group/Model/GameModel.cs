@@ -21,21 +21,15 @@ namespace TGC.Group.Model
 
         public override void Init()
         {            
-            var d3dDevice = D3DDevice.Instance.Device;           
-            
-            this.world    = new World(MediaDir, this.Input);                  
+            var d3dDevice = D3DDevice.Instance.Device;
+            this.world    = new World(MediaDir, this.Input);         
         }
 
-
-
         
-
         public override void Update()
         {
             PreUpdate();
-
             this.Camara = this.world.Camera;
-
             this.world.update(ElapsedTime);
         }
 

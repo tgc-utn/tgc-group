@@ -12,13 +12,24 @@ using TGC.Core.SkeletalAnimation;
 
 namespace TGC.Group.Model.Entities
 {
-    public abstract class EntityUpdatable : TgcSkeletalMesh, IEntity, IUpdateObject
-    {        
-        public virtual new void render()
+    public abstract class EntityUpdatable : IEntity, IUpdateObject
+    {
+        public virtual bool AlphaBlendEnable
         {
-            base.render();
-            this.UpdateMeshTransform();
+            get
+            {
+                return true;
+            }
+
+            set
+            {
+                return;
+            }
         }
+    
+        public abstract void dispose();
+
+        public abstract void render();
         
 
         public abstract void update(float elapsedTime);

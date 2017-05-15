@@ -8,11 +8,12 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using Microsoft.DirectX;
 using System.Windows.Forms;
+using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Model.Entities
 {
-    public interface IEntity: ITransformObject, IRenderObject
+    public interface IEntity: IRenderObject
     {
-
+        
     }
 }

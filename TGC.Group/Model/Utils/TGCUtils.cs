@@ -65,7 +65,5 @@ namespace TGC.Group.Model.Utils
 
             return mesh.BoundingBox;
         }
-
-
     }
 }

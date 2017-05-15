@@ -20,9 +20,11 @@ namespace TGC.Group.Model.Entities
 {
     public class EntityPlayer : EntityUpdatable
     {
-        private new TgcBoundingCylinderFixedY boundingBox;
-        private static float                  velocityNormal = 300f;
-        private new Vector3                   rotation;
+        private static float velocityNormal = 300f;
+        private static int   initialItem    = 2;
+
+        private TgcBoundingCylinderFixedY     boundingBox;        
+        private Vector3                       rotation;
         private Vector3                       velocity;
         private TgcD3dInput                   inputManager;
         private TgcCamera                     playerLookCamera;
@@ -31,11 +33,13 @@ namespace TGC.Group.Model.Entities
         private float                         nodRotation;
         private TgcRay                        velocityRay;
         private List<TgcBoundingAxisAlignBox> colliders;
+        private List<EntityPlayerItem>        items;
+        private int                           selectedItemIndex;
         protected TgcSkeletalMesh             hand;
 
             
 
-        public EntityPlayer(TgcD3dInput inputManager, TgcSkeletalLoader loader, string mediaPath)
+        public EntityPlayer(TgcD3dInput inputManager, TgcSkeletalLoader loader, string mediaPath, List<EntityPlayerItem> items)
         {
             
             this.inputManager                 = inputManager;
@@ -43,17 +47,17 @@ namespace TGC.Group.Model.Entities
             this.rotation                     = new Vector3(0f, 0f, 0f);
             this.playerLookCamera             = new TgcCamera();
             this.velocityRay                  = new TgcRay(this.boundingBox.Center, this.LookAt);
-            
+            this.items                        = items;
+            this.selectedItemIndex            = initialItem;
             this.hand                         = loader.loadMeshAndAnimationsFromFile(mediaPath + "/Hand-TgcSkeletalMesh.xml", new string[] { mediaPath + "/HandAnimation-TgcSkeletalAnim.xml", mediaPath + "/HandzAnimation-TgcSkeletalAnim.xml" });
             this.hand.playAnimation("Animation2");
             this.hand.stopAnimation();
             this.hand.rotateX(-(float)Math.PI / 2);
             this.hand.Scale                   = new Vector3(1 / 6f, 1 / 6f, 1 / 6f);
-            
         }
         
 
-        public new TgcBoundingCylinderFixedY BoundingBox
+        public TgcBoundingCylinderFixedY BoundingBox
         {
             get {return this.boundingBox;}
         }
@@ -92,9 +96,29 @@ namespace TGC.Group.Model.Entities
         {
             set { this.colliders = value; }
         }
+
+        public EntityPlayerItem HeldItem
+        {
+            get { return this.items[this.selectedItemIndex]; }
+        }
+
+        public void addItem(EntityPlayerItem item)
+        {
+            this.items.Add(item);
+        }
+
+        public void changeHeldItem()
+        {
+            this.selectedItemIndex++;
+            if(this.selectedItemIndex == this.items.Count)
+            {
+                this.selectedItemIndex = 0;
+            }
+        }
         
         public override void update(float elapsedTime)
-        {            
+        {
+            
             this.calculateLookAt();
             this.calculateVelocities(elapsedTime);
             this.rotateCamera();
@@ -106,7 +130,7 @@ namespace TGC.Group.Model.Entities
             this.hand.getBoneByName("Arm").MatFinal.RotateY(FastMath.PI_HALF);
             this.hand.UpdateMeshTransform();
             this.hand.updateAnimation(elapsedTime);
-            
+            this.updateItem(elapsedTime);            
         }
 
         protected void calculateLookAt()
@@ -115,6 +139,15 @@ namespace TGC.Group.Model.Entities
             this.nodRotation   -= this.inputManager.YposRelative * 0.01f;
             this.rotationMatrix = Matrix.RotationX(nodRotation) * Matrix.RotationY(sideRotation);
             this.rotation       = Vector3.TransformNormal(new Vector3(0f, 0f, -1f), rotationMatrix);            
+        }
+
+        protected void updateItem(float elapsedTime)
+        {
+            if(inputManager.keyPressed(Key.Q))
+            {
+                this.changeHeldItem();
+            }
+            this.HeldItem.update(elapsedTime);            
         }
 
         protected void rotateCamera()
@@ -133,17 +166,7 @@ namespace TGC.Group.Model.Entities
                 closestCollider.setRenderColor(System.Drawing.Color.Azure);
                 if((Vector3.Normalize(this.velocity) * this.boundingBox.Radius + this.velocity).Length() < distanceToClosestCollider.Length())
                 {
-                    this.boundingBox.Center += this.velocity;
-                    /*this.boundingBox.Center += this.velocity;
-                    int colliderCount = this.colliders.Count;
-                    for (int index = 0; index < colliderCount; index++)
-                    {
-                        if (TgcCollisionUtils.testAABBCylinder(this.colliders[index], this.boundingBox))
-                        {
-                            this.boundingBox.Center -= this.velocity;
-                            return;
-                        }
-                    }*/
+                    this.boundingBox.Center += this.velocity;                    
                 }           
             }
         }
@@ -198,6 +221,11 @@ namespace TGC.Group.Model.Entities
             this.velocity = Vector3.Normalize(this.LookAt) * twoDimensionalVelocity.X + Vector3.Normalize(this.Side) * twoDimensionalVelocity.Y;
         }
 
+        public bool canPickUpItem(EntityItem item)
+        {
+            return TgcCollisionUtils.testCylinderCylinder(this.boundingBox, item.BoundingBox);
+        }
+
         protected float getTimeBasedVelocity(float elapsedTime)
         {
             return velocityNormal * elapsedTime;
@@ -206,11 +234,13 @@ namespace TGC.Group.Model.Entities
         public override void render()
         {
             this.hand.render();
+            this.HeldItem.render();
         }
 
-        public new void dispose()
+        public override void dispose()
         {
-            this.hand.dispose();                
+            this.hand.dispose();
+            this.items.ForEach(m => { m.dispose(); });
         }
         
     }
