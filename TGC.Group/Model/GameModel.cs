@@ -444,8 +444,8 @@ namespace TGC.Group.Model
                     }
                     else
                     {
-                        //IA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111
-                        //unJugador.Update(ElapsedTime);
+                        //IA
+                        unJugador.Seguir(listaJugadores[0]);
                         unJugador.Update(false, false, false, false, false, false, ElapsedTime);
                     }
                 }

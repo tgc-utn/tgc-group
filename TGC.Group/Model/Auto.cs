@@ -72,6 +72,9 @@ namespace TGC.Group.Model
         public bool colisiono { get; set; }
         public float pesoImpacto { get; set; }
 
+        //Direccion para seguimiento
+        Vector3 direccionSeguir = new Vector3(0, 0, 0);
+
         public Auto(string MediaDir, int NroJugador)
         {
             this.NroJugador = NroJugador;
@@ -337,6 +340,8 @@ namespace TGC.Group.Model
             }
 
             this.ObbMesh.Center = this.Mesh.Position;
+
+            direccionSeguir = movement;
         }
 
         private bool ColisionesObb(List<TgcMesh> ListaMesh)
@@ -430,6 +435,19 @@ namespace TGC.Group.Model
                 return ROZAMIENTO;
 
             return 0;
+        }
+
+        public void Seguir(Auto autoRival)
+        {
+            var origen = this.Mesh.Position;
+
+            var rayo = new TgcRay(origen, direccionSeguir);
+
+            var lugarChoque = new Vector3(0,0,0);
+
+            var meshRival = autoRival.GetMesh();
+
+            //if (TgcCollisionUtils.intersectRayObb(rayo, meshRival, out lugarChoque)) ;
         }
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
