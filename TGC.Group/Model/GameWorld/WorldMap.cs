@@ -24,8 +24,9 @@ namespace TGC.Group.Model.GameWorld
         private bool shouldShowRoof;
         private bool shouldShowBoundingVolumes;
         private List<AINode> enemyIA;
+		private Vector3[] intersectionPoints;
 
-        private static float roomHeight = 16f;
+		private static float roomHeight = 16f;
 
         private static float[,,] roomPositions = new float[,,]
         {
@@ -120,6 +121,7 @@ namespace TGC.Group.Model.GameWorld
             this.createRoomInstances();
             this.rotateAndScaleScenario();
             this.createEnemyIA();
+			this.createIntersectionPoints();
             this.createRoofFromScene(mediaPath);
 
             this.createElementInstances(loader, mediaPath + "/Sillon-TgcScene.xml", sofaInstances, "Sillon", 1.5f);
@@ -399,7 +401,33 @@ namespace TGC.Group.Model.GameWorld
             get { return this.enemyIA; }
         }
 
-        private void createEnemyIA()
+		public Vector3[] IntersectionPoints
+		{
+			get { return this.intersectionPoints; }
+		}
+
+		private void createIntersectionPoints()
+		{
+			intersectionPoints = new Vector3[16];
+			intersectionPoints[0] = (new Vector3(330f, 0, 330f));
+			intersectionPoints[1] = (new Vector3(330f, 0, -330f));
+			intersectionPoints[2] = (new Vector3(-330f, 0, 330f));
+			intersectionPoints[3] = (new Vector3(-330f, 0, -330f));
+			intersectionPoints[4] = (new Vector3(-960f, 0f, 330f));
+			intersectionPoints[5] = (new Vector3(-960f, 0f, -330f));
+			intersectionPoints[6] = (new Vector3(960f, 0f, 330f));
+			intersectionPoints[7] = (new Vector3(960f, 0f, -330f));
+			intersectionPoints[8] = (new Vector3(330f, 0f, 960f));
+			intersectionPoints[9] = (new Vector3(-330f, 0f, 960f));
+			intersectionPoints[10] = (new Vector3(-330f, 0f, -960f));
+			intersectionPoints[11] = (new Vector3(330f, 0f, -960f));
+			intersectionPoints[12] = (new Vector3(960f, 0f, 960f));
+			intersectionPoints[13] = (new Vector3(-960f, 0f, 960f));
+			intersectionPoints[14] = (new Vector3(960f, 0f, -960f));
+			intersectionPoints[15] = (new Vector3(-960f, 0f, -960f));
+		}
+
+		private void createEnemyIA()
         {
 
             enemyIA = new List<AINode>();

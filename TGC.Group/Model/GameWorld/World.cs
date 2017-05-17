@@ -58,8 +58,11 @@ namespace TGC.Group.Model.GameWorld
             
             player.Colliders = this.worldMap.Collidables;
             monster.WalkingNodes = this.worldMap.EnemyIA;
-            
-            this.entities.Add(player);
+			monster.IntersectionPoints = this.worldMap.IntersectionPoints;
+			monster.playerColider(player.BoundingBox);
+			monster.WalkingNodes = this.worldMap.EnemyIA;
+
+			this.entities.Add(player);
             this.entities.Add(monster);
             this.updatableEntities.Add(player);
             this.updatableEntities.Add(monster);
