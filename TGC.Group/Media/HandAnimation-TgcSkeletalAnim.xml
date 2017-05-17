@@ -1,0 +1,61 @@
+<tgcSkeletalAnim>
+	<animation name='Animation' bonesCount='14' framesCount='36' frameRate='30' startFrame='0' endFrame='35'>
+		<boundingBox min='[-219.397,-137.585,-57.6474]' max='[575.619,122.122,132.833]'/>
+		<bone id='0' name='Arm' keyFramesCount='2'>
+			<frame n='0' pos='[582.356,20.572,91.3491]' rotQuat='[0.0,-1.0,0.0,0.0]' />
+			<frame n='35'  pos='[582.356,20.572,91.3491]' rotQuat='[0.0,-1.0,0.0,0.0]' />
+		</bone>
+		<bone id='1' name='SideHand' keyFramesCount='2'>
+			<frame n='0' pos='[543.808,0.00437164,-0.00025177]' rotQuat='[-0.256679,-0.333736,-0.353865,0.835174]' />
+			<frame n='35'  pos='[543.808,0.00437164,-0.00025177]' rotQuat='[-0.256679,-0.333736,-0.353865,0.835174]' />
+		</bone>
+		<bone id='2' name='SideFinger' keyFramesCount='2'>
+			<frame n='0' pos='[127.175,0,0]' rotQuat='[-0.0743781,0.204553,-0.0937321,0.971514]' />
+			<frame n='35'  pos='[127.175,0,0]' rotQuat='[-0.0743781,0.204553,-0.0937321,0.971514]' />
+		</bone>
+		<bone id='3' name='SideFingerEnd' keyFramesCount='2'>
+			<frame n='0' pos='[36.588,0,0]' rotQuat='[-0.00765787,0.0971409,0.00383344,0.995234]' />
+			<frame n='35'  pos='[36.588,0,0]' rotQuat='[-0.00765787,0.0971409,0.00383344,0.995234]' />
+		</bone>
+		<bone id='4' name='SideFingerToken' keyFramesCount='2'>
+			<frame n='0' pos='[36.7599,0,0]' rotQuat='[0.0,0.0,0.0,1.0]' />
+			<frame n='35'  pos='[36.7599,0,0]' rotQuat='[0.0,0.0,0.0,1.0]' />
+		</bone>
+		<bone id='5' name='MiddleHand' keyFramesCount='2'>
+			<frame n='0' pos='[543.812,0,0]' rotQuat='[-0.000392841,0.0017487,-0.219185,0.975682]' />
+			<frame n='35'  pos='[543.812,0,0]' rotQuat='[-0.000392841,0.0017487,-0.219185,0.975682]' />
+		</bone>
+		<bone id='6' name='RightVenue' keyFramesCount='2'>
+			<frame n='0' pos='[105.156,0.271749,0.99688]' rotQuat='[-0.0686814,0.295839,-0.125464,0.944469]' />
+			<frame n='35'  pos='[105.156,0.271749,0.99688]' rotQuat='[-0.0686814,0.295839,-0.125464,0.944469]' />
+		</bone>
+		<bone id='7' name='RightVenueFinger' keyFramesCount='2'>
+			<frame n='0' pos='[156.772,0,0]' rotQuat='[-0.0654749,-0.097031,-0.0123821,0.993048]' />
+			<frame n='35'  pos='[156.772,0,0]' rotQuat='[-0.0654749,-0.097031,-0.0123821,0.993048]' />
+		</bone>
+		<bone id='8' name='RightVenueFingerMiddle' keyFramesCount='2'>
+			<frame n='0' pos='[68.9961,0,0]' rotQuat='[-0.0337655,0.0193067,0.0,0.999243]' />
+			<frame n='35'  pos='[68.9961,0,0]' rotQuat='[-0.0337655,0.0193067,0.0,0.999243]' />
+		</bone>
+		<bone id='9' name='RightVenueFingerEnd' keyFramesCount='2'>
+			<frame n='0' pos='[19.8989,0.000106812,0]' rotQuat='[0.0,-0.0871222,0.0,0.996198]' />
+			<frame n='35'  pos='[19.8989,0.000106812,0]' rotQuat='[0.0,-0.0871222,0.0,0.996198]' />
+		</bone>
+		<bone id='10' name='LeftVenue' keyFramesCount='2'>
+			<frame n='0' pos='[105.156,0.271749,0.99688]' rotQuat='[0.010887,-0.234701,-0.102684,0.966568]' />
+			<frame n='35'  pos='[105.156,0.271749,0.99688]' rotQuat='[0.010887,-0.234701,-0.102684,0.966568]' />
+		</bone>
+		<bone id='11' name='LeftVenueFinger' keyFramesCount='2'>
+			<frame n='0' pos='[156.772,0,0]' rotQuat='[0.0226135,0.177126,-0.0149895,0.983814]' />
+			<frame n='35'  pos='[156.772,0,0]' rotQuat='[0.0226135,0.177126,-0.0149895,0.983814]' />
+		</bone>
+		<bone id='12' name='LeftVenueFingerMiddle' keyFramesCount='2'>
+			<frame n='0' pos='[68.9962,0,0]' rotQuat='[0.0324013,-0.0418821,-0.00121578,0.998596]' />
+			<frame n='35'  pos='[68.9962,0,0]' rotQuat='[0.0324013,-0.0418821,-0.00121578,0.998596]' />
+		</bone>
+		<bone id='13' name='LeftVenueFingerEnd' keyFramesCount='2'>
+			<frame n='0' pos='[19.8989,0.000106812,0]' rotQuat='[0.0,-0.0871222,0.0,0.996198]' />
+			<frame n='35'  pos='[19.8989,0.000106812,0]' rotQuat='[0.0,-0.0871222,0.0,0.996198]' />
+		</bone>
+	</animation>
+</tgcSkeletalAnim>
