@@ -89,7 +89,7 @@ namespace TGC.Group.Model
         {
             if (this.EstadoMenu == "E")
             {
-                if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.BackSpace))
+                if (Input.keyDown(Microsoft.DirectX.DirectInput.Key.BackSpace))
                 {
                     if (this.NombreJugador.Length == 0)
                         return;
@@ -99,135 +99,271 @@ namespace TGC.Group.Model
 
                 if (this.NombreJugador.Length < 10)
                 {
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.A))
+                    if (Input.keyDown(Microsoft.DirectX.DirectInput.Key.LeftShift))
                     {
-                        this.NombreJugador += "a";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.A))
+                        {
+                            this.NombreJugador += "A";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.B))
-                    {
-                        this.NombreJugador += "b";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.B))
+                        {
+                            this.NombreJugador += "B";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.C))
-                    {
-                        this.NombreJugador += "c";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.C))
+                        {
+                            this.NombreJugador += "C";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.D))
-                    {
-                        this.NombreJugador += "d";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.D))
+                        {
+                            this.NombreJugador += "D";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.E))
-                    {
-                        this.NombreJugador += "e";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.E))
+                        {
+                            this.NombreJugador += "E";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.F))
-                    {
-                        this.NombreJugador += "f";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.F))
+                        {
+                            this.NombreJugador += "F";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.G))
-                    {
-                        this.NombreJugador += "g";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.G))
+                        {
+                            this.NombreJugador += "G";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.H))
-                    {
-                        this.NombreJugador += "h";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.H))
+                        {
+                            this.NombreJugador += "H";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.I))
-                    {
-                        this.NombreJugador += "i";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.I))
+                        {
+                            this.NombreJugador += "I";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.J))
-                    {
-                        this.NombreJugador += "j";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.J))
+                        {
+                            this.NombreJugador += "J";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.K))
-                    {
-                        this.NombreJugador += "k";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.K))
+                        {
+                            this.NombreJugador += "K";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.L))
-                    {
-                        this.NombreJugador += "l";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.L))
+                        {
+                            this.NombreJugador += "L";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.M))
-                    {
-                        this.NombreJugador += "m";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.M))
+                        {
+                            this.NombreJugador += "M";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.N))
-                    {
-                        this.NombreJugador += "n";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.N))
+                        {
+                            this.NombreJugador += "N";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.O))
-                    {
-                        this.NombreJugador += "o";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.O))
+                        {
+                            this.NombreJugador += "O";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.P))
-                    {
-                        this.NombreJugador += "p";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.P))
+                        {
+                            this.NombreJugador += "P";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Q))
-                    {
-                        this.NombreJugador += "q";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Q))
+                        {
+                            this.NombreJugador += "Q";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.R))
-                    {
-                        this.NombreJugador += "r";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.R))
+                        {
+                            this.NombreJugador += "R";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.S))
-                    {
-                        this.NombreJugador += "s";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.S))
+                        {
+                            this.NombreJugador += "S";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.T))
-                    {
-                        this.NombreJugador += "t";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.T))
+                        {
+                            this.NombreJugador += "T";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.U))
-                    {
-                        this.NombreJugador += "u";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.U))
+                        {
+                            this.NombreJugador += "U";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.V))
-                    {
-                        this.NombreJugador += "v";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.V))
+                        {
+                            this.NombreJugador += "V";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.W))
-                    {
-                        this.NombreJugador += "w";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.W))
+                        {
+                            this.NombreJugador += "W";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.X))
-                    {
-                        this.NombreJugador += "x";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.X))
+                        {
+                            this.NombreJugador += "X";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Y))
-                    {
-                        this.NombreJugador += "y";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Y))
+                        {
+                            this.NombreJugador += "Y";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Z))
-                    {
-                        this.NombreJugador += "z";
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Z))
+                        {
+                            this.NombreJugador += "Z";
+                        }
                     }
+                    else
+                    {
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.A))
+                        {
+                            this.NombreJugador += "a";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.B))
+                        {
+                            this.NombreJugador += "b";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.C))
+                        {
+                            this.NombreJugador += "c";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.D))
+                        {
+                            this.NombreJugador += "d";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.E))
+                        {
+                            this.NombreJugador += "e";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.F))
+                        {
+                            this.NombreJugador += "f";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.G))
+                        {
+                            this.NombreJugador += "g";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.H))
+                        {
+                            this.NombreJugador += "h";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.I))
+                        {
+                            this.NombreJugador += "i";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.J))
+                        {
+                            this.NombreJugador += "j";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.K))
+                        {
+                            this.NombreJugador += "k";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.L))
+                        {
+                            this.NombreJugador += "l";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.M))
+                        {
+                            this.NombreJugador += "m";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.N))
+                        {
+                            this.NombreJugador += "n";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.O))
+                        {
+                            this.NombreJugador += "o";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.P))
+                        {
+                            this.NombreJugador += "p";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Q))
+                        {
+                            this.NombreJugador += "q";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.R))
+                        {
+                            this.NombreJugador += "r";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.S))
+                        {
+                            this.NombreJugador += "s";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.T))
+                        {
+                            this.NombreJugador += "t";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.U))
+                        {
+                            this.NombreJugador += "u";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.V))
+                        {
+                            this.NombreJugador += "v";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.W))
+                        {
+                            this.NombreJugador += "w";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.X))
+                        {
+                            this.NombreJugador += "x";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Y))
+                        {
+                            this.NombreJugador += "y";
+                        }
+
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Z))
+                        {
+                            this.NombreJugador += "z";
+                        }
+                    }
+                    
                 }
             }
         }
