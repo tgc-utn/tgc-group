@@ -99,140 +99,6 @@ namespace TGC.Group.Model
 
                 if (this.NombreJugador.Length < 10)
                 {
-                    if (Input.keyDown(Microsoft.DirectX.DirectInput.Key.LeftShift))
-                    {
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.A))
-                        {
-                            this.NombreJugador += "A";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.B))
-                        {
-                            this.NombreJugador += "B";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.C))
-                        {
-                            this.NombreJugador += "C";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.D))
-                        {
-                            this.NombreJugador += "D";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.E))
-                        {
-                            this.NombreJugador += "E";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.F))
-                        {
-                            this.NombreJugador += "F";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.G))
-                        {
-                            this.NombreJugador += "G";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.H))
-                        {
-                            this.NombreJugador += "H";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.I))
-                        {
-                            this.NombreJugador += "I";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.J))
-                        {
-                            this.NombreJugador += "J";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.K))
-                        {
-                            this.NombreJugador += "K";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.L))
-                        {
-                            this.NombreJugador += "L";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.M))
-                        {
-                            this.NombreJugador += "M";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.N))
-                        {
-                            this.NombreJugador += "N";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.O))
-                        {
-                            this.NombreJugador += "O";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.P))
-                        {
-                            this.NombreJugador += "P";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Q))
-                        {
-                            this.NombreJugador += "Q";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.R))
-                        {
-                            this.NombreJugador += "R";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.S))
-                        {
-                            this.NombreJugador += "S";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.T))
-                        {
-                            this.NombreJugador += "T";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.U))
-                        {
-                            this.NombreJugador += "U";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.V))
-                        {
-                            this.NombreJugador += "V";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.W))
-                        {
-                            this.NombreJugador += "W";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.X))
-                        {
-                            this.NombreJugador += "X";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Y))
-                        {
-                            this.NombreJugador += "Y";
-                        }
-
-                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Z))
-                        {
-                            this.NombreJugador += "Z";
-                        }
-                    }
-                    else
-                    {
                         if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.A))
                         {
                             this.NombreJugador += "a";
@@ -362,7 +228,7 @@ namespace TGC.Group.Model
                         {
                             this.NombreJugador += "z";
                         }
-                    }
+                 
                     
                 }
             }
