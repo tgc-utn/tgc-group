@@ -148,6 +148,7 @@ namespace TGC.Group.Model
 
             //Inicio clase de menu
             this.claseMenu = new HUDMenu(MediaDir);
+            GameModel.finReloj = false;
         }
 
         private void TransformarMeshScenePpal (int index, float escala, float desplazamiento)
