@@ -63,6 +63,12 @@ namespace TGC.Group.Model
             this.claseHUD.ActualizarNombreJugador(NombreJugador);
         }
 
+        public void Seguir(Jugador otroJugador)
+        {
+            var autoRival = otroJugador.claseAuto;
+            this.claseAuto.Seguir(autoRival);
+        }
+
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
         {
             this.claseHUD.SetVidaJugador(this.claseAuto.pesoImpacto);

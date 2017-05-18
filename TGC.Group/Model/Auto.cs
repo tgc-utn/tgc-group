@@ -72,6 +72,9 @@ namespace TGC.Group.Model
         public bool colisiono { get; set; }
         public float pesoImpacto { get; set; }
 
+        //Direccion para seguimiento
+        Vector3 direccionSeguir = new Vector3(0, 0, 0);
+
         public Auto(string MediaDir, int NroJugador)
         {
             this.NroJugador = NroJugador;
@@ -337,6 +340,8 @@ namespace TGC.Group.Model
             }
 
             this.ObbMesh.Center = this.Mesh.Position;
+
+            direccionSeguir = movement;
         }
 
         private bool ColisionesObb(List<TgcMesh> ListaMesh)
@@ -430,6 +435,30 @@ namespace TGC.Group.Model
                 return ROZAMIENTO;
 
             return 0;
+        }
+
+        public void Seguir(Auto autoJugador)
+        {
+            /*
+            var origenIA = this.Mesh.Position;
+
+            var rayo = new TgcRay(origenIA, direccionSeguir);
+
+            var lugarChoque = new Vector3(0,0,0);
+
+            Vector3[] puntosDelAuto = autoJugador.Mesh.getVertexPositions();
+
+            var obbJugador = TgcBoundingOrientedBox.computeFromPoints(puntosDelAuto); //No se si es la mejor resolucion por ser un calculo costoso que se va a hacer muchas veces
+            
+            if (TgcCollisionUtils.intersectRayObb(rayo, obbJugador, out lugarChoque))
+            {
+                this.Update(true, true, false, false, false, false, ElapsedTime); //Si el rayo proyectado impacta con el auto del jugador, el auto de la ia comienza a avanzar hacia su posicion
+            }
+            else
+            {
+                this.Update(true, false, true, false, true, false, ElapsedTime); //Si el rayo no impacta con el auto del jugador, el auto comienza a frenar mientras que gira en sentido horario intentando encontrar al auto del jugador
+            }*/
+            
         }
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)

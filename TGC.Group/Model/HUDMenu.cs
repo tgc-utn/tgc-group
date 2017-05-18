@@ -89,7 +89,7 @@ namespace TGC.Group.Model
         {
             if (this.EstadoMenu == "E")
             {
-                if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.BackSpace))
+                if (Input.keyDown(Microsoft.DirectX.DirectInput.Key.BackSpace))
                 {
                     if (this.NombreJugador.Length == 0)
                         return;
@@ -99,135 +99,137 @@ namespace TGC.Group.Model
 
                 if (this.NombreJugador.Length < 10)
                 {
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.A))
-                    {
-                        this.NombreJugador += "a";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.A))
+                        {
+                            this.NombreJugador += "a";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.B))
-                    {
-                        this.NombreJugador += "b";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.B))
+                        {
+                            this.NombreJugador += "b";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.C))
-                    {
-                        this.NombreJugador += "c";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.C))
+                        {
+                            this.NombreJugador += "c";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.D))
-                    {
-                        this.NombreJugador += "d";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.D))
+                        {
+                            this.NombreJugador += "d";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.E))
-                    {
-                        this.NombreJugador += "e";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.E))
+                        {
+                            this.NombreJugador += "e";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.F))
-                    {
-                        this.NombreJugador += "f";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.F))
+                        {
+                            this.NombreJugador += "f";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.G))
-                    {
-                        this.NombreJugador += "g";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.G))
+                        {
+                            this.NombreJugador += "g";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.H))
-                    {
-                        this.NombreJugador += "h";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.H))
+                        {
+                            this.NombreJugador += "h";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.I))
-                    {
-                        this.NombreJugador += "i";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.I))
+                        {
+                            this.NombreJugador += "i";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.J))
-                    {
-                        this.NombreJugador += "j";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.J))
+                        {
+                            this.NombreJugador += "j";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.K))
-                    {
-                        this.NombreJugador += "k";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.K))
+                        {
+                            this.NombreJugador += "k";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.L))
-                    {
-                        this.NombreJugador += "l";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.L))
+                        {
+                            this.NombreJugador += "l";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.M))
-                    {
-                        this.NombreJugador += "m";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.M))
+                        {
+                            this.NombreJugador += "m";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.N))
-                    {
-                        this.NombreJugador += "n";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.N))
+                        {
+                            this.NombreJugador += "n";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.O))
-                    {
-                        this.NombreJugador += "o";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.O))
+                        {
+                            this.NombreJugador += "o";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.P))
-                    {
-                        this.NombreJugador += "p";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.P))
+                        {
+                            this.NombreJugador += "p";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Q))
-                    {
-                        this.NombreJugador += "q";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Q))
+                        {
+                            this.NombreJugador += "q";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.R))
-                    {
-                        this.NombreJugador += "r";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.R))
+                        {
+                            this.NombreJugador += "r";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.S))
-                    {
-                        this.NombreJugador += "s";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.S))
+                        {
+                            this.NombreJugador += "s";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.T))
-                    {
-                        this.NombreJugador += "t";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.T))
+                        {
+                            this.NombreJugador += "t";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.U))
-                    {
-                        this.NombreJugador += "u";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.U))
+                        {
+                            this.NombreJugador += "u";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.V))
-                    {
-                        this.NombreJugador += "v";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.V))
+                        {
+                            this.NombreJugador += "v";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.W))
-                    {
-                        this.NombreJugador += "w";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.W))
+                        {
+                            this.NombreJugador += "w";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.X))
-                    {
-                        this.NombreJugador += "x";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.X))
+                        {
+                            this.NombreJugador += "x";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Y))
-                    {
-                        this.NombreJugador += "y";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Y))
+                        {
+                            this.NombreJugador += "y";
+                        }
 
-                    if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Z))
-                    {
-                        this.NombreJugador += "z";
-                    }
+                        if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.Z))
+                        {
+                            this.NombreJugador += "z";
+                        }
+                 
+                    
                 }
             }
         }
@@ -251,10 +253,14 @@ namespace TGC.Group.Model
                     colorPosicion2 = Color.Red;
                     this.EstadoMenu = "C";
 
-                    this.letraMenu.drawText("Acelerar/Frenar:", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 350, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 125, colorPosicion2);
-                    this.letraMenu.drawText("Up/Down", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 125, colorPosicion2);
-                    this.letraMenu.drawText("Saltar:", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 350, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 200, colorPosicion2);
-                    this.letraMenu.drawText("Space", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 200, colorPosicion2);
+                    this.letraMenu.drawText("Acelerar:", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 350, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 125, colorPosicion2);
+                    this.letraMenu.drawText("W o Flecha Arriba", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 125, colorPosicion2);
+                    this.letraMenu.drawText("Frenar:", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 350, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 200, colorPosicion2);
+                    this.letraMenu.drawText("S o Flecha Abajo", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 200, colorPosicion2);
+                    this.letraMenu.drawText("Girar:", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 350, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 275, colorPosicion2);
+                    this.letraMenu.drawText("A/Flecha Izquierda y D/Flecha Derecha", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 275, colorPosicion2);
+                    this.letraMenu.drawText("Saltar:", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 350, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 350, colorPosicion2);
+                    this.letraMenu.drawText("Barra Espaciadora", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 350, colorPosicion2);
                 }
 
                 if (PosicionMenu == 3)
