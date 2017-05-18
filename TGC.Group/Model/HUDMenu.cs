@@ -18,6 +18,7 @@ namespace TGC.Group.Model
         private int NroMenu = 1;
         private int PosicionMenu = 1;
         private int DistanciaSeparacionMenu = 75;
+        private int DistanciaSeparacionMenuControles = 0;
         private int DistanciaSeparacionTitulo_V = 335;
         private int DistanciaSeparacionTitulo_H = 0;
         private int DistanciaSeparacionNombre_H = 0;
@@ -38,6 +39,7 @@ namespace TGC.Group.Model
                 fontSizeMenu = 12;
                 fontSizeTitulo = 28;
                 this.DistanciaSeparacionMenu = 50;
+                this.DistanciaSeparacionMenuControles = 50;
                 this.DistanciaSeparacionTitulo_V = 250;
                 this.DistanciaSeparacionTitulo_H = 70;
                 this.DistanciaSeparacionNombre_H = 115;
@@ -253,14 +255,14 @@ namespace TGC.Group.Model
                     colorPosicion2 = Color.Red;
                     this.EstadoMenu = "C";
 
-                    this.letraMenu.drawText("Acelerar:", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 350, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 125, colorPosicion2);
-                    this.letraMenu.drawText("W o Flecha Arriba", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 125, colorPosicion2);
-                    this.letraMenu.drawText("Frenar:", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 350, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 200, colorPosicion2);
-                    this.letraMenu.drawText("S o Flecha Abajo", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 200, colorPosicion2);
-                    this.letraMenu.drawText("Girar:", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 350, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 275, colorPosicion2);
-                    this.letraMenu.drawText("A/Flecha Izquierda y D/Flecha Derecha", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 275, colorPosicion2);
-                    this.letraMenu.drawText("Saltar:", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 350, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 350, colorPosicion2);
-                    this.letraMenu.drawText("Barra Espaciadora", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 350, colorPosicion2);
+                    this.letraMenu.drawText("Acelerar:", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 350, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 125 - this.DistanciaSeparacionMenuControles, colorPosicion2);
+                    this.letraMenu.drawText("W o Flecha Arriba", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 125 - this.DistanciaSeparacionMenuControles, colorPosicion2);
+                    this.letraMenu.drawText("Frenar:", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 350, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 175 - this.DistanciaSeparacionMenuControles, colorPosicion2);
+                    this.letraMenu.drawText("S o Flecha Abajo", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 175 - this.DistanciaSeparacionMenuControles, colorPosicion2);
+                    this.letraMenu.drawText("Girar:", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 350, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 225 - this.DistanciaSeparacionMenuControles, colorPosicion2);
+                    this.letraMenu.drawText("A/Flecha Izquierda y D/Flecha Derecha", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 225 - this.DistanciaSeparacionMenuControles, colorPosicion2);
+                    this.letraMenu.drawText("Saltar:", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 350, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 275 - this.DistanciaSeparacionMenuControles, colorPosicion2);
+                    this.letraMenu.drawText("Barra Espaciadora", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 50, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 275 - this.DistanciaSeparacionMenuControles, colorPosicion2);
                 }
 
                 if (PosicionMenu == 3)

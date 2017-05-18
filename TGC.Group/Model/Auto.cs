@@ -18,7 +18,7 @@ namespace TGC.Group.Model
         private const float ALTURA_SALTO = 95f;
 
         //Velocidad de movimiento del auto
-        private float MOVEMENT_SPEED = 0f;
+        public float MOVEMENT_SPEED = 0f;
 
         //Rozamiento del piso
         private const float ROZAMIENTO = 100f;
@@ -36,9 +36,19 @@ namespace TGC.Group.Model
         public TgcBoundingOrientedBox ObbMesh;
 
         //Obbs del auto
+		/*
         private TgcBoundingOrientedBox ObbArriba;
         private TgcBoundingOrientedBox ObbMedio;
         private TgcBoundingOrientedBox ObbAbajo;
+		*/
+		private TgcBoundingOrientedBox ObbArribaIzq;
+        private TgcBoundingOrientedBox ObbArribaDer;
+        private TgcBoundingOrientedBox ObbAbajoIzq;
+        private TgcBoundingOrientedBox ObbAbajoDer;
+        private TgcBoundingOrientedBox ObbArriba;
+        private TgcBoundingOrientedBox ObbAbajo;
+
+        private List<TgcBoundingOrientedBox> ObbLista;
 
         //Ruedas
         TgcMesh ruedaDerechaDelanteraMesh;
@@ -58,6 +68,9 @@ namespace TGC.Group.Model
         List<float> dx = new List<float> { 23, -23, -23, 23 };
         List<float> dy = new List<float> { -30, 32, -31, 30 };
 
+		//Posicion de los Obb
+        List<float> dxObb = new List<float> { 16, -16, -16, 16, 0, 0 };
+        List<float> dyObb = new List<float> { -28, 30, -28, 30, 58, -58 };
         //Estado de salto
         private bool falling = false;
         private bool jumping = false;
@@ -67,6 +80,8 @@ namespace TGC.Group.Model
 
         //MediaDir
         private string MediaDir;
+		public Vector3 velocidad;
+        private Vector3 OriginalPos;
 
         //Colisiono
         public bool colisiono { get; set; }
@@ -85,9 +100,17 @@ namespace TGC.Group.Model
         public void RenderObb()
         {
             this.ObbMesh.render();
+			/*    this.ObbArriba.render();
+                this.ObbMedio.render();
+                this.ObbAbajo.render();*/
+
             this.ObbArriba.render();
-            this.ObbMedio.render();
+            this.ObbArribaIzq.render();
+            this.ObbArribaDer.render();
+
             this.ObbAbajo.render();
+            this.ObbAbajoDer.render();
+            this.ObbAbajoIzq.render();
         }
 
         public TgcMesh GetMesh()
@@ -115,27 +138,50 @@ namespace TGC.Group.Model
             this.Mesh.move(0, 0.5f, 0);
             this.Mesh.updateBoundingBox();
             this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
-            this.ObbArriba = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 40)).BoundingBox);
+			/*   this.ObbArriba = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 40)).BoundingBox);
+               this.ObbArriba.setRenderColor(System.Drawing.Color.IndianRed);
+               this.ObbMedio = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 40)).BoundingBox);
+               this.ObbMedio.setRenderColor(System.Drawing.Color.Green);
+               this.ObbAbajo = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 40)).BoundingBox);
+               this.ObbAbajo.setRenderColor(System.Drawing.Color.Blue);*/
+
+            this.ObbArriba = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 3)).BoundingBox);
             this.ObbArriba.setRenderColor(System.Drawing.Color.IndianRed);
-            this.ObbMedio = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 40)).BoundingBox);
-            this.ObbMedio.setRenderColor(System.Drawing.Color.Green);
-            this.ObbAbajo = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 40)).BoundingBox);
+
+
+            this.ObbAbajo = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 3)).BoundingBox);
             this.ObbAbajo.setRenderColor(System.Drawing.Color.Blue);
+            this.ObbArribaIzq = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(20, 30, 55)).BoundingBox);
+            this.ObbArribaIzq.setRenderColor(System.Drawing.Color.Green);
+            this.ObbArribaDer = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(20, 30, 55)).BoundingBox);
+            this.ObbArribaDer.setRenderColor(System.Drawing.Color.Fuchsia);
+            this.ObbAbajoIzq = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(20, 30, 55)).BoundingBox);
+            this.ObbAbajoIzq.setRenderColor(System.Drawing.Color.Chocolate);
+            this.ObbAbajoDer = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(20, 30, 55)).BoundingBox);
+            this.ObbAbajoDer.setRenderColor(System.Drawing.Color.Crimson);
+
+            ObbLista = new List<TgcBoundingOrientedBox>();
+            this.ObbLista.Add(ObbArribaDer);
+            this.ObbLista.Add(ObbAbajoDer);
+            this.ObbLista.Add(ObbArribaIzq);
+            this.ObbLista.Add(ObbAbajoIzq);
+            this.ObbLista.Add(ObbArriba);
+            this.ObbLista.Add(ObbAbajo);
         }
 
-        public float GetRotationAngle ()
+        public float GetRotationAngle()
         {
             return this.rotAngle;
         }
 
-        public Vector3 GetPosition ()
+        public Vector3 GetPosition()
         {
-            return this.Mesh.Position;    
+            return this.Mesh.Position;
         }
 
         public void SetPositionMesh(Vector3 unVector, bool rotar)
         {
-            this.Mesh.AutoTransformEnable = false;
+            this.Mesh.AutoTransformEnable = true;
             this.Mesh.AutoUpdateBoundingBox = true;
 
             if (rotar)
@@ -182,7 +228,7 @@ namespace TGC.Group.Model
             RuedasJugador = new List<TgcMesh> { ruedaDerechaDelanteraMesh, ruedaDerechaTraseraMesh, ruedaIzquierdaDelanteraMesh, ruedaIzquierdaTraseraMesh };
         }
 
-        private void CalcularPosicionRuedas (bool MoverRuedas)
+        private void CalcularPosicionRuedas(bool MoverRuedas)
         {
             float ro, alfa_rueda, rotacionRueda;
             float posicion_x;
@@ -222,6 +268,32 @@ namespace TGC.Group.Model
 
         public void CalcularPosObb() //funcion medio rara que calcula posicion de los 3 obb meidante cordenadas polares
         {
+			float ro, alfa_OBB;
+            float posicion_x;
+            float posicion_y;
+
+            //   this.ObbArribaIzq.Center = (new Vector3(posicion_xArribaIzq, 11.5f, posicion_yArribaIzq) + this.Mesh.Position);
+
+            for (int i = 0; i < 6; i++)
+            {
+                ro = FastMath.Sqrt(dxObb[i] * dxObb[i] + dyObb[i] * dyObb[i]);
+
+                alfa_OBB = FastMath.Asin(dxObb[i] / ro);
+
+                if (i == 0 || i == 2 || i == 4)
+                {
+                    alfa_OBB += FastMath.PI;
+                }
+
+                posicion_x = FastMath.Sin(alfa_OBB + this.Mesh.Rotation.Y) * ro;
+                posicion_y = FastMath.Cos(alfa_OBB + this.Mesh.Rotation.Y) * ro;
+
+                this.ObbLista[i].Center = (new Vector3(posicion_x, 7.5f, posicion_y) + this.Mesh.Position);
+                this.ObbLista[i].rotate((new Vector3(0, rotAngle, 0)));
+
+            }
+			
+			/*
             float distanciaObb = 40;
             float alfaObbArriba = FastMath.PI;
             float alfaObbAbajo = 0;
@@ -238,6 +310,7 @@ namespace TGC.Group.Model
             this.ObbMedio.rotate((new Vector3(0, rotAngle, 0)));
             this.ObbAbajo.Center = (new Vector3(posicion_xAbajo, 0, posicion_yAbajo) + this.Mesh.Position);
             this.ObbAbajo.rotate((new Vector3(0, rotAngle, 0)));
+			*/
         }
 
         public void MoverAutoConColisiones(bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
@@ -248,6 +321,7 @@ namespace TGC.Group.Model
             var movement = new Vector3(0, 0, 0);
             var moveForward = 0f;
             var rotating = false;
+			var posicionAnterior = this.Mesh.Position;
 
             rotate = 0;
 
@@ -321,7 +395,7 @@ namespace TGC.Group.Model
             }
 
             //Guardar posicion original antes de cambiarla
-            var originalPos = this.Mesh.Position;
+            this.OriginalPos = this.Mesh.Position;
 
             //Multiplicar movimiento por velocidad y elapsedTime
             movement *= this.MOVEMENT_SPEED * ElapsedTime;
@@ -330,18 +404,23 @@ namespace TGC.Group.Model
 
             this.Mesh.moveOrientedY(moveForward * ElapsedTime);
 
-            if (this.DetectarColisionesObb())
+			if (this.colisiono)
             {
-                this.Mesh.Position = originalPos;
-                this.MOVEMENT_SPEED = (-1) * Math.Sign(this.MOVEMENT_SPEED) * Math.Abs(this.MOVEMENT_SPEED * 0.2f);
-                this.Mesh.moveOrientedY((-3.5f) * moveForward * ElapsedTime);
-
-                this.colisiono = false;
+                colisionSimple(ElapsedTime, moveForward);
             }
-
+			
+			this.ColisionesObbObb(GameModel.ListaMeshAutos, ElapsedTime, moveForward);
             this.ObbMesh.Center = this.Mesh.Position;
-
             direccionSeguir = movement;
+        }
+		
+		private void colisionSimple(float elapsedTime, float moveForward)
+        {
+            this.Mesh.Position = this.OriginalPos;
+            this.MOVEMENT_SPEED = (-1) * Math.Sign(this.MOVEMENT_SPEED) * Math.Abs(this.MOVEMENT_SPEED * 0.2f);
+            this.Mesh.moveOrientedY((-3.5f) * moveForward * elapsedTime);
+
+            this.colisiono = false;
         }
 
         private bool ColisionesObb(List<TgcMesh> ListaMesh)
@@ -367,7 +446,7 @@ namespace TGC.Group.Model
             return false;
         }
 
-        private bool ColisionesObbObb(List<Auto> ListaMesh)
+        private bool ColisionesObbObb(List<Auto> ListaMesh, float elapsedTime, float movefoward)
         {
             //Me fijo si colisiona con algo
             if (ListaMesh != null)
@@ -379,6 +458,7 @@ namespace TGC.Group.Model
                         //me fijo si hubo alguna colision vuelvo
                         if (TgcCollisionUtils.testObbObb(this.ObbMesh.toStruct(), unMesh.ObbMesh.toStruct()))
                         {
+							respuestaColisionAutovsAuto(unMesh, elapsedTime, movefoward);
                             return true;
                         }
                     }
@@ -389,6 +469,122 @@ namespace TGC.Group.Model
             return false;
         }        
 
+		private void respuestaColisionAutovsAuto(Auto unAuto, float elapsedTime, float moveFoward)
+        {
+            if (TgcCollisionUtils.testObbObb(this.ObbArriba.toStruct(), unAuto.ObbMesh.toStruct()))
+            {
+                if (Math.Truncate(this.MOVEMENT_SPEED) == 0)
+                {
+                    this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
+                    this.colisionSimple(elapsedTime, 2); //esto esta medio harcodeado pero dejarlo asi por ahora
+                }
+                else
+                {
+                    this.colisionSimple(elapsedTime, moveFoward);
+                }
+                return;
+
+            }
+
+            if (TgcCollisionUtils.testObbObb(this.ObbArribaDer.toStruct(), unAuto.ObbMesh.toStruct()))
+            {
+                if ((Math.Truncate(this.MOVEMENT_SPEED)) == 0)
+                {
+                    this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
+                    this.colisionSimpleCostados(elapsedTime, -1);
+                }
+                else
+                {
+                    this.colisionSimpleCostados(elapsedTime, -1);
+                }
+                this.pesoImpacto = 5;
+                return;
+            }
+
+            if (TgcCollisionUtils.testObbObb(this.ObbArribaIzq.toStruct(), unAuto.ObbMesh.toStruct()))
+            {
+                if (Math.Truncate(this.MOVEMENT_SPEED) == 0)
+                {
+                    this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
+                    this.colisionSimpleCostados(elapsedTime, 1);
+                }
+                else
+                {
+                    this.colisionSimpleCostados(elapsedTime, 1);
+                }
+                this.pesoImpacto = 5;
+                return;
+            }
+
+            if (TgcCollisionUtils.testObbObb(this.ObbAbajo.toStruct(), unAuto.ObbMesh.toStruct()))
+            {
+                if (Math.Truncate(this.MOVEMENT_SPEED) == 0)
+                {
+                    this.MOVEMENT_SPEED -= unAuto.MOVEMENT_SPEED;
+                    this.colisionSimple(elapsedTime, 2);
+
+                }
+                else
+                {
+                    this.colisionSimple(elapsedTime, moveFoward);
+                }
+                this.pesoImpacto = 5;
+                return;
+
+            }
+
+            if (TgcCollisionUtils.testObbObb(this.ObbAbajoIzq.toStruct(), unAuto.ObbMesh.toStruct()))
+            {
+                if (Math.Truncate(this.MOVEMENT_SPEED) == 0)
+                {
+                    this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
+                    this.colisionSimpleCostados(elapsedTime, -1);
+                }
+                else
+                {
+                    this.colisionSimpleCostados(elapsedTime, -1);
+                }
+                this.pesoImpacto = 5;
+                return;
+            }
+
+            if (TgcCollisionUtils.testObbObb(this.ObbAbajoDer.toStruct(), unAuto.ObbMesh.toStruct()))
+            {
+                if (Math.Truncate(this.MOVEMENT_SPEED) == 0)
+                {
+                    this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
+                    this.colisionSimpleCostados(elapsedTime, 1);
+                }
+                else
+                {
+                    this.colisionSimpleCostados(elapsedTime, 1);
+                }
+                this.pesoImpacto = 5;
+                return;
+            }
+        }
+		
+		private void colisionSimpleCostados(float elapsedTime, float orientacion)
+        {
+            this.rotAngle = (this.MOVEMENT_SPEED * 1f * Math.Sign(orientacion) * elapsedTime) * (FastMath.PI / 50);
+            this.Mesh.rotateY(rotAngle);
+            this.ObbMesh.rotate(new Vector3(0, rotAngle, 0));
+        }
+		
+		private float AnguloEntreVectores(Vector3 vector1, Vector3 vector2)
+        {
+            var v1x = vector1.X;
+            var v1y = vector1.Y;
+            var v1z = vector1.Z;
+            var v2x = vector1.X;
+            var v2y = vector2.Y;
+            var v2z = vector2.Z;
+            var dotProduct = vector1.X * vector2.X + vector1.Y * vector2.Y + vector1.Z * vector2.Z;
+            var modv1xv2 = FastMath.Sqrt(v1x * v1x + v1y * v1y + v1z * v1z) + FastMath.Sqrt(v2x * v2x + v2y * v2y + v2z * v2z);
+            var angle = FastMath.Acos(dotProduct / modv1xv2);
+            return angle;
+        }
+		
         private bool DetectarColisionesObb()
         {/*
             if (this.ColisionesObb(GameModel.ScenePpal.Meshes))
@@ -406,9 +602,10 @@ namespace TGC.Group.Model
             if (this.ColisionesObb(GameModel.MeshArbolesBananas))
                 return true;
         */
+        /*
             if (this.colisiono || this.ColisionesObbObb(GameModel.ListaMeshAutos))
                return true;
-
+         */
             return false;
         }
 
@@ -477,7 +674,6 @@ namespace TGC.Group.Model
                 this.RuedasJugador[i].render();
             }
         }
-
         public void Dispose()
         {
             foreach (var unaRueda in this.RuedasJugador)
