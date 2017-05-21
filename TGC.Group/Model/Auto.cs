@@ -475,7 +475,7 @@ namespace TGC.Group.Model
 
             if (TgcCollisionUtils.testObbObb(this.ObbArriba.toStruct(), unAuto.ObbMesh.toStruct()))
             {
-                if (Math.Abs(speed) < 0)
+                if (Math.Abs(speed) < 5)
                 {
                     this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
                     this.colisionSimple(elapsedTime, 2); //esto esta medio harcodeado pero dejarlo asi por ahora
@@ -490,7 +490,7 @@ namespace TGC.Group.Model
 
             if (TgcCollisionUtils.testObbObb(this.ObbArribaDer.toStruct(), unAuto.ObbMesh.toStruct()))
             {
-                if (Math.Abs(speed) < 0)
+                if (Math.Abs(speed) < 5)
                 {
                     this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
                     this.colisionSimpleCostados(elapsedTime, -1);
@@ -505,7 +505,7 @@ namespace TGC.Group.Model
 
             if (TgcCollisionUtils.testObbObb(this.ObbArribaIzq.toStruct(), unAuto.ObbMesh.toStruct()))
             {
-                if (Math.Abs(speed) < 0)
+                if (Math.Abs(speed) < 5)
                 {
                     this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
                     this.colisionSimpleCostados(elapsedTime, 1);
@@ -520,7 +520,7 @@ namespace TGC.Group.Model
 
             if (TgcCollisionUtils.testObbObb(this.ObbAbajo.toStruct(), unAuto.ObbMesh.toStruct()))
             {
-                if (Math.Abs(speed) < 0)
+                if (Math.Abs(speed) < 5)
                 {
                     this.MOVEMENT_SPEED -= unAuto.MOVEMENT_SPEED;
                     this.colisionSimple(elapsedTime, 2);
@@ -537,7 +537,7 @@ namespace TGC.Group.Model
 
             if (TgcCollisionUtils.testObbObb(this.ObbAbajoIzq.toStruct(), unAuto.ObbMesh.toStruct()))
             {
-                if (Math.Abs(speed) < 0)
+                if (Math.Abs(speed) < 5)
                 {
                     this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
                     this.colisionSimpleCostados(elapsedTime, -1);
@@ -552,7 +552,7 @@ namespace TGC.Group.Model
 
             if (TgcCollisionUtils.testObbObb(this.ObbAbajoDer.toStruct(), unAuto.ObbMesh.toStruct()))
             {
-                if (Math.Abs(speed) < 0)
+                if (Math.Abs(speed) < 5)
                 {
                     this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
                     this.colisionSimpleCostados(elapsedTime, 1);
