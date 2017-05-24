@@ -8,6 +8,7 @@ using TGC.Core.BoundingVolumes;
 using TGC.Core.Collision;
 using TGC.Core.Geometry;
 using TGC.Core.SceneLoader;
+using TGC.Core.Textures;
 using TGC.Core.Utils;
 
 namespace TGC.Group.Model
@@ -90,6 +91,9 @@ namespace TGC.Group.Model
         //Direccion para seguimiento
         Vector3 direccionSeguir = new Vector3(0, 0, 0);
 
+        //Humo
+        HumoParticula emisorHumo;
+
         public Auto(string MediaDir, int NroJugador)
         {
             this.NroJugador = NroJugador;
@@ -103,7 +107,7 @@ namespace TGC.Group.Model
 			/*    this.ObbArriba.render();
                 this.ObbMedio.render();
                 this.ObbAbajo.render();*/
-
+/*
             this.ObbArriba.render();
             this.ObbArribaIzq.render();
             this.ObbArribaDer.render();
@@ -111,6 +115,7 @@ namespace TGC.Group.Model
             this.ObbAbajo.render();
             this.ObbAbajoDer.render();
             this.ObbAbajoIzq.render();
+*/
         }
 
         public TgcMesh GetMesh()
@@ -137,8 +142,18 @@ namespace TGC.Group.Model
             this.Mesh.AutoTransformEnable = true;
             this.Mesh.move(0, 0.5f, 0);
             this.Mesh.updateBoundingBox();
+
             this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
-			/*   this.ObbArriba = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 40)).BoundingBox);
+            this.emisorHumo = new HumoParticula(this.MediaDir);
+
+            /*
+
+            Vector3[] puntosDelAuto = this.Mesh.getVertexPositions();
+
+            this.ObbMesh = TgcBoundingOrientedBox.computeFromPoints(puntosDelAuto);
+            */
+
+            /*   this.ObbArriba = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 40)).BoundingBox);
                this.ObbArriba.setRenderColor(System.Drawing.Color.IndianRed);
                this.ObbMedio = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 40)).BoundingBox);
                this.ObbMedio.setRenderColor(System.Drawing.Color.Green);
@@ -655,14 +670,15 @@ namespace TGC.Group.Model
             {
                 this.Update(true, false, true, false, true, false, ElapsedTime); //Si el rayo no impacta con el auto del jugador, el auto comienza a frenar mientras que gira en sentido horario intentando encontrar al auto del jugador
             }*/
-            
+
         }
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
         {
             this.MoverAutoConColisiones(Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
             this.CalcularPosicionRuedas(MoverRuedas);
-            this.CalcularPosObb();     
+            this.CalcularPosObb();
+            this.emisorHumo.Update(ElapsedTime, this.ObbAbajoDer.Position, this.Mesh.Rotation.Y);
         }
 
         public void Render()
@@ -673,6 +689,8 @@ namespace TGC.Group.Model
             {
                 this.RuedasJugador[i].render();
             }
+
+            this.emisorHumo.Render();
         }
         public void Dispose()
         {
@@ -680,6 +698,8 @@ namespace TGC.Group.Model
             {
                 unaRueda.dispose();
             }
+
+            this.emisorHumo.Dispose();
         }
     }
 }
