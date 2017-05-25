@@ -14,6 +14,7 @@ using TGC.UtilsGroup;
 using TGC.Core.Geometry;
 using System;
 using TGC.Core.BoundingVolumes;
+using TGC.Core.Shaders;
 
 namespace TGC.Group.Model
 {
@@ -105,6 +106,10 @@ namespace TGC.Group.Model
         public static bool finReloj = false;
         public static int nroGanador = 0;
 
+        //Luna
+        private TgcMesh lunaMesh;
+        private TgcSphere sphere;
+
         public override void Init()
         {
             //Device de DirectX para crear primitivas.
@@ -145,6 +150,20 @@ namespace TGC.Group.Model
             //Inicio camara de presentacion
             CamaraInit = new CamaraTW (this.listaJugadores[0].claseAuto.GetPosition());
             Camara = CamaraInit.GetCamera();
+
+            //Crear caja para indicar ubicacion de la luz
+            this.lunaMesh = TgcBox.fromSize(new Vector3(20, 20, 20), Color.Yellow).toMesh("Box");
+            this.lunaMesh.AutoTransformEnable = true;
+            this.lunaMesh.Position = new Vector3(0, 1800, 0);
+            this.sphere = new TgcSphere();
+            this.sphere.AutoTransformEnable = true;
+            this.sphere.Radius = 100;
+            this.sphere.Position = this.lunaMesh.Position;
+            this.sphere.LevelOfDetail = 4;
+            this.sphere.BasePoly = TgcSphere.eBasePoly.ICOSAHEDRON;
+            this.sphere.setTexture(TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "\\Textures\\luna.jpg"));
+            this.sphere.updateValues();
+            ////////////////////////////////////////////////////////////////////////////////////////
 
             //Inicio clase de menu
             this.claseMenu = new HUDMenu(MediaDir);
@@ -469,6 +488,9 @@ namespace TGC.Group.Model
 
         public override void Render()
         {
+            Microsoft.DirectX.Direct3D.Effect lunaShader;
+            TgcMesh unMesh;
+
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
@@ -494,11 +516,30 @@ namespace TGC.Group.Model
             //Renderizo todos los objetos
             quadtree.render(Frustum, false);
 
+            /////////////////////////////////////////////////////////////////////////////////
+            lunaShader = TgcShaders.Instance.TgcMeshPhongShader;
+            /////////////////////////////////////////////////////////////////////////////////
+
             //Dibujo los jugadores
             foreach (var unJugador in this.listaJugadores)
             {
+                unMesh = unJugador.claseAuto.GetMesh();
+                unMesh.Effect = lunaShader;
+                unMesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(unMesh.RenderType);
+
+                unMesh.Effect.SetValue("lightPosition", TgcParserUtils.vector3ToFloat4Array(lunaMesh.Position));
+                unMesh.Effect.SetValue("eyePosition", TgcParserUtils.vector3ToFloat4Array(Camara.Position));
+                unMesh.Effect.SetValue("ambientColor", Microsoft.DirectX.Direct3D.ColorValue.FromColor(Color.White));
+                unMesh.Effect.SetValue("diffuseColor", Microsoft.DirectX.Direct3D.ColorValue.FromColor(Color.White));
+                unMesh.Effect.SetValue("specularColor", Microsoft.DirectX.Direct3D.ColorValue.FromColor(Color.White));
+                unMesh.Effect.SetValue("specularExp", 80f);
+
                 unJugador.Render();
             }
+
+            //Renderizo la luna
+            this.lunaMesh.render();
+            this.sphere.render();
 
             //Dibujo el reloj o solo muevo la camara para la presentación del juego
             if (!this.ModoPresentacion)
