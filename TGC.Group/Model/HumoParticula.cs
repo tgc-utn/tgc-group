@@ -8,13 +8,14 @@ namespace TGC.Group.Model
     class HumoParticula
     {
         private ParticleEmitter emitter;
-        private const int CANTIDAD_PARTICULAS = 10;
-        private const float TAMANO_PARTICULA = 0.75f;
+        private const int CANTIDAD_PARTICULAS = 20;
+        private const float TAMANO_PARTICULA = 1f;
         private const float TTL_PARTICULA = 0.8f;
-        private const float FQ_PARTICULA = 0.25f;
-        private const int DISPERSION_PARTICULA = 50;
-        private const float VELOCIDAD_PARTICULA = 40f;
+        private const float FQ_PARTICULA = 0.5f;
+        private const int DISPERSION_PARTICULA = 120;
+        private const float VELOCIDAD_PARTICULA = 60f;
         private float ElapsedTime = 0;
+        private Vector2 posicionHumo = new Vector2(0, 35);
 
         public HumoParticula (string MediaDir)
         {
@@ -33,9 +34,9 @@ namespace TGC.Group.Model
             float posicion_xhumo;
             float posicion_yhumo;
 
-            rohumo = FastMath.Sqrt(-this.emitter.Position.X * -this.emitter.Position.X + this.emitter.Position.Z * this.emitter.Position.Z);
+            rohumo = FastMath.Sqrt(this.posicionHumo.X * this.posicionHumo.X + this.posicionHumo.Y * this.posicionHumo.Y);
 
-            alfa_humo = FastMath.Asin(this.emitter.Position.X / rohumo);
+            alfa_humo = FastMath.Asin(this.posicionHumo.X / rohumo);
             posicion_xhumo = FastMath.Sin(alfa_humo + Rotation) * rohumo;
             posicion_yhumo = FastMath.Cos(alfa_humo + Rotation) * rohumo;
 
