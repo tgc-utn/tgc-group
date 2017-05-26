@@ -42,13 +42,13 @@ namespace TGC.Group.Model
         private HUDMenu claseMenu;
 
         //Cantidad de filas
-        private const int ROWS = 30;
+        private const int ROWS = 15;
 
         //Cantidad de columnas
-        private const int COLUMNS = 30;
+        private const int COLUMNS = 15;
 
         //Tamaño cuadrante
-        private const int CUADRANTE_SIZE = 600;
+        private const int CUADRANTE_SIZE = 1200;
 
         //Posicion vertices
         private const int POSICION_VERTICE = 9000;
@@ -91,6 +91,10 @@ namespace TGC.Group.Model
         public static List<TgcMesh> MeshArbolesBananas;
         private TgcMesh ArbolBananasOriginal;
 
+        //Lista de Postes de luz
+        public static List<TgcMesh> MeshPDL;
+        private TgcMesh PDLOriginal;
+
         //Jugadores
         private List <Jugador> listaJugadores;
 
@@ -109,14 +113,27 @@ namespace TGC.Group.Model
         public static int nroGanador = 0;
 
         //Luna
-        private TgcMesh lunaMesh;
         private TgcSphere sphere;
 
         //Shadows
         private readonly int SHADOWMAP_SIZE = 2048;
-        private readonly float far_plane = 29000f;
+        private readonly float far_plane = 5000f;
         private readonly float near_plane = 1f;
         private Vector2 posicionLuzEnAuto = new Vector2(20, 0);
+        private Vector3 g_LightPos;
+        private Vector3 g_LightDir;
+        private Microsoft.DirectX.Direct3D.Effect shadowEffect;
+        private Matrix g_LightView;
+        private Matrix g_mShadowProj;
+        private Surface g_pDSShadow;
+        private Texture g_pShadowMap;
+
+        //Luz de postes de luz
+        private TgcBox luzAutoAzulMesh;
+
+        //Reflejo
+        private Microsoft.DirectX.Direct3D.Effect envMapEffect;
+        private CubeTexture g_pCubeMap;
 
         public override void Init()
         {
@@ -127,6 +144,19 @@ namespace TGC.Group.Model
             ////////////////////////////////////////////////////////////////////////////////////////
             //Cargar Shader personalizado
             this.shadowEffect = TgcShaders.loadEffect(MediaDir + "Shaders\\ShadowMap.fx");
+            
+            //Cargar Shader personalizado
+            this.envMapEffect = TgcShaders.loadEffect(MediaDir + "Shaders\\EnvMap.fx");
+
+            //Cargar variables de shader de envmap
+            this.envMapEffect.SetValue("fvLightPosition", new Vector4(0, 2150, 0, 0));
+            this.envMapEffect.SetValue("fvEyePosition", TgcParserUtils.vector3ToFloat3Array(Camara.Position));
+            this.envMapEffect.SetValue("kx", 0.5f);
+            this.envMapEffect.SetValue("kc", 0.5f);
+            this.envMapEffect.SetValue("usar_fresnel", true);
+
+            //Creo la textura para envmap
+            g_pCubeMap = new CubeTexture(D3DDevice.Instance.Device, 256, 1, Usage.RenderTarget, Format.A16B16G16R16F, Pool.Default);
 
             //--------------------------------------------------------------------------------------
             // Creo el shadowmap.
@@ -160,7 +190,7 @@ namespace TGC.Group.Model
             this.claseTiempo = new HUDTiempo(MediaDir, this.TiempoDeJuego);
 
             //Cargo el terreno
-            ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA-TgcScene.xml");
+            ScenePpal = loader.loadSceneFromFile(MediaDir + "MAPA2-TgcScene.xml");
 
             TransformarMeshScenePpal(0, 3, POSICION_VERTICE);
             TransformarMeshScenePpal(1, 3, POSICION_VERTICE);
@@ -168,6 +198,12 @@ namespace TGC.Group.Model
             TransformarMeshScenePpal(3, 3, POSICION_VERTICE);
             TransformarMeshScenePpal(4, 3, POSICION_VERTICE);
             TransformarMeshScenePpal(5, 3, POSICION_VERTICE);
+
+            //Crear caja para luz de PDL
+            this.luzAutoAzulMesh = TgcBox.fromSize(new Vector3(10, 10, 10));
+            this.luzAutoAzulMesh.AutoTransformEnable = true;
+            this.luzAutoAzulMesh.Color = Color.White;
+            ////////////////////////////////////////////////////////////////////////////////////////
 
             //Cargo los jugadores y sus autos
             this.CrearJugadores(loader);
@@ -179,31 +215,40 @@ namespace TGC.Group.Model
             {
                 unMesh.Effect = this.shadowEffect;
             }
-            
+
+            foreach (TgcMesh unMesh in GameModel.MeshPDL)
+            {
+                unMesh.Effect = this.shadowEffect;
+            }
+
+            /*
+            foreach (var unJugador in this.listaJugadores)
+            {
+                unJugador.claseAuto.GetMesh().D3dMesh.ComputeNormals();
+            }
+            */
+
             //Crear Quadtree
             List<TgcMesh> listaMeshesQ = new List<TgcMesh>();
             listaMeshesQ.AddRange(MeshPalmeras);
             listaMeshesQ.AddRange(MeshPinos);
             listaMeshesQ.AddRange(MeshRocas);
             listaMeshesQ.AddRange(MeshArbolesBananas);
+            listaMeshesQ.AddRange(MeshPDL);
             listaMeshesQ.AddRange(GameModel.ScenePpal.Meshes);
 
             quadtree = new Quadtree();
             quadtree.create(listaMeshesQ, ScenePpal.BoundingBox);
-            //quadtree.createDebugQuadtreeMeshes();
 
             //Inicio camara de presentacion
             CamaraInit = new CamaraTW (this.listaJugadores[0].claseAuto.GetPosition());
             Camara = CamaraInit.GetCamera();
 
-            //Crear caja para indicar ubicacion de la luz
-            this.lunaMesh = TgcBox.fromSize(new Vector3(20, 20, 20), Color.Yellow).toMesh("Box");
-            this.lunaMesh.AutoTransformEnable = true;
-            this.lunaMesh.Position = new Vector3(0, 1800, 0);
+            //Crear caja para indicar ubicacion de la luz luna
             this.sphere = new TgcSphere();
             this.sphere.AutoTransformEnable = true;
-            this.sphere.Radius = 100;
-            this.sphere.Position = this.lunaMesh.Position;
+            this.sphere.Radius = 500;
+            this.sphere.Position = new Vector3(0, 2400, 0);
             this.sphere.LevelOfDetail = 4;
             this.sphere.BasePoly = TgcSphere.eBasePoly.ICOSAHEDRON;
             this.sphere.setTexture(TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "\\Textures\\luna.jpg"));
@@ -272,10 +317,12 @@ namespace TGC.Group.Model
         private void CrearJugadores(TgcSceneLoader loader)
         {
             System.Random randomNumber = new System.Random();
+            TgcMesh instanciaPDL_1, instanciaPDL_2, instanciaPDL_3, instanciaPDL_4, instanciaPDL_5;
 
             //Creo la lista de jugadores y sus autos
             GameModel.MeshAutos = new List<TgcMesh>();
             GameModel.ListaMeshAutos = new List<Auto>();
+            GameModel.MeshPDL = new List<TgcMesh>();
             this.listaJugadores = new List<Jugador>();
             this.listaJugadores.Add(new Jugador(this.NombreJugador1, MediaDir, 0));
             this.listaJugadores[0].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto\\Auto-TgcScene.xml").Meshes[0]);
@@ -285,8 +332,19 @@ namespace TGC.Group.Model
             GameModel.MeshAutos.Add(this.listaJugadores[0].claseAuto.GetMesh());
             GameModel.ListaMeshAutos.Add(this.listaJugadores[0].claseAuto);
 
+            PDLOriginal = loader.loadSceneFromFile(MediaDir + "Objetos\\PosteDeLuz\\PosteDeLuz-TgcScene.xml").Meshes[0];
+            instanciaPDL_1 = PDLOriginal.createMeshInstance(PDLOriginal.Name + "_1");
+            instanciaPDL_1.AutoTransformEnable = true;
+            instanciaPDL_1.move(new Vector3(12, 0, 0));
+            instanciaPDL_1.BoundingBox.setExtremes(new Vector3(0, 0, 0), new Vector3(10, 70, 10));
+            instanciaPDL_1.BoundingBox.move(new Vector3 (40, 0, 0));
+            GameModel.MeshPDL.Add(instanciaPDL_1);
+
+            this.luzAutoAzulMesh.move (new Vector3(0, 80, 0));
+
             if (CantidadDeOponentes >= 1)
             {
+                //Crear instancia de modelo
                 listaJugadores.Add(new Jugador("gris", MediaDir, 1));
                 this.listaJugadores[1].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\AutoGris\\Auto-TgcScene.xml").Meshes[0]);
                 this.listaJugadores[1].claseAuto.SetPositionMesh(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (POSICION_VERTICE - CUADRANTE_SIZE * 4)), false);
@@ -294,6 +352,13 @@ namespace TGC.Group.Model
                 this.listaJugadores[1].CreateCamera();
                 GameModel.MeshAutos.Add(this.listaJugadores[1].claseAuto.GetMesh());
                 GameModel.ListaMeshAutos.Add(this.listaJugadores[1].claseAuto);
+
+                instanciaPDL_2 = PDLOriginal.createMeshInstance(PDLOriginal.Name + "_2");
+                instanciaPDL_2.AutoTransformEnable = true;
+                instanciaPDL_2.move(new Vector3(((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)) + 20, 0, (POSICION_VERTICE - CUADRANTE_SIZE * 4)));
+                instanciaPDL_2.BoundingBox.setExtremes(new Vector3(0, 0, 0), new Vector3(10, 70, 10));
+                instanciaPDL_2.BoundingBox.move(new Vector3(((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)) + 45, 0, (POSICION_VERTICE - CUADRANTE_SIZE * 4)));
+                GameModel.MeshPDL.Add(instanciaPDL_2);
             }
 
             if (CantidadDeOponentes >= 2)
@@ -533,16 +598,8 @@ namespace TGC.Group.Model
                 }
             }
 
-            CalcularPosicionLuz();
+            CalcularPosicionLuzAuto();
         }
-
-        private Vector3 g_LightPos;
-        private Vector3 g_LightDir;
-        private Microsoft.DirectX.Direct3D.Effect shadowEffect;
-        private Matrix g_LightView;
-        private Matrix g_mShadowProj;
-        private Surface g_pDSShadow;
-        private Texture g_pShadowMap;
 
         public void RenderShadowMap()
         {
@@ -564,6 +621,7 @@ namespace TGC.Group.Model
             D3DDevice.Instance.Device.SetRenderTarget(0, pShadowSurf);
             var pOldDS = D3DDevice.Instance.Device.DepthStencilSurface;
             D3DDevice.Instance.Device.DepthStencilSurface = g_pDSShadow;
+
             D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
             D3DDevice.Instance.Device.BeginScene();
 
@@ -571,10 +629,9 @@ namespace TGC.Group.Model
             shadowEffect.SetValue("g_txShadow", g_pShadowMap);
 
             //Renderizo todos las sombras de todos los objetos del mapa
-            quadtree.render(Frustum, false, "RenderShadow");
+            quadtree.render(Frustum, false, "RenderShadow", 0, this.shadowEffect);
 
             //Dibujo las sombras de los jugadores
-            /*
             foreach (var unJugador in this.listaJugadores)
             {
                 unMesh = unJugador.claseAuto.GetMesh();
@@ -582,16 +639,18 @@ namespace TGC.Group.Model
                 unMesh.Technique = "RenderShadow";
                 unJugador.claseAuto.Render();
             }
-            */
+
             // Termino
             D3DDevice.Instance.Device.EndScene();
 
             // restuaro el render target y el stencil
             D3DDevice.Instance.Device.DepthStencilSurface = pOldDS;
             D3DDevice.Instance.Device.SetRenderTarget(0, pOldRT);
+
+            pShadowSurf.Dispose();
         }
 
-        public void CalcularPosicionLuz()
+        public void CalcularPosicionLuzAuto()
         {
             float rohumo, alfa_luz;
             float posicion_xluz;
@@ -610,8 +669,9 @@ namespace TGC.Group.Model
 
         public override void Render()
         {
-            Microsoft.DirectX.Direct3D.Effect lunaShader;
             TgcMesh unMesh;
+            Surface pOldRT, pFace;
+
 
             //Habilito el render de particulas para el humo
             D3DDevice.Instance.ParticlesEnabled = true;
@@ -621,26 +681,111 @@ namespace TGC.Group.Model
             //PreRender();
             ClearTextures();
 
-            /*
-            g_LightPos = new Vector3(200, 200, 0);
-            g_LightDir = new Vector3(0, 0, 0) - g_LightPos;
-            g_LightDir.Normalize();
-            */
-            /*
-            g_LightPos = this.listaJugadores[0].claseAuto.ObbMesh.Position + new Vector3(20, 20, 20);
-            g_LightDir = g_LightPos + new Vector3(-10, 10, -10);
-            g_LightDir.Normalize();*/
+            #region RenderEnvMap
 
+            pOldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
+            // ojo: es fundamental que el fov sea de 90 grados.
+            // asi que re-genero la matriz de proyeccion
+            D3DDevice.Instance.Device.Transform.Projection = Matrix.PerspectiveFovLH (Geometry.DegreeToRadian(90.0f), 1f, 1f, 10000f);
 
+            // Genero las caras del enviroment map
+            for (var nFace = CubeMapFace.PositiveX; nFace <= CubeMapFace.NegativeZ; ++nFace)
+            {
+                pFace = g_pCubeMap.GetCubeMapSurface(nFace, 0);
+                D3DDevice.Instance.Device.SetRenderTarget(0, pFace);
+                Vector3 Dir, VUP;
+                Color color;
+                switch (nFace)
+                {
+                    default:
+                    case CubeMapFace.PositiveX:
+                        // Left
+                        Dir = new Vector3(1, 0, 0);
+                        VUP = new Vector3(0, 1, 0);
+                        color = Color.Black;
+                        break;
 
+                    case CubeMapFace.NegativeX:
+                        // Right
+                        Dir = new Vector3(-1, 0, 0);
+                        VUP = new Vector3(0, 1, 0);
+                        color = Color.Red;
+                        break;
+
+                    case CubeMapFace.PositiveY:
+                        // Up
+                        Dir = new Vector3(0, 1, 0);
+                        VUP = new Vector3(0, 0, -1);
+                        color = Color.Gray;
+                        break;
+
+                    case CubeMapFace.NegativeY:
+                        // Down
+                        Dir = new Vector3(0, -1, 0);
+                        VUP = new Vector3(0, 0, 1);
+                        color = Color.Yellow;
+                        break;
+
+                    case CubeMapFace.PositiveZ:
+                        // Front
+                        Dir = new Vector3(0, 0, 1);
+                        VUP = new Vector3(0, 1, 0);
+                        color = Color.Green;
+                        break;
+
+                    case CubeMapFace.NegativeZ:
+                        // Back
+                        Dir = new Vector3(0, 0, -1);
+                        VUP = new Vector3(0, 1, 0);
+                        color = Color.Blue;
+                        break;
+                }
+
+                D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, color, 1.0f, 0);
+                D3DDevice.Instance.Device.BeginScene();
+
+                quadtree.render(Frustum, false, "", 1, null);
+
+                D3DDevice.Instance.Device.EndScene();
+                pFace.Dispose();
+            }
+
+            D3DDevice.Instance.Device.SetRenderTarget(0, pOldRT);
+
+            // Restauro el estado de las transformaciones
+            D3DDevice.Instance.Device.Transform.View = Camara.GetViewMatrix();
+            D3DDevice.Instance.Device.Transform.Projection = Matrix.PerspectiveFovLH(Geometry.DegreeToRadian(45.0f), D3DDevice.Instance.AspectRatio, 1f, 10000f);
+
+            //Dibujo el auto espejado
+            D3DDevice.Instance.Device.BeginScene();
             D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+
+            this.envMapEffect.SetValue("g_txCubeMap", g_pCubeMap);
+            
+            foreach (var unJugador in this.listaJugadores)
+            {
+                unMesh = unJugador.claseAuto.GetMesh();
+                unMesh.Effect = this.envMapEffect;
+                unMesh.Technique = "RenderCubeMap";
+                unJugador.Render();
+            }            
+
+            D3DDevice.Instance.Device.EndScene();
+
+            #endregion
+
+            #region RenderShadowMap
+
+            //D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
 
             //Genero el shadow map
             this.RenderShadowMap();
 
+            #endregion
+
+            #region RenderEscenaConLuna
+
             D3DDevice.Instance.Device.BeginScene();
-            // dibujo la escena pp dicha
-            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
 
             //Dibuja un texto por pantalla
             this.RenderFPS();
@@ -659,37 +804,10 @@ namespace TGC.Group.Model
             }
 
             //Renderizo todos los objetos
-            quadtree.render(Frustum, false, "RenderScene");
-
-            /////////////////////////////////////////////////////////////////////////////////
-            //lunaShader = TgcShaders.Instance.TgcMeshPhongShader;
-            /////////////////////////////////////////////////////////////////////////////////
-
-            //Dibujo los jugadores
-            foreach (var unJugador in this.listaJugadores)
-            {
-                /*
-                unMesh = unJugador.claseAuto.GetMesh();
-                unMesh.Effect = lunaShader;
-                unMesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(unMesh.RenderType);
-
-                unMesh.Effect.SetValue("lightPosition", TgcParserUtils.vector3ToFloat4Array(lunaMesh.Position));
-                unMesh.Effect.SetValue("eyePosition", TgcParserUtils.vector3ToFloat4Array(Camara.Position));
-                unMesh.Effect.SetValue("ambientColor", Microsoft.DirectX.Direct3D.ColorValue.FromColor(Color.White));
-                unMesh.Effect.SetValue("diffuseColor", Microsoft.DirectX.Direct3D.ColorValue.FromColor(Color.White));
-                unMesh.Effect.SetValue("specularColor", Microsoft.DirectX.Direct3D.ColorValue.FromColor(Color.White));
-                unMesh.Effect.SetValue("specularExp", 80f);
-                */
-                unMesh = unJugador.claseAuto.GetMesh();
-                unMesh.Effect = this.shadowEffect;
-                unMesh.Technique = "RenderScene";
-
-                unJugador.Render();
-            }
+            quadtree.render(Frustum, false, "RenderScene", 0, this.shadowEffect);
 
             //Renderizo la luna
-            //this.lunaMesh.render();
-            //this.sphere.render();
+            this.sphere.render();
 
             //Dibujo el reloj o solo muevo la camara para la presentación del juego
             if (!this.ModoPresentacion)
@@ -703,8 +821,76 @@ namespace TGC.Group.Model
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             //PostRender();
             D3DDevice.Instance.Device.EndScene();
-            D3DDevice.Instance.Device.Present();
+            #endregion
 
+
+           
+
+            /*
+            pointLightShader = TgcShaders.Instance.TgcMeshPointLightShader;
+
+            //Dibujo los jugadores
+            Microsoft.DirectX.Direct3D.Effect EffectTmp;
+            string TechniqueTmp;
+
+            TgcBox unaCaja = TgcBox.fromSize(new Vector3(40, 40, 40));
+            unaCaja.setTexture(TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "\\Textures\\luna.jpg"));
+            unMesh = unaCaja.toMesh("unameshs");
+
+            EffectTmp = unMesh.Effect;
+            TechniqueTmp = unMesh.Technique;
+
+            unMesh.Effect = pointLightShader;
+            unMesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(unMesh.RenderType);
+
+            //Cargar variables shader de la luz
+            unMesh.Effect.SetValue("lightColor", ColorValue.FromColor(this.luzAutoAzulMesh.Color));
+            unMesh.Effect.SetValue("lightPosition", TgcParserUtils.vector3ToFloat4Array(luzAutoAzulMesh.Position));
+            unMesh.Effect.SetValue("eyePosition", TgcParserUtils.vector3ToFloat4Array(Camara.Position));
+            unMesh.Effect.SetValue("lightIntensity", 100);
+            unMesh.Effect.SetValue("lightAttenuation", 0.3f);
+
+            //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
+            unMesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.Violet));
+            unMesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Color.Brown));
+            unMesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.Red));
+            unMesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Color.Blue));
+            unMesh.Effect.SetValue("materialSpecularExp", 1f);
+            unMesh.render();
+            */
+
+
+            /*foreach (var unJugador in this.listaJugadores)
+            {
+                unMesh = unJugador.claseAuto.GetMesh();
+                unMesh.Effect = pointLightShader;
+                unMesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(unMesh.RenderType);
+
+                //Cargar variables shader de la luz
+                unMesh.Effect.SetValue("lightColor", ColorValue.FromColor(this.luzAutoAzulMesh.Color));
+                unMesh.Effect.SetValue("lightPosition", TgcParserUtils.vector3ToFloat4Array(luzAutoAzulMesh.Position));
+                unMesh.Effect.SetValue("eyePosition", TgcParserUtils.vector3ToFloat4Array(Camara.Position));
+                unMesh.Effect.SetValue("lightIntensity", 50);
+                unMesh.Effect.SetValue("lightAttenuation", 0.0f);
+
+                //Cargar variables de shader de Material. El Material en realidad deberia ser propio de cada mesh. Pero en este ejemplo se simplifica con uno comun para todos
+                unMesh.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
+                unMesh.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Color.Brown));
+                unMesh.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.Red));
+                unMesh.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Color.Blue));
+                unMesh.Effect.SetValue("materialSpecularExp", 10f);
+
+                unJugador.claseAuto.Render();
+            }
+
+            this.luzAutoAzulMesh.render();
+            */
+            /*
+                        D3DDevice.Instance.Device.EndScene();
+
+                        #endregion
+            */
+            D3DDevice.Instance.Device.Present();
         }
 
         private void CalcularGanador()
@@ -841,6 +1027,9 @@ namespace TGC.Group.Model
 
             //Renderizar rocas
             AccionarListaMesh(MeshRocas, unaAccion, null);
+
+            //Renderizar PDL
+            AccionarListaMesh(MeshPDL, unaAccion, null);
         }
 
         public void ActivarBoundingBox()
@@ -891,6 +1080,9 @@ namespace TGC.Group.Model
             PinoOriginal.dispose();
             RocaOriginal.dispose();
             ArbolBananasOriginal.dispose();
+            PDLOriginal.dispose();
+            g_pCubeMap.Dispose();
+            g_pShadowMap.Dispose();
             ScenePpal.disposeAll();
         }
     }
