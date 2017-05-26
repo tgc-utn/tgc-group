@@ -744,7 +744,8 @@ namespace TGC.Group.Model
                 D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, color, 1.0f, 0);
                 D3DDevice.Instance.Device.BeginScene();
 
-                quadtree.render(Frustum, false, "", 1, null);
+                this.quadtree.render(Frustum, false, "", 1, null);
+                this.sphere.render();
 
                 D3DDevice.Instance.Device.EndScene();
                 pFace.Dispose();
@@ -754,7 +755,7 @@ namespace TGC.Group.Model
 
             // Restauro el estado de las transformaciones
             D3DDevice.Instance.Device.Transform.View = Camara.GetViewMatrix();
-            D3DDevice.Instance.Device.Transform.Projection = Matrix.PerspectiveFovLH(Geometry.DegreeToRadian(45.0f), D3DDevice.Instance.AspectRatio, 1f, 10000f);
+            D3DDevice.Instance.Device.Transform.Projection = Matrix.PerspectiveFovLH(Geometry.DegreeToRadian(45.0f), D3DDevice.Instance.AspectRatio, near_plane, far_plane);
 
             //Dibujo el auto espejado
             D3DDevice.Instance.Device.BeginScene();
