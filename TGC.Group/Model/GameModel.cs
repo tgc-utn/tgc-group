@@ -15,6 +15,8 @@ using TGC.Core.Geometry;
 using System;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Shaders;
+using Microsoft.DirectX.Direct3D;
+using TGC.Core;
 
 namespace TGC.Group.Model
 {
@@ -110,12 +112,50 @@ namespace TGC.Group.Model
         private TgcMesh lunaMesh;
         private TgcSphere sphere;
 
+        //Shadows
+        private readonly int SHADOWMAP_SIZE = 2048;
+        private readonly float far_plane = 29000f;
+        private readonly float near_plane = 1f;
+        private Vector2 posicionLuzEnAuto = new Vector2(20, 0);
+
         public override void Init()
         {
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
             var loader = new TgcSceneLoader();
-            
+
+            ////////////////////////////////////////////////////////////////////////////////////////
+            //Cargar Shader personalizado
+            this.shadowEffect = TgcShaders.loadEffect(MediaDir + "Shaders\\ShadowMap.fx");
+
+            //--------------------------------------------------------------------------------------
+            // Creo el shadowmap.
+            // Format.R32F
+            // Format.X8R8G8B8
+            g_pShadowMap = new Texture(D3DDevice.Instance.Device, SHADOWMAP_SIZE, SHADOWMAP_SIZE,
+                1, Usage.RenderTarget, Format.R32F,
+                Pool.Default);
+
+            // tengo que crear un stencilbuffer para el shadowmap manualmente
+            // para asegurarme que tenga la el mismo tamano que el shadowmap, y que no tenga
+            // multisample, etc etc.
+            g_pDSShadow = D3DDevice.Instance.Device.CreateDepthStencilSurface(SHADOWMAP_SIZE,
+                SHADOWMAP_SIZE,
+                DepthFormat.D24S8,
+                MultiSampleType.None,
+                0,
+                true);
+            // por ultimo necesito una matriz de proyeccion para el shadowmap, ya
+            // que voy a dibujar desde el pto de vista de la luz.
+            // El angulo tiene que ser mayor a 45 para que la sombra no falle en los extremos del cono de luz
+            // de hecho, un valor mayor a 90 todavia es mejor, porque hasta con 90 grados es muy dificil
+            // lograr que los objetos del borde generen sombras
+            var aspectRatio = D3DDevice.Instance.AspectRatio;
+            g_mShadowProj = Matrix.PerspectiveFovLH(Geometry.DegreeToRadian(80), aspectRatio, 50, 5000);
+            D3DDevice.Instance.Device.Transform.Projection =
+                Matrix.PerspectiveFovLH(Geometry.DegreeToRadian(45.0f), aspectRatio, near_plane, far_plane);
+            ////////////////////////////////////////////////////////////////////////////////////////
+
             //Cargo la clase de Tiempo
             this.claseTiempo = new HUDTiempo(MediaDir, this.TiempoDeJuego);
 
@@ -135,6 +175,11 @@ namespace TGC.Group.Model
             //Creo los objetos del escenario
             this.CrearObjetos(loader);
 
+            foreach (TgcMesh unMesh in GameModel.ScenePpal.Meshes)
+            {
+                unMesh.Effect = this.shadowEffect;
+            }
+            
             //Crear Quadtree
             List<TgcMesh> listaMeshesQ = new List<TgcMesh>();
             listaMeshesQ.AddRange(MeshPalmeras);
@@ -320,7 +365,7 @@ namespace TGC.Group.Model
                             //Calculo la matriz de traslación aleatoria
                             unaTranslation = Matrix.Translation(new Vector3((-1) * randomNumber.Next(j * CUADRANTE_SIZE, (j + 1) * CUADRANTE_SIZE), 0,
                                                                  randomNumber.Next(i * CUADRANTE_SIZE, (i + 1) * CUADRANTE_SIZE)));
-                            
+
                             //Lo posiciono en una posición aleatoria
                             instance.Transform = instance.Transform * unaTranslation;
 
@@ -329,13 +374,13 @@ namespace TGC.Group.Model
 
                             //Muevo el bounding box
                             instance.BoundingBox.transform(instance.Transform);
-                            
+
                             //Valido si pisa a otro objeto que ya existe
                             if (ValidarColisionCrearInstancias(instance, ListaMesh))
                             {
                                 //Hubo colision, no creo el objeto
                                 instance.dispose();
-                                continue;                                
+                                continue;
                             }
                             ///////////////////////////////////////////////////////////////////////////////////
 
@@ -343,10 +388,13 @@ namespace TGC.Group.Model
                             if ((unObjeto.Name == "Palmera") || (unObjeto.Name == "Pino") || (unObjeto.Name == "ArbolBananas"))
                             {
                                 instance.BoundingBox.transform(unaBoundingBoxMatrix);
-                                
+
                                 //Le activo el alpha para que se vea mejor
                                 instance.AlphaBlendEnable = true;
-                            }                            
+                            }
+
+                            //Cargo el efecto de sombra
+                            instance.Effect = this.shadowEffect;
 
                             //Lo agrego a la lista para después renderizarlo
                             ListaMesh.Add(instance);
@@ -484,6 +532,80 @@ namespace TGC.Group.Model
                     this.restartModelo = true;
                 }
             }
+
+            CalcularPosicionLuz();
+        }
+
+        private Vector3 g_LightPos;
+        private Vector3 g_LightDir;
+        private Microsoft.DirectX.Direct3D.Effect shadowEffect;
+        private Matrix g_LightView;
+        private Matrix g_mShadowProj;
+        private Surface g_pDSShadow;
+        private Texture g_pShadowMap;
+
+        public void RenderShadowMap()
+        {
+            TgcMesh unMesh;
+
+            // Calculo la matriz de view de la luz
+            shadowEffect.SetValue("g_vLightPos", new Vector4(g_LightPos.X, g_LightPos.Y, g_LightPos.Z, 1));
+            shadowEffect.SetValue("g_vLightDir", new Vector4(g_LightDir.X, g_LightDir.Y, g_LightDir.Z, 1));
+            g_LightView = Matrix.LookAtLH(g_LightPos, g_LightPos + g_LightDir, new Vector3(0, 0, 1));
+
+            // inicializacion standard:
+            shadowEffect.SetValue("g_mProjLight", g_mShadowProj);
+            shadowEffect.SetValue("g_mViewLightProj", g_LightView * g_mShadowProj);
+
+            // Primero genero el shadow map, para ello dibujo desde el pto de vista de luz
+            // a una textura, con el VS y PS que generan un mapa de profundidades.
+            var pOldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
+            var pShadowSurf = g_pShadowMap.GetSurfaceLevel(0);
+            D3DDevice.Instance.Device.SetRenderTarget(0, pShadowSurf);
+            var pOldDS = D3DDevice.Instance.Device.DepthStencilSurface;
+            D3DDevice.Instance.Device.DepthStencilSurface = g_pDSShadow;
+            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+            D3DDevice.Instance.Device.BeginScene();
+
+            //Hago el render de la escena pp dicha
+            shadowEffect.SetValue("g_txShadow", g_pShadowMap);
+
+            //Renderizo todos las sombras de todos los objetos del mapa
+            quadtree.render(Frustum, false, "RenderShadow");
+
+            //Dibujo las sombras de los jugadores
+            /*
+            foreach (var unJugador in this.listaJugadores)
+            {
+                unMesh = unJugador.claseAuto.GetMesh();
+                unMesh.Effect = this.shadowEffect;
+                unMesh.Technique = "RenderShadow";
+                unJugador.claseAuto.Render();
+            }
+            */
+            // Termino
+            D3DDevice.Instance.Device.EndScene();
+
+            // restuaro el render target y el stencil
+            D3DDevice.Instance.Device.DepthStencilSurface = pOldDS;
+            D3DDevice.Instance.Device.SetRenderTarget(0, pOldRT);
+        }
+
+        public void CalcularPosicionLuz()
+        {
+            float rohumo, alfa_luz;
+            float posicion_xluz;
+            float posicion_yluz;
+
+            rohumo = FastMath.Sqrt(this.posicionLuzEnAuto.X * this.posicionLuzEnAuto.X + this.posicionLuzEnAuto.Y * this.posicionLuzEnAuto.Y);
+
+            alfa_luz = FastMath.Asin(this.posicionLuzEnAuto.X / rohumo);
+            posicion_xluz = FastMath.Sin(alfa_luz + this.listaJugadores[0].claseAuto.GetMesh().Rotation.Y) * rohumo;
+            posicion_yluz = FastMath.Cos(alfa_luz + this.listaJugadores[0].claseAuto.GetMesh().Rotation.Y) * rohumo;
+
+            this.g_LightPos = this.listaJugadores[0].claseAuto.ObbArribaDer.Position + new Vector3(posicion_xluz, 0, posicion_yluz);
+            this.g_LightDir = new Vector3((-1) * FastMath.Sin(this.listaJugadores[0].claseAuto.GetMesh().Rotation.Y), 0, (-1) * FastMath.Cos(this.listaJugadores[0].claseAuto.GetMesh().Rotation.Y));
+            this.g_LightDir.Normalize();
         }
 
         public override void Render()
@@ -491,14 +613,37 @@ namespace TGC.Group.Model
             Microsoft.DirectX.Direct3D.Effect lunaShader;
             TgcMesh unMesh;
 
-            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
-            PreRender();
-
             //Habilito el render de particulas para el humo
             D3DDevice.Instance.ParticlesEnabled = true;
             D3DDevice.Instance.EnableParticles();
 
+            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
+            //PreRender();
+            ClearTextures();
+
+            /*
+            g_LightPos = new Vector3(200, 200, 0);
+            g_LightDir = new Vector3(0, 0, 0) - g_LightPos;
+            g_LightDir.Normalize();
+            */
+            /*
+            g_LightPos = this.listaJugadores[0].claseAuto.ObbMesh.Position + new Vector3(20, 20, 20);
+            g_LightDir = g_LightPos + new Vector3(-10, 10, -10);
+            g_LightDir.Normalize();*/
+
+
+
+            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+
+            //Genero el shadow map
+            this.RenderShadowMap();
+
+            D3DDevice.Instance.Device.BeginScene();
+            // dibujo la escena pp dicha
+            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+
             //Dibuja un texto por pantalla
+            this.RenderFPS();
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.Red);
             DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.Red);
 
@@ -514,15 +659,16 @@ namespace TGC.Group.Model
             }
 
             //Renderizo todos los objetos
-            quadtree.render(Frustum, false);
+            quadtree.render(Frustum, false, "RenderScene");
 
             /////////////////////////////////////////////////////////////////////////////////
-            lunaShader = TgcShaders.Instance.TgcMeshPhongShader;
+            //lunaShader = TgcShaders.Instance.TgcMeshPhongShader;
             /////////////////////////////////////////////////////////////////////////////////
 
             //Dibujo los jugadores
             foreach (var unJugador in this.listaJugadores)
             {
+                /*
                 unMesh = unJugador.claseAuto.GetMesh();
                 unMesh.Effect = lunaShader;
                 unMesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(unMesh.RenderType);
@@ -533,13 +679,17 @@ namespace TGC.Group.Model
                 unMesh.Effect.SetValue("diffuseColor", Microsoft.DirectX.Direct3D.ColorValue.FromColor(Color.White));
                 unMesh.Effect.SetValue("specularColor", Microsoft.DirectX.Direct3D.ColorValue.FromColor(Color.White));
                 unMesh.Effect.SetValue("specularExp", 80f);
+                */
+                unMesh = unJugador.claseAuto.GetMesh();
+                unMesh.Effect = this.shadowEffect;
+                unMesh.Technique = "RenderScene";
 
                 unJugador.Render();
             }
 
             //Renderizo la luna
-            this.lunaMesh.render();
-            this.sphere.render();
+            //this.lunaMesh.render();
+            //this.sphere.render();
 
             //Dibujo el reloj o solo muevo la camara para la presentación del juego
             if (!this.ModoPresentacion)
@@ -551,7 +701,10 @@ namespace TGC.Group.Model
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
-            PostRender();
+            //PostRender();
+            D3DDevice.Instance.Device.EndScene();
+            D3DDevice.Instance.Device.Present();
+
         }
 
         private void CalcularGanador()

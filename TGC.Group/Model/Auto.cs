@@ -43,7 +43,7 @@ namespace TGC.Group.Model
         private TgcBoundingOrientedBox ObbAbajo;
 		*/
 		private TgcBoundingOrientedBox ObbArribaIzq;
-        private TgcBoundingOrientedBox ObbArribaDer;
+        public TgcBoundingOrientedBox ObbArribaDer;
         private TgcBoundingOrientedBox ObbAbajoIzq;
         private TgcBoundingOrientedBox ObbAbajoDer;
         private TgcBoundingOrientedBox ObbArriba;
@@ -89,7 +89,7 @@ namespace TGC.Group.Model
         public float pesoImpacto { get; set; }
 
         //Direccion para seguimiento
-        Vector3 direccionSeguir = new Vector3(0, 0, 0);
+        public Vector3 direccionSeguir = new Vector3(0, 0, 0);
 
         //Humo
         HumoParticula emisorHumo;
@@ -651,10 +651,10 @@ namespace TGC.Group.Model
 
         public void Seguir(Auto autoJugador)
         {
-            /*
+/*            
             var origenIA = this.Mesh.Position;
 
-            var rayo = new TgcRay(origenIA, direccionSeguir);
+            var rayo = new TgcRay (origenIA, direccionSeguir);
 
             var lugarChoque = new Vector3(0,0,0);
 

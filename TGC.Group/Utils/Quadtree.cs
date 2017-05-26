@@ -56,7 +56,7 @@ namespace TGC.UtilsGroup
         /// <summary>
         ///     Renderizar en forma optimizado utilizando el Quadtree para hacer FrustumCulling
         /// </summary>
-        public void render(TgcFrustum frustum, bool debugEnabled)
+        public void render(TgcFrustum frustum, bool debugEnabled, string Technique)
         {
             var pMax = sceneBounds.PMax;
             var pMin = sceneBounds.PMin;
@@ -71,6 +71,7 @@ namespace TGC.UtilsGroup
             {
                 if (mesh.Enabled)
                 {
+                    mesh.Technique = Technique;
                     mesh.render();
                     mesh.Enabled = false;
                 }
