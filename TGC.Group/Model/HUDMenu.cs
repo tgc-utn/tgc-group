@@ -91,7 +91,7 @@ namespace TGC.Group.Model
         {
             if (this.EstadoMenu == "E")
             {
-                if (Input.keyDown(Microsoft.DirectX.DirectInput.Key.BackSpace))
+                if (Input.keyPressed(Microsoft.DirectX.DirectInput.Key.BackSpace))
                 {
                     if (this.NombreJugador.Length == 0)
                         return;

@@ -63,7 +63,7 @@
     </Reference>
     <Reference Include="Microsoft.DirectX.Direct3DX, Version=1.0.2909.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2909.0\Microsoft.DirectX.Direct3DX.dll</HintPath>
+      <HintPath>C:\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2911.0\Microsoft.DirectX.Direct3DX.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.DirectX.DirectInput, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <SpecificVersion>False</SpecificVersion>
@@ -73,8 +73,9 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="TGC.Core">
-      <HintPath>..\packages\TGC.Core.2.2.3\lib\net452\TGC.Core.dll</HintPath>
+    <Reference Include="TGC.Core, Version=2.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\tgc-viewer-2.2.2\TGC.Core\bin\Release\TGC.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -99,6 +100,7 @@
     <Compile Include="Model\HUDJugador.cs" />
     <Compile Include="Model\HUDMenu.cs" />
     <Compile Include="Model\HUDTiempo.cs" />
+    <Compile Include="Model\HumoParticula.cs" />
     <Compile Include="Model\Jugador.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

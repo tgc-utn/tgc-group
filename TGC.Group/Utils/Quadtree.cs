@@ -1,9 +1,11 @@
 using Microsoft.DirectX;
+using Microsoft.DirectX.Direct3D;
 using System.Collections.Generic;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Collision;
 using TGC.Core.Geometry;
 using TGC.Core.SceneLoader;
+using TGC.Core.Shaders;
 using TGC.Core.Utils;
 using TGC.Group.Model;
 
@@ -56,7 +58,7 @@ namespace TGC.UtilsGroup
         /// <summary>
         ///     Renderizar en forma optimizado utilizando el Quadtree para hacer FrustumCulling
         /// </summary>
-        public void render(TgcFrustum frustum, bool debugEnabled)
+        public void render(TgcFrustum frustum, bool debugEnabled, string Technique, int soloObjetos, Effect unEfecto)
         {
             var pMax = sceneBounds.PMax;
             var pMin = sceneBounds.PMin;
@@ -69,10 +71,28 @@ namespace TGC.UtilsGroup
             //Renderizar
             foreach (var mesh in modelos)
             {
-                if (mesh.Enabled)
+                if ((soloObjetos == 1) &&
+                    ((mesh.Name.IndexOf("Room") != -1) || (mesh.Name == "Pasto"))
+                    )
+                    continue;
+                else
                 {
-                    mesh.render();
-                    mesh.Enabled = false;
+                    if (mesh.Enabled)
+                    {
+                        if (Technique == "")
+                        {
+                            mesh.Effect = TgcShaders.Instance.TgcMeshShader;
+                            mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
+                        }
+                        else
+                        {
+                            mesh.Effect = unEfecto;
+                            mesh.Technique = Technique;
+                        }
+
+                        mesh.render();
+                        mesh.Enabled = false;
+                    }
                 }
             }
 
