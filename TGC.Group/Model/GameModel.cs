@@ -249,7 +249,7 @@ namespace TGC.Group.Model
             listaMeshesQ.AddRange(MeshPinos);
             listaMeshesQ.AddRange(MeshRocas);
             listaMeshesQ.AddRange(MeshArbolesBananas);
-            listaMeshesQ.AddRange(MeshPDL);
+            //listaMeshesQ.AddRange(MeshPDL);
             listaMeshesQ.AddRange(GameModel.ScenePpal.Meshes);
 
             quadtree = new Quadtree();
@@ -351,7 +351,7 @@ namespace TGC.Group.Model
                 //Crear instancia de modelo
                 listaJugadores.Add(new Jugador("gris", MediaDir, 1));
                 this.listaJugadores[1].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\AutoGris\\Auto-TgcScene.xml").Meshes[0]);
-                this.listaJugadores[1].claseAuto.SetPositionMesh(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (POSICION_VERTICE - CUADRANTE_SIZE * 4)), false);
+                this.listaJugadores[1].claseAuto.SetPositionMesh(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 2), 0, (POSICION_VERTICE - CUADRANTE_SIZE * 2)), false);
                 this.listaJugadores[1].claseAuto.SetRuedas(loader);
                 this.listaJugadores[1].CreateCamera();
                 GameModel.MeshAutos.Add(this.listaJugadores[1].claseAuto.GetMesh());
@@ -371,7 +371,7 @@ namespace TGC.Group.Model
             {
                 listaJugadores.Add(new Jugador("verde", MediaDir, 2));
                 this.listaJugadores[2].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\AutoVerde\\Auto-TgcScene.xml").Meshes[0]);
-                this.listaJugadores[2].claseAuto.SetPositionMesh(new Vector3(POSICION_VERTICE - CUADRANTE_SIZE * 4, 0, POSICION_VERTICE - CUADRANTE_SIZE * 4), false);
+                this.listaJugadores[2].claseAuto.SetPositionMesh(new Vector3(POSICION_VERTICE - CUADRANTE_SIZE * 2, 0, POSICION_VERTICE - CUADRANTE_SIZE * 2), false);
                 this.listaJugadores[2].claseAuto.SetRuedas(loader);
                 this.listaJugadores[2].CreateCamera();
                 GameModel.MeshAutos.Add(this.listaJugadores[2].claseAuto.GetMesh());
@@ -382,7 +382,7 @@ namespace TGC.Group.Model
             {
                 listaJugadores.Add(new Jugador("rojo", MediaDir, 3));
                 this.listaJugadores[3].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\AutoRojo\\Auto-TgcScene.xml").Meshes[0]);
-                this.listaJugadores[3].claseAuto.SetPositionMesh(new Vector3((POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)), true);
+                this.listaJugadores[3].claseAuto.SetPositionMesh(new Vector3((POSICION_VERTICE - CUADRANTE_SIZE * 2), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 2)), true);
                 this.listaJugadores[3].claseAuto.SetRuedas(loader);
                 this.listaJugadores[3].CreateCamera();
                 GameModel.MeshAutos.Add(this.listaJugadores[3].claseAuto.GetMesh());
@@ -393,7 +393,7 @@ namespace TGC.Group.Model
             {
                 listaJugadores.Add(new Jugador("marrón", MediaDir, 4));
                 this.listaJugadores[4].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\AutoMarron\\Auto-TgcScene.xml").Meshes[0]);
-                this.listaJugadores[4].claseAuto.SetPositionMesh(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 4)), true);
+                this.listaJugadores[4].claseAuto.SetPositionMesh(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 2), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 2)), true);
                 this.listaJugadores[4].claseAuto.SetRuedas(loader);
                 this.listaJugadores[4].CreateCamera();
                 GameModel.MeshAutos.Add(this.listaJugadores[4].claseAuto.GetMesh());
@@ -685,6 +685,8 @@ namespace TGC.Group.Model
             D3DDevice.Instance.ParticlesEnabled = true;
             D3DDevice.Instance.EnableParticles();
 
+            ClearTextures();
+
             #region RenderEnvMap
 
             pOldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
@@ -832,10 +834,6 @@ namespace TGC.Group.Model
             D3DDevice.Instance.Device.EndScene();
 
             #endregion
-
-            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
-            //PreRender();
-            ClearTextures();
 
             #region Luz de Luna
 
@@ -1061,8 +1059,12 @@ namespace TGC.Group.Model
             RocaOriginal.dispose();
             ArbolBananasOriginal.dispose();
             PDLOriginal.dispose();
-            g_pCubeMap.Dispose();
-            g_pShadowMap.Dispose();
+            this.g_pCubeMap.Dispose();
+            this.g_pShadowMap.Dispose();
+            this.lunaEffect.Dispose();
+            this.luzLunaMesh.dispose();
+            this.shadowEffect.Dispose();
+            this.envMapEffect.Dispose();
             ScenePpal.disposeAll();
         }
     }
