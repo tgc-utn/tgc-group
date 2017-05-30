@@ -587,7 +587,7 @@ namespace TGC.Group.Model
                     else
                     {
                         //IA
-                        unJugador.Seguir(listaJugadores[0]);
+                        unJugador.Seguir(listaJugadores[0], ElapsedTime);
                         unJugador.Update(false, false, false, false, false, false, ElapsedTime);
                     }
                 }
