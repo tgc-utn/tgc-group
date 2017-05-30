@@ -10,7 +10,6 @@ using TGC.Core.Geometry;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.Utils;
-using TGC.Core.Example;
 
 namespace TGC.Group.Model
 {
@@ -662,7 +661,7 @@ namespace TGC.Group.Model
 
             //Vector3[] puntosDelAuto = autoJugador.Mesh.getVertexPositions();
 
-            var obbJugador = autoJugador.ObbAbajo;
+            var obbJugador = autoJugador.ObbMesh;
 
             bool encontrado = TgcCollisionUtils.intersectRayObb(rayo, obbJugador, out lugarChoque);
             if (encontrado)
