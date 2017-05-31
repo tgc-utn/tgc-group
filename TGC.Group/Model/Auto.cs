@@ -657,7 +657,7 @@ namespace TGC.Group.Model
 
             var rayo = new TgcRay (origenIA, direccionSeguir);
 
-            var lugarChoque = new Vector3(1000,1000,1000);
+            var lugarChoque = new Vector3(0,0,0);
 
             //Vector3[] puntosDelAuto = autoJugador.Mesh.getVertexPositions();
 
