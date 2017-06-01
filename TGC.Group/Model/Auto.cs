@@ -653,26 +653,38 @@ namespace TGC.Group.Model
 
         public void Seguir(Auto autoJugador , float ElapsedTime)
         {           
-            var origenIA = this.Mesh.Position;
-
-            var rayo = new TgcRay (origenIA, direccionSeguir);
-
-            var lugarChoque = new Vector3(0,0,0);
-
-            //Vector3[] puntosDelAuto = autoJugador.Mesh.getVertexPositions();
-
-            var obbJugador = autoJugador.ObbMesh;
-
-            bool encontrado = TgcCollisionUtils.intersectRayObb(rayo, obbJugador, out lugarChoque);
-            if (encontrado)
+            if (JugadorEncontrado(autoJugador))
             {
-                this.UpdateIA(true, true, false, true, false, false, ElapsedTime, 100000f); //Si el rayo proyectado impacta con el auto del jugador, el auto de la ia comienza a avanzar hacia su posicion
+                UpdateIA(true, true, false, false, false, false, ElapsedTime, 100000f); //Si el rayo proyectado impacta con el auto del jugador, el auto de la ia comienza a avanzar hacia su posicion
             }
             else
             {
-                this.UpdateIA(true, true, false, false, true, false, ElapsedTime, 150f); //Si el rayo no impacta con el auto del jugador, el auto comienza a frenar mientras que gira en sentido horario intentando encontrar al auto del jugador
+                UpdateIA(true, true, false, false, true, false, ElapsedTime, 150f); //Si el rayo no impacta con el auto del jugador, el auto comienza a frenar mientras que gira en sentido horario intentando encontrar al auto del jugador
             }
 
+        }
+
+        public bool JugadorEncontrado(Auto autoJugador)
+        {
+            var origenIA = Mesh.Position;
+
+            //var direccionSeguirNew = new Vector3(0, 0, 0);
+            //direccionSeguirNew = Microsoft.DirectX.Vector3.Multiply(direccionSeguir, 1000000);
+
+            var rayo = new TgcRay(origenIA, direccionSeguir);
+
+            var lugarChoque = new Vector3(0, 0, 0);
+
+            var obbJugador = autoJugador.ObbMesh;
+
+            if (TgcCollisionUtils.intersectRayObb(rayo, obbJugador, out lugarChoque))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
