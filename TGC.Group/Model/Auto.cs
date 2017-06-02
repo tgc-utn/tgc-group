@@ -507,7 +507,7 @@ namespace TGC.Group.Model
             {
                 if (Math.Abs(speed) < 5)
                 {
-                    this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
+                    this.MOVEMENT_SPEED += 30;
                     this.colisionSimpleCostados(elapsedTime, -1);
                 }
                 else
@@ -522,7 +522,7 @@ namespace TGC.Group.Model
             {
                 if (Math.Abs(speed) < 5)
                 {
-                    this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
+                    this.MOVEMENT_SPEED += 30;
                     this.colisionSimpleCostados(elapsedTime, 1);
                 }
                 else
@@ -554,7 +554,7 @@ namespace TGC.Group.Model
             {
                 if (Math.Abs(speed) < 5)
                 {
-                    this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
+                  this.MOVEMENT_SPEED += 30;
                     this.colisionSimpleCostados(elapsedTime, -1);
                 }
                 else
@@ -569,7 +569,7 @@ namespace TGC.Group.Model
             {
                 if (Math.Abs(speed) < 5)
                 {
-                    this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
+                    this.MOVEMENT_SPEED += 30;
                     this.colisionSimpleCostados(elapsedTime, 1);
                 }
                 else
