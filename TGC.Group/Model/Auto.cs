@@ -486,9 +486,11 @@ namespace TGC.Group.Model
 
 		private void respuestaColisionAutovsAuto(Auto unAuto, float elapsedTime, float moveFoward)
         {
+            var speed = Math.Truncate(this.MOVEMENT_SPEED);
+
             if (TgcCollisionUtils.testObbObb(this.ObbArriba.toStruct(), unAuto.ObbMesh.toStruct()))
             {
-                if (Math.Truncate(this.MOVEMENT_SPEED) == 0)
+                if (Math.Abs(speed) < 5)
                 {
                     this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
                     this.colisionSimple(elapsedTime, 2); //esto esta medio harcodeado pero dejarlo asi por ahora
@@ -503,9 +505,9 @@ namespace TGC.Group.Model
 
             if (TgcCollisionUtils.testObbObb(this.ObbArribaDer.toStruct(), unAuto.ObbMesh.toStruct()))
             {
-                if ((Math.Truncate(this.MOVEMENT_SPEED)) == 0)
+                if (Math.Abs(speed) < 5)
                 {
-                    this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
+                    this.MOVEMENT_SPEED += 30;
                     this.colisionSimpleCostados(elapsedTime, -1);
                 }
                 else
@@ -518,9 +520,9 @@ namespace TGC.Group.Model
 
             if (TgcCollisionUtils.testObbObb(this.ObbArribaIzq.toStruct(), unAuto.ObbMesh.toStruct()))
             {
-                if (Math.Truncate(this.MOVEMENT_SPEED) == 0)
+                if (Math.Abs(speed) < 5)
                 {
-                    this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
+                    this.MOVEMENT_SPEED += 30;
                     this.colisionSimpleCostados(elapsedTime, 1);
                 }
                 else
@@ -533,7 +535,7 @@ namespace TGC.Group.Model
 
             if (TgcCollisionUtils.testObbObb(this.ObbAbajo.toStruct(), unAuto.ObbMesh.toStruct()))
             {
-                if (Math.Truncate(this.MOVEMENT_SPEED) == 0)
+                if (Math.Abs(speed) < 5)
                 {
                     this.MOVEMENT_SPEED -= unAuto.MOVEMENT_SPEED;
                     this.colisionSimple(elapsedTime, 2);
@@ -550,9 +552,9 @@ namespace TGC.Group.Model
 
             if (TgcCollisionUtils.testObbObb(this.ObbAbajoIzq.toStruct(), unAuto.ObbMesh.toStruct()))
             {
-                if (Math.Truncate(this.MOVEMENT_SPEED) == 0)
+                if (Math.Abs(speed) < 5)
                 {
-                    this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
+                  this.MOVEMENT_SPEED += 30;
                     this.colisionSimpleCostados(elapsedTime, -1);
                 }
                 else
@@ -565,9 +567,9 @@ namespace TGC.Group.Model
 
             if (TgcCollisionUtils.testObbObb(this.ObbAbajoDer.toStruct(), unAuto.ObbMesh.toStruct()))
             {
-                if (Math.Truncate(this.MOVEMENT_SPEED) == 0)
+                if (Math.Abs(speed) < 5)
                 {
-                    this.MOVEMENT_SPEED += unAuto.MOVEMENT_SPEED;
+                    this.MOVEMENT_SPEED += 30;
                     this.colisionSimpleCostados(elapsedTime, 1);
                 }
                 else
@@ -649,28 +651,40 @@ namespace TGC.Group.Model
             return 0;
         }
 
-        public void Seguir(Auto autoJugador)
-        {
-/*            
-            var origenIA = this.Mesh.Position;
-
-            var rayo = new TgcRay (origenIA, direccionSeguir);
-
-            var lugarChoque = new Vector3(0,0,0);
-
-            Vector3[] puntosDelAuto = autoJugador.Mesh.getVertexPositions();
-
-            var obbJugador = TgcBoundingOrientedBox.computeFromPoints(puntosDelAuto); //No se si es la mejor resolucion por ser un calculo costoso que se va a hacer muchas veces
-            
-            if (TgcCollisionUtils.intersectRayObb(rayo, obbJugador, out lugarChoque))
+        public void Seguir(Auto autoJugador , float ElapsedTime)
+        {           
+            if (JugadorEncontrado(autoJugador))
             {
-                this.Update(true, true, false, false, false, false, ElapsedTime); //Si el rayo proyectado impacta con el auto del jugador, el auto de la ia comienza a avanzar hacia su posicion
+                UpdateIA(true, true, false, false, false, false, ElapsedTime, 100000f); //Si el rayo proyectado impacta con el auto del jugador, el auto de la ia comienza a avanzar hacia su posicion
             }
             else
             {
-                this.Update(true, false, true, false, true, false, ElapsedTime); //Si el rayo no impacta con el auto del jugador, el auto comienza a frenar mientras que gira en sentido horario intentando encontrar al auto del jugador
-            }*/
+                UpdateIA(true, true, false, false, true, false, ElapsedTime, 150f); //Si el rayo no impacta con el auto del jugador, el auto comienza a frenar mientras que gira en sentido horario intentando encontrar al auto del jugador
+            }
 
+        }
+
+        public bool JugadorEncontrado(Auto autoJugador)
+        {
+            var origenIA = Mesh.Position;
+
+            //var direccionSeguirNew = new Vector3(0, 0, 0);
+            //direccionSeguirNew = Microsoft.DirectX.Vector3.Multiply(direccionSeguir, 1000000);
+
+            var rayo = new TgcRay(origenIA, direccionSeguir);
+
+            var lugarChoque = new Vector3(0, 0, 0);
+
+            var obbJugador = autoJugador.ObbMesh;
+
+            if (TgcCollisionUtils.intersectRayObb(rayo, obbJugador, out lugarChoque))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
@@ -679,6 +693,116 @@ namespace TGC.Group.Model
             this.CalcularPosicionRuedas(MoverRuedas);
             this.CalcularPosObb();
             this.emisorHumo.Update(ElapsedTime, this.ObbAbajoDer.Position, this.Mesh.Rotation.Y);
+        }
+
+        public void UpdateIA(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime, float aceleraciooon)
+        {
+            this.MoverAutoIAConColisiones(Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime, aceleraciooon);
+            this.CalcularPosicionRuedas(MoverRuedas);
+            this.CalcularPosObb();
+            this.emisorHumo.Update(ElapsedTime, this.ObbAbajoDer.Position, this.Mesh.Rotation.Y);
+        }
+
+        public void MoverAutoIAConColisiones(bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime, float aceleraciooon)
+        {
+            //Declaramos un vector de movimiento inicializado en cero.
+            //El movimiento sobre el suelo es sobre el plano XZ.
+            //Sobre XZ nos movemos con las flechas del teclado o con las letas WASD.
+            var movement = new Vector3(0, 0, 0);
+            var moveForward = 0f;
+            var rotating = false;
+            var posicionAnterior = this.Mesh.Position;
+            var ROTATION_SPEED_IA = ROTATION_SPEED*20f;
+
+            rotate = 0;
+
+            //Movernos de izquierda a derecha, sobre el eje X.
+            if (Izquierda)
+            {
+                rotate = -ROTATION_SPEED_IA;
+                rotating = true;
+            }
+            else if (Derecha)
+            {
+                rotate = ROTATION_SPEED_IA;
+                rotating = true;
+            }
+
+            //Movernos adelante y atras, sobre el eje Z.
+            if (Avanzar)
+            {
+                moveForward += -this.Acelerar(aceleraciooon, ElapsedTime);
+            }
+
+            if (Frenar)
+            {
+                //moveForward += -this.Acelerar(-250f, ElapsedTime);
+            }
+
+            //El auto dejo de acelerar e ira frenando de apoco 
+            if (!Avanzar && !Frenar)
+            {
+                moveForward = -this.Acelerar(0f, ElapsedTime);
+            }
+
+            if (rotating)
+            {
+                if (this.MOVEMENT_SPEED <= (Auto.MAX_SPEED / 2))
+                    this.rotAngle = (this.MOVEMENT_SPEED * 0.2f * Math.Sign(rotate) * ElapsedTime) * (FastMath.PI / 50) * Math.Abs(ROTATION_SPEED_IA);
+                else
+                    this.rotAngle = (this.MOVEMENT_SPEED * 0.2f * Math.Sign(rotate) * ElapsedTime) * (FastMath.PI / 180) * Math.Abs(ROTATION_SPEED_IA);
+
+                this.Mesh.rotateY(rotAngle);
+                this.ObbMesh.rotate(new Vector3(0, rotAngle, 0));
+            }
+            else
+                rotAngle = 0;
+
+            if (Saltar && !falling)
+            {
+                jumping = true;
+            }
+
+            if (jumping)
+            {
+                Mesh.move(0, 100 * ElapsedTime * 2, 0);
+
+                if (Mesh.Position.Y >= ALTURA_SALTO)
+                {
+                    jumping = false;
+                    falling = true;
+                }
+            }
+
+            if (falling)
+            {
+                Mesh.move(0, -100 * ElapsedTime * 3, 0);
+
+                if (Mesh.Position.Y < 0.5f)
+                {
+                    Mesh.move(0, 0.5f - Mesh.Position.Y, 0);
+                    falling = false;
+                }
+            }
+
+            //Guardar posicion original antes de cambiarla
+            this.OriginalPos = this.Mesh.Position;
+
+            //Multiplicar movimiento por velocidad y elapsedTime
+            movement *= this.MOVEMENT_SPEED * ElapsedTime;
+
+            rotacionVertical -= this.MOVEMENT_SPEED * ElapsedTime / 60;
+
+            this.Mesh.moveOrientedY(moveForward * ElapsedTime);
+
+            if (this.colisiono)
+            {
+                colisionSimple(ElapsedTime, moveForward);
+            }
+
+            this.ColisionesObbObb(GameModel.ListaMeshAutos, ElapsedTime, moveForward);
+            this.ObbMesh.Center = this.Mesh.Position;
+            direccionSeguir = movement;
         }
 
         public void Render()
