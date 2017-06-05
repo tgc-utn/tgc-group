@@ -131,12 +131,14 @@ float4 PixScene(float2 Tex : TEXCOORD0,
 	float3 vLight = normalize(float3(vPos - g_vLightPos));
 	float cono = dot(vLight, g_vLightDir);
 	float4 K = 0.0;
+	float4 color_base = tex2D(diffuseMap, Tex);
+
 	if (cono > 0.7 && vPosLight.z < 650)
 	{
-		// coordenada de textura CT
+		//coordenada de textura CT
 		float2 CT = 0.5 * vPosLight.xy / vPosLight.w + float2(0.5, 0.5);
 		CT.y = 1.0f - CT.y;
-
+		
 		// sin ningun aa. conviene con smap size >= 512
 		float I = (tex2D(g_samShadow, CT) + EPSILON < vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
 
@@ -175,8 +177,8 @@ float4 PixScene(float2 Tex : TEXCOORD0,
 		K = I;
 	}
 
-	float4 color_base = tex2D(diffuseMap, Tex);
-	color_base.rgb *= 0.5 + 0.5*K;
+	color_base.rgb *= 0.6 + 0.5*K;
+	
 	return color_base;
 }
 

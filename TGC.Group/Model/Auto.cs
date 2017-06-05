@@ -369,6 +369,13 @@ namespace TGC.Group.Model
                 moveForward = -this.Acelerar(0f, ElapsedTime);
             }
 
+            //Para que el auto no tiemble
+            if (Math.Abs (moveForward) < 1)
+            {
+                moveForward = 0;
+                this.MOVEMENT_SPEED = 0;
+            }
+
             if (rotating)
             {
                 if (this.MOVEMENT_SPEED <= (Auto.MAX_SPEED / 2))
