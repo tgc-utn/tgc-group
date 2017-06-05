@@ -10,6 +10,7 @@ using TGC.Core.Geometry;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.Utils;
+using TGC.Core.Sound;
 
 namespace TGC.Group.Model
 {
@@ -94,11 +95,22 @@ namespace TGC.Group.Model
         //Humo
         HumoParticula emisorHumo;
 
-        public Auto(string MediaDir, int NroJugador)
+        private string pathSonidoGolpe1;
+
+        private string pathSonidoEncendido;
+
+        private TgcStaticSound sound;
+
+        private TgcDirectSound DirectSound;
+
+        public Auto(string MediaDir, int NroJugador, TgcDirectSound directSound)
         {
             this.NroJugador = NroJugador;
             this.MediaDir = MediaDir;
             this.colisiono = false;
+            this.pathSonidoGolpe1 = MediaDir + "Sounds\\Golpe1.wav";
+            this.pathSonidoEncendido = MediaDir + "Sounds\\Encendido.wav";
+            this.DirectSound = directSound;
         }
 
         public void RenderObb()
@@ -145,7 +157,7 @@ namespace TGC.Group.Model
 
             this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
             this.emisorHumo = new HumoParticula(this.MediaDir);
-
+            
             /*
 
             Vector3[] puntosDelAuto = this.Mesh.getVertexPositions();
@@ -182,6 +194,7 @@ namespace TGC.Group.Model
             this.ObbLista.Add(ObbAbajoIzq);
             this.ObbLista.Add(ObbArriba);
             this.ObbLista.Add(ObbAbajo);
+
         }
 
         public float GetRotationAngle()
@@ -421,6 +434,7 @@ namespace TGC.Group.Model
 
 			if (this.colisiono)
             {
+                ReproducirSonidoChoque();
                 colisionSimple(ElapsedTime, moveForward);
             }
 			
@@ -487,6 +501,7 @@ namespace TGC.Group.Model
 		private void respuestaColisionAutovsAuto(Auto unAuto, float elapsedTime, float moveFoward)
         {
             var speed = Math.Truncate(this.MOVEMENT_SPEED);
+            ReproducirSonidoChoque();
 
             if (TgcCollisionUtils.testObbObb(this.ObbArriba.toStruct(), unAuto.ObbMesh.toStruct()))
             {
@@ -579,6 +594,7 @@ namespace TGC.Group.Model
                 this.pesoImpacto = 5;
                 return;
             }
+
         }
 		
 		private void colisionSimpleCostados(float elapsedTime, float orientacion)
@@ -803,6 +819,47 @@ namespace TGC.Group.Model
             this.ColisionesObbObb(GameModel.ListaMeshAutos, ElapsedTime, moveForward);
             this.ObbMesh.Center = this.Mesh.Position;
             direccionSeguir = movement;
+        }
+
+        private void loadSound(string filePath)
+        {
+                //Borrar sonido anterior
+                if (sound != null)
+                {
+                    sound.dispose();
+                    sound = null;
+                }
+
+                //Cargar sonido
+                sound = new TgcStaticSound();
+                sound.loadSound(filePath, DirectSound.DsDevice);
+            
+        }
+
+        private void ReproducirSonidoChoque()
+        {
+            if(this.NroJugador == 0)
+            {
+                if (Math.Abs(this.MOVEMENT_SPEED) < Math.Abs((Auto.MAX_SPEED * 0.5)))
+                {
+                    loadSound(this.pathSonidoGolpe1);
+                    sound.play();
+                }
+
+                else
+                {
+                    loadSound(this.pathSonidoGolpe1);
+                    sound.play();
+                    //TODO: Reproducir sonido de un golpe fuerte
+                }
+
+            }
+        }
+
+        public void ReproducirSonidoArranque()
+        {
+            loadSound(this.pathSonidoEncendido);
+            sound.play();
         }
 
         public void Render()

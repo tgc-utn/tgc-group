@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TGC.Camara;
 using TGC.Core.SceneLoader;
+using TGC.Core.Sound;
 
 namespace TGC.Group.Model
 {
@@ -28,7 +29,7 @@ namespace TGC.Group.Model
         //Camara personal
         public CamaraTW claseCamara;
 
-        public Jugador(string NombreJugador, string MediaDir, int NroJugador)
+        public Jugador(string NombreJugador, string MediaDir, int NroJugador, TgcDirectSound directSound)
         {
             //Guardo variables
             this.NombreJugador = NombreJugador;
@@ -37,7 +38,7 @@ namespace TGC.Group.Model
 
             //Creo las clases de HUD y el auto
             this.claseHUD = new HUDJugador (MediaDir, this.NombreJugador, this.NroJugador);
-            this.claseAuto = new Auto(MediaDir, this.NroJugador);
+            this.claseAuto = new Auto(MediaDir, this.NroJugador, directSound);
 
             return;
         }

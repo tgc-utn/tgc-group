@@ -17,6 +17,8 @@ using TGC.Core.BoundingVolumes;
 using TGC.Core.Shaders;
 using Microsoft.DirectX.Direct3D;
 using TGC.Core;
+using TGC.Core.Sound;
+using System.Windows.Forms;
 
 namespace TGC.Group.Model
 {
@@ -338,7 +340,7 @@ namespace TGC.Group.Model
             GameModel.MeshAutos = new List<TgcMesh>();
             GameModel.ListaMeshAutos = new List<Auto>();
             this.listaJugadores = new List<Jugador>();
-            this.listaJugadores.Add(new Jugador(this.NombreJugador1, MediaDir, 0));
+            this.listaJugadores.Add(new Jugador(this.NombreJugador1, MediaDir, 0, DirectSound));
             this.listaJugadores[0].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\Auto\\Auto-TgcScene.xml").Meshes[0]);
             this.listaJugadores[0].claseAuto.SetRuedas(loader);
             this.listaJugadores[0].CreateCamera();
@@ -349,7 +351,7 @@ namespace TGC.Group.Model
             if (CantidadDeOponentes >= 1)
             {
                 //Crear instancia de modelo
-                listaJugadores.Add(new Jugador("gris", MediaDir, 1));
+                listaJugadores.Add(new Jugador("gris", MediaDir, 1, DirectSound));
                 this.listaJugadores[1].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\AutoGris\\Auto-TgcScene.xml").Meshes[0]);
                 this.listaJugadores[1].claseAuto.SetPositionMesh(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 2), 0, (POSICION_VERTICE - CUADRANTE_SIZE * 2)), false);
                 this.listaJugadores[1].claseAuto.SetRuedas(loader);
@@ -369,7 +371,7 @@ namespace TGC.Group.Model
 
             if (CantidadDeOponentes >= 2)
             {
-                listaJugadores.Add(new Jugador("verde", MediaDir, 2));
+                listaJugadores.Add(new Jugador("verde", MediaDir, 2, DirectSound));
                 this.listaJugadores[2].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\AutoVerde\\Auto-TgcScene.xml").Meshes[0]);
                 this.listaJugadores[2].claseAuto.SetPositionMesh(new Vector3(POSICION_VERTICE - CUADRANTE_SIZE * 2, 0, POSICION_VERTICE - CUADRANTE_SIZE * 2), false);
                 this.listaJugadores[2].claseAuto.SetRuedas(loader);
@@ -380,7 +382,7 @@ namespace TGC.Group.Model
 
             if (CantidadDeOponentes >= 3)
             {
-                listaJugadores.Add(new Jugador("rojo", MediaDir, 3));
+                listaJugadores.Add(new Jugador("rojo", MediaDir, 3, DirectSound));
                 this.listaJugadores[3].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\AutoRojo\\Auto-TgcScene.xml").Meshes[0]);
                 this.listaJugadores[3].claseAuto.SetPositionMesh(new Vector3((POSICION_VERTICE - CUADRANTE_SIZE * 2), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 2)), true);
                 this.listaJugadores[3].claseAuto.SetRuedas(loader);
@@ -391,7 +393,7 @@ namespace TGC.Group.Model
 
             if (CantidadDeOponentes >= 4)
             {
-                listaJugadores.Add(new Jugador("marrón", MediaDir, 4));
+                listaJugadores.Add(new Jugador("marrón", MediaDir, 4, DirectSound));
                 this.listaJugadores[4].claseAuto.SetMesh(loader.loadSceneFromFile(MediaDir + "Vehiculos\\AutoMarron\\Auto-TgcScene.xml").Meshes[0]);
                 this.listaJugadores[4].claseAuto.SetPositionMesh(new Vector3((-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 2), 0, (-1) * (POSICION_VERTICE - CUADRANTE_SIZE * 2)), true);
                 this.listaJugadores[4].claseAuto.SetRuedas(loader);
@@ -521,6 +523,7 @@ namespace TGC.Group.Model
                         this.listaJugadores[0].ActualizarNombreJugador(this.claseMenu.GetNombreJugador());
                         this.NombreJugador1 = this.claseMenu.GetNombreJugador();
                         Camara = this.listaJugadores[0].claseCamara.GetCamera();
+                        this.listaJugadores[0].claseAuto.ReproducirSonidoArranque();
                     }
 
                     if (this.claseMenu.GetEstadoMenu() == "S")
