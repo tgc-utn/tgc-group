@@ -8,9 +8,9 @@ namespace TGC.Group.Model
     class HumoParticula
     {
         private ParticleEmitter emitter;
-        private const int CANTIDAD_PARTICULAS = 20;
+        private const int CANTIDAD_PARTICULAS = 60;
         private const float TAMANO_PARTICULA = 1f;
-        private const float TTL_PARTICULA = 0.8f;
+        private const float TTL_PARTICULA = 1f;
         private const float FQ_PARTICULA = 0.5f;
         private const int DISPERSION_PARTICULA = 120;
         private const float VELOCIDAD_PARTICULA = 60f;

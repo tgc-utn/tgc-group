@@ -280,6 +280,9 @@ namespace TGC.Group.Model
             {
                 this.letraMenu.drawText("Ingrese su nombre y presione Enter", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 300 + this.DistanciaSeparacionNombre_H, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - 100, Color.Red);
                 this.letraMenu.drawText(this.NombreJugador, (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 100, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) - 25, Color.DeepSkyBlue);
+                this.letraMenu.drawText("El objetivo es chocar a los rivales", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 300 + this.DistanciaSeparacionNombre_H, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 125, Color.Red);
+                this.letraMenu.drawText("y sacarles toda la vida antes de que", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 300 + this.DistanciaSeparacionNombre_H, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 200, Color.Red);
+                this.letraMenu.drawText("ellos te la saquen a vos", (Convert.ToInt32(D3DDevice.Instance.Width) / 2) - 300 + this.DistanciaSeparacionNombre_H, (Convert.ToInt32(D3DDevice.Instance.Height) / 2) + 270, Color.Red);
             }
         }
 

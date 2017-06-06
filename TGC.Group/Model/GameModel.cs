@@ -120,7 +120,7 @@ namespace TGC.Group.Model
         private TgcBox luzLunaMesh;
 
         //Shadows
-        private readonly int SHADOWMAP_SIZE = 2048;
+        private readonly int SHADOWMAP_SIZE = 1024;
         private float far_plane = 25000f;
         private readonly float near_plane = 1f;
         private Vector2 posicionLuzEnAuto = new Vector2(20, 0);
@@ -135,6 +135,7 @@ namespace TGC.Group.Model
         //Reflejo
         private Microsoft.DirectX.Direct3D.Effect envMapEffect;
         private CubeTexture g_pCubeMap;
+        private float FPS_EnvMap = 0;
 
         public override void Init()
         {
@@ -210,7 +211,7 @@ namespace TGC.Group.Model
             this.luzLunaMesh.Color = Color.White;
             this.luzLunaMesh.move(new Vector3(0, 2000, 0));
 
-            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\block10d.jpg");
+            //var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Textures\\block10d.jpg");
             TgcMesh instanciaPDL_1;
 
             PDLOriginal = loader.loadSceneFromFile(MediaDir + "Objetos\\PosteDeLuz\\PosteDeLuz-TgcScene.xml").Meshes[0];
@@ -219,7 +220,7 @@ namespace TGC.Group.Model
             instanciaPDL_1.move(new Vector3(32, 0, 0));
             instanciaPDL_1.BoundingBox.setExtremes(new Vector3(0, 0, 0), new Vector3(10, 70, 10));
             instanciaPDL_1.BoundingBox.move(new Vector3(50, 0, 0));
-            GameModel.MeshPDL.Add(instanciaPDL_1);            
+            //GameModel.MeshPDL.Add(instanciaPDL_1);            
             ////////////////////////////////////////////////////////////////////////////////////////
 
             //Cargo los jugadores y sus autos
@@ -692,76 +693,84 @@ namespace TGC.Group.Model
 
             #region RenderEnvMap
 
+            if (this.FPS_EnvMap == float.MaxValue)
+                this.FPS_EnvMap = 0;
+            else
+                this.FPS_EnvMap++;
+
             pOldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
             // ojo: es fundamental que el fov sea de 90 grados.
             // asi que re-genero la matriz de proyeccion
-            D3DDevice.Instance.Device.Transform.Projection = Matrix.PerspectiveFovLH(Geometry.DegreeToRadian(90.0f), 1f, 1f, 10000f);
+            D3DDevice.Instance.Device.Transform.Projection = Matrix.PerspectiveFovLH(Geometry.DegreeToRadian(90.0f), 1f, 1f, 200f);
 
             if (!this.ModoPresentacion)
             {
-                // Genero las caras del enviroment map
-                for (var nFace = CubeMapFace.PositiveX; nFace <= CubeMapFace.NegativeZ; ++nFace)
+                if ((this.FPS_EnvMap % 3) == 0)
                 {
-                    pFace = g_pCubeMap.GetCubeMapSurface(nFace, 0);
-                    D3DDevice.Instance.Device.SetRenderTarget(0, pFace);
-                    Vector3 Dir, VUP;
-                    Color color;
-                    switch (nFace)
+                    // Genero las caras del enviroment map
+                    for (var nFace = CubeMapFace.PositiveX; nFace <= CubeMapFace.NegativeZ; ++nFace)
                     {
-                        case CubeMapFace.PositiveX:
-                            // Left
-                            Dir = new Vector3(1, 0, 0);
-                            VUP = new Vector3(0, 1, 0);
-                            color = Color.Black;
-                            break;
+                        pFace = g_pCubeMap.GetCubeMapSurface(nFace, 0);
+                        D3DDevice.Instance.Device.SetRenderTarget(0, pFace);
+                        Vector3 Dir, VUP;
+                        Color color;
+                        switch (nFace)
+                        {
+                            case CubeMapFace.PositiveX:
+                                // Left
+                                Dir = new Vector3(1, 0, 0);
+                                VUP = new Vector3(0, 1, 0);
+                                color = Color.Black;
+                                break;
 
-                        //case CubeMapFace.NegativeX:
-                        //    // Right
-                        //    Dir = new Vector3(-1, 0, 0);
-                        //    VUP = new Vector3(0, 1, 0);
-                        //    color = Color.Red;
-                        //    break;
+                            case CubeMapFace.NegativeX:
+                                // Right
+                                Dir = new Vector3(-1, 0, 0);
+                                VUP = new Vector3(0, 1, 0);
+                                color = Color.Red;
+                                break;
 
-                        case CubeMapFace.PositiveY:
-                            // Up
-                            Dir = new Vector3(0, 1, 0);
-                            VUP = new Vector3(0, 0, -1);
-                            color = Color.Gray;
-                            break;
+                            case CubeMapFace.PositiveY:
+                                // Up
+                                Dir = new Vector3(0, 1, 0);
+                                VUP = new Vector3(0, 0, -1);
+                                color = Color.Gray;
+                                break;
+                            
+                            /*case CubeMapFace.NegativeY:
+                                // Down
+                                Dir = new Vector3(0, -1, 0);
+                                VUP = new Vector3(0, 0, 1);
+                                color = Color.Yellow;
+                                break;*/
 
-                        //case CubeMapFace.NegativeY:
-                        //    // Down
-                        //    Dir = new Vector3(0, -1, 0);
-                        //    VUP = new Vector3(0, 0, 1);
-                        //    color = Color.Yellow;
-                        //    break;
+                            case CubeMapFace.PositiveZ:
+                                // Front
+                                Dir = new Vector3(0, 0, 1);
+                                VUP = new Vector3(0, 1, 0);
+                                color = Color.Green;
+                                break;
+                            
+                            case CubeMapFace.NegativeZ:
+                                // Back
+                                Dir = new Vector3(0, 0, -1);
+                                VUP = new Vector3(0, 1, 0);
+                                color = Color.Blue;
+                                break;
 
-                        case CubeMapFace.PositiveZ:
-                            // Front
-                            Dir = new Vector3(0, 0, 1);
-                            VUP = new Vector3(0, 1, 0);
-                            color = Color.Green;
-                            break;
+                            default:
+                                continue;
+                        }
 
-                        //case CubeMapFace.NegativeZ:
-                        //    // Back
-                        //    Dir = new Vector3(0, 0, -1);
-                        //    VUP = new Vector3(0, 1, 0);
-                        //    color = Color.Blue;
-                        //    break;
+                        D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, color, 1.0f, 0);
+                        D3DDevice.Instance.Device.BeginScene();
 
-                        default:
-                            continue;
+                        this.quadtree.render(Frustum, false, "", 1, null);
+                        this.sphereLuna.render();
+
+                        D3DDevice.Instance.Device.EndScene();
+                        pFace.Dispose();
                     }
-
-                    D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, color, 1.0f, 0);
-                    D3DDevice.Instance.Device.BeginScene();
-
-                    this.quadtree.render(Frustum, false, "", 1, null);
-                    this.sphereLuna.render();
-
-                    D3DDevice.Instance.Device.EndScene();
-                    pFace.Dispose();
                 }
             }
 
@@ -786,6 +795,7 @@ namespace TGC.Group.Model
             }
 
             D3DDevice.Instance.Device.EndScene();
+
             #endregion
 
             #region RenderShadowMap
