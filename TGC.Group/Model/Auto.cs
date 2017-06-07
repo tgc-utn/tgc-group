@@ -541,7 +541,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimpleCostados(elapsedTime, -1);
                 }
-                this.ModificadorVida = 5;
+                this.ModificadorVida = -5;
                 return;
             }
 
@@ -556,7 +556,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimpleCostados(elapsedTime, 1);
                 }
-                this.ModificadorVida = 5;
+                this.ModificadorVida = -5;
                 return;
             }
 
@@ -572,7 +572,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimple(elapsedTime, moveFoward);
                 }
-                this.ModificadorVida = 5;
+                this.ModificadorVida = -5;
                 return;
 
             }
@@ -588,7 +588,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimpleCostados(elapsedTime, -1);
                 }
-                this.ModificadorVida = 5;
+                this.ModificadorVida = -5;
                 return;
             }
 
@@ -603,7 +603,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimpleCostados(elapsedTime, 1);
                 }
-                this.ModificadorVida = 5;
+                this.ModificadorVida = -5;
                 return;
             }
 
@@ -700,9 +700,9 @@ namespace TGC.Group.Model
 
             var direccionASeguir = new Vector3(origenJugador.X-origenIA.X , origenJugador.Y-origenIA.Y , origenJugador.Z-origenIA.Z);
 
-            direccionASeguir.Normalize();
+            //direccionASeguir.Normalize();
 
-            direccionSeguir.Normalize();
+            //direccionSeguir.Normalize();
 
             if(direccionSeguir == direccionASeguir)
             {
