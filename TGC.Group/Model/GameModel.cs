@@ -141,6 +141,10 @@ namespace TGC.Group.Model
         private CubeTexture g_pCubeMap;
         private float FPS_EnvMap = 0;
 
+        //PowerUps
+        private Microsoft.DirectX.Direct3D.Effect powerUpEffect;
+        private float TiempoRotacion = 0;
+
         private float currentMoveDirPowerUpVida = 1f;
 
         public override void Init()
@@ -150,6 +154,9 @@ namespace TGC.Group.Model
             var loader = new TgcSceneLoader();
 
             ////////////////////////////////////////////////////////////////////////////////////////
+            //Cargar Shader personalizado
+            this.powerUpEffect = TgcShaders.loadEffect(MediaDir + "Shaders\\PowerUps.fx");
+
             //Cargar Shader personalizado
             this.shadowEffect = TgcShaders.loadEffect(MediaDir + "Shaders\\ShadowMap.fx");
             
@@ -245,6 +252,12 @@ namespace TGC.Group.Model
                 unMesh.Effect = this.shadowEffect;
             }
 
+            foreach (TgcMesh unMesh in GameModel.MeshPowerUpsVida)
+            {
+                unMesh.Effect = this.powerUpEffect;
+                unMesh.Technique = "RenderScene";
+            }
+
             /*
             foreach (var unJugador in this.listaJugadores)
             {
@@ -322,10 +335,10 @@ namespace TGC.Group.Model
             ArbolBananasOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\ArbolBananas\\ArbolBananas-TgcScene.xml").Meshes[0];
             GameModel.MeshArbolesBananas = CrearInstancias(ArbolBananasOriginal, 1.50f, 0.15f, 1, MatrizPoblacion);
 
+            //Creo PowerUps
             MatrizPoblacion = RandomMatrix(0, 6);
-            PowerUpVidaOriginal = loader.loadSceneFromFile(MediaDir + "PowerUps\\PowerUp Vida\\PowerUpVida-TgcScene.xml").Meshes[0];
-            GameModel.MeshPowerUpsVida = CrearInstancias(PowerUpVidaOriginal, 1, 5f, 1, MatrizPoblacion);
-
+            PowerUpVidaOriginal = loader.loadSceneFromFile(MediaDir + "PowerUps\\PowerUpVida\\PowerUpVida-TgcScene.xml").Meshes[0];
+            GameModel.MeshPowerUpsVida = CrearInstancias(PowerUpVidaOriginal, 1, 50f, 1, MatrizPoblacion);
         }
 
         private int[,] RandomMatrix(int minValue, int maxValue)
@@ -479,7 +492,7 @@ namespace TGC.Group.Model
                                 instance.AlphaBlendEnable = true;
                             }
 
-                            //Cargo el efecto de sombra
+                            //Cargo el efecto de sombra excepto para los powerups que no hacen sombra y solo giran
                             instance.Effect = this.shadowEffect;
 
                             //Lo agrego a la lista para después renderizarlo
@@ -552,6 +565,7 @@ namespace TGC.Group.Model
                 }
 
                 this.claseMenu.EscribirTeclasEnPantalla (Input);
+                this.TiempoRotacion = 0;
             }
             else
             {
@@ -702,6 +716,8 @@ namespace TGC.Group.Model
             //Habilito el render de particulas para el humo
             D3DDevice.Instance.ParticlesEnabled = true;
             D3DDevice.Instance.EnableParticles();
+            this.TiempoRotacion += ElapsedTime;
+            this.powerUpEffect.SetValue("time", this.TiempoRotacion);
 
             ClearTextures();
 
@@ -829,6 +845,7 @@ namespace TGC.Group.Model
             this.RenderFPS();
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.Red);
             DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.Red);
+            
 
             //Renderizo los objetos/bounding box cargados de las listas
             if (BoundingBox)
@@ -1038,7 +1055,6 @@ namespace TGC.Group.Model
 
             //Rederizar Power ups de vida
             AccionarListaMesh(MeshPowerUpsVida, unaAccion, null);
-
         }
 
         public void ActivarBoundingBox()
@@ -1090,6 +1106,7 @@ namespace TGC.Group.Model
             RocaOriginal.dispose();
             ArbolBananasOriginal.dispose();
             PDLOriginal.dispose();
+            PowerUpVidaOriginal.dispose();
             this.g_pCubeMap.Dispose();
             this.g_pShadowMap.Dispose();
             this.lunaEffect.Dispose();

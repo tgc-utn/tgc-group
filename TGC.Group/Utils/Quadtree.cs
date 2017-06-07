@@ -81,15 +81,19 @@ namespace TGC.UtilsGroup
                 {
                     if (mesh.Enabled)
                     {
-                        if (Technique == "")
+                        if (mesh.Name.IndexOf("PowerUp") == -1)
                         {
-                            mesh.Effect = TgcShaders.Instance.TgcMeshShader;
-                            mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
-                        }
-                        else
-                        {
-                            mesh.Effect = unEfecto;
-                            mesh.Technique = Technique;
+                            if (Technique == "")
+                            {
+                                mesh.Effect = TgcShaders.Instance.TgcMeshShader;
+                                mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
+                            }
+                            else
+                            {
+
+                                mesh.Effect = unEfecto;
+                                mesh.Technique = Technique;
+                            }
                         }
 
                         mesh.render();
@@ -215,7 +219,26 @@ namespace TGC.UtilsGroup
                         {
                             //me fijo si hubo alguna colision
                              if (TgcCollisionUtils.testObbAABB(unAuto.ObbMesh, m.BoundingBox))
-                            {
+                             {
+                                if (m.Name.IndexOf("PowerUp Vida") != -1)
+                                {
+                                    //int index = Array.IndexOf(models, m);
+                                    //models = models.Where((val, idx) => idx != index).ToArray();
+                                    //modelos.Remove(m);
+
+                                    m.Enabled = false;
+
+                                    if (modelos.IndexOf(m) != -1)
+                                    {
+                                        modelos.Remove(m);
+                                        unAuto.ModificadorVida += 4f;
+                                    }
+
+                                    unAuto.colisiono = false;
+
+                                    continue;
+                                }
+
                                 unAuto.colisiono = true;
 
                                 if ((m.Name.IndexOf ("Palmera") != -1) || (m.Name.IndexOf ("Pino") != -1) || (m.Name.IndexOf("ArbolBananas") != -1))
@@ -223,18 +246,6 @@ namespace TGC.UtilsGroup
 
                                 if ((m.Name.IndexOf("Roca") != -1) || (m.Name.IndexOf("Estructura") != -1) || (m.Name.IndexOf("Glorieta") != -1))
                                     unAuto.ModificadorVida = -2.5f;
-
-                                if (m.Name.IndexOf("PowerUp Vida") != -1)
-                                {
-                                    int index = Array.IndexOf(models, m);
-                                    models = models.Where((val, idx) => idx != index).ToArray();
-                                    modelos.Remove(m);
-                                    //m.dispose();
-                                    unAuto.ModificadorVida = 1f;
-                                    unAuto.colisiono = false;
-                                }
-
-
                             }
                         }
                     }
