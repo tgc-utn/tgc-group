@@ -696,10 +696,27 @@ namespace TGC.Group.Model
         {
             var origenIA = Mesh.Position;
 
+            Vector3 origenJugador = autoJugador.Mesh.Position;
+
+            var direccionASeguir = new Vector3(origenJugador.X-origenIA.X , origenJugador.Y-origenIA.Y , origenJugador.Z-origenIA.Z);
+
+            direccionASeguir.Normalize();
+
+            direccionSeguir.Normalize();
+
+            if(direccionSeguir == direccionASeguir)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
             //var direccionSeguirNew = new Vector3(0, 0, 0);
             //direccionSeguirNew = Microsoft.DirectX.Vector3.Multiply(direccionSeguir, 1000000);
 
-            var rayo = new TgcRay(origenIA, direccionSeguir);
+            /*var rayo = new TgcRay(origenIA, direccionSeguir);
 
             var lugarChoque = new Vector3(0, 0, 0);
 
@@ -712,7 +729,7 @@ namespace TGC.Group.Model
             else
             {
                 return false;
-            }
+            }*/
         }
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
