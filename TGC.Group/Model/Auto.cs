@@ -87,7 +87,7 @@ namespace TGC.Group.Model
 
         //Colisiono
         public bool colisiono { get; set; }
-        public float pesoImpacto { get; set; }
+        public float ModificadorVida { get; set; }
 
         //Direccion para seguimiento
         public Vector3 direccionSeguir = new Vector3(0, 0, 0);
@@ -231,6 +231,11 @@ namespace TGC.Group.Model
             this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
             this.ObbMesh.updateValues();*/
 
+        }
+
+        public void AumentarVida()
+        {
+            
         }
 
         public void SetRuedas(TgcSceneLoader loader)
@@ -536,7 +541,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimpleCostados(elapsedTime, -1);
                 }
-                this.pesoImpacto = 5;
+                this.ModificadorVida = 5;
                 return;
             }
 
@@ -551,7 +556,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimpleCostados(elapsedTime, 1);
                 }
-                this.pesoImpacto = 5;
+                this.ModificadorVida = 5;
                 return;
             }
 
@@ -567,7 +572,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimple(elapsedTime, moveFoward);
                 }
-                this.pesoImpacto = 5;
+                this.ModificadorVida = 5;
                 return;
 
             }
@@ -583,7 +588,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimpleCostados(elapsedTime, -1);
                 }
-                this.pesoImpacto = 5;
+                this.ModificadorVida = 5;
                 return;
             }
 
@@ -598,7 +603,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimpleCostados(elapsedTime, 1);
                 }
-                this.pesoImpacto = 5;
+                this.ModificadorVida = 5;
                 return;
             }
 

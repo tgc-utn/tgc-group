@@ -1,6 +1,8 @@
 using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Collision;
 using TGC.Core.Geometry;
@@ -212,15 +214,27 @@ namespace TGC.UtilsGroup
                         (m.Name != "Pasto") && (m.Name != "Plane_5"))
                         {
                             //me fijo si hubo alguna colision
-                            if (TgcCollisionUtils.testObbAABB(unAuto.ObbMesh, m.BoundingBox))
+                             if (TgcCollisionUtils.testObbAABB(unAuto.ObbMesh, m.BoundingBox))
                             {
                                 unAuto.colisiono = true;
 
                                 if ((m.Name.IndexOf ("Palmera") != -1) || (m.Name.IndexOf ("Pino") != -1) || (m.Name.IndexOf("ArbolBananas") != -1))
-                                    unAuto.pesoImpacto = 5;
+                                    unAuto.ModificadorVida = -5;
 
                                 if ((m.Name.IndexOf("Roca") != -1) || (m.Name.IndexOf("Estructura") != -1) || (m.Name.IndexOf("Glorieta") != -1))
-                                    unAuto.pesoImpacto = 2.5f;
+                                    unAuto.ModificadorVida = -2.5f;
+
+                                if (m.Name.IndexOf("PowerUp Vida") != -1)
+                                {
+                                    int index = Array.IndexOf(models, m);
+                                    models = models.Where((val, idx) => idx != index).ToArray();
+                                    modelos.Remove(m);
+                                    //m.dispose();
+                                    unAuto.ModificadorVida = 1f;
+                                    unAuto.colisiono = false;
+                                }
+
+
                             }
                         }
                     }

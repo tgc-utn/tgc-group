@@ -122,10 +122,17 @@ namespace TGC.Group.Model
 
         public void SetVidaJugador(float modificacion)
         {
-            if (this.cantVidaJugador > 0)
-                this.cantVidaJugador -= modificacion;
-            else
-                this.cantVidaJugador = 0;
+            if (modificacion != 0)
+            {
+                this.cantVidaJugador += modificacion;
+
+                if (cantVidaJugador > 100)
+                    this.cantVidaJugador = 100;
+                if (cantVidaJugador < 0)
+                    this.cantVidaJugador = 0;
+            }
+
+
         }
 
         public void Update()

@@ -97,6 +97,10 @@ namespace TGC.Group.Model
         public static List<TgcMesh> MeshPDL;
         private TgcMesh PDLOriginal;
 
+        //Lista de power ups de vida
+        public static List<TgcMesh> MeshPowerUpsVida;
+        private TgcMesh PowerUpVidaOriginal;
+
         //Jugadores
         private List <Jugador> listaJugadores;
 
@@ -136,6 +140,8 @@ namespace TGC.Group.Model
         private Microsoft.DirectX.Direct3D.Effect envMapEffect;
         private CubeTexture g_pCubeMap;
         private float FPS_EnvMap = 0;
+
+        private float currentMoveDirPowerUpVida = 1f;
 
         public override void Init()
         {
@@ -254,6 +260,7 @@ namespace TGC.Group.Model
             listaMeshesQ.AddRange(MeshArbolesBananas);
             //listaMeshesQ.AddRange(MeshPDL);
             listaMeshesQ.AddRange(GameModel.ScenePpal.Meshes);
+            listaMeshesQ.AddRange(MeshPowerUpsVida);
 
             quadtree = new Quadtree();
             quadtree.create(listaMeshesQ, ScenePpal.BoundingBox);
@@ -296,27 +303,32 @@ namespace TGC.Group.Model
             int[,] MatrizPoblacion;
 
             //Creo palmeras
-            MatrizPoblacion = RandomMatrix();
+            MatrizPoblacion = RandomMatrix(0,2);
             PalmeraOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Palmera\\Palmera-TgcScene.xml").Meshes[0];
             GameModel.MeshPalmeras = CrearInstancias(PalmeraOriginal, 0.75f, 0.25f, 1, MatrizPoblacion);
 
             //Creo pinos
-            MatrizPoblacion = RandomMatrix();
+            MatrizPoblacion = RandomMatrix(0, 2);
             PinoOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Pino\\Pino-TgcScene.xml").Meshes[0];
             GameModel.MeshPinos = CrearInstancias(PinoOriginal, 0.90f, -0.05f, 1, MatrizPoblacion);
 
             //Creo rocas
-            MatrizPoblacion = RandomMatrix();
+            MatrizPoblacion = RandomMatrix(0, 2);
             RocaOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\Roca\\Roca-TgcScene.xml").Meshes[0];
             GameModel.MeshRocas = CrearInstancias(RocaOriginal, 0.75f, 0.30f, 1, MatrizPoblacion);
 
             //Creo arboles bananas
-            MatrizPoblacion = RandomMatrix();
+            MatrizPoblacion = RandomMatrix(0, 2);
             ArbolBananasOriginal = loader.loadSceneFromFile(MediaDir + "Vegetacion\\ArbolBananas\\ArbolBananas-TgcScene.xml").Meshes[0];
-            GameModel.MeshArbolesBananas = CrearInstancias(ArbolBananasOriginal, 1.50f, 0.15f, 1, MatrizPoblacion);            
+            GameModel.MeshArbolesBananas = CrearInstancias(ArbolBananasOriginal, 1.50f, 0.15f, 1, MatrizPoblacion);
+
+            MatrizPoblacion = RandomMatrix(0, 6);
+            PowerUpVidaOriginal = loader.loadSceneFromFile(MediaDir + "PowerUps\\PowerUp Vida\\PowerUpVida-TgcScene.xml").Meshes[0];
+            GameModel.MeshPowerUpsVida = CrearInstancias(PowerUpVidaOriginal, 1, 5f, 1, MatrizPoblacion);
+
         }
 
-        private int[,] RandomMatrix()
+        private int[,] RandomMatrix(int minValue, int maxValue)
         {
             int[,] MatrizPoblacion = new int[ROWS, COLUMNS];
             System.Random randomNumber = new System.Random();
@@ -325,7 +337,7 @@ namespace TGC.Group.Model
             {
                 for (int j = 0; j < COLUMNS; j++)
                 {
-                    MatrizPoblacion[i, j] = randomNumber.Next(0, 2);
+                    MatrizPoblacion[i, j] = randomNumber.Next(minValue, maxValue);
                 }
             }
 
@@ -489,7 +501,8 @@ namespace TGC.Group.Model
                 AccionarListaMesh(MeshRocas, 2, unaInstancia) ||
                 AccionarListaMesh(MeshArbolesBananas, 2, unaInstancia) ||
                 AccionarListaMesh(MeshAutos, 2, unaInstancia) ||
-                AccionarListaMesh(GameModel.ScenePpal.Meshes, 2, unaInstancia)
+                AccionarListaMesh(GameModel.ScenePpal.Meshes, 2, unaInstancia) ||
+                AccionarListaMesh(MeshPowerUpsVida,2,unaInstancia)
                 )
             {
                 return true;
@@ -612,6 +625,7 @@ namespace TGC.Group.Model
             }
 
             CalcularPosicionLuzAuto();
+
         }
 
         public void RenderShadowMap()
@@ -1021,6 +1035,10 @@ namespace TGC.Group.Model
 
             //Renderizar PDL
             AccionarListaMesh(MeshPDL, unaAccion, null);
+
+            //Rederizar Power ups de vida
+            AccionarListaMesh(MeshPowerUpsVida, unaAccion, null);
+
         }
 
         public void ActivarBoundingBox()
