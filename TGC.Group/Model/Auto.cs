@@ -11,6 +11,7 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.Utils;
 using TGC.Core.Sound;
+using TGC.UtilsGroup;
 
 namespace TGC.Group.Model
 {
@@ -91,6 +92,7 @@ namespace TGC.Group.Model
 
         //Direccion para seguimiento
         public Vector3 direccionSeguir = new Vector3(0, 0, 0);
+        private TgcDrawText letraTitulo;
 
         //Humo
         HumoParticula emisorHumo;
@@ -452,7 +454,7 @@ namespace TGC.Group.Model
 			
 			this.ColisionesObbObb(GameModel.ListaMeshAutos, ElapsedTime, moveForward);
             this.ObbMesh.Center = this.Mesh.Position;
-            direccionSeguir = movement;
+            direccionSeguir = new Vector3((-1) * FastMath.Sin(this.GetMesh().Rotation.Y), 0, (-1) * FastMath.Cos(this.GetMesh().Rotation.Y));
         }
 		
 		private void colisionSimple(float elapsedTime, float moveForward)
@@ -680,7 +682,7 @@ namespace TGC.Group.Model
         }
 
         public void Seguir(Auto autoJugador , float ElapsedTime)
-        {           
+        {
             if (JugadorEncontrado(autoJugador))
             {
                 UpdateIA(true, true, false, false, false, false, ElapsedTime, 100000f); //Si el rayo proyectado impacta con el auto del jugador, el auto de la ia comienza a avanzar hacia su posicion
@@ -694,15 +696,17 @@ namespace TGC.Group.Model
 
         public bool JugadorEncontrado(Auto autoJugador)
         {
+            direccionSeguir = new Vector3((-1) * FastMath.Sin(this.GetMesh().Rotation.Y), 0, (-1) * FastMath.Cos(this.GetMesh().Rotation.Y));
+
             var origenIA = Mesh.Position;
 
             Vector3 origenJugador = autoJugador.Mesh.Position;
 
-            var direccionASeguir = new Vector3(origenJugador.X-origenIA.X , origenJugador.Y-origenIA.Y , origenJugador.Z-origenIA.Z);
+            var direccionASeguir = new Vector3(origenJugador.X-origenIA.X , 0, origenJugador.Z-origenIA.Z);
 
-            //direccionASeguir.Normalize();
+            direccionASeguir.Normalize();
 
-            //direccionSeguir.Normalize();
+            direccionSeguir.Normalize();
 
             if(direccionSeguir == direccionASeguir)
             {
@@ -847,7 +851,7 @@ namespace TGC.Group.Model
 
             this.ColisionesObbObb(GameModel.ListaMeshAutos, ElapsedTime, moveForward);
             this.ObbMesh.Center = this.Mesh.Position;
-            direccionSeguir = movement;
+            direccionSeguir = new Vector3((-1) * FastMath.Sin(this.GetMesh().Rotation.Y), 0, (-1) * FastMath.Cos(this.GetMesh().Rotation.Y));
         }
 
         private void loadSound(string filePath)

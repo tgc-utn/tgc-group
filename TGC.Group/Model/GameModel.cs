@@ -845,7 +845,8 @@ namespace TGC.Group.Model
             this.RenderFPS();
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.Red);
             DrawText.drawText("Con la tecla F1 se cambia el tipo de camara. Pos [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30, Color.Red);
-            
+            DrawText.drawText("Direccion: " + TgcParserUtils.printVector3(listaJugadores[1].claseAuto.direccionSeguir), 0, 60, Color.Red);
+
 
             //Renderizo los objetos/bounding box cargados de las listas
             if (BoundingBox)
