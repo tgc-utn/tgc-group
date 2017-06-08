@@ -73,31 +73,47 @@ namespace TGC.UtilsGroup
             //Renderizar
             foreach (var mesh in modelos)
             {
-                if ((soloObjetos == 1) &&
-                    ((mesh.Name.IndexOf("Room") != -1) || (mesh.Name == "Pasto"))
-                    )
-                    continue;
-                else
+                if (soloObjetos == 2)
                 {
                     if (mesh.Enabled)
                     {
-                        if (mesh.Name.IndexOf("PowerUp") == -1)
+                        if ((mesh.Name == "Pasto") || (mesh.Name == "Plane_5") || (mesh.Name == "Room-1-Floor-0"))
                         {
-                            if (Technique == "")
-                            {
-                                mesh.Effect = TgcShaders.Instance.TgcMeshShader;
-                                mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
-                            }
-                            else
-                            {
-
-                                mesh.Effect = unEfecto;
-                                mesh.Technique = Technique;
-                            }
+                            mesh.Effect = unEfecto;
+                            mesh.Technique = Technique;
+                            mesh.render();
+                            mesh.Enabled = false;
                         }
+                    }
+                }
+                else
+                {
+                    if ((soloObjetos == 1) &&
+                        ((mesh.Name.IndexOf("Room") != -1) || (mesh.Name == "Pasto"))
+                        )
+                        continue;
+                    else
+                    {
+                        if (mesh.Enabled)
+                        {
+                            if (mesh.Name.IndexOf("PowerUp") == -1)
+                            {
+                                if (Technique == "")
+                                {
+                                    mesh.Effect = TgcShaders.Instance.TgcMeshShader;
+                                    mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
+                                }
+                                else
+                                {
 
-                        mesh.render();
-                        mesh.Enabled = false;
+                                    mesh.Effect = unEfecto;
+                                    mesh.Technique = Technique;
+                                }
+                            }
+
+                            mesh.render();
+                            mesh.Enabled = false;
+                        }
                     }
                 }
             }
