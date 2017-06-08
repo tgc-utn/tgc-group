@@ -238,9 +238,6 @@ namespace TGC.UtilsGroup
                              {
                                 if (m.Name.IndexOf("PowerUp Vida") != -1)
                                 {
-                                    //int index = Array.IndexOf(models, m);
-                                    //models = models.Where((val, idx) => idx != index).ToArray();
-                                    //modelos.Remove(m);
 
                                     m.Enabled = false;
 
@@ -248,6 +245,7 @@ namespace TGC.UtilsGroup
                                     {
                                         modelos.Remove(m);
                                         unAuto.ModificadorVida += 4f;
+                                        unAuto.ReproducirSonidoPowerUpVida();
                                     }
 
                                     unAuto.colisiono = false;

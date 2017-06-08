@@ -11,6 +11,7 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.Utils;
 using TGC.Core.Sound;
+using TGC.UtilsGroup;
 
 namespace TGC.Group.Model
 {
@@ -27,6 +28,7 @@ namespace TGC.Group.Model
 
         //Velocidad Maxima
         private const float MAX_SPEED = 1000f;
+        private const float MAX_SPEEDIA = 500f;
 
         //Velocidad de rotación del auto
         private const float ROTATION_SPEED = 0.3f;
@@ -91,6 +93,8 @@ namespace TGC.Group.Model
 
         //Direccion para seguimiento
         public Vector3 direccionSeguir = new Vector3(0, 0, 0);
+        public Vector3 direccionASeguir = new Vector3(0, 0, 0);
+        public float desviacion = 0.1f;
 
         //Humo
         HumoParticula emisorHumo;
@@ -98,6 +102,8 @@ namespace TGC.Group.Model
         private string pathSonidoGolpe1;
 
         private string pathSonidoEncendido;
+
+        private string pathSonidoPowerUpVida;
 
         private TgcStaticSound sound;
 
@@ -110,6 +116,7 @@ namespace TGC.Group.Model
             this.colisiono = false;
             this.pathSonidoGolpe1 = MediaDir + "Sounds\\Golpe1.wav";
             this.pathSonidoEncendido = MediaDir + "Sounds\\Encendido.wav";
+            this.pathSonidoPowerUpVida = MediaDir + "Sounds\\PowerUpVida.wav";
             this.DirectSound = directSound;
         }
 
@@ -231,11 +238,6 @@ namespace TGC.Group.Model
             this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
             this.ObbMesh.updateValues();*/
 
-        }
-
-        public void AumentarVida()
-        {
-            
         }
 
         public void SetRuedas(TgcSceneLoader loader)
@@ -452,7 +454,7 @@ namespace TGC.Group.Model
 			
 			this.ColisionesObbObb(GameModel.ListaMeshAutos, ElapsedTime, moveForward);
             this.ObbMesh.Center = this.Mesh.Position;
-            direccionSeguir = movement;
+            direccionSeguir = new Vector3((-1) * FastMath.Sin(this.GetMesh().Rotation.Y), 0, (-1) * FastMath.Cos(this.GetMesh().Rotation.Y));
         }
 		
 		private void colisionSimple(float elapsedTime, float moveForward)
@@ -541,7 +543,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimpleCostados(elapsedTime, -1);
                 }
-                this.ModificadorVida = 5;
+                this.ModificadorVida = -5;
                 return;
             }
 
@@ -556,7 +558,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimpleCostados(elapsedTime, 1);
                 }
-                this.ModificadorVida = 5;
+                this.ModificadorVida = -5;
                 return;
             }
 
@@ -572,7 +574,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimple(elapsedTime, moveFoward);
                 }
-                this.ModificadorVida = 5;
+                this.ModificadorVida = -5;
                 return;
 
             }
@@ -588,7 +590,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimpleCostados(elapsedTime, -1);
                 }
-                this.ModificadorVida = 5;
+                this.ModificadorVida = -5;
                 return;
             }
 
@@ -603,7 +605,7 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimpleCostados(elapsedTime, 1);
                 }
-                this.ModificadorVida = 5;
+                this.ModificadorVida = -5;
                 return;
             }
 
@@ -680,10 +682,10 @@ namespace TGC.Group.Model
         }
 
         public void Seguir(Auto autoJugador , float ElapsedTime)
-        {           
+        {
             if (JugadorEncontrado(autoJugador))
             {
-                UpdateIA(true, true, false, false, false, false, ElapsedTime, 100000f); //Si el rayo proyectado impacta con el auto del jugador, el auto de la ia comienza a avanzar hacia su posicion
+                UpdateIA(true, true, false, false, false, false, ElapsedTime, 225f); //Si el rayo proyectado impacta con el auto del jugador, el auto de la ia comienza a avanzar hacia su posicion
             }
             else
             {
@@ -694,12 +696,40 @@ namespace TGC.Group.Model
 
         public bool JugadorEncontrado(Auto autoJugador)
         {
+            direccionSeguir = new Vector3((-1) * FastMath.Sin(this.GetMesh().Rotation.Y), 0, (-1) * FastMath.Cos(this.GetMesh().Rotation.Y));
+
             var origenIA = Mesh.Position;
 
-            //var direccionSeguirNew = new Vector3(0, 0, 0);
-            //direccionSeguirNew = Microsoft.DirectX.Vector3.Multiply(direccionSeguir, 1000000);
+            Vector3 origenJugador = autoJugador.Mesh.Position;
 
-            var rayo = new TgcRay(origenIA, direccionSeguir);
+            direccionASeguir = new Vector3(origenJugador.X-origenIA.X , 0, origenJugador.Z-origenIA.Z);
+
+            direccionASeguir.Normalize();
+
+            direccionSeguir.Normalize();
+
+            var xmin = direccionASeguir.X - desviacion;
+            var xmax = direccionASeguir.X + desviacion;
+            var zmin = direccionASeguir.Z - desviacion;
+            var zmax = direccionASeguir.Z + desviacion;
+
+            if (xmin <= direccionSeguir.X && direccionSeguir.X <= xmax)
+            {
+                if(zmin <= direccionSeguir.Z && direccionSeguir.Z <= zmax)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            /*var rayo = new TgcRay(origenIA, direccionSeguir);
 
             var lugarChoque = new Vector3(0, 0, 0);
 
@@ -712,7 +742,7 @@ namespace TGC.Group.Model
             else
             {
                 return false;
-            }
+            }*/
         }
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
@@ -759,23 +789,23 @@ namespace TGC.Group.Model
             //Movernos adelante y atras, sobre el eje Z.
             if (Avanzar)
             {
-                moveForward += -this.Acelerar(aceleraciooon, ElapsedTime);
+                moveForward += -this.AcelerarIA(aceleraciooon, ElapsedTime);
             }
 
             if (Frenar)
             {
-                //moveForward += -this.Acelerar(-250f, ElapsedTime);
+                //moveForward += -this.AcelerarIA(-250f, ElapsedTime);
             }
 
             //El auto dejo de acelerar e ira frenando de apoco 
             if (!Avanzar && !Frenar)
             {
-                moveForward = -this.Acelerar(0f, ElapsedTime);
+                moveForward = -this.AcelerarIA(0f, ElapsedTime);
             }
 
             if (rotating)
             {
-                if (this.MOVEMENT_SPEED <= (Auto.MAX_SPEED / 2))
+                if (this.MOVEMENT_SPEED <= (Auto.MAX_SPEEDIA / 2))
                     this.rotAngle = (this.MOVEMENT_SPEED * 0.2f * Math.Sign(rotate) * ElapsedTime) * (FastMath.PI / 50) * Math.Abs(ROTATION_SPEED_IA);
                 else
                     this.rotAngle = (this.MOVEMENT_SPEED * 0.2f * Math.Sign(rotate) * ElapsedTime) * (FastMath.PI / 180) * Math.Abs(ROTATION_SPEED_IA);
@@ -830,7 +860,21 @@ namespace TGC.Group.Model
 
             this.ColisionesObbObb(GameModel.ListaMeshAutos, ElapsedTime, moveForward);
             this.ObbMesh.Center = this.Mesh.Position;
-            direccionSeguir = movement;
+            direccionSeguir = new Vector3((-1) * FastMath.Sin(this.GetMesh().Rotation.Y), 0, (-1) * FastMath.Cos(this.GetMesh().Rotation.Y));
+        }
+
+        private float AcelerarIA(float aceleracion, float ElapsedTime)
+        {
+            if ((this.MOVEMENT_SPEED < MAX_SPEEDIA))
+            {
+                this.MOVEMENT_SPEED = MOVEMENT_SPEED + ((aceleracion + ObtenerRozamiento()) * ElapsedTime);
+
+                if (this.MOVEMENT_SPEED > Math.Abs(MAX_SPEEDIA))
+                    this.MOVEMENT_SPEED = MAX_SPEEDIA - 1;
+
+                return this.MOVEMENT_SPEED;
+            }
+            else return this.MOVEMENT_SPEED;
         }
 
         private void loadSound(string filePath)
@@ -873,6 +917,14 @@ namespace TGC.Group.Model
             loadSound(this.pathSonidoEncendido);
             sound.play();
         }
+
+        public void ReproducirSonidoPowerUpVida()
+        {
+            loadSound(this.pathSonidoPowerUpVida);
+            sound.play();
+        }
+
+
 
         public void Render()
         {
