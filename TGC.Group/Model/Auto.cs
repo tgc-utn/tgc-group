@@ -102,6 +102,8 @@ namespace TGC.Group.Model
 
         private string pathSonidoEncendido;
 
+        private string pathSonidoPowerUpVida;
+
         private TgcStaticSound sound;
 
         private TgcDirectSound DirectSound;
@@ -113,6 +115,7 @@ namespace TGC.Group.Model
             this.colisiono = false;
             this.pathSonidoGolpe1 = MediaDir + "Sounds\\Golpe1.wav";
             this.pathSonidoEncendido = MediaDir + "Sounds\\Encendido.wav";
+            this.pathSonidoPowerUpVida = MediaDir + "Sounds\\PowerUpVida.wav";
             this.DirectSound = directSound;
         }
 
@@ -234,11 +237,6 @@ namespace TGC.Group.Model
             this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
             this.ObbMesh.updateValues();*/
 
-        }
-
-        public void AumentarVida()
-        {
-            
         }
 
         public void SetRuedas(TgcSceneLoader loader)
@@ -898,6 +896,14 @@ namespace TGC.Group.Model
             loadSound(this.pathSonidoEncendido);
             sound.play();
         }
+
+        public void ReproducirSonidoPowerUpVida()
+        {
+            loadSound(this.pathSonidoPowerUpVida);
+            sound.play();
+        }
+
+
 
         public void Render()
         {
