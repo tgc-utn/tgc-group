@@ -92,7 +92,8 @@ namespace TGC.Group.Model
 
         //Direccion para seguimiento
         public Vector3 direccionSeguir = new Vector3(0, 0, 0);
-        private TgcDrawText letraTitulo;
+        public Vector3 direccionASeguir = new Vector3(0, 0, 0);
+        public float desviacion = 0.005f;
 
         //Humo
         HumoParticula emisorHumo;
@@ -685,7 +686,7 @@ namespace TGC.Group.Model
         {
             if (JugadorEncontrado(autoJugador))
             {
-                UpdateIA(true, true, false, false, false, false, ElapsedTime, 100000f); //Si el rayo proyectado impacta con el auto del jugador, el auto de la ia comienza a avanzar hacia su posicion
+                UpdateIA(true, true, false, false, false, false, ElapsedTime, 1000f); //Si el rayo proyectado impacta con el auto del jugador, el auto de la ia comienza a avanzar hacia su posicion
             }
             else
             {
@@ -702,13 +703,16 @@ namespace TGC.Group.Model
 
             Vector3 origenJugador = autoJugador.Mesh.Position;
 
-            var direccionASeguir = new Vector3(origenJugador.X-origenIA.X , 0, origenJugador.Z-origenIA.Z);
+            direccionASeguir = new Vector3(origenJugador.X-origenIA.X , 0, origenJugador.Z-origenIA.Z);
 
             direccionASeguir.Normalize();
 
             direccionSeguir.Normalize();
 
-            if(direccionSeguir == direccionASeguir)
+            var xmin = direccionASeguir.X - desviacion;
+            var xmax = direccionASeguir.X + desviacion;
+
+            if (xmin <= direccionSeguir.X && direccionSeguir.X <= xmax)
             {
                 return true;
             }
