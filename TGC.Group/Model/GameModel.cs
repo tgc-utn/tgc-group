@@ -136,6 +136,14 @@ namespace TGC.Group.Model
         private Surface g_pDSShadow;
         private Texture g_pShadowMap;
 
+        //Shadows Salto
+        private Vector2 posicionLuzSobreAuto = new Vector2(20, 0);
+        private Vector3 g_LightPosSalto = new Vector3 (0, 0, 0);
+        private Vector3 g_LightDirSalto = new Vector3(0, 0, 0);
+        private Matrix g_LightViewSalto;
+        private Surface g_pDSShadowSalto;
+        private Texture g_pShadowMapSalto;
+
         //Reflejo
         private Microsoft.DirectX.Direct3D.Effect envMapEffect;
         private CubeTexture g_pCubeMap;
@@ -202,6 +210,24 @@ namespace TGC.Group.Model
             g_mShadowProj = Matrix.PerspectiveFovLH(Geometry.DegreeToRadian(80), aspectRatio, 50, 5000);
             D3DDevice.Instance.Device.Transform.Projection =
                 Matrix.PerspectiveFovLH(Geometry.DegreeToRadian(45.0f), aspectRatio, near_plane, far_plane);
+            ////////////////////////////////////////////////////////////////////////////////////////
+
+            //--------------------------------------------------------------------------------------
+            // Creo el shadowmap.
+            // Format.R32F
+            // Format.X8R8G8B8
+            g_pShadowMapSalto = new Texture(D3DDevice.Instance.Device, SHADOWMAP_SIZE, SHADOWMAP_SIZE,
+                1, Usage.RenderTarget, Format.R32F,
+                Pool.Default);
+            // tengo que crear un stencilbuffer para el shadowmap manualmente
+            // para asegurarme que tenga la el mismo tamano que el shadowmap, y que no tenga
+            // multisample, etc etc.
+            g_pDSShadowSalto = D3DDevice.Instance.Device.CreateDepthStencilSurface(SHADOWMAP_SIZE,
+                SHADOWMAP_SIZE,
+                DepthFormat.D24S8,
+                MultiSampleType.None,
+                0,
+                true);
             ////////////////////////////////////////////////////////////////////////////////////////
 
             //Cargo la clase de Tiempo
@@ -492,7 +518,7 @@ namespace TGC.Group.Model
                                 instance.AlphaBlendEnable = true;
                             }
 
-                            //Cargo el efecto de sombra excepto para los powerups que no hacen sombra y solo giran
+                            //Cargo el efecto de sombra
                             instance.Effect = this.shadowEffect;
 
                             //Lo agrego a la lista para después renderizarlo
@@ -638,7 +664,8 @@ namespace TGC.Group.Model
                 }
             }
 
-            CalcularPosicionLuzAuto();
+            this.CalcularPosicionLuzAuto();
+            this.CalcularPosicionLuzAutoSalto();
 
         }
 
@@ -651,14 +678,21 @@ namespace TGC.Group.Model
             shadowEffect.SetValue("g_vLightDir", new Vector4(g_LightDir.X, g_LightDir.Y, g_LightDir.Z, 1));
             g_LightView = Matrix.LookAtLH(g_LightPos, g_LightPos + g_LightDir, new Vector3(0, 0, 1));
 
+            shadowEffect.SetValue("g_vLightPosSalto", new Vector4(g_LightPosSalto.X, g_LightPosSalto.Y, g_LightPosSalto.Z, 1));
+            shadowEffect.SetValue("g_vLightDirSalto", new Vector4(g_LightDirSalto.X, g_LightDirSalto.Y, g_LightDirSalto.Z, 1));
+            g_LightViewSalto = Matrix.LookAtLH(g_LightPosSalto, g_LightPosSalto + g_LightDirSalto, new Vector3(0, 0, 1));
+
             // inicializacion standard:
             shadowEffect.SetValue("g_mProjLight", g_mShadowProj);
             shadowEffect.SetValue("g_mViewLightProj", g_LightView * g_mShadowProj);
+            shadowEffect.SetValue("g_mViewLightProjSalto", g_LightViewSalto * g_mShadowProj);
 
             // Primero genero el shadow map, para ello dibujo desde el pto de vista de luz
             // a una textura, con el VS y PS que generan un mapa de profundidades.
             var pOldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
             var pShadowSurf = g_pShadowMap.GetSurfaceLevel(0);
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             D3DDevice.Instance.Device.SetRenderTarget(0, pShadowSurf);
             var pOldDS = D3DDevice.Instance.Device.DepthStencilSurface;
             D3DDevice.Instance.Device.DepthStencilSurface = g_pDSShadow;
@@ -684,11 +718,42 @@ namespace TGC.Group.Model
             // Termino
             D3DDevice.Instance.Device.EndScene();
 
-            // restuaro el render target y el stencil
+            // restuaro el render target y el stencil oara las sombras
             D3DDevice.Instance.Device.DepthStencilSurface = pOldDS;
+            pShadowSurf.Dispose();
             D3DDevice.Instance.Device.SetRenderTarget(0, pOldRT);
 
-            pShadowSurf.Dispose();
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            var pShadowSurfSalto = g_pShadowMapSalto.GetSurfaceLevel(0);
+            D3DDevice.Instance.Device.SetRenderTarget(0, pShadowSurfSalto);
+            var pOldDSSalto = D3DDevice.Instance.Device.DepthStencilSurface;
+            D3DDevice.Instance.Device.DepthStencilSurface = g_pDSShadowSalto;
+
+            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+            D3DDevice.Instance.Device.BeginScene();
+
+            //Hago el render de la escena pp dicha
+            shadowEffect.SetValue("g_txShadowSalto", g_pShadowMapSalto);
+
+            //Renderizo todos las sombras de todos los objetos del mapa
+            quadtree.render(Frustum, false, "RenderShadowSalto", 2, this.shadowEffect);
+
+            //Dibujo las sombras del jugador principal
+            unMesh = this.listaJugadores[0].claseAuto.GetMesh();
+            unMesh.Effect = this.shadowEffect;
+            unMesh.Technique = "RenderShadowSalto";
+            unMesh.render();
+
+            // Termino
+            D3DDevice.Instance.Device.EndScene();
+
+            // restuaro el render target y el stencil
+            D3DDevice.Instance.Device.DepthStencilSurface = pOldDS;
+            pShadowSurfSalto.Dispose();
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            D3DDevice.Instance.Device.SetRenderTarget(0, pOldRT);
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         }
 
         public void CalcularPosicionLuzAuto()
@@ -706,6 +771,13 @@ namespace TGC.Group.Model
             this.g_LightPos = this.listaJugadores[0].claseAuto.ObbArribaDer.Position + new Vector3(posicion_xluz, 0, posicion_yluz);
             this.g_LightDir = new Vector3((-1) * FastMath.Sin(this.listaJugadores[0].claseAuto.GetMesh().Rotation.Y), 0, (-1) * FastMath.Cos(this.listaJugadores[0].claseAuto.GetMesh().Rotation.Y));
             this.g_LightDir.Normalize();
+        }
+
+        public void CalcularPosicionLuzAutoSalto()
+        {
+            this.g_LightPosSalto = this.listaJugadores[0].claseAuto.ObbMesh.Position + new Vector3(0, 250, 0);
+            this.g_LightDirSalto = this.listaJugadores[0].claseAuto.ObbMesh.Position - this.g_LightPosSalto;
+            this.g_LightDirSalto.Normalize();
         }
 
         public override void Render()
@@ -830,10 +902,8 @@ namespace TGC.Group.Model
 
             #region RenderShadowMap
 
-            //D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
-
             //Genero el shadow map
-            this.RenderShadowMap();
+            this.RenderShadowMap();           
 
             #endregion
 
@@ -848,7 +918,6 @@ namespace TGC.Group.Model
             DrawText.drawText("Direccion: " + TgcParserUtils.printVector3(listaJugadores[1].claseAuto.direccionSeguir), 0, 60, Color.Red);
             DrawText.drawText("Direccion: " + TgcParserUtils.printVector3(listaJugadores[1].claseAuto.direccionASeguir), 0, 80, Color.Red);
 
-
             //Renderizo los objetos/bounding box cargados de las listas
             if (BoundingBox)
             {
@@ -862,9 +931,6 @@ namespace TGC.Group.Model
 
             //Renderizo todos los objetos
             quadtree.render(Frustum, false, "RenderScene", 0, this.shadowEffect);
-
-            //Renderizo la luna
-            //this.sphereLuna.render();
 
             //Dibujo el reloj o solo muevo la camara para la presentación del juego
             if (!this.ModoPresentacion)
@@ -1111,6 +1177,7 @@ namespace TGC.Group.Model
             PowerUpVidaOriginal.dispose();
             this.g_pCubeMap.Dispose();
             this.g_pShadowMap.Dispose();
+            this.g_pDSShadow.Dispose();
             this.lunaEffect.Dispose();
             this.luzLunaMesh.dispose();
             this.shadowEffect.Dispose();
