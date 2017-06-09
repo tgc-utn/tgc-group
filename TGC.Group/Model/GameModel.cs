@@ -577,6 +577,9 @@ namespace TGC.Group.Model
                         this.NombreJugador1 = this.claseMenu.GetNombreJugador();
                         Camara = this.listaJugadores[0].claseCamara.GetCamera();
                         this.listaJugadores[0].claseAuto.ReproducirSonidoArranque();
+                        System.Threading.Thread.Sleep(2000);
+                        this.listaJugadores[0].claseAuto.ReproducirSonidoMotor();
+
                     }
 
                     if (this.claseMenu.GetEstadoMenu() == "S")
