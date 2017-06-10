@@ -65,7 +65,7 @@ namespace TGC.Group.Model
         public static TgcScene ScenePpal;
 
         //Cantidad de autos enemigos
-        public int CantidadDeOponentes = 4;
+        public int CantidadDeOponentes = 1;
 
         //Cantidad de tiempo de juego
         public int TiempoDeJuego = 5;
