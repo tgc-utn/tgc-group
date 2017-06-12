@@ -94,7 +94,7 @@ namespace TGC.Group.Model
         //Direccion para seguimiento
         public Vector3 direccionSeguir = new Vector3(0, 0, 0);
         public Vector3 direccionASeguir = new Vector3(0, 0, 0);
-        public float desviacion = 0.1f;
+        public float desviacion = 0.25f;
 
         //Humo
         HumoParticula emisorHumo;
