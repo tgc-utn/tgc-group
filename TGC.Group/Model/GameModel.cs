@@ -166,7 +166,7 @@ namespace TGC.Group.Model
             var d3dDevice = D3DDevice.Instance.Device;
             var loader = new TgcSceneLoader();
 
-            g_pBaseTexture2 = TextureLoader.FromFile(d3dDevice, MediaDir + "Textures\\transparent.png");
+            g_pBaseTexture2 = TextureLoader.FromFile(d3dDevice, MediaDir + "Textures\\stones.bmp");
             g_pHeightmap2 = TextureLoader.FromFile(d3dDevice, MediaDir + "Textures\\NM_height_stones.tga");
 
             ////////////////////////////////////////////////////////////////////////////////////////
@@ -992,16 +992,21 @@ namespace TGC.Group.Model
             #endregion
 
 
-            
+            /*
             this.parallaxEffect.SetValue("min_cant_samples", 10);
-            this.parallaxEffect.SetValue("max_cant_samples", 50);
-            this.parallaxEffect.SetValue("fHeightMapScale", 0.25f);
+            this.parallaxEffect.SetValue("max_cant_samples", 500);
+            this.parallaxEffect.SetValue("fHeightMapScale", 100f);
+            */
+
+
+
             this.parallaxEffect.SetValue("fvEyePosition", TgcParserUtils.vector3ToFloat3Array(Camara.Position));
-
             this.parallaxEffect.SetValue("time", this.TiempoRotacion);
-
-            //this.parallaxEffect.SetValue("aux_Tex", this.g_pBaseTexture2);
+            this.parallaxEffect.SetValue("aux_Tex", this.g_pBaseTexture2);
             this.parallaxEffect.SetValue("height_map", this.g_pHeightmap2);
+            //this.parallaxEffect.SetValue("g_fSpecularExponent", 10f);
+            //this.parallaxEffect.SetValue("g_fSpecularExponent", 0.9f);
+
 
             unMesh = this.listaJugadores[0].claseAuto.GetMesh();
             unMesh.Effect = this.parallaxEffect;

@@ -49,7 +49,7 @@ namespace TGC.Group.Model
         public TgcBoundingOrientedBox ObbArribaDer;
         private TgcBoundingOrientedBox ObbAbajoIzq;
         private TgcBoundingOrientedBox ObbAbajoDer;
-        private TgcBoundingOrientedBox ObbArriba;
+        public TgcBoundingOrientedBox ObbArriba;
         private TgcBoundingOrientedBox ObbAbajo;
 
         private List<TgcBoundingOrientedBox> ObbLista;
@@ -123,18 +123,12 @@ namespace TGC.Group.Model
         public void RenderObb()
         {
             this.ObbMesh.render();
-			/*    this.ObbArriba.render();
-                this.ObbMedio.render();
-                this.ObbAbajo.render();*/
-/*
             this.ObbArriba.render();
             this.ObbArribaIzq.render();
             this.ObbArribaDer.render();
-
             this.ObbAbajo.render();
             this.ObbAbajoDer.render();
             this.ObbAbajoIzq.render();
-*/
         }
 
         public TgcMesh GetMesh()
@@ -528,8 +522,11 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimple(elapsedTime, moveFoward);
                 }
-                return;
 
+
+
+
+                return;
             }
 
             if (TgcCollisionUtils.testObbObb(this.ObbArribaDer.toStruct(), unAuto.ObbMesh.toStruct()))

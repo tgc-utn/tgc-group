@@ -2,7 +2,7 @@ float time = 0;
 
 float3 g_LightDir = float3(0, -1, 0);
 float3 fvEyePosition = float3(0.00, 0.00, -100.00);
-float g_fSpecularExponent = 3;
+float g_fSpecularExponent = 0.9;
 float k_ld = 1;		// luz difusa
 float k_le = 1;		// luz specular
 float k_la = 1;		// luz ambiente
@@ -68,7 +68,6 @@ sampler_state
 float4 Phong(float2 texCoord, float3 vLightTS, float3 vViewTS, float dx, float dy)
 {
 	// Color Basico
-	//float4 cBaseColor = tex2Dgrad(auxMap, texCoord, dx, dy);
 	float4 cBaseColor = tex2Dgrad(diffuseMap, texCoord, dx, dy);
 	
 	if (phong_lighting)
@@ -133,7 +132,8 @@ void RenderSceneVS(float4 Pos : POSITION,
 	// proyecto
 	oPos = mul(Pos, matWorldViewProj);
 	//Propago la textura
-	Tex = Texcoord*fTexScale;
+	//Tex = Texcoord*fTexScale;
+	Tex =Texcoord;
 
 	tsView = mul(wsView, worldToTangentSpace);		// Vector View en TangentSpace
 	tsLight = mul(g_LightDir, worldToTangentSpace);	// Vector Light en TangentSpace
@@ -230,6 +230,8 @@ float4 PSBumpMap(float2 Texcoord: TEXCOORD0,
 ) : COLOR0
 {
 	return Phong(Texcoord, tsLight, -tsView,ddx(Texcoord),ddy(Texcoord));
+	//float4 color_base = tex2D(diffuseMap, Texcoord);
+	//return color_base;
 }
 
 technique BumpMap
