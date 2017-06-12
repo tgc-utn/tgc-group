@@ -674,11 +674,12 @@ namespace TGC.Group.Model
             return 0;
         }
 
-        public void Seguir(Auto autoJugador , float ElapsedTime)
+        public void Seguir(Auto autoJugador , List<TgcMesh> MeshAABB , float ElapsedTime)
         {
             if (JugadorEncontrado(autoJugador))
             {
-                UpdateIA(true, true, false, false, false, false, ElapsedTime, 225f); //Si el rayo proyectado impacta con el auto del jugador, el auto de la ia comienza a avanzar hacia su posicion
+                this.AvanzarHastaJugador(MeshAABB, ElapsedTime);
+                //UpdateIA(true, true, false, false, false, false, ElapsedTime, 225f); //Si el rayo proyectado impacta con el auto del jugador, el auto de la ia comienza a avanzar hacia su posicion
             }
             else
             {
@@ -736,6 +737,57 @@ namespace TGC.Group.Model
             {
                 return false;
             }*/
+        }
+
+        public void AvanzarHastaJugador(List<TgcMesh> MeshAABB, float ElapsedTime)
+        {
+            if(EncontroAABB(MeshAABB))
+            {
+                UpdateIA(true, true, false, false, true, false, ElapsedTime, 150f);
+            }
+            else
+            {
+                UpdateIA(true, true, false, false, false, false, ElapsedTime, 225f);
+            }
+        }
+
+        private bool EncontroAABB(List<TgcMesh> meshAABB)
+        {
+            bool e = false;
+            foreach (TgcMesh unMesh in meshAABB)
+            {
+                var posicion = new Vector3(this.Mesh.Position.X, this.Mesh.Position.Y, this.Mesh.Position.Z);
+                var rayo = new TgcRay(posicion, direccionSeguir);
+                var lugarChoque = new Vector3(0, 0, 0);
+                if (TgcCollisionUtils.intersectRayAABB(rayo, unMesh.BoundingBox, out lugarChoque))
+                {
+                    var distancia = DistanciaEntre2Puntos(this.Mesh.Position, lugarChoque);
+                    if (distancia < 100)
+                    {
+                        e = true;
+                    }
+                    else
+                    {
+                        e = false;
+                    }
+                }
+                else
+                {
+                    e = false;
+                }
+            }
+            return e;
+        }
+
+        public double DistanciaEntre2Puntos(Vector3 position, Vector3 lugarChoque)
+        {
+            float X = position.X - lugarChoque.X;
+            float Z = position.Z - lugarChoque.Z;
+            var XX = Math.Pow(X, 2);
+            var ZZ = Math.Pow(Z, 2);
+            var suma = XX + ZZ;
+            var distancia = Math.Sqrt(suma);
+            return distancia;
         }
 
         public void ReproducirSonidoMotor()

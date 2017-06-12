@@ -64,12 +64,12 @@ namespace TGC.Group.Model
             this.claseHUD.ActualizarNombreJugador(NombreJugador);
         }
 
-        public void Seguir(List<Jugador> listaJugadores, float ElapsedTime)
+        public void Seguir(List<Jugador> listaJugadores,List<TgcMesh> MeshAABB, float ElapsedTime)
         {
             //var autoRival = otroJugador.claseAuto;
             var otroJugador = listaJugadores[0];
             var otroAuto = otroJugador.claseAuto;
-            this.claseAuto.Seguir(otroAuto, ElapsedTime);
+            this.claseAuto.Seguir(otroAuto, MeshAABB, ElapsedTime);
         }
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
