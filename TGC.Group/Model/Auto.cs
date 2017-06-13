@@ -12,6 +12,7 @@ using TGC.Core.Textures;
 using TGC.Core.Utils;
 using TGC.Core.Sound;
 using TGC.UtilsGroup;
+using Microsoft.DirectX.Direct3D;
 
 namespace TGC.Group.Model
 {
@@ -109,6 +110,11 @@ namespace TGC.Group.Model
 
         private TgcDirectSound DirectSound;
 
+        //Deformacion
+        private object vertices;
+        private BoundingBox bB;
+        List<KeyValuePair<string, object>> variablesDeInterfaz;
+
         public Auto(string MediaDir, int NroJugador, TgcDirectSound directSound)
         {
             this.NroJugador = NroJugador;
@@ -196,6 +202,40 @@ namespace TGC.Group.Model
             this.ObbLista.Add(ObbArriba);
             this.ObbLista.Add(ObbAbajo);
 
+            //Para deformar el auto
+            this.variablesDeInterfaz = new List<KeyValuePair<string, object>>();
+
+            switch (this.Mesh.RenderType)
+            {
+                case TgcMesh.MeshRenderType.VERTEX_COLOR:
+                    TgcSceneLoader.VertexColorVertex[] verts1 = (TgcSceneLoader.VertexColorVertex[])this.Mesh.D3dMesh.LockVertexBuffer(
+                        typeof(TgcSceneLoader.VertexColorVertex), LockFlags.ReadOnly, this.Mesh.D3dMesh.NumberVertices);
+                    this.Mesh.D3dMesh.UnlockVertexBuffer();
+                    vertices = verts1;
+                    break;
+
+                case TgcMesh.MeshRenderType.DIFFUSE_MAP:
+                    TgcSceneLoader.DiffuseMapVertex[] verts2 = (TgcSceneLoader.DiffuseMapVertex[])this.Mesh.D3dMesh.LockVertexBuffer(
+                        typeof(TgcSceneLoader.DiffuseMapVertex), LockFlags.ReadOnly, this.Mesh.D3dMesh.NumberVertices);
+                    vertices = verts2;
+                    break;
+
+                case TgcMesh.MeshRenderType.DIFFUSE_MAP_AND_LIGHTMAP:
+                    TgcSceneLoader.DiffuseMapAndLightmapVertex[] verts3 = (TgcSceneLoader.DiffuseMapAndLightmapVertex[])this.Mesh.D3dMesh.LockVertexBuffer(
+                        typeof(TgcSceneLoader.DiffuseMapAndLightmapVertex), LockFlags.ReadOnly, this.Mesh.D3dMesh.NumberVertices);
+                    this.Mesh.D3dMesh.UnlockVertexBuffer();
+                    vertices = verts3;
+                    break;
+            }
+
+            //Se crea un boundingBox propio
+            this.bB = new BoundingBox(TgcBoundingAxisAlignBox.computeFromPoints(this.Mesh.getVertexPositions()));
+            this.variablesDeInterfaz.Add(new KeyValuePair<string, object>("beta", Math.Atan2(this.bB.PMax.Z, this.bB.PMax.X)));
+            this.variablesDeInterfaz.Add(new KeyValuePair<string, object>("hip", Math.Sqrt(Math.Pow(this.bB.PMax.X, 2f) + Math.Pow(this.bB.PMax.Z, 2f))));
+            this.variablesDeInterfaz.Add(new KeyValuePair<string, object>("radio", this.bB.PMax.Z));
+            this.bB.scaleTranslate(this.Mesh.Position, new Vector3(1f, 1f, 1f));//Hay que situar el boundingBox donde esta posicionado la malla
+            this.bB.setExtremes(this.bB.PMin, this.bB.PMax); //llevar a valores absolutos
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         }
 
         public float GetRotationAngle()
@@ -511,6 +551,47 @@ namespace TGC.Group.Model
             var speed = Math.Truncate(this.MOVEMENT_SPEED);
             ReproducirSonidoChoque();
 
+            /*
+            List<Vector3> corners = this.dameCorners(this.bB);
+            Type tipo = this.vertices.GetType();
+            int cantidadDeVertices = (int)tipo.GetProperty("Length").GetValue(this.vertices, null);
+            System.Reflection.MethodInfo dameValorPorIndice = tipo.GetMethod("GetValue", new Type[] { typeof(int) });
+            System.Reflection.MethodInfo insertaValorPorIndice = tipo.GetMethod("SetValue", new Type[] { typeof(object), typeof(int) });
+
+            this.test = false;
+
+
+
+            var distancia = UtilVector.calcularDistanciaEntrePuntos(corners[1], corners[3]);
+
+            var X = this.bB.Box.PMax.X - distancia;
+            var Z = this.bB.Box.PMax.Z;
+
+            for (int j = 0; j < cantidadDeVertices; j++)
+            {
+                object vertice = dameValorPorIndice.Invoke(this.vertices, new object[] { j });
+
+                Vector3 posicion = (Vector3)vertice.GetType().GetField("Position").GetValue(vertice);
+
+                if (posicion.Z > 40)
+                {
+                    if (posicion.X > 10)
+                    {
+                        posicion.Z -= 10;
+                        vertice.GetType().GetField("Position").SetValue(vertice, posicion);
+                        insertaValorPorIndice.Invoke(this.vertices, new object[] { vertice, j });
+                    }
+                }
+
+            }
+
+            this.listaJugadores[0].claseAuto.GetMesh().D3dMesh.SetVertexBufferData(this.vertices, LockFlags.None);
+
+            */
+
+
+
+
             if (TgcCollisionUtils.testObbObb(this.ObbArriba.toStruct(), unAuto.ObbMesh.toStruct()))
             {
                 if (Math.Abs(speed) < 5)
@@ -522,9 +603,6 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimple(elapsedTime, moveFoward);
                 }
-
-
-
 
                 return;
             }
@@ -607,8 +685,53 @@ namespace TGC.Group.Model
             }
 
         }
-		
-		private void colisionSimpleCostados(float elapsedTime, float orientacion)
+
+        private object getValorDeVariable(string key)
+        {
+            foreach (KeyValuePair<string, object> clave in variablesDeInterfaz)
+            {
+                if (clave.Key == key)
+                    return clave.Value;
+            }
+
+            return null;
+        }
+
+        private List<Vector3> dameCorners(BoundingBox auto)
+        {
+            double beta = (double)this.getValorDeVariable("beta");
+            double hip = (double)this.getValorDeVariable("hip");
+            double rotacion = this.Mesh.Rotation.Y;
+            Vector3 position = this.Mesh.Position;
+            List<Vector3> corners = new List<Vector3>();
+
+            double gama = -beta - rotacion;
+
+            float xMax = (float)(hip * Math.Cos(gama));
+            float zMin = (float)(hip * Math.Sin(gama));
+
+            xMax = xMax + position.X;
+            zMin = zMin + position.Z;
+
+            corners.Add(new Vector3(xMax, auto.PMin.Y, zMin));
+
+            gama = Math.PI - beta - rotacion;
+
+            float xMin = (float)(hip * Math.Cos(gama));
+            float zMax = (float)(hip * Math.Sin(gama));
+
+            xMin = xMin + position.X;
+            zMax = zMax + position.Z;
+
+            corners.Add(new Vector3(xMin, auto.PMin.Y, zMax));
+
+            corners.Add(auto.PMin);
+            corners.Add(auto.PMax);
+
+            return corners;
+        }
+
+        private void colisionSimpleCostados(float elapsedTime, float orientacion)
         {
             this.rotAngle = (this.MOVEMENT_SPEED * 1f * Math.Sign(orientacion) * elapsedTime) * (FastMath.PI / 50);
             this.Mesh.rotateY(rotAngle);
