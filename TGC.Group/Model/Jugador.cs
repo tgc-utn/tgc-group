@@ -69,7 +69,15 @@ namespace TGC.Group.Model
             //var autoRival = otroJugador.claseAuto;
             var otroJugador = listaJugadores[0];
             var otroAuto = otroJugador.claseAuto;
-            this.claseAuto.Seguir(otroAuto, ElapsedTime);
+
+            if (this.GetVidaJugador() > 0)
+            {
+                this.claseAuto.Seguir(otroAuto, ElapsedTime);
+            }
+            else
+            {
+                this.claseAuto.MOVEMENT_SPEED = 0;
+            }
         }
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
@@ -77,7 +85,7 @@ namespace TGC.Group.Model
             this.claseHUD.SetVidaJugador(this.claseAuto.ModificadorVida);
             this.claseAuto.ModificadorVida = 0;
             this.claseHUD.Update();
-            this.claseAuto.Update(MoverRuedas, Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
+            this.claseAuto.Update(MoverRuedas, Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime, this.claseHUD.GetVidaJugador());
             this.claseCamara.Update(this.claseAuto.GetPosition(), this.claseAuto.GetRotationAngle());
         }
 

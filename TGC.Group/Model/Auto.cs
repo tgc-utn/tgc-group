@@ -18,6 +18,9 @@ namespace TGC.Group.Model
 {
     public class Auto
     {
+        //Velocidad a partir de la cual se deforma el auto
+        private const int VELOCIDAD_DEFORMACION = 350;
+
         //Altura del salto
         private const float ALTURA_SALTO = 95f;
 
@@ -90,6 +93,7 @@ namespace TGC.Group.Model
 
         //Colisiono
         public bool colisiono { get; set; }
+        public TgcMesh meshColisionado { get; set; }
         public float ModificadorVida { get; set; }
 
         //Direccion para seguimiento
@@ -114,6 +118,14 @@ namespace TGC.Group.Model
         private object vertices;
         private BoundingBox bB;
         List<KeyValuePair<string, object>> variablesDeInterfaz;
+        private bool ColisionAdelanteIzq = false;
+        private bool ColisionAdelanteDer = false;
+        private bool ColisionAtrasIzq = false;
+        private bool ColisionAtrasDer = false;
+        private bool ColisionAdelanteIzqHabilitada = true;
+        private bool ColisionAdelanteDerHabilitada = true;
+        private bool ColisionAtrasIzqHabilitada = true;
+        private bool ColisionAtrasDerHabilitada = true;
 
         public Auto(string MediaDir, int NroJugador, TgcDirectSound directSound)
         {
@@ -493,11 +505,74 @@ namespace TGC.Group.Model
 		
 		private void colisionSimple(float elapsedTime, float moveForward)
         {
+            this.VerificarDeformacion(this.meshColisionado.BoundingBox);
             this.Mesh.Position = this.OriginalPos;
             this.MOVEMENT_SPEED = (-1) * Math.Sign(this.MOVEMENT_SPEED) * Math.Abs(this.MOVEMENT_SPEED * 0.2f);
             this.Mesh.moveOrientedY((-3.5f) * moveForward * elapsedTime);
 
             this.colisiono = false;
+        }
+
+        private void VerificarDeformacion(TgcBoundingAxisAlignBox a)
+        {
+            if (TgcCollisionUtils.testObbAABB(this.ObbArribaIzq, a))
+            {
+                this.ColisionAdelanteIzq = true;
+                this.deformarMalla();
+                return;
+            }
+
+            if (TgcCollisionUtils.testObbAABB(this.ObbArribaDer, a))
+            {
+                this.ColisionAdelanteDer = true;
+                this.deformarMalla();
+                return;
+            }
+
+            if (TgcCollisionUtils.testObbAABB(this.ObbAbajoIzq, a))
+            {
+                this.ColisionAtrasIzq = true;
+                this.deformarMalla();
+                return;
+            }
+
+            if (TgcCollisionUtils.testObbAABB(this.ObbAbajoDer, a))
+            {
+                this.ColisionAtrasDer = true;
+                this.deformarMalla();
+                return;
+            }
+        }
+
+        private void VerificarDeformacion (TgcBoundingOrientedBox a)
+        {
+            if (TgcCollisionUtils.testObbObb(this.ObbArribaIzq, a))
+            {
+                this.ColisionAdelanteIzq = true;
+                this.deformarMalla();
+                return;
+            }
+
+            if (TgcCollisionUtils.testObbObb(this.ObbArribaDer, a))
+            {
+                this.ColisionAdelanteDer = true;
+                this.deformarMalla();
+                return;
+            }
+
+            if (TgcCollisionUtils.testObbObb(this.ObbAbajoIzq, a))
+            {
+                this.ColisionAtrasIzq = true;
+                this.deformarMalla();
+                return;
+            }
+
+            if (TgcCollisionUtils.testObbObb(this.ObbAbajoDer, a))
+            {
+                this.ColisionAtrasDer = true;
+                this.deformarMalla();
+                return;
+            }            
         }
 
         private bool ColisionesObb(List<TgcMesh> ListaMesh)
@@ -544,53 +619,121 @@ namespace TGC.Group.Model
 
             //No colisiono nada
             return false;
-        }        
+        }
 
-		private void respuestaColisionAutovsAuto(Auto unAuto, float elapsedTime, float moveFoward)
+        private void deformarMalla ()
         {
-            var speed = Math.Truncate(this.MOVEMENT_SPEED);
-            ReproducirSonidoChoque();
-
-            /*
             List<Vector3> corners = this.dameCorners(this.bB);
             Type tipo = this.vertices.GetType();
             int cantidadDeVertices = (int)tipo.GetProperty("Length").GetValue(this.vertices, null);
             System.Reflection.MethodInfo dameValorPorIndice = tipo.GetMethod("GetValue", new Type[] { typeof(int) });
             System.Reflection.MethodInfo insertaValorPorIndice = tipo.GetMethod("SetValue", new Type[] { typeof(object), typeof(int) });
 
-            this.test = false;
-
-
-
-            var distancia = UtilVector.calcularDistanciaEntrePuntos(corners[1], corners[3]);
-
-            var X = this.bB.Box.PMax.X - distancia;
-            var Z = this.bB.Box.PMax.Z;
-
-            for (int j = 0; j < cantidadDeVertices; j++)
+            if (Math.Abs (this.MOVEMENT_SPEED) > VELOCIDAD_DEFORMACION)
             {
-                object vertice = dameValorPorIndice.Invoke(this.vertices, new object[] { j });
-
-                Vector3 posicion = (Vector3)vertice.GetType().GetField("Position").GetValue(vertice);
-
-                if (posicion.Z > 40)
+                for (int j = 0; j < cantidadDeVertices; j++)
                 {
-                    if (posicion.X > 10)
+                    object vertice = dameValorPorIndice.Invoke(this.vertices, new object[] { j });
+
+                    Vector3 posicion = (Vector3)vertice.GetType().GetField("Position").GetValue(vertice);
+
+                    if (this.ColisionAtrasIzq && this.ColisionAtrasIzqHabilitada)
                     {
-                        posicion.Z -= 10;
-                        vertice.GetType().GetField("Position").SetValue(vertice, posicion);
-                        insertaValorPorIndice.Invoke(this.vertices, new object[] { vertice, j });
+                        if (posicion.Z > 40)
+                        {
+                            if (posicion.X > 10)
+                            {
+                                posicion.Z -= 7;
+                                vertice.GetType().GetField("Position").SetValue(vertice, posicion);
+                                insertaValorPorIndice.Invoke(this.vertices, new object[] { vertice, j });
+                            }
+                        }
+
+                        continue;
                     }
+
+                    if (this.ColisionAtrasDer && this.ColisionAtrasDerHabilitada)
+                    {
+                        if (posicion.Z > 40)
+                        {
+                            if (posicion.X < 5)
+                            {
+                                posicion.Z -= 12;
+                                vertice.GetType().GetField("Position").SetValue(vertice, posicion);
+                                insertaValorPorIndice.Invoke(this.vertices, new object[] { vertice, j });
+                            }
+                        }
+
+                        continue;
+                    }
+
+                    if (this.ColisionAdelanteIzq && this.ColisionAdelanteIzqHabilitada)
+                    {
+                        if (posicion.Z < -30)
+                        {
+                            if (posicion.X > 10)
+                            {
+                                posicion.Z += 8;
+                                vertice.GetType().GetField("Position").SetValue(vertice, posicion);
+                                insertaValorPorIndice.Invoke(this.vertices, new object[] { vertice, j });
+                            }
+                        }
+
+                        continue;
+                    }
+
+                    if (this.ColisionAdelanteDer && this.ColisionAdelanteDerHabilitada)
+                    {
+                        if (posicion.Z < -30)
+                        {
+                            if (posicion.X < 5)
+                            {
+                                posicion.Z += 12;
+                                vertice.GetType().GetField("Position").SetValue(vertice, posicion);
+                                insertaValorPorIndice.Invoke(this.vertices, new object[] { vertice, j });
+                            }
+                        }
+
+                        continue;
+                    }
+
+                }
+
+                this.Mesh.D3dMesh.SetVertexBufferData(this.vertices, LockFlags.None);
+
+                if (this.ColisionAdelanteDer)
+                {
+                    this.ColisionAdelanteDer = false;
+                    this.ColisionAdelanteDerHabilitada = false;
+                }
+
+                if (this.ColisionAdelanteIzq)
+                {
+                    this.ColisionAdelanteIzq = false;
+                    this.ColisionAdelanteIzqHabilitada = false;
+                }
+
+                if (this.ColisionAtrasIzq)
+                {
+                    this.ColisionAtrasIzq = false;
+                    this.ColisionAtrasIzqHabilitada = false;
+                }
+
+                if (this.ColisionAtrasDer)
+                {
+                    this.ColisionAtrasDer = false;
+                    this.ColisionAtrasDerHabilitada = false;
                 }
 
             }
+        }
 
-            this.listaJugadores[0].claseAuto.GetMesh().D3dMesh.SetVertexBufferData(this.vertices, LockFlags.None);
+        private void respuestaColisionAutovsAuto(Auto unAuto, float elapsedTime, float moveFoward)
+        {
+            var speed = Math.Truncate(this.MOVEMENT_SPEED);
+            ReproducirSonidoChoque();
 
-            */
-
-
-
+            this.meshColisionado = unAuto.Mesh;
 
             if (TgcCollisionUtils.testObbObb(this.ObbArriba.toStruct(), unAuto.ObbMesh.toStruct()))
             {
@@ -619,6 +762,7 @@ namespace TGC.Group.Model
                     this.colisionSimpleCostados(elapsedTime, -1);
                 }
                 this.ModificadorVida = -5;
+
                 return;
             }
 
@@ -634,6 +778,7 @@ namespace TGC.Group.Model
                     this.colisionSimpleCostados(elapsedTime, 1);
                 }
                 this.ModificadorVida = -5;
+
                 return;
             }
 
@@ -650,8 +795,8 @@ namespace TGC.Group.Model
                     this.colisionSimple(elapsedTime, moveFoward);
                 }
                 this.ModificadorVida = -5;
-                return;
 
+                return;
             }
 
             if (TgcCollisionUtils.testObbObb(this.ObbAbajoIzq.toStruct(), unAuto.ObbMesh.toStruct()))
@@ -665,7 +810,9 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimpleCostados(elapsedTime, -1);
                 }
+
                 this.ModificadorVida = -5;
+
                 return;
             }
 
@@ -680,7 +827,9 @@ namespace TGC.Group.Model
                 {
                     this.colisionSimpleCostados(elapsedTime, 1);
                 }
+
                 this.ModificadorVida = -5;
+
                 return;
             }
 
@@ -811,7 +960,6 @@ namespace TGC.Group.Model
             {
                 UpdateIA(true, true, false, false, true, false, ElapsedTime, 150f); //Si el rayo no impacta con el auto del jugador, el auto comienza a frenar mientras que gira en sentido horario intentando encontrar al auto del jugador
             }
-
         }
 
         public bool JugadorEncontrado(Auto autoJugador)
@@ -865,9 +1013,17 @@ namespace TGC.Group.Model
             }*/
         }
 
-        public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
+        public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime, float VidaJugador)
         {
-            this.MoverAutoConColisiones(Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
+            if (VidaJugador > 0)
+            {
+                this.MoverAutoConColisiones(Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
+            }
+            else
+            {
+                this.MOVEMENT_SPEED = 0;
+            }
+
             this.CalcularPosicionRuedas(MoverRuedas);
             this.CalcularPosObb();
             this.emisorHumo.Update(ElapsedTime, this.ObbAbajoDer.Position, this.Mesh.Rotation.Y);
@@ -1044,8 +1200,6 @@ namespace TGC.Group.Model
             sound.play();
         }
 
-
-
         public void Render()
         {
             this.Mesh.render();
@@ -1057,6 +1211,7 @@ namespace TGC.Group.Model
 
             this.emisorHumo.Render();
         }
+
         public void Dispose()
         {
             foreach (var unaRueda in this.RuedasJugador)
