@@ -1220,9 +1220,10 @@ namespace TGC.Group.Model
                 this.ModificadorVida = -5f;
             }
 
+            this.VerificarDeformacion(otroAuto.Mesh.BoundingBox);
+
             if (this.NroJugador == 0)
             {
-
                 if (this.MOVEMENT_SPEED >= 0)
                 {
                     if (TgcCollisionUtils.testObbObb(this.ObbAbajoIzq, otroAuto.ObbArribaIzq) || TgcCollisionUtils.testObbObb(this.ObbAbajoIzq, otroAuto.ObbArribaDer)

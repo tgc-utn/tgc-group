@@ -64,7 +64,7 @@ namespace TGC.Group.Model
             this.claseHUD.ActualizarNombreJugador(NombreJugador);
         }
 
-        public void Seguir(List<Jugador> listaJugadores, float ElapsedTime)
+        public void Seguir(List<Jugador> listaJugadores, List<TgcMesh> MeshAABB, float ElapsedTime)
         {
             //var autoRival = otroJugador.claseAuto;
             var otroJugador = listaJugadores[0];
@@ -72,7 +72,7 @@ namespace TGC.Group.Model
 
             if (this.GetVidaJugador() > 0)
             {
-                this.claseAuto.Seguir(otroAuto, ElapsedTime);
+                this.claseAuto.Seguir(otroAuto, MeshAABB, ElapsedTime);
             }
             else
             {

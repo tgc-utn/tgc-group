@@ -97,6 +97,9 @@ namespace TGC.Group.Model
         public static List<TgcMesh> MeshPDL;
         private TgcMesh PDLOriginal;
 
+        //Lista AABB
+        List<TgcMesh> MeshAABB = new List<TgcMesh>();
+
         //Lista de power ups de vida
         public static List<TgcMesh> MeshPowerUpsVida;
         private TgcMesh PowerUpVidaOriginal;
@@ -329,6 +332,12 @@ namespace TGC.Group.Model
             this.sphereLuna.setTexture(TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "\\Textures\\luna.jpg"));
             this.sphereLuna.updateValues();
             ////////////////////////////////////////////////////////////////////////////////////////
+
+            MeshAABB.AddRange(MeshPalmeras);
+            MeshAABB.AddRange(MeshPinos);
+            MeshAABB.AddRange(MeshRocas);
+            MeshAABB.AddRange(MeshArbolesBananas);
+            MeshAABB.AddRange(MeshPDL);
 
             //Inicio clase de menu
             this.claseMenu = new HUDMenu(MediaDir);
@@ -655,7 +664,7 @@ namespace TGC.Group.Model
                     else
                     {
                         //IA
-                        unJugador.Seguir(listaJugadores, ElapsedTime);
+                        unJugador.Seguir(listaJugadores, MeshAABB, ElapsedTime);
                         unJugador.Update(false, false, false, false, false, false, ElapsedTime);
                     }
                 }
