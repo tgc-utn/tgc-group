@@ -97,6 +97,7 @@
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
     <Compile Include="Model\Auto.cs" />
+    <Compile Include="Model\ChoqueParticulas.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\HUDJugador.cs" />
     <Compile Include="Model\HUDMenu.cs" />

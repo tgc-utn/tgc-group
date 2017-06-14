@@ -31,7 +31,7 @@ namespace TGC.Group.Model
         private const float ROZAMIENTO = 100f;
 
         //Velocidad Maxima
-        private const float MAX_SPEED = 500f;
+        private const float MAX_SPEED = 800f;
         private const float MAX_SPEEDIA = 400f;
 
         //Velocidad de rotación del auto
@@ -103,18 +103,16 @@ namespace TGC.Group.Model
         //Humo
         HumoParticula emisorHumo;
 
+        //Choque
+        ChoqueParticula emisorChoque;
+
+        //Sonidos
         private string pathSonidoGolpe1;
-
         private string pathSonidoEncendido;
-
         private string pathSonidoPowerUpVida;
-
         private string pathSonidoMotor;
-
         private TgcStaticSound sound;
-
         private TgcStaticSound soundMotor;
-
         private TgcDirectSound DirectSound;
 
         //Deformacion
@@ -181,11 +179,10 @@ namespace TGC.Group.Model
 
             this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
             this.emisorHumo = new HumoParticula(this.MediaDir);
+            this.emisorChoque = new ChoqueParticula(this.MediaDir);
 
             /*
-
             Vector3[] puntosDelAuto = this.Mesh.getVertexPositions();
-
             this.ObbMesh = TgcBoundingOrientedBox.computeFromPoints(puntosDelAuto);
             */
 
@@ -198,7 +195,6 @@ namespace TGC.Group.Model
 
             this.ObbArriba = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 3)).BoundingBox);
             this.ObbArriba.setRenderColor(System.Drawing.Color.IndianRed);
-
 
             this.ObbAbajo = TgcBoundingOrientedBox.computeFromAABB(TgcBox.fromSize(this.ObbMesh.Position, new Vector3(55, 30, 3)).BoundingBox);
             this.ObbAbajo.setRenderColor(System.Drawing.Color.Blue);
@@ -520,9 +516,12 @@ namespace TGC.Group.Model
 
         private void VerificarDeformacion(TgcBoundingAxisAlignBox a)
         {
+            this.emisorChoque.SetInicioChoque(DateTime.Now);
+
             if (TgcCollisionUtils.testObbAABB(this.ObbArribaIzq, a))
             {
                 this.ColisionAdelanteIzq = true;
+                this.emisorChoque.SetChoqueAdelanteIzquierda();
                 this.deformarMalla();
                 return;
             }
@@ -530,6 +529,7 @@ namespace TGC.Group.Model
             if (TgcCollisionUtils.testObbAABB(this.ObbArribaDer, a))
             {
                 this.ColisionAdelanteDer = true;
+                this.emisorChoque.SetChoqueAdelanteDerecha();
                 this.deformarMalla();
                 return;
             }
@@ -537,6 +537,7 @@ namespace TGC.Group.Model
             if (TgcCollisionUtils.testObbAABB(this.ObbAbajoIzq, a))
             {
                 this.ColisionAtrasIzq = true;
+                this.emisorChoque.SetChoqueAtrasIzquierda();
                 this.deformarMalla();
                 return;
             }
@@ -544,6 +545,7 @@ namespace TGC.Group.Model
             if (TgcCollisionUtils.testObbAABB(this.ObbAbajoDer, a))
             {
                 this.ColisionAtrasDer = true;
+                this.emisorChoque.SetChoqueAtrasDerecha();
                 this.deformarMalla();
                 return;
             }
@@ -748,7 +750,7 @@ namespace TGC.Group.Model
             return corners;
         }
 	
-		    private void colisionSimpleCostados(float elapsedTime, float orientacion)
+		private void colisionSimpleCostados(float elapsedTime, float orientacion)
         {
             this.rotAngle = (80f * Math.Sign(orientacion) * elapsedTime) * (FastMath.PI / 50);
             this.Mesh.rotateY(rotAngle);
@@ -943,6 +945,8 @@ namespace TGC.Group.Model
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime, float VidaJugador)
         {
+            this.emisorChoque.Update(ElapsedTime, this.ObbAbajoDer.Position, this.Mesh.Rotation.Y);
+
             if (VidaJugador > 0)
             {
                 this.MoverAutoConColisiones(Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
@@ -1212,7 +1216,9 @@ namespace TGC.Group.Model
             }
 
             this.emisorHumo.Render();
+            this.emisorChoque.Render();
         }
+
         public void Dispose()
         {
             foreach (var unaRueda in this.RuedasJugador)
@@ -1221,6 +1227,7 @@ namespace TGC.Group.Model
             }
 
             this.emisorHumo.Dispose();
+            this.emisorChoque.Dispose();
         }
     }
 }
