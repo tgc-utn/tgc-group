@@ -157,11 +157,10 @@ namespace TGC.Group.Model
         private float TiempoRotacion = 0;
 
         //Parallax
-        private Microsoft.DirectX.Direct3D.Effect parallaxEffect;
-        private Texture g_pHeightmap2;
-        private Texture g_pBaseTexture2;
-
-        private float currentMoveDirPowerUpVida = 1f;
+        //private Microsoft.DirectX.Direct3D.Effect parallaxEffect;
+        //private Texture g_pHeightmap2;
+        //private Texture g_pBaseTexture2;
+        //private float currentMoveDirPowerUpVida = 1f;
 
         public override void Init()
         {
