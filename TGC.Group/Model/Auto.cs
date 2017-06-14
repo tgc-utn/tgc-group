@@ -1,4 +1,4 @@
-﻿using Microsoft.DirectX;
+using Microsoft.DirectX;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +12,15 @@ using TGC.Core.Textures;
 using TGC.Core.Utils;
 using TGC.Core.Sound;
 using TGC.UtilsGroup;
+using Microsoft.DirectX.Direct3D;
 
 namespace TGC.Group.Model
 {
     public class Auto
     {
+        //Velocidad a partir de la cual se deforma el auto
+        private const int VELOCIDAD_DEFORMACION = 300;
+
         //Altura del salto
         private const float ALTURA_SALTO = 95f;
 
@@ -40,12 +44,12 @@ namespace TGC.Group.Model
         public TgcBoundingOrientedBox ObbMesh;
 
         //Obbs del auto
-		/*
+        /*
         private TgcBoundingOrientedBox ObbArriba;
         private TgcBoundingOrientedBox ObbMedio;
         private TgcBoundingOrientedBox ObbAbajo;
 		*/
-		private TgcBoundingOrientedBox ObbArribaIzq;
+        private TgcBoundingOrientedBox ObbArribaIzq;
         public TgcBoundingOrientedBox ObbArribaDer;
         private TgcBoundingOrientedBox ObbAbajoIzq;
         private TgcBoundingOrientedBox ObbAbajoDer;
@@ -72,7 +76,7 @@ namespace TGC.Group.Model
         List<float> dx = new List<float> { 23, -23, -23, 23 };
         List<float> dy = new List<float> { -30, 32, -31, 30 };
 
-		//Posicion de los Obb
+        //Posicion de los Obb
         List<float> dxObb = new List<float> { 16, -16, -16, 16, 0, 0 };
         List<float> dyObb = new List<float> { -28, 30, -28, 30, 58, -58 };
         //Estado de salto
@@ -84,7 +88,7 @@ namespace TGC.Group.Model
 
         //MediaDir
         private string MediaDir;
-		public Vector3 velocidad;
+        public Vector3 velocidad;
         private Vector3 OriginalPos;
 
         //Colisiono
@@ -113,6 +117,20 @@ namespace TGC.Group.Model
 
         private TgcDirectSound DirectSound;
 
+        //Deformacion
+        private object vertices;
+        public TgcMesh meshColisionado;
+        private BoundingBox bB;
+        List<KeyValuePair<string, object>> variablesDeInterfaz;
+        private bool ColisionAdelanteIzq = false;
+        private bool ColisionAdelanteDer = false;
+        private bool ColisionAtrasIzq = false;
+        private bool ColisionAtrasDer = false;
+        private bool ColisionAdelanteIzqHabilitada = true;
+        private bool ColisionAdelanteDerHabilitada = true;
+        private bool ColisionAtrasIzqHabilitada = true;
+        private bool ColisionAtrasDerHabilitada = true;
+
         public Auto(string MediaDir, int NroJugador, TgcDirectSound directSound)
         {
             this.NroJugador = NroJugador;
@@ -128,18 +146,12 @@ namespace TGC.Group.Model
         public void RenderObb()
         {
             this.ObbMesh.render();
-			/*    this.ObbArriba.render();
-                this.ObbMedio.render();
-                this.ObbAbajo.render();*/
-/*
             this.ObbArriba.render();
             this.ObbArribaIzq.render();
             this.ObbArribaDer.render();
-
             this.ObbAbajo.render();
             this.ObbAbajoDer.render();
             this.ObbAbajoIzq.render();
-*/
         }
 
         public TgcMesh GetMesh()
@@ -169,7 +181,7 @@ namespace TGC.Group.Model
 
             this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
             this.emisorHumo = new HumoParticula(this.MediaDir);
-            
+
             /*
 
             Vector3[] puntosDelAuto = this.Mesh.getVertexPositions();
@@ -207,6 +219,40 @@ namespace TGC.Group.Model
             this.ObbLista.Add(ObbArriba);
             this.ObbLista.Add(ObbAbajo);
 
+            //Para deformar el auto
+            this.variablesDeInterfaz = new List<KeyValuePair<string, object>>();
+
+            switch (this.Mesh.RenderType)
+            {
+                case TgcMesh.MeshRenderType.VERTEX_COLOR:
+                    TgcSceneLoader.VertexColorVertex[] verts1 = (TgcSceneLoader.VertexColorVertex[])this.Mesh.D3dMesh.LockVertexBuffer(
+                        typeof(TgcSceneLoader.VertexColorVertex), LockFlags.ReadOnly, this.Mesh.D3dMesh.NumberVertices);
+                    this.Mesh.D3dMesh.UnlockVertexBuffer();
+                    vertices = verts1;
+                    break;
+
+                case TgcMesh.MeshRenderType.DIFFUSE_MAP:
+                    TgcSceneLoader.DiffuseMapVertex[] verts2 = (TgcSceneLoader.DiffuseMapVertex[])this.Mesh.D3dMesh.LockVertexBuffer(
+                        typeof(TgcSceneLoader.DiffuseMapVertex), LockFlags.ReadOnly, this.Mesh.D3dMesh.NumberVertices);
+                    vertices = verts2;
+                    break;
+
+                case TgcMesh.MeshRenderType.DIFFUSE_MAP_AND_LIGHTMAP:
+                    TgcSceneLoader.DiffuseMapAndLightmapVertex[] verts3 = (TgcSceneLoader.DiffuseMapAndLightmapVertex[])this.Mesh.D3dMesh.LockVertexBuffer(
+                        typeof(TgcSceneLoader.DiffuseMapAndLightmapVertex), LockFlags.ReadOnly, this.Mesh.D3dMesh.NumberVertices);
+                    this.Mesh.D3dMesh.UnlockVertexBuffer();
+                    vertices = verts3;
+                    break;
+            }
+
+            //Se crea un boundingBox propio
+            this.bB = new BoundingBox(TgcBoundingAxisAlignBox.computeFromPoints(this.Mesh.getVertexPositions()));
+            this.variablesDeInterfaz.Add(new KeyValuePair<string, object>("beta", Math.Atan2(this.bB.PMax.Z, this.bB.PMax.X)));
+            this.variablesDeInterfaz.Add(new KeyValuePair<string, object>("hip", Math.Sqrt(Math.Pow(this.bB.PMax.X, 2f) + Math.Pow(this.bB.PMax.Z, 2f))));
+            this.variablesDeInterfaz.Add(new KeyValuePair<string, object>("radio", this.bB.PMax.Z));
+            this.bB.scaleTranslate(this.Mesh.Position, new Vector3(1f, 1f, 1f));//Hay que situar el boundingBox donde esta posicionado la malla
+            this.bB.setExtremes(this.bB.PMin, this.bB.PMax); //llevar a valores absolutos
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         }
 
         public float GetRotationAngle()
@@ -235,7 +281,7 @@ namespace TGC.Group.Model
             //Cargo el bouding box obb del auto a partir de su AABB
             this.ObbMesh = TgcBoundingOrientedBox.computeFromAABB(this.Mesh.BoundingBox);
             this.Mesh.Position = unVector;
-            
+
             /*this.Mesh.AutoTransformEnable = true;
             this.Mesh.move(unVector);
             this.Mesh.UpdateMeshTransform();
@@ -308,7 +354,7 @@ namespace TGC.Group.Model
 
         public void CalcularPosObb() //funcion medio rara que calcula posicion de los 3 obb meidante cordenadas polares
         {
-			float ro, alfa_OBB;
+            float ro, alfa_OBB;
             float posicion_x;
             float posicion_y;
 
@@ -332,8 +378,8 @@ namespace TGC.Group.Model
                 this.ObbLista[i].rotate((new Vector3(0, rotAngle, 0)));
 
             }
-			
-			/*
+
+            /*
             float distanciaObb = 40;
             float alfaObbArriba = FastMath.PI;
             float alfaObbAbajo = 0;
@@ -361,7 +407,7 @@ namespace TGC.Group.Model
             var movement = new Vector3(0, 0, 0);
             var moveForward = 0f;
             var rotating = false;
-			var posicionAnterior = this.Mesh.Position;
+            var posicionAnterior = this.Mesh.Position;
 
             rotate = 0;
 
@@ -395,7 +441,7 @@ namespace TGC.Group.Model
             }
 
             //Para que el auto no tiemble
-            if (Math.Abs (moveForward) < 1)
+            if (Math.Abs(moveForward) < 1)
             {
                 moveForward = 0;
                 this.MOVEMENT_SPEED = 0;
@@ -451,24 +497,56 @@ namespace TGC.Group.Model
 
             this.Mesh.moveOrientedY(moveForward * ElapsedTime);
 
-			if (this.colisiono)
+            if (this.colisiono)
             {
                 ReproducirSonidoChoque();
                 colisionSimple(ElapsedTime, moveForward);
             }
-			
-			this.ColisionesObbObb(GameModel.ListaMeshAutos, ElapsedTime, moveForward);
+
+            this.ColisionesObbObb(GameModel.ListaMeshAutos, ElapsedTime, moveForward);
             this.ObbMesh.Center = this.Mesh.Position;
             direccionSeguir = new Vector3((-1) * FastMath.Sin(this.GetMesh().Rotation.Y), 0, (-1) * FastMath.Cos(this.GetMesh().Rotation.Y));
         }
-		
-		private void colisionSimple(float elapsedTime, float moveForward)
+
+        private void colisionSimple(float elapsedTime, float moveForward)
         {
+            this.VerificarDeformacion(this.meshColisionado.BoundingBox);
             this.Mesh.Position = this.OriginalPos;
             this.MOVEMENT_SPEED = (-1) * Math.Sign(this.MOVEMENT_SPEED) * Math.Abs(300f * 0.2f);
             this.Mesh.moveOrientedY((-3.5f) * moveForward * elapsedTime);
 
             this.colisiono = false;
+        }
+
+        private void VerificarDeformacion(TgcBoundingAxisAlignBox a)
+        {
+            if (TgcCollisionUtils.testObbAABB(this.ObbArribaIzq, a))
+            {
+                this.ColisionAdelanteIzq = true;
+                this.deformarMalla();
+                return;
+            }
+
+            if (TgcCollisionUtils.testObbAABB(this.ObbArribaDer, a))
+            {
+                this.ColisionAdelanteDer = true;
+                this.deformarMalla();
+                return;
+            }
+
+            if (TgcCollisionUtils.testObbAABB(this.ObbAbajoIzq, a))
+            {
+                this.ColisionAtrasIzq = true;
+                this.deformarMalla();
+                return;
+            }
+
+            if (TgcCollisionUtils.testObbAABB(this.ObbAbajoDer, a))
+            {
+                this.ColisionAtrasDer = true;
+                this.deformarMalla();
+                return;
+            }
         }
 
         private bool ColisionesObb(List<TgcMesh> ListaMesh)
@@ -506,7 +584,7 @@ namespace TGC.Group.Model
                         //me fijo si hubo alguna colision vuelvo
                         if (TgcCollisionUtils.testObbObb(this.ObbMesh.toStruct(), unMesh.ObbMesh.toStruct()))
                         {
-					//		respuestaColisionAutovsAuto(unMesh, elapsedTime, movefoward);
+                            //		respuestaColisionAutovsAuto(unMesh, elapsedTime, movefoward);
                             colisionEntreAutos(unMesh, elapsedTime);
                             return true;
                         }
@@ -516,102 +594,168 @@ namespace TGC.Group.Model
 
             //No colisiono nada
             return false;
-        }        
+        }
 
-		////private void respuestaColisionAutovsAuto(Auto unAuto, float elapsedTime, float moveFoward)
-  ////      {
-            
-  ////          ReproducirSonidoChoque();
-  ////          var ChoqueFrenteContraFrente = TgcCollisionUtils.testObbObb(this.ObbArriba.toStruct(), unAuto.ObbArriba.toStruct());
-  ////          var ChoqueFrenteContraCostadoDerecho = TgcCollisionUtils.testObbObb(this.ObbArriba.toStruct(), unAuto.ObbArribaDer.toStruct());
-  ////          var ChoqueFrenteContraIzquierda = TgcCollisionUtils.testObbObb(this.ObbArriba.toStruct(), unAuto.ObbArribaIzq.toStruct());
+        private void deformarMalla()
+        {
+            List<Vector3> corners = this.dameCorners(this.bB);
+            Type tipo = this.vertices.GetType();
+            int cantidadDeVertices = (int)tipo.GetProperty("Length").GetValue(this.vertices, null);
+            System.Reflection.MethodInfo dameValorPorIndice = tipo.GetMethod("GetValue", new Type[] { typeof(int) });
+            System.Reflection.MethodInfo insertaValorPorIndice = tipo.GetMethod("SetValue", new Type[] { typeof(object), typeof(int) });
 
-  ////          if (ChoqueFrenteContraFrente)
-  ////          {
-  ////                   //Auto jugador
-  ////                  this.Mesh.Position = this.OriginalPos;
-  ////                  this.MOVEMENT_SPEED = (-1) * Math.Abs(600f * 0.2f);
-  ////                  this.Mesh.moveOrientedY((-3.5f) * moveFoward * elapsedTime);
-  ////                  this.colisiono = false;
+            if (Math.Abs(this.MOVEMENT_SPEED) > VELOCIDAD_DEFORMACION)
+            {
+                for (int j = 0; j < cantidadDeVertices; j++)
+                {
+                    object vertice = dameValorPorIndice.Invoke(this.vertices, new object[] { j });
 
-  ////                  //AutoIA
-  ////                  this.Mesh.Position = this.OriginalPos;
-  ////                  this.MOVEMENT_SPEED = (-1) * Math.Abs(600f * 0.2f);
-  ////                  this.Mesh.moveOrientedY((-3.5f) * moveFoward * elapsedTime);
-  ////                  this.colisiono = false;
+                    Vector3 posicion = (Vector3)vertice.GetType().GetField("Position").GetValue(vertice);
 
-  ////              return;
-  ////          }
+                    if (this.ColisionAtrasIzq && this.ColisionAtrasIzqHabilitada)
+                    {
+                        if (posicion.Z > 40)
+                        {
+                            if (posicion.X > 10)
+                            {
+                                posicion.Z -= 7;
+                                vertice.GetType().GetField("Position").SetValue(vertice, posicion);
+                                insertaValorPorIndice.Invoke(this.vertices, new object[] { vertice, j });
+                            }
+                        }
 
-  ////          if (ChoqueFrenteContraCostadoDerecho)
-  ////          {
+                        continue;
+                    }
 
-  ////              //Auto jugador
-  ////              this.rotAngle = (80f * Math.Sign(-1f) * elapsedTime) * (FastMath.PI / 50);
-  ////              this.Mesh.rotateY(this.rotAngle);
-  ////              this.ObbMesh.rotate(new Vector3(0, this.rotAngle, 0));
-  ////              this.ModificadorVida = -5;
+                    if (this.ColisionAtrasDer && this.ColisionAtrasDerHabilitada)
+                    {
+                        if (posicion.Z > 40)
+                        {
+                            if (posicion.X < 5)
+                            {
+                                posicion.Z -= 12;
+                                vertice.GetType().GetField("Position").SetValue(vertice, posicion);
+                                insertaValorPorIndice.Invoke(this.vertices, new object[] { vertice, j });
+                            }
+                        }
 
-  ////              //AutoIA
-  ////              unAuto.rotAngle = (80f * Math.Sign(-1f) * elapsedTime) * (FastMath.PI / 50);
-  ////              unAuto.Mesh.rotateY(unAuto.rotAngle);
-  ////              unAuto.ObbMesh.rotate(new Vector3(0, unAuto.rotAngle, 0));
-  ////              unAuto.ModificadorVida = -5;
-  ////              return;
-  ////          }
+                        continue;
+                    }
 
-  ////          if (TgcCollisionUtils.testObbObb(this.ObbArribaIzq.toStruct(), unAuto.ObbMesh.toStruct()))
-  ////          {
+                    if (this.ColisionAdelanteIzq && this.ColisionAdelanteIzqHabilitada)
+                    {
+                        if (posicion.Z < -30)
+                        {
+                            if (posicion.X > 10)
+                            {
+                                posicion.Z += 8;
+                                vertice.GetType().GetField("Position").SetValue(vertice, posicion);
+                                insertaValorPorIndice.Invoke(this.vertices, new object[] { vertice, j });
+                            }
+                        }
 
-  ////              this.colisionSimple(elapsedTime, moveFoward);
-  ////              this.colisionSimpleCostados(elapsedTime, 1);
-      
-  ////              this.ModificadorVida = -5;
-  ////              return;
-  ////          }
+                        continue;
+                    }
 
-  ////          if (TgcCollisionUtils.testObbObb(this.ObbAbajo.toStruct(), unAuto.ObbMesh.toStruct()))
-  ////          {
+                    if (this.ColisionAdelanteDer && this.ColisionAdelanteDerHabilitada)
+                    {
+                        if (posicion.Z < -30)
+                        {
+                            if (posicion.X < 5)
+                            {
+                                posicion.Z += 12;
+                                vertice.GetType().GetField("Position").SetValue(vertice, posicion);
+                                insertaValorPorIndice.Invoke(this.vertices, new object[] { vertice, j });
+                            }
+                        }
 
+                        continue;
+                    }
 
-  ////              this.Mesh.Position = this.OriginalPos;
-  ////              this.MOVEMENT_SPEED =  Math.Abs(400f * 0.2f);
-  ////              this.Mesh.moveOrientedY((-3.5f) * moveFoward * elapsedTime);
+                }
 
-  ////              this.colisiono = false;
+                this.Mesh.D3dMesh.SetVertexBufferData(this.vertices, LockFlags.None);
 
-  ////              this.ModificadorVida = -5;
-  ////              return;
+                if (this.ColisionAdelanteDer)
+                {
+                    this.ColisionAdelanteDer = false;
+                    this.ColisionAdelanteDerHabilitada = false;
+                }
 
-  ////          }
+                if (this.ColisionAdelanteIzq)
+                {
+                    this.ColisionAdelanteIzq = false;
+                    this.ColisionAdelanteIzqHabilitada = false;
+                }
 
-  ////          if (TgcCollisionUtils.testObbObb(this.ObbAbajoIzq.toStruct(), unAuto.ObbMesh.toStruct()))
-  ////          {
-  ////              this.colisionSimple(elapsedTime, moveFoward);
-  ////              this.colisionSimpleCostados(elapsedTime, -1);
-                
-  ////              this.ModificadorVida = -5;
-  ////              return;
-  ////          }
+                if (this.ColisionAtrasIzq)
+                {
+                    this.ColisionAtrasIzq = false;
+                    this.ColisionAtrasIzqHabilitada = false;
+                }
 
-  ////          if (TgcCollisionUtils.testObbObb(this.ObbAbajoDer.toStruct(), unAuto.ObbMesh.toStruct()))
-  ////          {
-  ////              this.colisionSimple(elapsedTime, moveFoward);
-  ////              this.colisionSimpleCostados(elapsedTime, 1);
+                if (this.ColisionAtrasDer)
+                {
+                    this.ColisionAtrasDer = false;
+                    this.ColisionAtrasDerHabilitada = false;
+                }
 
-  ////              return;
-  ////          }
+            }
+        }
 
-  ////      }
-		
-		private void colisionSimpleCostados(float elapsedTime, float orientacion)
+        private object getValorDeVariable(string key)
+        {
+            foreach (KeyValuePair<string, object> clave in variablesDeInterfaz)
+            {
+                if (clave.Key == key)
+                    return clave.Value;
+            }
+
+            return null;
+        }
+
+        private List<Vector3> dameCorners(BoundingBox auto)
+        {
+            double beta = (double)this.getValorDeVariable("beta");
+            double hip = (double)this.getValorDeVariable("hip");
+            double rotacion = this.Mesh.Rotation.Y;
+            Vector3 position = this.Mesh.Position;
+            List<Vector3> corners = new List<Vector3>();
+
+            double gama = -beta - rotacion;
+
+            float xMax = (float)(hip * Math.Cos(gama));
+            float zMin = (float)(hip * Math.Sin(gama));
+
+            xMax = xMax + position.X;
+            zMin = zMin + position.Z;
+
+            corners.Add(new Vector3(xMax, auto.PMin.Y, zMin));
+
+            gama = Math.PI - beta - rotacion;
+
+            float xMin = (float)(hip * Math.Cos(gama));
+            float zMax = (float)(hip * Math.Sin(gama));
+
+            xMin = xMin + position.X;
+            zMax = zMax + position.Z;
+
+            corners.Add(new Vector3(xMin, auto.PMin.Y, zMax));
+
+            corners.Add(auto.PMin);
+            corners.Add(auto.PMax);
+
+            return corners;
+        }
+	
+		    private void colisionSimpleCostados(float elapsedTime, float orientacion)
         {
             this.rotAngle = (80f * Math.Sign(orientacion) * elapsedTime) * (FastMath.PI / 50);
             this.Mesh.rotateY(rotAngle);
             this.ObbMesh.rotate(new Vector3(0, rotAngle, 0));
         }
-		
-		private float AnguloEntreVectores(Vector3 vector1, Vector3 vector2)
+
+        private float AnguloEntreVectores(Vector3 vector1, Vector3 vector2)
         {
             var v1x = vector1.X;
             var v1y = vector1.Y;
@@ -624,7 +768,7 @@ namespace TGC.Group.Model
             var angle = FastMath.Acos(dotProduct / modv1xv2);
             return angle;
         }
-		
+
         private bool DetectarColisionesObb()
         {/*
             if (this.ColisionesObb(GameModel.ScenePpal.Meshes))
@@ -642,10 +786,10 @@ namespace TGC.Group.Model
             if (this.ColisionesObb(GameModel.MeshArbolesBananas))
                 return true;
         */
-        /*
-            if (this.colisiono || this.ColisionesObbObb(GameModel.ListaMeshAutos))
-               return true;
-         */
+         /*
+             if (this.colisiono || this.ColisionesObbObb(GameModel.ListaMeshAutos))
+                return true;
+          */
             return false;
         }
 
@@ -674,7 +818,7 @@ namespace TGC.Group.Model
             return 0;
         }
 
-        public void Seguir(Auto autoJugador , List<TgcMesh> MeshAABB , float ElapsedTime)
+        public void Seguir(Auto autoJugador, List<TgcMesh> MeshAABB, float ElapsedTime)
         {
             if (JugadorEncontrado(autoJugador))
             {
@@ -696,7 +840,7 @@ namespace TGC.Group.Model
 
             Vector3 origenJugador = autoJugador.Mesh.Position;
 
-            direccionASeguir = new Vector3(origenJugador.X-origenIA.X , 0, origenJugador.Z-origenIA.Z);
+            direccionASeguir = new Vector3(origenJugador.X - origenIA.X, 0, origenJugador.Z - origenIA.Z);
 
             direccionASeguir.Normalize();
 
@@ -709,7 +853,7 @@ namespace TGC.Group.Model
 
             if (xmin <= direccionSeguir.X && direccionSeguir.X <= xmax)
             {
-                if(zmin <= direccionSeguir.Z && direccionSeguir.Z <= zmax)
+                if (zmin <= direccionSeguir.Z && direccionSeguir.Z <= zmax)
                 {
                     return true;
                 }
@@ -741,7 +885,7 @@ namespace TGC.Group.Model
 
         public void AvanzarHastaJugador(List<TgcMesh> MeshAABB, float ElapsedTime)
         {
-            if(EncontroAABB(MeshAABB))
+            if (EncontroAABB(MeshAABB))
             {
                 UpdateIA(true, true, false, false, true, false, ElapsedTime, 150f);
             }
@@ -799,7 +943,61 @@ namespace TGC.Group.Model
 
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
         {
-            this.MoverAutoConColisiones(Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
+            bool e = false;
+            foreach (TgcMesh unMesh in meshAABB)
+            {
+                var posicion = new Vector3(this.Mesh.Position.X, this.Mesh.Position.Y, this.Mesh.Position.Z);
+                var rayo = new TgcRay(posicion, direccionSeguir);
+                var lugarChoque = new Vector3(0, 0, 0);
+                if (TgcCollisionUtils.intersectRayAABB(rayo, unMesh.BoundingBox, out lugarChoque))
+                {
+                    var distancia = DistanciaEntre2Puntos(this.Mesh.Position, lugarChoque);
+                    if (distancia < 100)
+                    {
+                        e = true;
+                    }
+                    else
+                    {
+                        e = false;
+                    }
+                }
+                else
+                {
+                    e = false;
+                }
+            }
+            return e;
+        }
+
+        public double DistanciaEntre2Puntos(Vector3 position, Vector3 lugarChoque)
+        {
+            float X = position.X - lugarChoque.X;
+            float Z = position.Z - lugarChoque.Z;
+            var XX = Math.Pow(X, 2);
+            var ZZ = Math.Pow(Z, 2);
+            var suma = XX + ZZ;
+            var distancia = Math.Sqrt(suma);
+            return distancia;
+        }
+
+        public void ReproducirSonidoMotor()
+        {
+            soundMotor = new TgcStaticSound();
+            soundMotor.loadSound(pathSonidoMotor, DirectSound.DsDevice);
+            soundMotor.play(true);
+        }
+
+        public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime, float VidaJugador)
+        {
+            if (VidaJugador > 0)
+            {
+                this.MoverAutoConColisiones(Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime);
+            }
+            else
+            {
+                this.MOVEMENT_SPEED = 0;
+            }
+
             this.CalcularPosicionRuedas(MoverRuedas);
             this.CalcularPosObb();
             this.emisorHumo.Update(ElapsedTime, this.ObbAbajoDer.Position, this.Mesh.Rotation.Y);
@@ -822,7 +1020,7 @@ namespace TGC.Group.Model
             var moveForward = 0f;
             var rotating = false;
             var posicionAnterior = this.Mesh.Position;
-            var ROTATION_SPEED_IA = ROTATION_SPEED*20f;
+            var ROTATION_SPEED_IA = ROTATION_SPEED * 20f;
 
             rotate = 0;
 
@@ -931,22 +1129,21 @@ namespace TGC.Group.Model
 
         private void loadSound(string filePath)
         {
-                //Borrar sonido anterior
-                if (sound != null)
-                {
-                    sound.dispose();
-                    sound = null;
-                }
+            //Borrar sonido anterior
+            if (sound != null)
+            {
+                sound.dispose();
+                sound = null;
+            }
 
-                //Cargar sonido
-                sound = new TgcStaticSound();
-                sound.loadSound(filePath, DirectSound.DsDevice);
-            
+            //Cargar sonido
+            sound = new TgcStaticSound();
+            sound.loadSound(filePath, DirectSound.DsDevice);
         }
 
         private void ReproducirSonidoChoque()
         {
-            if(this.NroJugador == 0)
+            if (this.NroJugador == 0)
             {
                 if (Math.Abs(this.MOVEMENT_SPEED) < Math.Abs((Auto.MAX_SPEED * 0.5)))
                 {
@@ -978,14 +1175,15 @@ namespace TGC.Group.Model
 
         public void colisionEntreAutos(Auto otroAuto, float elapsedTime)
         {
-            if(!TgcCollisionUtils.testObbObb(this.ObbArriba, otroAuto.ObbMesh))
+            if (!TgcCollisionUtils.testObbObb(this.ObbArriba, otroAuto.ObbMesh))
             {
                 this.ModificadorVida = -5f;
             }
 
+            this.VerificarDeformacion(otroAuto.Mesh.BoundingBox);
+
             if (this.NroJugador == 0)
             {
-
                 if (this.MOVEMENT_SPEED >= 0)
                 {
                     if (TgcCollisionUtils.testObbObb(this.ObbAbajoIzq, otroAuto.ObbArribaIzq) || TgcCollisionUtils.testObbObb(this.ObbAbajoIzq, otroAuto.ObbArribaDer)
@@ -1045,14 +1243,10 @@ namespace TGC.Group.Model
                         //rebota auto
                         this.GetMesh().moveOrientedY(10 * this.MOVEMENT_SPEED * elapsedTime); //Lo hago "como que rebote un poco" para no seguir colisionando
                         this.MOVEMENT_SPEED = -(this.MOVEMENT_SPEED * 0.3f); //Lo hago ir atrás un tercio de velocidad de choque
-
                     }
-
                 }
             }
         }
-
-
 
         public void Render()
         {

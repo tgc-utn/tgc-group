@@ -156,6 +156,11 @@ namespace TGC.Group.Model
         private Microsoft.DirectX.Direct3D.Effect powerUpEffect;
         private float TiempoRotacion = 0;
 
+        //Parallax
+        private Microsoft.DirectX.Direct3D.Effect parallaxEffect;
+        private Texture g_pHeightmap2;
+        private Texture g_pBaseTexture2;
+
         private float currentMoveDirPowerUpVida = 1f;
 
         public override void Init()
@@ -163,6 +168,9 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
             var loader = new TgcSceneLoader();
+
+            //g_pBaseTexture2 = TextureLoader.FromFile(d3dDevice, MediaDir + "Textures\\stones.bmp");
+            //g_pHeightmap2 = TextureLoader.FromFile(d3dDevice, MediaDir + "Textures\\NM_height_stones.tga");
 
             ////////////////////////////////////////////////////////////////////////////////////////
             //Cargar Shader personalizado
@@ -176,6 +184,9 @@ namespace TGC.Group.Model
 
             //Cargar Shader personalizado
             this.lunaEffect = TgcShaders.loadEffect(MediaDir + "Shaders\\MultiDiffuseLights.fx");
+
+            //Cargar Shader
+            //this.parallaxEffect = TgcShaders.loadEffect(MediaDir + "Shaders\\Parallax.fx");
 
             //Cargar variables de shader de envmap
             this.envMapEffect.SetValue("fvLightPosition", new Vector4(0, 2150, 0, 0));
@@ -322,12 +333,12 @@ namespace TGC.Group.Model
             this.sphereLuna.updateValues();
             ////////////////////////////////////////////////////////////////////////////////////////
 
+            //Lista para colisiones IA
             MeshAABB.AddRange(MeshPalmeras);
             MeshAABB.AddRange(MeshPinos);
             MeshAABB.AddRange(MeshRocas);
             MeshAABB.AddRange(MeshArbolesBananas);
             MeshAABB.AddRange(MeshPDL);
-
 
             //Inicio clase de menu
             this.claseMenu = new HUDMenu(MediaDir);
@@ -657,7 +668,7 @@ namespace TGC.Group.Model
                     else
                     {
                         //IA
-                        unJugador.Seguir(listaJugadores, MeshAABB , ElapsedTime);
+                        unJugador.Seguir(listaJugadores, MeshAABB, ElapsedTime);
                         unJugador.Update(false, false, false, false, false, false, ElapsedTime);
                     }
                 }
@@ -993,6 +1004,38 @@ namespace TGC.Group.Model
             D3DDevice.Instance.Device.EndScene();
             #endregion
 
+
+            /********************************************************************************************************************************************/
+            /********************************************************************************************************************************************/
+            /********************************************************************************************************************************************/
+
+            /*
+            this.parallaxEffect.SetValue("min_cant_samples", 10);
+            this.parallaxEffect.SetValue("max_cant_samples", 500);
+            this.parallaxEffect.SetValue("fHeightMapScale", 100f);
+            */
+
+            /*
+            this.parallaxEffect.SetValue("fvEyePosition", TgcParserUtils.vector3ToFloat3Array(Camara.Position));
+            this.parallaxEffect.SetValue("time", this.TiempoRotacion);
+            this.parallaxEffect.SetValue("aux_Tex", this.g_pBaseTexture2);
+            this.parallaxEffect.SetValue("height_map", this.g_pHeightmap2);
+            */
+
+            //this.parallaxEffect.SetValue("g_fSpecularExponent", 10f);
+            //this.parallaxEffect.SetValue("g_fSpecularExponent", 0.9f);
+
+            /*
+            unMesh = this.listaJugadores[0].claseAuto.GetMesh();
+            unMesh.Effect = this.parallaxEffect;
+            unMesh.Technique = "BumpMap";
+            unMesh.render();
+            */
+
+            /********************************************************************************************************************************************/
+            /********************************************************************************************************************************************/
+            /********************************************************************************************************************************************/
+
             D3DDevice.Instance.Device.Present();
         }
 
@@ -1197,5 +1240,289 @@ namespace TGC.Group.Model
             this.envMapEffect.Dispose();
             ScenePpal.disposeAll();
         }
+    }
+
+    class UtilVector
+    {
+        public static bool estaDentroDeLaTolerancia(float valor)
+        {
+            return Math.Abs(Math.Round(valor, 3)) == 0.000f;
+        }
+
+        public static float dameDistanciaUnidimensional(float x, float y)
+        {
+            return Math.Abs(y - x);
+        }
+
+        public static float calcularDistanciaEntrePuntos(Vector3 punto1, Vector3 punto2)
+        {
+            return (float)Math.Sqrt(Math.Pow(punto1.X - punto2.X, 2.0) + Math.Pow(punto1.Z - punto2.Z, 2.0));
+        }
+
+        public static bool vectoresIguales(Vector3 punto1, Vector3 punto2)
+        {
+            return (punto1.X == punto2.X) && (punto1.Y == punto2.Y) && (punto1.Z == punto2.Z);
+        }
+    }
+
+    class RectaVector
+    {
+        public Vector3 puntoInicial;
+        public Vector3 puntoFinal;
+        public float pendiente;
+
+        public RectaVector(Vector3 punto1, Vector3 punto2)
+        {
+            if (punto1.X < punto2.X)
+            {
+                this.puntoInicial = punto1;
+                this.puntoFinal = punto2;
+            }
+            else
+            {
+                this.puntoInicial = punto2;
+                this.puntoFinal = punto1;
+            }
+
+            this.pendiente = (this.puntoFinal.X == this.puntoInicial.X) ? float.PositiveInfinity : (this.puntoFinal.Z - this.puntoInicial.Z) / (this.puntoFinal.X - this.puntoInicial.X);
+        }
+
+        public void dameAnguloInt(RectaVector recta, Vector3 puntoInt, ref float angulo)
+        {
+            float altura = puntoInt.Z - this.puntoInicial.Z;
+            float ancho = puntoInt.X - this.puntoInicial.X;
+
+            float distancia1 = (float)Math.Sqrt(Math.Pow(puntoInt.X - this.puntoInicial.X, 2.0f) + Math.Pow(puntoInt.Z - this.puntoInicial.Z, 2.0f));
+            float distancia2 = (float)Math.Sqrt(Math.Pow(puntoInt.X - this.puntoFinal.X, 2.0f) + Math.Pow(puntoInt.Z - this.puntoFinal.Z, 2.0f));
+
+            if (distancia2 > distancia1)
+            {
+                ancho = puntoInt.X - this.puntoFinal.X;
+                altura = puntoInt.Z - this.puntoFinal.Z;
+            }
+
+            float radio = (float)Math.Sqrt(Math.Pow(ancho, 2.0f) + Math.Pow(altura, 2.0f));
+
+            if (recta.pendiente == 0f)
+            {
+                if (Math.Abs(ancho) > 0)
+                {
+                    angulo = (float)Math.Atan(Math.Abs(altura / ancho));
+                }
+
+            }
+            else
+            {
+                if (Math.Abs(altura) > 0)
+                {
+                    angulo = -1 * (float)Math.Atan(Math.Abs(ancho / altura));
+                }
+            }
+
+        }
+
+        public bool damePuntoInt(RectaVector rec, ref Vector3 puntoInt)
+        {
+            float x;
+            float z;
+
+            if (this.pendiente == rec.pendiente)
+            {
+                if (rec.pendiente == 0f)
+                {
+                    if (UtilVector.estaDentroDeLaTolerancia(this.puntoInicial.Z - rec.puntoInicial.Z))
+                    {
+                        z = this.puntoInicial.Z;
+
+                        if (this.puntoInicial.X >= rec.puntoInicial.X && this.puntoInicial.X <= rec.puntoFinal.X)
+                        {
+                            if (UtilVector.dameDistanciaUnidimensional(this.puntoInicial.X, rec.puntoFinal.X) < UtilVector.dameDistanciaUnidimensional(this.puntoInicial.X, this.puntoFinal.X))
+                            {
+                                x = (this.puntoInicial.X + rec.puntoFinal.X) / 2f;
+                            }
+                            else
+                            {
+                                x = (this.puntoInicial.X + this.puntoFinal.X) / 2f;
+                            }
+
+                            puntoInt.X = x;
+                            puntoInt.Z = z;
+
+                            return true;
+                        }
+                        else if (this.puntoFinal.X >= rec.puntoInicial.X && this.puntoFinal.X <= rec.puntoFinal.X)
+                        {
+                            x = (rec.puntoInicial.X + this.puntoFinal.X) / 2f;
+
+                            puntoInt.X = x;
+                            puntoInt.Z = z;
+
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    if (UtilVector.estaDentroDeLaTolerancia(this.puntoInicial.X - rec.puntoInicial.X))
+                    {
+                        x = this.puntoInicial.X;
+
+                        if (this.puntoInicial.Z >= rec.puntoInicial.Z && this.puntoInicial.Z <= rec.puntoFinal.Z)
+                        {
+                            if (UtilVector.dameDistanciaUnidimensional(this.puntoInicial.Z, rec.puntoFinal.Z) < UtilVector.dameDistanciaUnidimensional(this.puntoInicial.Z, this.puntoFinal.Z))
+                            {
+                                z = (this.puntoInicial.Z + rec.puntoFinal.Z) / 2f;
+                            }
+                            else
+                            {
+                                z = (this.puntoInicial.Z + this.puntoFinal.Z) / 2f;
+                            }
+
+                            puntoInt.X = x;
+                            puntoInt.Z = z;
+
+                            return true;
+                        }
+                        else if (this.puntoFinal.Z >= rec.puntoInicial.Z && this.puntoFinal.Z <= rec.puntoFinal.Z)
+                        {
+                            z = (rec.puntoInicial.Z + this.puntoFinal.Z) / 2f;
+
+                            puntoInt.X = x;
+                            puntoInt.Z = z;
+
+                            return true;
+                        }
+                    }
+                }
+
+                puntoInt.X = float.NaN;
+                puntoInt.Z = float.NaN;
+
+                return false;
+            }
+
+            if (rec.pendiente == 0f)
+            {
+                x = (rec.puntoInicial.Z - this.puntoInicial.Z) / this.pendiente + this.puntoInicial.X;
+                z = rec.puntoInicial.Z;
+            }
+            else if (rec.pendiente == float.PositiveInfinity)
+            {
+                x = rec.puntoInicial.X;
+                z = (x - this.puntoInicial.X) * this.pendiente + this.puntoInicial.Z;
+            }
+            else
+            {
+                x = ((this.pendiente / rec.pendiente * -1) * this.puntoInicial.X + ((this.puntoInicial.Z - rec.puntoInicial.Z) / rec.pendiente) + rec.puntoInicial.X) / (1 - this.pendiente / rec.pendiente);
+                z = (x - this.puntoInicial.X) * this.pendiente + this.puntoInicial.Z;
+            }
+
+            puntoInt.X = x;
+            puntoInt.Z = z;
+
+
+            bool valor = (puntoInt.X >= this.puntoInicial.X && puntoInt.X <= this.puntoFinal.X) && ((puntoInt.Z >= this.puntoInicial.Z && puntoInt.Z <= this.puntoFinal.Z) || (puntoInt.Z >= this.puntoFinal.Z && puntoInt.Z <= this.puntoInicial.Z));
+
+            return valor && (puntoInt.X >= rec.puntoInicial.X && puntoInt.X <= rec.puntoFinal.X) && ((puntoInt.Z >= rec.puntoInicial.Z && puntoInt.Z <= rec.puntoFinal.Z) || (puntoInt.Z >= rec.puntoFinal.Z && puntoInt.Z <= rec.puntoInicial.Z));
+        }
+
+        public override string ToString()
+        {
+            return this.puntoInicial.X + " ; " + this.puntoInicial.Z + " : " + this.puntoFinal.X + " ; " + this.puntoFinal.Z;
+        }
+    }
+
+    class BoundingBox
+    {
+        TgcBoundingAxisAlignBox box;
+
+        public TgcBoundingAxisAlignBox Box
+        {
+            get { return box; }
+            set { box = value; }
+        }
+
+        Vector3 pMinOriginal;
+        Vector3 pMaxOriginal;
+
+        Vector3 pMin;
+
+        public Vector3 PMin
+        {
+            get { return pMin; }
+        }
+
+        Vector3 pMax;
+
+        public Vector3 PMax
+        {
+            get { return pMax; }
+        }
+
+        int renderColor;
+
+
+        CustomVertex.PositionColored[] vertices;
+        bool dirtyValues;
+
+
+        public BoundingBox()
+        {
+            renderColor = Color.Yellow.ToArgb();
+            dirtyValues = true;
+        }
+
+
+        public BoundingBox(Vector3 pMin, Vector3 pMax)
+            : this()
+        {
+            setExtremes(pMin, pMax);
+        }
+
+        public BoundingBox(TgcBoundingAxisAlignBox box)
+            : this()
+        {
+            this.box = box;
+            setExtremes(this.box.PMin, this.box.PMax);
+        }
+
+
+        public void setExtremes(Vector3 pMin, Vector3 pMax)
+        {
+            this.pMin = pMin;
+            this.pMax = pMax;
+            pMinOriginal = pMin;
+            pMaxOriginal = pMax;
+
+            dirtyValues = true;
+        }
+
+        public override string ToString()
+        {
+            return "Min[" + TgcParserUtils.printFloat(pMin.X) + ", " + TgcParserUtils.printFloat(pMin.Y) + ", " + TgcParserUtils.printFloat(pMin.Z) + "]" +
+                " Max[" + TgcParserUtils.printFloat(pMax.X) + ", " + TgcParserUtils.printFloat(pMax.Y) + ", " + TgcParserUtils.printFloat(pMax.Z) + "]";
+        }
+
+        public void scaleTranslate(Vector3 position, Vector3 scale)
+        {
+
+            //actualizar puntos extremos
+            pMin.X = pMinOriginal.X * scale.X + position.X;
+            pMin.Y = pMinOriginal.Y * scale.Y + position.Y;
+            pMin.Z = pMinOriginal.Z * scale.Z + position.Z;
+
+            pMax.X = pMaxOriginal.X * scale.X + position.X;
+            pMax.Y = pMaxOriginal.Y * scale.Y + position.Y;
+            pMax.Z = pMaxOriginal.Z * scale.Z + position.Z;
+
+            dirtyValues = true;
+        }
+
+
+        public void dispose()
+        {
+            vertices = null;
+        }
+
     }
 }

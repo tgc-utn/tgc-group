@@ -238,7 +238,6 @@ namespace TGC.UtilsGroup
                              {
                                 if (m.Name.IndexOf("PowerUp Vida") != -1)
                                 {
-
                                     m.Enabled = false;
 
                                     if (modelos.IndexOf(m) != -1)
@@ -253,6 +252,7 @@ namespace TGC.UtilsGroup
                                     continue;
                                 }
 
+                                unAuto.meshColisionado = m;
                                 unAuto.colisiono = true;
 
                                 if ((m.Name.IndexOf ("Palmera") != -1) || (m.Name.IndexOf ("Pino") != -1) || (m.Name.IndexOf("ArbolBananas") != -1))
