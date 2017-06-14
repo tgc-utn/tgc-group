@@ -941,52 +941,6 @@ namespace TGC.Group.Model
             soundMotor.play(true);
         }
 
-        public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
-        {
-            bool e = false;
-            foreach (TgcMesh unMesh in meshAABB)
-            {
-                var posicion = new Vector3(this.Mesh.Position.X, this.Mesh.Position.Y, this.Mesh.Position.Z);
-                var rayo = new TgcRay(posicion, direccionSeguir);
-                var lugarChoque = new Vector3(0, 0, 0);
-                if (TgcCollisionUtils.intersectRayAABB(rayo, unMesh.BoundingBox, out lugarChoque))
-                {
-                    var distancia = DistanciaEntre2Puntos(this.Mesh.Position, lugarChoque);
-                    if (distancia < 100)
-                    {
-                        e = true;
-                    }
-                    else
-                    {
-                        e = false;
-                    }
-                }
-                else
-                {
-                    e = false;
-                }
-            }
-            return e;
-        }
-
-        public double DistanciaEntre2Puntos(Vector3 position, Vector3 lugarChoque)
-        {
-            float X = position.X - lugarChoque.X;
-            float Z = position.Z - lugarChoque.Z;
-            var XX = Math.Pow(X, 2);
-            var ZZ = Math.Pow(Z, 2);
-            var suma = XX + ZZ;
-            var distancia = Math.Sqrt(suma);
-            return distancia;
-        }
-
-        public void ReproducirSonidoMotor()
-        {
-            soundMotor = new TgcStaticSound();
-            soundMotor.loadSound(pathSonidoMotor, DirectSound.DsDevice);
-            soundMotor.play(true);
-        }
-
         public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime, float VidaJugador)
         {
             if (VidaJugador > 0)
