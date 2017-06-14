@@ -65,7 +65,7 @@ namespace TGC.Group.Model
         public static TgcScene ScenePpal;
 
         //Cantidad de autos enemigos
-        public int CantidadDeOponentes = 4;
+        public int CantidadDeOponentes = 1;
 
         //Cantidad de tiempo de juego
         public int TiempoDeJuego = 5;
@@ -333,6 +333,7 @@ namespace TGC.Group.Model
             this.sphereLuna.updateValues();
             ////////////////////////////////////////////////////////////////////////////////////////
 
+            //Lista para colisiones IA
             MeshAABB.AddRange(MeshPalmeras);
             MeshAABB.AddRange(MeshPinos);
             MeshAABB.AddRange(MeshRocas);
@@ -597,6 +598,9 @@ namespace TGC.Group.Model
                         this.NombreJugador1 = this.claseMenu.GetNombreJugador();
                         Camara = this.listaJugadores[0].claseCamara.GetCamera();
                         this.listaJugadores[0].claseAuto.ReproducirSonidoArranque();
+                        System.Threading.Thread.Sleep(2000);
+                        this.listaJugadores[0].claseAuto.ReproducirSonidoMotor();
+
                     }
 
                     if (this.claseMenu.GetEstadoMenu() == "S")

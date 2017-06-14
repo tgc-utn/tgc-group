@@ -596,92 +596,6 @@ namespace TGC.Group.Model
             return false;
         }
 
-        ////private void respuestaColisionAutovsAuto(Auto unAuto, float elapsedTime, float moveFoward)
-        ////      {
-
-        ////          ReproducirSonidoChoque();
-        ////          var ChoqueFrenteContraFrente = TgcCollisionUtils.testObbObb(this.ObbArriba.toStruct(), unAuto.ObbArriba.toStruct());
-        ////          var ChoqueFrenteContraCostadoDerecho = TgcCollisionUtils.testObbObb(this.ObbArriba.toStruct(), unAuto.ObbArribaDer.toStruct());
-        ////          var ChoqueFrenteContraIzquierda = TgcCollisionUtils.testObbObb(this.ObbArriba.toStruct(), unAuto.ObbArribaIzq.toStruct());
-
-        ////          if (ChoqueFrenteContraFrente)
-        ////          {
-        ////                   //Auto jugador
-        ////                  this.Mesh.Position = this.OriginalPos;
-        ////                  this.MOVEMENT_SPEED = (-1) * Math.Abs(600f * 0.2f);
-        ////                  this.Mesh.moveOrientedY((-3.5f) * moveFoward * elapsedTime);
-        ////                  this.colisiono = false;
-
-        ////                  //AutoIA
-        ////                  this.Mesh.Position = this.OriginalPos;
-        ////                  this.MOVEMENT_SPEED = (-1) * Math.Abs(600f * 0.2f);
-        ////                  this.Mesh.moveOrientedY((-3.5f) * moveFoward * elapsedTime);
-        ////                  this.colisiono = false;
-
-        ////              return;
-        ////          }
-
-        ////          if (ChoqueFrenteContraCostadoDerecho)
-        ////          {
-
-        ////              //Auto jugador
-        ////              this.rotAngle = (80f * Math.Sign(-1f) * elapsedTime) * (FastMath.PI / 50);
-        ////              this.Mesh.rotateY(this.rotAngle);
-        ////              this.ObbMesh.rotate(new Vector3(0, this.rotAngle, 0));
-        ////              this.ModificadorVida = -5;
-
-        ////              //AutoIA
-        ////              unAuto.rotAngle = (80f * Math.Sign(-1f) * elapsedTime) * (FastMath.PI / 50);
-        ////              unAuto.Mesh.rotateY(unAuto.rotAngle);
-        ////              unAuto.ObbMesh.rotate(new Vector3(0, unAuto.rotAngle, 0));
-        ////              unAuto.ModificadorVida = -5;
-        ////              return;
-        ////          }
-
-        ////          if (TgcCollisionUtils.testObbObb(this.ObbArribaIzq.toStruct(), unAuto.ObbMesh.toStruct()))
-        ////          {
-
-        ////              this.colisionSimple(elapsedTime, moveFoward);
-        ////              this.colisionSimpleCostados(elapsedTime, 1);
-
-        ////              this.ModificadorVida = -5;
-        ////              return;
-        ////          }
-
-        ////          if (TgcCollisionUtils.testObbObb(this.ObbAbajo.toStruct(), unAuto.ObbMesh.toStruct()))
-        ////          {
-
-
-        ////              this.Mesh.Position = this.OriginalPos;
-        ////              this.MOVEMENT_SPEED =  Math.Abs(400f * 0.2f);
-        ////              this.Mesh.moveOrientedY((-3.5f) * moveFoward * elapsedTime);
-
-        ////              this.colisiono = false;
-
-        ////              this.ModificadorVida = -5;
-        ////              return;
-
-        ////          }
-
-        ////          if (TgcCollisionUtils.testObbObb(this.ObbAbajoIzq.toStruct(), unAuto.ObbMesh.toStruct()))
-        ////          {
-        ////              this.colisionSimple(elapsedTime, moveFoward);
-        ////              this.colisionSimpleCostados(elapsedTime, -1);
-
-        ////              this.ModificadorVida = -5;
-        ////              return;
-        ////          }
-
-        ////          if (TgcCollisionUtils.testObbObb(this.ObbAbajoDer.toStruct(), unAuto.ObbMesh.toStruct()))
-        ////          {
-        ////              this.colisionSimple(elapsedTime, moveFoward);
-        ////              this.colisionSimpleCostados(elapsedTime, 1);
-
-        ////              return;
-        ////          }
-
-        ////      }
-
         private void deformarMalla()
         {
             List<Vector3> corners = this.dameCorners(this.bB);
@@ -833,8 +747,8 @@ namespace TGC.Group.Model
 
             return corners;
         }
-
-        private void colisionSimpleCostados(float elapsedTime, float orientacion)
+	
+		    private void colisionSimpleCostados(float elapsedTime, float orientacion)
         {
             this.rotAngle = (80f * Math.Sign(orientacion) * elapsedTime) * (FastMath.PI / 50);
             this.Mesh.rotateY(rotAngle);
@@ -982,6 +896,52 @@ namespace TGC.Group.Model
         }
 
         private bool EncontroAABB(List<TgcMesh> meshAABB)
+        {
+            bool e = false;
+            foreach (TgcMesh unMesh in meshAABB)
+            {
+                var posicion = new Vector3(this.Mesh.Position.X, this.Mesh.Position.Y, this.Mesh.Position.Z);
+                var rayo = new TgcRay(posicion, direccionSeguir);
+                var lugarChoque = new Vector3(0, 0, 0);
+                if (TgcCollisionUtils.intersectRayAABB(rayo, unMesh.BoundingBox, out lugarChoque))
+                {
+                    var distancia = DistanciaEntre2Puntos(this.Mesh.Position, lugarChoque);
+                    if (distancia < 100)
+                    {
+                        e = true;
+                    }
+                    else
+                    {
+                        e = false;
+                    }
+                }
+                else
+                {
+                    e = false;
+                }
+            }
+            return e;
+        }
+
+        public double DistanciaEntre2Puntos(Vector3 position, Vector3 lugarChoque)
+        {
+            float X = position.X - lugarChoque.X;
+            float Z = position.Z - lugarChoque.Z;
+            var XX = Math.Pow(X, 2);
+            var ZZ = Math.Pow(Z, 2);
+            var suma = XX + ZZ;
+            var distancia = Math.Sqrt(suma);
+            return distancia;
+        }
+
+        public void ReproducirSonidoMotor()
+        {
+            soundMotor = new TgcStaticSound();
+            soundMotor.loadSound(pathSonidoMotor, DirectSound.DsDevice);
+            soundMotor.play(true);
+        }
+
+        public void Update(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
         {
             bool e = false;
             foreach (TgcMesh unMesh in meshAABB)
@@ -1239,8 +1199,8 @@ namespace TGC.Group.Model
                         otroAuto.MOVEMENT_SPEED = -(otroAuto.MOVEMENT_SPEED * 0.3f);
 
                     }
-                    else if (TgcCollisionUtils.testObbObb(otroAuto.ObbAbajoIzq, this.ObbArribaIzq) || TgcCollisionUtils.testObbObb(otroAuto.ObbAbajoIzq, this.ObbArribaDer)
-                        || TgcCollisionUtils.testObbObb(otroAuto.ObbAbajoDer, this.ObbArribaIzq) || TgcCollisionUtils.testObbObb(otroAuto.ObbAbajoDer, this.ObbArribaDer))
+                    else if (TgcCollisionUtils.testObbObb(otroAuto.ObbAbajoIzq, this.ObbArribaIzq ) || TgcCollisionUtils.testObbObb(otroAuto.ObbAbajoIzq, this.ObbArribaDer)
+                        || TgcCollisionUtils.testObbObb(otroAuto.ObbAbajoDer, this.ObbArribaIzq ) || TgcCollisionUtils.testObbObb(otroAuto.ObbAbajoDer, this.ObbArribaDer))
                     {
                         //auto gira cierto angulo hacia derecha y sube velocidad
                         if (Math.Truncate(otroAuto.MOVEMENT_SPEED) == 0)
@@ -1250,7 +1210,7 @@ namespace TGC.Group.Model
                         //otroAuto reduce bastante velocidad y se lo traslada un poco hacia atrás para no seguir chocando
                         otroAuto.GetMesh().moveOrientedY(10 * this.MOVEMENT_SPEED * elapsedTime); //Lo hago "como que rebote un poco" para no seguir colisionando
                     }
-                    else if (TgcCollisionUtils.testObbObb(this.ObbArribaIzq, otroAuto.ObbArribaIzq) || TgcCollisionUtils.testObbObb(this.ObbArribaDer, otroAuto.ObbArribaIzq) || TgcCollisionUtils.testObbObb(this.ObbArribaIzq, otroAuto.ObbArribaDer) || TgcCollisionUtils.testObbObb(this.ObbArribaDer, otroAuto.ObbArribaDer))
+                    else if (TgcCollisionUtils.testObbObb(this.ObbArribaIzq , otroAuto.ObbArribaIzq) || TgcCollisionUtils.testObbObb(this.ObbArribaDer, otroAuto.ObbArribaIzq) || TgcCollisionUtils.testObbObb( this.ObbArribaIzq , otroAuto.ObbArribaDer) || TgcCollisionUtils.testObbObb(this.ObbArribaDer , otroAuto.ObbArribaDer))
                     {
                         //auto se mueve hacia atrás y cambia de sentido 180° (rebota)
                         if (Math.Truncate(this.MOVEMENT_SPEED) == 0)
@@ -1283,9 +1243,7 @@ namespace TGC.Group.Model
                         //rebota auto
                         this.GetMesh().moveOrientedY(10 * this.MOVEMENT_SPEED * elapsedTime); //Lo hago "como que rebote un poco" para no seguir colisionando
                         this.MOVEMENT_SPEED = -(this.MOVEMENT_SPEED * 0.3f); //Lo hago ir atrás un tercio de velocidad de choque
-
                     }
-
                 }
             }
         }
