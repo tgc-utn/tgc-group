@@ -1227,9 +1227,6 @@ namespace TGC.Group.Model
 
             this.VerificarDeformacion(otroAuto.Mesh.BoundingBox);
 
-            //if (this.NroJugador == 0)
-            //{
-
             ReproducirSonidoChoque();
 
                 if (this.MOVEMENT_SPEED >= 0)
