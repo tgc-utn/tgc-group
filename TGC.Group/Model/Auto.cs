@@ -1229,6 +1229,9 @@ namespace TGC.Group.Model
 
             //if (this.NroJugador == 0)
             //{
+
+            ReproducirSonidoChoque();
+
                 if (this.MOVEMENT_SPEED >= 0)
                 {
                     if (TgcCollisionUtils.testObbObb(this.ObbAbajoIzq, otroAuto.ObbArribaIzq) || TgcCollisionUtils.testObbObb(this.ObbAbajoIzq, otroAuto.ObbArribaDer)

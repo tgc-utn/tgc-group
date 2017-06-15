@@ -603,7 +603,7 @@ namespace TGC.Group.Model
 
                         Camara = this.listaJugadores[0].claseCamara.GetCamera();
                         this.listaJugadores[0].claseAuto.ReproducirSonidoArranque();
-                        System.Threading.Thread.Sleep(2000);
+                        System.Threading.Thread.Sleep(500);
                         this.listaJugadores[0].claseAuto.ReproducirSonidoMotor();
 
                     }
