@@ -1042,6 +1042,8 @@ namespace TGC.Group.Model
 
         public void UpdateIA(bool MoverRuedas, bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime, float aceleraciooon)
         {
+            this.emisorChoque.Update(ElapsedTime, this.ObbAbajoDer.Position, this.Mesh.Rotation.Y);
+
             this.MoverAutoIAConColisiones(Avanzar, Frenar, Izquierda, Derecha, Saltar, ElapsedTime, aceleraciooon);
             this.CalcularPosicionRuedas(MoverRuedas);
             this.CalcularPosObb();
@@ -1147,6 +1149,9 @@ namespace TGC.Group.Model
 
             this.ColisionesObbObb(GameModel.ListaMeshAutos, ElapsedTime, moveForward);
             this.ObbMesh.Center = this.Mesh.Position;
+            this.rotarBoundingBox();
+            this.moverBoundingBox();
+
             direccionSeguir = new Vector3((-1) * FastMath.Sin(this.GetMesh().Rotation.Y), 0, (-1) * FastMath.Cos(this.GetMesh().Rotation.Y));
         }
 
@@ -1212,6 +1217,9 @@ namespace TGC.Group.Model
 
         public void colisionEntreAutos(Auto otroAuto, float elapsedTime)
         {
+            int x = 0, z = 0;
+            Vector3 unaDiferencia = new Vector3(0, 0, 0);
+
             if (!TgcCollisionUtils.testObbObb(this.ObbArriba, otroAuto.ObbMesh))
             {
                 this.ModificadorVida = -5f;
@@ -1219,8 +1227,8 @@ namespace TGC.Group.Model
 
             this.VerificarDeformacion(otroAuto.Mesh.BoundingBox);
 
-            if (this.NroJugador == 0)
-            {
+            //if (this.NroJugador == 0)
+            //{
                 if (this.MOVEMENT_SPEED >= 0)
                 {
                     if (TgcCollisionUtils.testObbObb(this.ObbAbajoIzq, otroAuto.ObbArribaIzq) || TgcCollisionUtils.testObbObb(this.ObbAbajoIzq, otroAuto.ObbArribaDer)
@@ -1282,7 +1290,37 @@ namespace TGC.Group.Model
                         this.MOVEMENT_SPEED = -(this.MOVEMENT_SPEED * 0.3f); //Lo hago ir atrás un tercio de velocidad de choque
                     }
                 }
-            }
+
+                if (TgcCollisionUtils.testObbAABB(this.ObbMesh, otroAuto.Mesh.BoundingBox))
+                {
+                    if (TgcCollisionUtils.testObbAABB(this.ObbArribaIzq, otroAuto.Mesh.BoundingBox) ||
+                        TgcCollisionUtils.testObbAABB(this.ObbAbajoIzq, otroAuto.Mesh.BoundingBox)
+                        )
+                    {
+                        unaDiferencia = this.ObbArribaDer.Position - this.ObbArribaIzq.Position;
+                    }
+
+                    if (TgcCollisionUtils.testObbAABB(this.ObbArribaDer, otroAuto.Mesh.BoundingBox) ||
+                        TgcCollisionUtils.testObbAABB(this.ObbAbajoDer, otroAuto.Mesh.BoundingBox)
+                        )
+                    {
+                        unaDiferencia = this.ObbArribaIzq.Position - this.ObbArribaDer.Position;
+                    }
+
+                    if (unaDiferencia.X > 0)
+                        x = -20;
+                    else
+                        x = 20;
+
+                    if (unaDiferencia.Z > 0)
+                        z = -20;
+                    else
+                        z = 20;
+
+                    unaDiferencia = unaDiferencia + new Vector3(x, 0, z);
+                    this.Mesh.move(unaDiferencia.X, 0, unaDiferencia.Z);
+                }
+            //}
         }
 
         public void Render()
