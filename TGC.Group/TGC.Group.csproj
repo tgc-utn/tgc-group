@@ -9,10 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TGC.Group</RootNamespace>
     <AssemblyName>TGC.Group</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -60,19 +61,30 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.Direct3D.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DirectX.Direct3DX, Version=1.0.2909.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2911.0\Microsoft.DirectX.Direct3DX.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.DirectX.DirectInput, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.DirectInput.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DirectX.DirectSound, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="Microsoft.VisualC" />
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="TGC.Core">
-      <HintPath>..\packages\TGC.Core.2.2.3\lib\net452\TGC.Core.dll</HintPath>
+    <Reference Include="TGC.Core, Version=2.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\TGC.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camara\CamaraTW.cs" />
+    <Compile Include="Camara\TgcFpsCamera.cs" />
+    <Compile Include="Camara\TgcRotationalCamera.cs" />
+    <Compile Include="Camara\TgcSpringThirdPersonCamera.cs" />
+    <Compile Include="Camara\TgcThirdPersonCamera.cs" />
     <Compile Include="Form\GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -84,9 +96,22 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\Auto.cs" />
+    <Compile Include="Model\ChoqueParticulas.cs" />
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Model\HUDJugador.cs" />
+    <Compile Include="Model\HUDMenu.cs" />
+    <Compile Include="Model\HUDTiempo.cs" />
+    <Compile Include="Model\HumoParticula.cs" />
+    <Compile Include="Model\Jugador.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\Quadtree.cs" />
+    <Compile Include="Utils\QuadtreeBuilder.cs" />
+    <Compile Include="Utils\QuadtreeNode.cs" />
+    <Compile Include="Utils\TgcDrawer2D.cs" />
+    <Compile Include="Utils\TgcDrawText.cs" />
+    <Compile Include="Utils\TgcSprite.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -153,6 +178,42 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Media\Twisted_Chano\Armas\CajaMuniciones\CajaMuniciones-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Armas\CajaMuniciones\Textures\ammobox.bmp" />
+    <Content Include="Media\Twisted_Chano\MAPA-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Muebles\ExpendedorDeBebidas\ExpendedorDeBebidas-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Muebles\ExpendedorDeBebidas\Textures\sodamachine.jpg" />
+    <Content Include="Media\Twisted_Chano\Muebles\LockerMetal\LockerMetal-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Muebles\LockerMetal\Textures\kast.jpg" />
+    <Content Include="Media\Twisted_Chano\Objetos\BarrilPolvora\BarrilPolvora-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Objetos\BarrilPolvora\Textures\gunpowder.bmp" />
+    <Content Include="Media\Twisted_Chano\Objetos\Carretilla\Carretilla-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Objetos\Carretilla\Textures\wagon.bmp" />
+    <Content Include="Media\Twisted_Chano\Objetos\Contenedor\Contenedor-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Objetos\Contenedor\Textures\dumbster.jpg" />
+    <Content Include="Media\Twisted_Chano\Objetos\FuenteAgua\FuenteAgua-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Objetos\FuenteAgua\Textures\fountan1.jpg" />
+    <Content Include="Media\Twisted_Chano\Textures\block10d.jpg" />
+    <Content Include="Media\Twisted_Chano\Textures\Grass.JPG" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\ArbolBananas\ArbolBananas-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\ArbolBananas\Textures\banana.jpg" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\ArbolSelvatico\ArbolSelvatico-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\ArbolSelvatico\Textures\Hojas_selva.png" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\ArbolSelvatico\Textures\lianas.png" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\ArbolSelvatico\Textures\WoodTexture.jpg" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Palmera\Palmera-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Palmera\Textures\hojaPalmera.jpg" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Palmera\Textures\Palmera_Textura.jpg" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Palmera\Textures\troncoPalmera.jpg" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Pino\Pino-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Pino\Textures\spar.png" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Roca\Roca-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Vegetacion\Roca\Textures\Piedra3.jpg" />
+    <Content Include="Media\Twisted_Chano\Vehiculos\Auto\Auto-TgcScene.xml" />
+    <Content Include="Media\Twisted_Chano\Vehiculos\Auto\Textures\car.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

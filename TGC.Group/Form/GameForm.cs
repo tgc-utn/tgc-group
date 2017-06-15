@@ -28,7 +28,7 @@ namespace TGC.Group.Form
         /// <summary>
         ///     Ejemplo del juego a correr
         /// </summary>
-        private TgcExample Modelo { get; set; }
+        private GameModel Modelo { get; set; }
 
         /// <summary>
         ///     Obtener o parar el estado del RenderLoop.
@@ -44,6 +44,8 @@ namespace TGC.Group.Form
         ///     Permite manejar los inputs de la computadora.
         /// </summary>
         private TgcD3dInput Input { get; set; }
+
+        private string currentDirectory = "";
 
         private void GameForm_Load(object sender, EventArgs e)
         {
@@ -62,6 +64,9 @@ namespace TGC.Group.Form
 
         private void GameForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Modelo.finModelo = true;
+            Modelo.restartModelo = false;
+
             if (ApplicationRunning)
             {
                 ShutDown();
@@ -88,7 +93,7 @@ namespace TGC.Group.Form
             DirectSound.InitializeD3DDevice(panel3D);
 
             //Directorio actual de ejecución
-            var currentDirectory = Environment.CurrentDirectory + "\\";
+            currentDirectory = Environment.CurrentDirectory + "\\";
 
             //Cargar shaders del framework
             TgcShaders.Instance.loadCommonShaders(currentDirectory + Game.Default.ShadersDirectory);
@@ -116,6 +121,19 @@ namespace TGC.Group.Form
                     {
                         Modelo.Update();
                         Modelo.Render();
+
+                        if (Modelo.finModelo && !Modelo.restartModelo)
+                        {
+                            this.Close();
+                            return;
+                        }
+
+                        if (Modelo.finModelo && Modelo.restartModelo)
+                        {
+                            Modelo.Dispose();
+                            Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory, currentDirectory + Game.Default.ShadersDirectory);
+                            this.ExecuteModel();
+                        }
                     }
                     else
                     {
@@ -195,6 +213,11 @@ namespace TGC.Group.Form
             //Liberar Device al finalizar la aplicacion
             D3DDevice.Instance.Dispose();
             TexturesPool.Instance.clearAll();
+        }
+
+        private void panel3D_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }
