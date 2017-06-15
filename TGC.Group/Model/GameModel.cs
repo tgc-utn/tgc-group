@@ -1394,8 +1394,8 @@ namespace TGC.Group.Model
                     }
                 }
 
-                puntoInt.X = float.NaN;
-                puntoInt.Z = float.NaN;
+                puntoInt.X = 0;
+                puntoInt.Z = 0;
 
                 return false;
             }
@@ -1431,7 +1431,7 @@ namespace TGC.Group.Model
         }
     }
 
-    class BoundingBox
+    public class BoundingBox
     {
         TgcBoundingAxisAlignBox box;
 

@@ -55,7 +55,6 @@ namespace TGC.Group.Model
         private TgcBoundingOrientedBox ObbAbajoDer;
         private TgcBoundingOrientedBox ObbArriba;
         private TgcBoundingOrientedBox ObbAbajo;
-
         private List<TgcBoundingOrientedBox> ObbLista;
 
         //Ruedas
@@ -79,6 +78,7 @@ namespace TGC.Group.Model
         //Posicion de los Obb
         List<float> dxObb = new List<float> { 16, -16, -16, 16, 0, 0 };
         List<float> dyObb = new List<float> { -28, 30, -28, 30, 58, -58 };
+
         //Estado de salto
         private bool falling = false;
         private bool jumping = false;
@@ -118,7 +118,7 @@ namespace TGC.Group.Model
         //Deformacion
         private object vertices;
         public TgcMesh meshColisionado;
-        private BoundingBox bB;
+        public BoundingBox bB;
         List<KeyValuePair<string, object>> variablesDeInterfaz;
         private bool ColisionAdelanteIzq = false;
         private bool ColisionAdelanteDer = false;
@@ -395,6 +395,49 @@ namespace TGC.Group.Model
 			*/
         }
 
+        private Vector3[] dameRotados()
+        {
+            List<Vector3> points = new List<Vector3>();
+            float rotacion = this.Mesh.Rotation.Y;
+
+            double gama = (double)this.getValorDeVariable("beta") - rotacion;
+
+            float xMax = (float)((double)this.getValorDeVariable("hip") * Math.Cos(gama));
+            float zMax = (float)((double)this.getValorDeVariable("hip") * Math.Sin(gama));
+
+            double betaPrima = -Math.PI + (double)this.getValorDeVariable("beta");
+
+            gama = betaPrima - rotacion;
+
+            float xMin = (float)((double)this.getValorDeVariable("hip") * Math.Cos(gama));
+            float zMin = (float)((double)this.getValorDeVariable("hip") * Math.Sin(gama));
+
+            points.Add(new Vector3(xMin, this.bB.PMin.Y, zMin));
+            points.Add(new Vector3(xMax, this.bB.PMax.Y, zMax));
+
+            return points.ToArray();
+        }
+
+        private void rotarBoundingBox()
+        {
+            Vector3[] rotados = this.dameRotados();
+
+            TgcBoundingAxisAlignBox box = this.bB.Box;
+
+            this.bB = new BoundingBox(rotados[0], rotados[1]);
+            this.bB.Box = box;
+
+            this.bB.scaleTranslate(this.Mesh.Position, new Vector3(1f, 1f, 1f));
+            this.bB.setExtremes(this.bB.PMin, this.bB.PMax);
+        }
+
+        private void moverBoundingBox()
+        {
+            Vector3 moverse = new Vector3(0f, 0f, 0f);
+            this.bB.scaleTranslate(moverse, new Vector3(1f, 1f, 1f));
+            this.bB.setExtremes(this.bB.PMin, this.bB.PMax);
+        }
+
         public void MoverAutoConColisiones(bool Avanzar, bool Frenar, bool Izquierda, bool Derecha, bool Saltar, float ElapsedTime)
         {
             //Declaramos un vector de movimiento inicializado en cero.
@@ -501,15 +544,51 @@ namespace TGC.Group.Model
 
             this.ColisionesObbObb(GameModel.ListaMeshAutos, ElapsedTime, moveForward);
             this.ObbMesh.Center = this.Mesh.Position;
+            this.rotarBoundingBox();
+            this.moverBoundingBox();
+            
             direccionSeguir = new Vector3((-1) * FastMath.Sin(this.GetMesh().Rotation.Y), 0, (-1) * FastMath.Cos(this.GetMesh().Rotation.Y));
         }
 
         private void colisionSimple(float elapsedTime, float moveForward)
         {
+            int x = 0, z = 0;
+            Vector3 unaDiferencia = new Vector3(0, 0, 0);
+
             this.VerificarDeformacion(this.meshColisionado.BoundingBox);
             this.Mesh.Position = this.OriginalPos;
-            this.MOVEMENT_SPEED = (-1) * Math.Sign(this.MOVEMENT_SPEED) * Math.Abs(300f * 0.2f);
+            this.MOVEMENT_SPEED = (-1) * Math.Sign(this.MOVEMENT_SPEED) * Math.Abs(500f * 0.2f);
             this.Mesh.moveOrientedY((-3.5f) * moveForward * elapsedTime);
+
+            if (TgcCollisionUtils.testObbAABB(this.ObbMesh, this.meshColisionado.BoundingBox))
+            {
+                if (TgcCollisionUtils.testObbAABB(this.ObbArribaIzq, this.meshColisionado.BoundingBox) ||
+                    TgcCollisionUtils.testObbAABB(this.ObbAbajoIzq, this.meshColisionado.BoundingBox)
+                    )
+                {
+                    unaDiferencia = this.ObbArribaDer.Position - this.ObbArribaIzq.Position;
+                }
+
+                if (TgcCollisionUtils.testObbAABB(this.ObbArribaDer, this.meshColisionado.BoundingBox) ||
+                    TgcCollisionUtils.testObbAABB(this.ObbAbajoDer, this.meshColisionado.BoundingBox)
+                    )
+                {
+                    unaDiferencia = this.ObbArribaIzq.Position - this.ObbArribaDer.Position;
+                }
+
+                if (unaDiferencia.X > 0)
+                    x = -20;
+                else
+                    x = 20;
+
+                if (unaDiferencia.Z > 0)
+                    z = -20;
+                else
+                    z = 20;
+
+                unaDiferencia = unaDiferencia + new Vector3(x, 0, z);
+                this.Mesh.move(unaDiferencia.X, 0, unaDiferencia.Z);
+            }
 
             this.colisiono = false;
         }
