@@ -13,7 +13,7 @@ namespace TGC.Group.Model
 {
     /// <summary>
     ///     Ejemplo para implementar el TP.
-    ///     Inicialmente puede ser renombrado o copiado para hacer más ejemplos chicos, en el caso de copiar para que se
+    ///     Inicialmente puede ser renombrado o copiado para hacer mï¿½s ejemplos chicos, en el caso de copiar para que se
     ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
     ///     line 97.
     /// </summary>
@@ -42,7 +42,7 @@ namespace TGC.Group.Model
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
-        ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
+        ///     Escribir aquï¿½ todo el cï¿½digo de inicializaciï¿½n: cargar modelos, texturas, estructuras de optimizaciï¿½n, todo
         ///     procesamiento que podemos pre calcular para nuestro juego.
         ///     Borrar el codigo ejemplo no utilizado.
         /// </summary>
@@ -61,10 +61,10 @@ namespace TGC.Group.Model
 
             //Creamos una caja 3D ubicada de dimensiones (5, 10, 5) y la textura como color.
             var size = new Vector3(5, 10, 5);
-            //Construimos una caja según los parámetros, por defecto la misma se crea con centro en el origen y se recomienda así para facilitar las transformaciones.
+            //Construimos una caja segï¿½n los parï¿½metros, por defecto la misma se crea con centro en el origen y se recomienda asï¿½ para facilitar las transformaciones.
             Box = TgcBox.fromSize(size, texture);
-            //Posición donde quiero que este la caja, es común que se utilicen estructuras internas para las transformaciones.
-            //Entonces actualizamos la posición lógica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
+            //Posiciï¿½n donde quiero que este la caja, es comï¿½n que se utilicen estructuras internas para las transformaciones.
+            //Entonces actualizamos la posiciï¿½n lï¿½gica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
             Box.Position = new Vector3(-25, 0, 0);
 
             //Cargo el unico mesh que tiene la escena.
@@ -73,21 +73,21 @@ namespace TGC.Group.Model
             Mesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
-            //Lo que en realidad necesitamos gráficamente es una matriz de View.
-            //El framework maneja una cámara estática, pero debe ser inicializada.
-            //Posición de la camara.
+            //Lo que en realidad necesitamos grï¿½ficamente es una matriz de View.
+            //El framework maneja una cï¿½mara estï¿½tica, pero debe ser inicializada.
+            //Posiciï¿½n de la camara.
             var cameraPosition = new Vector3(0, 0, 125);
             //Quiero que la camara mire hacia el origen (0,0,0).
             var lookAt = Vector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara.SetCamera(cameraPosition, lookAt);
             //Internamente el framework construye la matriz de view con estos dos vectores.
-            //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
+            //Luego en nuestro juego tendremos que crear una cï¿½mara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
         }
 
         /// <summary>
         ///     Se llama en cada frame.
-        ///     Se debe escribir toda la lógica de computo del modelo, así como también verificar entradas del usuario y reacciones
+        ///     Se debe escribir toda la lï¿½gica de computo del modelo, asï¿½ como tambiï¿½n verificar entradas del usuario y reacciones
         ///     ante ellas.
         /// </summary>
         public override void Update()
@@ -103,12 +103,12 @@ namespace TGC.Group.Model
             //Capturar Input Mouse
             if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
             {
-                //Como ejemplo podemos hacer un movimiento simple de la cámara.
+                //Como ejemplo podemos hacer un movimiento simple de la cï¿½mara.
                 //En este caso le sumamos un valor en Y
                 Camara.SetCamera(Camara.Position + new Vector3(0, 10f, 0), Camara.LookAt);
-                //Ver ejemplos de cámara para otras operaciones posibles.
+                //Ver ejemplos de cï¿½mara para otras operaciones posibles.
 
-                //Si superamos cierto Y volvemos a la posición original.
+                //Si superamos cierto Y volvemos a la posiciï¿½n original.
                 if (Camara.Position.Y > 300f)
                 {
                     Camara.SetCamera(new Vector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
@@ -118,12 +118,12 @@ namespace TGC.Group.Model
 
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
-        ///     Escribir aquí todo el código referido al renderizado.
+        ///     Escribir aquï¿½ todo el cï¿½digo referido al renderizado.
         ///     Borrar todo lo que no haga falta.
         /// </summary>
         public override void Render()
         {
-            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
+            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones segï¿½n nuestra conveniencia.
             PreRender();
 
             //Dibuja un texto por pantalla
@@ -133,21 +133,21 @@ namespace TGC.Group.Model
                 Color.OrangeRed);
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
-            //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
+            //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerï¿½rquicos, tenemos control total.
             Box.Transform = Matrix.Scaling(Box.Scale) *
                             Matrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) *
                             Matrix.Translation(Box.Position);
-            //A modo ejemplo realizamos toda las multiplicaciones, pero aquí solo nos hacia falta la traslación.
+            //A modo ejemplo realizamos toda las multiplicaciones, pero aquï¿½ solo nos hacia falta la traslaciï¿½n.
             //Finalmente invocamos al render de la caja
             Box.render();
 
-            //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
-            //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
+            //Cuando tenemos modelos mesh podemos utilizar un mï¿½todo que hace la matriz de transformaciï¿½n estï¿½ndar.
+            //Es ï¿½til cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerï¿½rquicas o complicadas.
             Mesh.UpdateMeshTransform();
             //Render del mesh
             Mesh.render();
 
-            //Render de BoundingBox, muy útil para debug de colisiones.
+            //Render de BoundingBox, muy ï¿½til para debug de colisiones.
             if (BoundingBox)
             {
                 Box.BoundingBox.render();
@@ -159,9 +159,9 @@ namespace TGC.Group.Model
         }
 
         /// <summary>
-        ///     Se llama cuando termina la ejecución del ejemplo.
+        ///     Se llama cuando termina la ejecuciï¿½n del ejemplo.
         ///     Hacer Dispose() de todos los objetos creados.
-        ///     Es muy importante liberar los recursos, sobretodo los gráficos ya que quedan bloqueados en el device de video.
+        ///     Es muy importante liberar los recursos, sobretodo los grï¿½ficos ya que quedan bloqueados en el device de video.
         /// </summary>
         public override void Dispose()
         {
@@ -172,3 +172,5 @@ namespace TGC.Group.Model
         }
     }
 }
+
+//This is a comment to be able to make a push
