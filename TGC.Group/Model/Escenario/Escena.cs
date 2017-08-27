@@ -14,6 +14,7 @@ using TGC.Core.Terrain;
 using TGC.Core.UserControls;
 using TGC.Core.UserControls.Modifier;
 using TGC.Core.BoundingVolumes;
+using TGC.Examples.Camara;
 
 namespace TGC.Group.Model
 {
@@ -55,8 +56,8 @@ namespace TGC.Group.Model
             currentScene = loader.loadSceneFromFile(MediaDir + "Isla\\isla-TgcScene.xml");
 
             //Ajustar camara en base al tamano del objeto
-            var Camara = new TgcRotationalCamera(currentScene.BoundingBox.calculateBoxCenter(),
-                currentScene.BoundingBox.calculateBoxRadius() * 2, Input);
+            var Camara = new TgcRotationalCamera(currentScene.BoundingBox.calculateBoxCenter(), currentScene.BoundingBox.calculateBoxRadius() * 2, Input);
+
         }
 
         public void Update()
