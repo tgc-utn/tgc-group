@@ -8,6 +8,14 @@ using TGC.Core.Input;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.Utils;
+using TGC.Core.Text;
+using System.Collections.Generic;
+using TGC.Core.Terrain;
+using TGC.Core.UserControls;
+using TGC.Core.UserControls.Modifier;
+using TGC.Core.Sound;
+using TGC.Core.Shaders;
+using Microsoft.DirectX.Direct3D;
 
 namespace TGC.Group.Model
 {
@@ -37,6 +45,9 @@ namespace TGC.Group.Model
         //Mesh de TgcLogo.
         private TgcMesh Mesh { get; set; }
 
+        public Escena Isla;
+
+
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
 
@@ -50,6 +61,10 @@ namespace TGC.Group.Model
         {
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
+
+
+            // Inicializo la Escena
+            Isla = new Escena(this);
 
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
@@ -68,9 +83,10 @@ namespace TGC.Group.Model
             Box.Position = new Vector3(-25, 0, 0);
 
             //Cargo el unico mesh que tiene la escena.
-            Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
+           // Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
+
             //Defino una escala en el modelo logico del mesh que es muy grande.
-            Mesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            //Mesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
@@ -141,11 +157,10 @@ namespace TGC.Group.Model
             //Finalmente invocamos al render de la caja
             Box.render();
 
-            //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
-            //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
-            Mesh.UpdateMeshTransform();
-            //Render del mesh
-            Mesh.render();
+            // Render de la Isla
+            Isla.Render();
+
+            
 
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (BoundingBox)
@@ -167,8 +182,7 @@ namespace TGC.Group.Model
         {
             //Dispose de la caja.
             Box.dispose();
-            //Dispose del mesh.
-            Mesh.dispose();
+
         }
     }
 }
