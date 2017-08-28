@@ -16,7 +16,6 @@ using TGC.Core.UserControls.Modifier;
 using TGC.Core.Sound;
 using TGC.Core.Shaders;
 using Microsoft.DirectX.Direct3D;
-using TGC.Examples.Camara;
 
 namespace TGC.Group.Model
 {
@@ -44,7 +43,7 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
-            Camara.UpdateCamera(ElapsedTime / 100);
+            Camara.UpdateCamera(ElapsedTime);
         }
 
         public override void Render()
