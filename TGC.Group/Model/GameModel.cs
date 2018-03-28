@@ -1,13 +1,12 @@
-using Microsoft.DirectX;
 using Microsoft.DirectX.DirectInput;
 using System.Drawing;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
 using TGC.Core.Input;
+using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
-using TGC.Core.Utils;
 
 namespace TGC.Group.Model
 {
@@ -32,7 +31,7 @@ namespace TGC.Group.Model
         }
 
         //Caja que se muestra en el ejemplo.
-        private TgcBox Box { get; set; }
+        private TGCBox Box { get; set; }
 
         //Mesh de TgcLogo.
         private TgcMesh Mesh { get; set; }
@@ -60,25 +59,25 @@ namespace TGC.Group.Model
             var texture = TgcTexture.createTexture(pathTexturaCaja);
 
             //Creamos una caja 3D ubicada de dimensiones (5, 10, 5) y la textura como color.
-            var size = new Vector3(5, 10, 5);
+            var size = new TGCVector3(5, 10, 5);
             //Construimos una caja según los parámetros, por defecto la misma se crea con centro en el origen y se recomienda así para facilitar las transformaciones.
-            Box = TgcBox.fromSize(size, texture);
+            Box = TGCBox.fromSize(size, texture);
             //Posición donde quiero que este la caja, es común que se utilicen estructuras internas para las transformaciones.
             //Entonces actualizamos la posición lógica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
-            Box.Position = new Vector3(-25, 0, 0);
+            Box.Position = new TGCVector3(-25, 0, 0);
 
             //Cargo el unico mesh que tiene la escena.
             Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
             //Defino una escala en el modelo logico del mesh que es muy grande.
-            Mesh.Scale = new Vector3(0.5f, 0.5f, 0.5f);
+            Mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
             //El framework maneja una cámara estática, pero debe ser inicializada.
             //Posición de la camara.
-            var cameraPosition = new Vector3(0, 0, 125);
+            var cameraPosition = new TGCVector3(0, 0, 125);
             //Quiero que la camara mire hacia el origen (0,0,0).
-            var lookAt = Vector3.Empty;
+            var lookAt = TGCVector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara.SetCamera(cameraPosition, lookAt);
             //Internamente el framework construye la matriz de view con estos dos vectores.
@@ -105,15 +104,17 @@ namespace TGC.Group.Model
             {
                 //Como ejemplo podemos hacer un movimiento simple de la cámara.
                 //En este caso le sumamos un valor en Y
-                Camara.SetCamera(Camara.Position + new Vector3(0, 10f, 0), Camara.LookAt);
+                Camara.SetCamera(Camara.Position + new TGCVector3(0, 10f, 0), Camara.LookAt);
                 //Ver ejemplos de cámara para otras operaciones posibles.
 
                 //Si superamos cierto Y volvemos a la posición original.
                 if (Camara.Position.Y > 300f)
                 {
-                    Camara.SetCamera(new Vector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
+                    Camara.SetCamera(new TGCVector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
                 }
             }
+
+            PostUpdate();
         }
 
         /// <summary>
@@ -128,30 +129,26 @@ namespace TGC.Group.Model
 
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
-            DrawText.drawText(
-                "Con clic izquierdo subimos la camara [Actual]: " + TgcParserUtils.printVector3(Camara.Position), 0, 30,
-                Color.OrangeRed);
+            DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.OrangeRed);
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
-            Box.Transform = Matrix.Scaling(Box.Scale) *
-                            Matrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) *
-                            Matrix.Translation(Box.Position);
+            Box.Transform = TGCMatrix.Scaling(Box.Scale) * TGCMatrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) * TGCMatrix.Translation(Box.Position);
             //A modo ejemplo realizamos toda las multiplicaciones, pero aquí solo nos hacia falta la traslación.
             //Finalmente invocamos al render de la caja
-            Box.render();
+            Box.Render();
 
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
             Mesh.UpdateMeshTransform();
             //Render del mesh
-            Mesh.render();
+            Mesh.Render();
 
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (BoundingBox)
             {
-                Box.BoundingBox.render();
-                Mesh.BoundingBox.render();
+                Box.BoundingBox.Render();
+                Mesh.BoundingBox.Render();
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
@@ -166,9 +163,9 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             //Dispose de la caja.
-            Box.dispose();
+            Box.Dispose();
             //Dispose del mesh.
-            Mesh.dispose();
+            Mesh.Dispose();
         }
     }
 }
