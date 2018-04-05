@@ -42,7 +42,10 @@ namespace TGC.Group.Model
 
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
-
+        public float AnguloARadianes(float angulo, float timeLapse)
+        {
+            return ((angulo * timeLapse) * 3.14159265f) / 180f;
+        }
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
         ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
@@ -106,7 +109,7 @@ namespace TGC.Group.Model
             //El framework maneja una cámara estática, pero debe ser inicializada.
             //Posición de la camara.
 
-            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 200, -400);
+            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 200, -700);
             //Quiero que la camara mire hacia el origen (0,0,0).
             var lookAt = TGCVector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
@@ -125,8 +128,8 @@ namespace TGC.Group.Model
             PreUpdate();
 
             var velocidadCaminar = 300f;
-            var velocidadRotacion = 200f;
-            var velocidadRotCamara = 10f;
+            var velocidadRotacion = 300f;
+            var velocidadRotCamara = 200f;
 
             //Capturar Input teclado
             if (Input.keyPressed(Key.F))
@@ -138,8 +141,10 @@ namespace TGC.Group.Model
             //Calcular proxima posicion de personaje segun Input
             var moveForward = 0f;
             float rotate = 0;
+            float rotateCam = 0;
             var moving = false;
             var rotating = false;
+            var rotatingCam = false;
 
             //Adelante
             if (Input.keyDown(Key.W))
@@ -169,13 +174,33 @@ namespace TGC.Group.Model
                 rotating = true;
             }
 
+            //Rotar camara hacua izquierda
+            if (Input.keyDown(Key.Q))
+            {
+                rotateCam = -velocidadRotCamara;
+                rotatingCam = true;
+            }
+            // Rotar camara hacia derecha
+            if (Input.keyDown(Key.E))
+            {
+                rotateCam = velocidadRotCamara;
+                rotatingCam = true;
+            }
+
+            //Aplica rotacion de camara si hubo rotacion
+            if (rotatingCam)
+            {
+                var rotAngleCam = AnguloARadianes(rotateCam, ElapsedTime);
+                camaraInterna.rotateY(rotAngleCam);
+            }
+
             //Si hubo rotacion
             if (rotating)
             {
                 //Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
-                var rotAngle = ((rotate * ElapsedTime) * 3.14f) / 180f;
+                var rotAngle = AnguloARadianes(rotate, ElapsedTime);
                 personaje.RotateY(rotAngle);
-                camaraInterna.rotateY(rotAngle);
+                //camaraInterna.rotateY(rotAngle);
             }
 
             if (moving)
@@ -190,16 +215,7 @@ namespace TGC.Group.Model
             }
             else personaje.playAnimation("Parado", true);
 
-            //Rotar camara hacua izquierda
-            if (Input.keyDown(Key.Q))
-            {
-                camaraInterna.rotateY(-velocidadRotCamara * ElapsedTime);
-            }
-            // Rotar camara hacia derecha
-            if (Input.keyDown(Key.E))
-            {
-                camaraInterna.rotateY(velocidadRotCamara * ElapsedTime);
-            }
+            
             camaraInterna.Target = personaje.Position;
             PostUpdate();
         }
