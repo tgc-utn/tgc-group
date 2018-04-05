@@ -7,6 +7,8 @@ using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
+using TGC.Core.SkeletalAnimation;
+
 
 namespace TGC.Group.Model
 {
@@ -23,6 +25,8 @@ namespace TGC.Group.Model
         /// </summary>
         /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
         /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
+        private TgcSkeletalMesh personaje;
+        private TgcThirdPersonCamera camaraInterna;
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
@@ -59,7 +63,7 @@ namespace TGC.Group.Model
             var texture = TgcTexture.createTexture(pathTexturaCaja);
 
             //Creamos una caja 3D ubicada de dimensiones (5, 10, 5) y la textura como color.
-            var size = new TGCVector3(5, 10, 5);
+            var size = new TGCVector3(20, 30, 40);
             //Construimos una caja según los parámetros, por defecto la misma se crea con centro en el origen y se recomienda así para facilitar las transformaciones.
             Box = TGCBox.fromSize(size, texture);
             //Posición donde quiero que este la caja, es común que se utilicen estructuras internas para las transformaciones.
@@ -67,19 +71,46 @@ namespace TGC.Group.Model
             Box.Position = new TGCVector3(-25, 0, 0);
 
             //Cargo el unico mesh que tiene la escena.
-            Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
+            var skeletalLoader = new TgcSkeletalLoader();
+            personaje =
+                skeletalLoader.loadMeshAndAnimationsFromFile(
+                    MediaDir + "Media\\SkeletalAnimations\\Robot\\Robot-TgcSkeletalMesh.xml",
+                    MediaDir + "Media\\SkeletalAnimations\\Robot\\",
+                    new[]
+                    {
+                        MediaDir + "Media\\SkeletalAnimations\\Robot\\Caminando-TgcSkeletalAnim.xml",
+                        MediaDir + "Media\\SkeletalAnimations\\Robot\\Parado-TgcSkeletalAnim.xml"
+                    });
+
+            //Configurar animacion inicial
+            personaje.playAnimation("Parado", true);
+            //Posicion inicial
+            personaje.Position = new TGCVector3(0, -45, 0);
+            //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
+            personaje.AutoTransform = true;
+            //Rotar al robot en el Init para que mire hacia el otro lado
+            personaje.RotateY(3.1415f);
+            //Le cambiamos la textura para diferenciarlo un poco
+            personaje.changeDiffuseMaps(new[]
+            {
+                TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Media\\SkeletalAnimations\\Robot\\Textures\\uvwGreen.jpg")
+            });
+            //Prueba de agregar al robot
+           // Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + /*"LogoTGC-TgcScene.xml"*/"Media\\ModelosTgc\\Robot\\Robot-TgcScene.xml").Meshes[0];
+
             //Defino una escala en el modelo logico del mesh que es muy grande.
-            Mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
+           // Mesh.Scale = new TGCVector3(0.4f, 0.4f, 0.4f);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
             //El framework maneja una cámara estática, pero debe ser inicializada.
             //Posición de la camara.
-            var cameraPosition = new TGCVector3(0, 0, 125);
+
+            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 200, -400);
             //Quiero que la camara mire hacia el origen (0,0,0).
             var lookAt = TGCVector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
-            Camara.SetCamera(cameraPosition, lookAt);
+            Camara = camaraInterna;
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
         }
@@ -93,27 +124,83 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
+            var velocidadCaminar = 300f;
+            var velocidadRotacion = 200f;
+            var velocidadRotCamara = 10f;
+
             //Capturar Input teclado
             if (Input.keyPressed(Key.F))
             {
                 BoundingBox = !BoundingBox;
             }
 
-            //Capturar Input Mouse
-            if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
-            {
-                //Como ejemplo podemos hacer un movimiento simple de la cámara.
-                //En este caso le sumamos un valor en Y
-                Camara.SetCamera(Camara.Position + new TGCVector3(0, 10f, 0), Camara.LookAt);
-                //Ver ejemplos de cámara para otras operaciones posibles.
 
-                //Si superamos cierto Y volvemos a la posición original.
-                if (Camara.Position.Y > 300f)
-                {
-                    Camara.SetCamera(new TGCVector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
-                }
+            //Calcular proxima posicion de personaje segun Input
+            var moveForward = 0f;
+            float rotate = 0;
+            var moving = false;
+            var rotating = false;
+
+            //Adelante
+            if (Input.keyDown(Key.W))
+            {
+                moveForward = -velocidadCaminar;
+                moving = true;
             }
 
+            //Atras
+            if (Input.keyDown(Key.S))
+            {
+                moveForward = velocidadCaminar;
+                moving = true;
+            }
+
+            //Derecha
+            if (Input.keyDown(Key.D))
+            {
+                rotate = velocidadRotacion;
+                rotating = true;
+            }
+
+            //Izquierda
+            if (Input.keyDown(Key.A))
+            {
+                rotate = -velocidadRotacion;
+                rotating = true;
+            }
+
+            //Si hubo rotacion
+            if (rotating)
+            {
+                //Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
+                var rotAngle = ((rotate * ElapsedTime) * 3.14f) / 180f;
+                personaje.RotateY(rotAngle);
+                camaraInterna.rotateY(rotAngle);
+            }
+
+            if (moving)
+            {
+                //Activar animacion de caminando
+                personaje.playAnimation("Caminando", true);
+
+                //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
+                var lastPos = personaje.Position;
+
+                personaje.MoveOrientedY(moveForward * ElapsedTime);
+            }
+            else personaje.playAnimation("Parado", true);
+
+            //Rotar camara hacua izquierda
+            if (Input.keyDown(Key.Q))
+            {
+                camaraInterna.rotateY(-velocidadRotCamara * ElapsedTime);
+            }
+            // Rotar camara hacia derecha
+            if (Input.keyDown(Key.E))
+            {
+                camaraInterna.rotateY(velocidadRotCamara * ElapsedTime);
+            }
+            camaraInterna.Target = personaje.Position;
             PostUpdate();
         }
 
@@ -126,6 +213,8 @@ namespace TGC.Group.Model
         {
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
+
+   
 
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
@@ -140,20 +229,30 @@ namespace TGC.Group.Model
 
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
-            Mesh.UpdateMeshTransform();
+           // Mesh.UpdateMeshTransform();
             //Render del mesh
-            Mesh.Render();
+            //Mesh.Render();
 
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (BoundingBox)
             {
                 Box.BoundingBox.Render();
-                Mesh.BoundingBox.Render();
+          
             }
+
+            personaje.animateAndRender(ElapsedTime);
+            if (BoundingBox)
+            {
+                personaje.BoundingBox.Render();
+            }
+
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
+
+
+
 
         /// <summary>
         ///     Se llama cuando termina la ejecución del ejemplo.
@@ -164,8 +263,9 @@ namespace TGC.Group.Model
         {
             //Dispose de la caja.
             Box.Dispose();
+            personaje.Dispose();
             //Dispose del mesh.
-            Mesh.Dispose();
+         //   Mesh.Dispose();
         }
     }
 }
