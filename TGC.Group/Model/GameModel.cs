@@ -259,6 +259,7 @@ namespace TGC.Group.Model
         {
             camaraInterna.Flip();
             personaje.RotateY(3.1415f);
+            //Es solo un comentario de relleno
         }
 
         /// <summary>
