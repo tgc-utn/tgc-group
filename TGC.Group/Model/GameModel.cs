@@ -3,7 +3,6 @@ using System.Drawing;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
-using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
@@ -27,6 +26,11 @@ namespace TGC.Group.Model
         /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
         private TgcSkeletalMesh personaje;
         private TgcThirdPersonCamera camaraInterna;
+        private Calculos calculo = new Calculos();
+        private TGCVector3 velocidad = TGCVector3.Empty;
+        private TGCVector3 aceleracion = new TGCVector3(0, -100f, 0);
+        private bool firstTime = true;
+
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
@@ -42,10 +46,7 @@ namespace TGC.Group.Model
 
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
-        public float AnguloARadianes(float angulo, float timeLapse)
-        {
-            return ((angulo * timeLapse) * 3.14159265f) / 180f;
-        }
+
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
         ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
@@ -88,7 +89,7 @@ namespace TGC.Group.Model
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
             //Posicion inicial
-            personaje.Position = new TGCVector3(0, -45, 0);
+            personaje.Position = new TGCVector3(0, 0, 0);
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = true;
             //Rotar al robot en el Init para que mire hacia el otro lado
@@ -96,13 +97,13 @@ namespace TGC.Group.Model
             //Le cambiamos la textura para diferenciarlo un poco
             personaje.changeDiffuseMaps(new[]
             {
-                TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Media\\SkeletalAnimations\\Robot\\Textures\\uvwGreen.jpg")
+                TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Media\\SkeletalAnimations\\Robot\\Textures\\uvw.jpg")
             });
             //Prueba de agregar al robot
-           // Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + /*"LogoTGC-TgcScene.xml"*/"Media\\ModelosTgc\\Robot\\Robot-TgcScene.xml").Meshes[0];
+            // Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + /*"LogoTGC-TgcScene.xml"*/"Media\\ModelosTgc\\Robot\\Robot-TgcScene.xml").Meshes[0];
 
             //Defino una escala en el modelo logico del mesh que es muy grande.
-           // Mesh.Scale = new TGCVector3(0.4f, 0.4f, 0.4f);
+            // Mesh.Scale = new TGCVector3(0.4f, 0.4f, 0.4f);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
@@ -129,7 +130,7 @@ namespace TGC.Group.Model
 
             var velocidadCaminar = 300f;
             var velocidadRotacion = 300f;
-            var velocidadRotCamara = 200f;
+
 
             //Capturar Input teclado
             if (Input.keyPressed(Key.F))
@@ -141,11 +142,9 @@ namespace TGC.Group.Model
             //Calcular proxima posicion de personaje segun Input
             var moveForward = 0f;
             float rotate = 0;
-            float rotateCam = 0;
             var moving = false;
             var rotating = false;
-            var rotatingCam = false;
-
+            bool OnGround = true;
             //Adelante
             if (Input.keyDown(Key.W))
             {
@@ -174,33 +173,54 @@ namespace TGC.Group.Model
                 rotating = true;
             }
 
-            //Rotar camara hacua izquierda
-            if (Input.keyDown(Key.Q))
+            if (personaje.Position.Y <= 0f)
             {
-                rotateCam = -velocidadRotCamara;
-                rotatingCam = true;
-            }
-            // Rotar camara hacia derecha
-            if (Input.keyDown(Key.E))
-            {
-                rotateCam = velocidadRotCamara;
-                rotatingCam = true;
+                OnGround = true;
+                firstTime = true;
             }
 
-            //Aplica rotacion de camara si hubo rotacion
-            if (rotatingCam)
+            //Jump
+            if (Input.keyPressed(Key.Space))
             {
-                var rotAngleCam = AnguloARadianes(rotateCam, ElapsedTime);
-                camaraInterna.rotateY(rotAngleCam);
+                //Salta si esta en el piso
+                if (OnGround)
+                {
+                    //Vector3 velocity = GuiController.Instance.FpsCamera.Velocity;
+                    velocidad.Y = 200f;
+                    OnGround = false;
+                    firstTime = false;
+                }
+            }
+
+            var perPos = personaje.Position;
+
+
+            if (!firstTime)
+            {
+                velocidad = velocidad + ElapsedTime * aceleracion;
+                perPos = perPos + velocidad * ElapsedTime;
+                perPos.Y -= 0.2f;
+
+                personaje.Move(perPos - personaje.Position);
+ 
+            }
+
+
+            //Rotar camara con movimiento de mouse
+
+            if (Input.XposRelative != 0)
+            {
+                camaraInterna.rotateY(Input.XposRelative);
+                personaje.RotateY(Input.XposRelative);
+                personaje.Move(perPos - personaje.Position);
             }
 
             //Si hubo rotacion
             if (rotating)
             {
                 //Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
-                var rotAngle = AnguloARadianes(rotate, ElapsedTime);
+                var rotAngle = calculo.AnguloARadianes(rotate, ElapsedTime);
                 personaje.RotateY(rotAngle);
-                //camaraInterna.rotateY(rotAngle);
             }
 
             if (moving)
@@ -209,7 +229,7 @@ namespace TGC.Group.Model
                 personaje.playAnimation("Caminando", true);
 
                 //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
-                var lastPos = personaje.Position;
+                
 
                 personaje.MoveOrientedY(moveForward * ElapsedTime);
             }
@@ -233,8 +253,8 @@ namespace TGC.Group.Model
    
 
             //Dibuja un texto por pantalla
-            DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
-            DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.OrangeRed);
+            DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.GhostWhite);
+            DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.GhostWhite);
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
