@@ -1,26 +1,28 @@
-﻿using TGC.Core.Camara;
+﻿using System;
+using TGC.Core.Camara;
 using TGC.Core.Mathematica;
 
 namespace TGC.Group.Model
 {
-        public class TgcThirdPersonCamera : TgcCamera
+    public class TgcThirdPersonCamera : TgcCamera
+    {
+            
+        private TGCVector3 position;
+
+        /// <summary>
+        ///     Crear una nueva camara
+        /// </summary>
+        public TgcThirdPersonCamera()
         {
-            private TGCVector3 position;
+            resetValues();
+        }
 
-            /// <summary>
-            ///     Crear una nueva camara
-            /// </summary>
-            public TgcThirdPersonCamera()
-            {
-                resetValues();
-            }
-
-            public TgcThirdPersonCamera(TGCVector3 target, float offsetHeight, float offsetForward) : this()
-            {
-                Target = target;
-                OffsetHeight = offsetHeight;
-                OffsetForward = offsetForward;
-            }
+        public TgcThirdPersonCamera(TGCVector3 target, float offsetHeight, float offsetForward) : this()
+        {
+            Target = target;
+            OffsetHeight = offsetHeight;
+            OffsetForward = offsetForward;
+        }
 
         public TgcThirdPersonCamera(TGCVector3 target, TGCVector3 targetDisplacement, float offsetHeight, float offsetForward)
         : this()
@@ -113,6 +115,12 @@ namespace TGC.Group.Model
         public void rotateY(float angle)
         {
             RotationY += angle;
+        }
+
+        public void Flip()
+        {
+            OffsetForward = OffsetForward * (-1);
+            //rotateY(3.1415f);
         }
 
     }

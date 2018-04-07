@@ -7,7 +7,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.SkeletalAnimation;
-
+using System;
 
 namespace TGC.Group.Model
 {
@@ -30,6 +30,9 @@ namespace TGC.Group.Model
         private TGCVector3 velocidad = TGCVector3.Empty;
         private TGCVector3 aceleracion = new TGCVector3(0, -100f, 0);
         private bool firstTime = true;
+
+        bool facingForward = true;
+        bool OnGround = true;
 
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
@@ -130,6 +133,7 @@ namespace TGC.Group.Model
 
             var velocidadCaminar = 300f;
             var velocidadRotacion = 300f;
+            
 
 
             //Capturar Input teclado
@@ -144,12 +148,17 @@ namespace TGC.Group.Model
             float rotate = 0;
             var moving = false;
             var rotating = false;
-            bool OnGround = true;
+
             //Adelante
             if (Input.keyDown(Key.W))
             {
                 moveForward = -velocidadCaminar;
                 moving = true;
+                if (!facingForward)
+                {
+                    facingForward = true;
+                    flip();
+                }
             }
 
             //Atras
@@ -157,6 +166,12 @@ namespace TGC.Group.Model
             {
                 moveForward = velocidadCaminar;
                 moving = true;
+                if (facingForward)
+                {
+                    facingForward = false;
+                    flip();
+                }
+
             }
 
             //Derecha
@@ -208,12 +223,12 @@ namespace TGC.Group.Model
 
             //Rotar camara con movimiento de mouse
 
-            if (Input.XposRelative != 0)
+            /*if (Input.XposRelative != 0)
             {
                 camaraInterna.rotateY(Input.XposRelative);
                 personaje.RotateY(Input.XposRelative);
                 personaje.Move(perPos - personaje.Position);
-            }
+            }*/
 
             //Si hubo rotacion
             if (rotating)
@@ -238,6 +253,12 @@ namespace TGC.Group.Model
             
             camaraInterna.Target = personaje.Position;
             PostUpdate();
+        }
+
+        private void flip()
+        {
+            camaraInterna.Flip();
+            personaje.RotateY(3.1415f);
         }
 
         /// <summary>
