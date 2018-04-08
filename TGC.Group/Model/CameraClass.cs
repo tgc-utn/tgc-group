@@ -117,9 +117,13 @@ namespace TGC.Group.Model
             RotationY += angle;
         }
 
+        Calculos calculo = new Calculos();
+
         public void Flip()
         {
-            OffsetForward = OffsetForward * (-1);
+            
+            this.rotateY(calculo.AnguloARadianes(180, 1));
+
             //rotateY(3.1415f);
         }
 

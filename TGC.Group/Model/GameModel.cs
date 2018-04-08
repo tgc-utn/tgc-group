@@ -31,8 +31,11 @@ namespace TGC.Group.Model
         private TGCVector3 aceleracion = new TGCVector3(0, -100f, 0);
         private bool firstTime = true;
 
-        bool facingForward = true;
-        bool OnGround = true;
+        bool facingForward { get; set; } = true;
+        bool facingRight { get; set; } = false;
+        bool facingBackWards { get; set; } = false;
+        bool facingLeft { get; set; } = false;
+        bool OnGround { get; set; } = true;
 
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
@@ -78,6 +81,9 @@ namespace TGC.Group.Model
             Box.Position = new TGCVector3(-25, 0, 0);
 
             //Cargo el unico mesh que tiene la escena.
+
+
+
             var skeletalLoader = new TgcSkeletalLoader();
             personaje =
                 skeletalLoader.loadMeshAndAnimationsFromFile(
@@ -121,7 +127,27 @@ namespace TGC.Group.Model
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
         }
-
+        /* Descomentar para movimiento estilo pedro
+        public float Facing(Key input)
+        {
+            //Input W
+            if (facingBackWards && input == Key.W) return calculo.AnguloARadianes(180f,1f);
+            if (facingRight && input == Key.W) return calculo.AnguloARadianes(-90f,1f);
+            if (facingLeft && input == Key.W) return calculo.AnguloARadianes(90f,1f);
+            //Input S
+            if (facingForward && input == Key.S) return calculo.AnguloARadianes(180f,1f) ;
+            if (facingRight && input == Key.S) return calculo.AnguloARadianes(90f,1f);
+            if (facingLeft && input == Key.S) return calculo.AnguloARadianes(-90f,1f);
+            //Input A
+            if (facingForward && input == Key.A) return calculo.AnguloARadianes(-90f,1f);
+            if (facingRight && input == Key.A) return calculo.AnguloARadianes(180f,1f);
+            if (facingBackWards && input == Key.A) return calculo.AnguloARadianes(90f,1f);
+            //Input D
+            if (facingForward && input == Key.D) return calculo.AnguloARadianes(90f,1f);
+            if (facingLeft && input == Key.D) return calculo.AnguloARadianes(180f,1f);
+            if (facingBackWards && input == Key.D) return calculo.AnguloARadianes(-90f,1f);
+            return 0;
+        }*/
         /// <summary>
         ///     Se llama en cada frame.
         ///     Se debe escribir toda la lógica de computo del modelo, así como también verificar entradas del usuario y reacciones
@@ -132,8 +158,10 @@ namespace TGC.Group.Model
             PreUpdate();
 
             var velocidadCaminar = 300f;
-            var velocidadRotacion = 300f;
-            
+           // var velocidadCaminarID = 300f; Movimiento estilo Pedro
+            var velocidadRotacion = 150f;
+            var velocidadSalto = 200f;
+            var coeficienteDeSalto = 0.3f;
 
 
             //Capturar Input teclado
@@ -145,8 +173,10 @@ namespace TGC.Group.Model
 
             //Calcular proxima posicion de personaje segun Input
             var moveForward = 0f;
+           // var moveID = 0f; Movimiento estilo Pedro
             float rotate = 0;
             var moving = false;
+            // var movingID = false; movimiento estilo pedro
             var rotating = false;
 
             //Adelante
@@ -154,36 +184,79 @@ namespace TGC.Group.Model
             {
                 moveForward = -velocidadCaminar;
                 moving = true;
-                if (!facingForward)
+                /*Movimiento esstilo Pedro
+                 * if (!facingForward)
                 {
+                    personaje.RotateY(Facing(Key.W));
+                    camaraInterna.Flip();
                     facingForward = true;
-                    flip();
-                }
+                    facingRight = false;
+                    facingBackWards = false;
+                    facingLeft = false;
+                    
+                   // flip();
+                }*/
             }
 
             //Atras
             if (Input.keyDown(Key.S))
             {
-                moveForward = velocidadCaminar;
+                moveForward = -velocidadCaminar;
                 moving = true;
-                if (facingForward)
+                /*Movimiento estilo Pedro
+                 * if (!facingBackWards)
                 {
+                    personaje.RotateY(Facing(Key.S));
+                    camaraInterna.Flip();
                     facingForward = false;
-                    flip();
-                }
+                    facingRight = false;
+                    facingBackWards = true;
+                    facingLeft = false;
+
+                    //flip();
+                 
+                }*/
 
             }
 
             //Derecha
             if (Input.keyDown(Key.D))
             {
-                rotate = velocidadRotacion;
-                rotating = true;
+                /*Movimiento estilo Pedro
+                 * moveID = velocidadCaminarID;
+                movingID = true;
+
+                if (!facingRight)
+                {
+                    personaje.RotateY(Facing(Key.D));
+                    facingForward = false;
+                    facingRight = true;
+                    facingBackWards = false;
+                    facingLeft = false;
+
+                   // personaje.RotateY(calculo.AnguloARadianes(180f, 1f));
+                }
+                */
+                 rotate = velocidadRotacion;
+                 rotating = true;
             }
 
             //Izquierda
             if (Input.keyDown(Key.A))
             {
+                /*Movimiento estilo Pedro
+                 * moveID = -velocidadCaminarID;
+                movingID = true;
+
+                if (!facingLeft)
+                {
+                    personaje.RotateY(Facing(Key.A));
+                    facingForward = false;
+                    facingRight = false;
+                    facingBackWards = false;
+                    facingLeft = true;
+                    //personaje.RotateY(calculo.AnguloARadianes(180f, 1f));
+                }*/
                 rotate = -velocidadRotacion;
                 rotating = true;
             }
@@ -201,7 +274,7 @@ namespace TGC.Group.Model
                 if (OnGround)
                 {
                     //Vector3 velocity = GuiController.Instance.FpsCamera.Velocity;
-                    velocidad.Y = 200f;
+                    velocidad.Y = velocidadSalto;
                     OnGround = false;
                     firstTime = false;
                 }
@@ -214,7 +287,7 @@ namespace TGC.Group.Model
             {
                 velocidad = velocidad + ElapsedTime * aceleracion;
                 perPos = perPos + velocidad * ElapsedTime;
-                perPos.Y -= 0.2f;
+                perPos.Y -= coeficienteDeSalto;
 
                 personaje.Move(perPos - personaje.Position);
  
@@ -236,6 +309,7 @@ namespace TGC.Group.Model
                 //Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
                 var rotAngle = calculo.AnguloARadianes(rotate, ElapsedTime);
                 personaje.RotateY(rotAngle);
+                camaraInterna.rotateY(rotAngle);
             }
 
             if (moving)
@@ -250,7 +324,19 @@ namespace TGC.Group.Model
             }
             else personaje.playAnimation("Parado", true);
 
-            
+            /*Movimiento estilo Pedro
+             * if (movingID)
+            {
+                //Activar animacion de caminando
+                personaje.playAnimation("Caminando", true);
+
+                //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
+
+
+                personaje.Move(new TGCVector3(moveID, 0f,0f) * ElapsedTime);
+            }*/
+           // else personaje.playAnimation("Parado", true);
+
             camaraInterna.Target = personaje.Position;
             PostUpdate();
         }
@@ -258,7 +344,8 @@ namespace TGC.Group.Model
         private void flip()
         {
             camaraInterna.Flip();
-            personaje.RotateY(3.1415f);
+
+            personaje.RotateY(calculo.AnguloARadianes(180f, 1));
         }
 
         /// <summary>
@@ -276,6 +363,11 @@ namespace TGC.Group.Model
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.GhostWhite);
             DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.GhostWhite);
+           /* Descomentar para verificar correcto funcionamiento del estilo pedro
+            * DrawText.drawText("FacingFront: " + facingForward, 0, 40, Color.GhostWhite);
+            DrawText.drawText("FacingBack: " + facingBackWards, 0, 50, Color.GhostWhite);
+            DrawText.drawText("FacingRight: " + facingRight, 0, 60, Color.GhostWhite);
+            DrawText.drawText("FacingLeft: " + facingLeft, 0, 70, Color.GhostWhite);*/
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
