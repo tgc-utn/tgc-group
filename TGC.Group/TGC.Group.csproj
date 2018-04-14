@@ -105,6 +105,24 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Game.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Media\BasicHuman\Animations\BasicHuman_CrouchWalk.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_FlyingKick.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_HighKick.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_Jump.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_LowKick.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_Push.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_Run.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_StandBy.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_Talk.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_Walk.max" />
+    <None Include="Media\BasicHuman\BasicHuman_InitialPose.max" />
+    <None Include="Media\BasicHuman\CombineSoldier_InitialPose.max" />
+    <None Include="Media\BasicHuman\CS_Arctic_InitialPose.max" />
+    <None Include="Media\BasicHuman\CS_Gign_InitialPose.max" />
+    <None Include="Media\BasicHuman\Pilot_InitialPose.max" />
+    <None Include="Media\BasicHuman\Quake2Scout_InitialPose.max" />
+    <None Include="Media\BasicHuman\WomanJeans_InitialPose.max" />
+    <None Include="Media\Ciudad\Ciudad.max" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -156,7 +174,50 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Media\BasicHuman\Animations\CrouchWalk-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\FlyingKick-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\HighKick-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\Jump-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\LowKick-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\Push-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\Run-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\StandBy-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\Talk-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\Walk-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\BasicHuman-TgcSkeletalMesh.xml" />
+    <Content Include="Media\BasicHuman\CombineSoldier-TgcSkeletalMesh.xml" />
+    <Content Include="Media\BasicHuman\CS_Arctic-TgcSkeletalMesh.xml" />
+    <Content Include="Media\BasicHuman\CS_Gign-TgcSkeletalMesh.xml" />
+    <Content Include="Media\BasicHuman\Pilot-TgcSkeletalMesh.xml" />
+    <Content Include="Media\BasicHuman\Quake2Scout-TgcSkeletalMesh.xml" />
+    <Content Include="Media\BasicHuman\Textures\arctic_skin.jpg" />
+    <Content Include="Media\BasicHuman\Textures\CombineSoldier_sheet.jpg" />
+    <Content Include="Media\BasicHuman\Textures\EuroSoldier_body.jpg" />
+    <Content Include="Media\BasicHuman\Textures\EuroSoldier_head.jpg" />
+    <Content Include="Media\BasicHuman\Textures\gign_skin.jpg" />
+    <Content Include="Media\BasicHuman\Textures\Pilot_body.jpg" />
+    <Content Include="Media\BasicHuman\Textures\Pilot_head.jpg" />
+    <Content Include="Media\BasicHuman\Textures\scout.jpg" />
+    <Content Include="Media\BasicHuman\Textures\WomanJeans_body.jpg" />
+    <Content Include="Media\BasicHuman\Textures\WomanJeans_head.jpg" />
+    <Content Include="Media\BasicHuman\WomanJeans-TgcSkeletalMesh.xml" />
     <Content Include="Media\cajaMadera4.jpg" />
+    <Content Include="Media\Ciudad\Ciudad-TgcScene.xml" />
+    <Content Include="Media\Ciudad\preview.jpg" />
+    <Content Include="Media\Ciudad\Textures\Door Rusty.jpg" />
+    <Content Include="Media\Ciudad\Textures\Floor.jpg" />
+    <Content Include="Media\Ciudad\Textures\GlassPattern.jpg" />
+    <Content Include="Media\Ciudad\Textures\Grass.jpg" />
+    <Content Include="Media\Ciudad\Textures\Grey Bricks.jpg" />
+    <Content Include="Media\Ciudad\Textures\Marble.jpg" />
+    <Content Include="Media\Ciudad\Textures\Metal Pattern.jpg" />
+    <Content Include="Media\Ciudad\Textures\Path.jpg" />
+    <Content Include="Media\Ciudad\Textures\Red Bricks.jpg" />
+    <Content Include="Media\Ciudad\Textures\Road Union.jpg" />
+    <Content Include="Media\Ciudad\Textures\Road.jpg" />
+    <Content Include="Media\Ciudad\Textures\Traffic Light.jpg" />
+    <Content Include="Media\Ciudad\Textures\White Wall.JPG" />
+    <Content Include="Media\Ciudad\Textures\Yellow Painted.jpg" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
