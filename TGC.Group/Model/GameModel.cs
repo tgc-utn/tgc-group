@@ -6,7 +6,11 @@ using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Core.Camara;
 using TGC.Core.Textures;
+using TGC.Examples.Camara;
+
+
 
 namespace TGC.Group.Model
 {
@@ -33,11 +37,32 @@ namespace TGC.Group.Model
         //Caja que se muestra en el ejemplo.
         private TGCBox Box { get; set; }
 
-        //Mesh de TgcLogo.
-        private TgcMesh Mesh { get; set; }
+        //Mesh del Personaje.
+        private TgcMesh MeshPersonaje { get; set; }
+
+        // Declaro el Mesh de la scena
+        private TgcMesh MeshScena { get; set; }
+
+
+        //scena del juego
+        private TgcScene Scene { get; set; }
+
 
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
+
+
+        // el target seria mi personaje para que lo siga la camara
+        
+
+        //Constantes para velocidades de movimiento
+        private const float ROTATION_SPEED = 3f;
+        private const float MOVEMENT_SPEED = 10f;
+
+        private TgcThirdPersonCamera camaraInterna;
+
+
+        
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -66,20 +91,57 @@ namespace TGC.Group.Model
             //Entonces actualizamos la posición lógica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
             Box.Position = new TGCVector3(-25, 0, 0);
 
-            //Cargo el unico mesh que tiene la escena.
-            Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
+            //Cargo a nuestro personaje  que esta mirando hacia atras
+            MeshPersonaje = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Robot-TgcScene.xml").Meshes[0];
+
+
+            //Quiero rotar al robot mirando hacia afuera de la pantalla
+            MeshPersonaje.RotateY(FastMath.PI - (System.Convert.ToSingle(0.20)));
+
+            //Si quiero que mira para adelante
+            // MeshPersonaje.RotateY(FastMath.PI_HALF);
+
+            //Si quiero que mira para atras
+            //MeshPersonaje.RotateY((FastMath.QUARTER_PI) * 6);
+
+
+
+            //Creo un loader para cargar la scena
+            var loader = new TgcSceneLoader();
+            //Cargo la scena del juego
+            Scene =
+               loader.loadSceneFromFile(MediaDir +
+                                        "Iglesia-TgcScene.xml");
+            MeshScena = Scene.Meshes[0];
+            
+
+
             //Defino una escala en el modelo logico del mesh que es muy grande.
-            Mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
+            MeshScena.Scale = new TGCVector3(0.3f, 0.3f, 0.3f);
+            MeshScena.Position = new TGCVector3(0f, 0f, 0f);
+            MeshScena.AutoTransform = true;
+
+            MeshPersonaje.Scale = new TGCVector3(0.20f, 0.20f, 0.20f);
+            //defino la posicion del jugador para que este posicionado en medio de la escena
+            MeshPersonaje.Position = new TGCVector3(0.0f, 50.0f, 50.0f);
+
+        
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
             //El framework maneja una cámara estática, pero debe ser inicializada.
             //Posición de la camara.
-            var cameraPosition = new TGCVector3(0, 0, 125);
+           // var cameraPosition = new TGCVector3(0, 120, 100);
             //Quiero que la camara mire hacia el origen (0,0,0).
-            var lookAt = TGCVector3.Empty;
+            //lo que va a hacer es alejarse cada vez mas del origen
+            //el lookAt es  la dirección hacia donde apunta la cámara en un momento determinado,
+            // partiendo desde la posición especificada del personaje
+            //var lookAt = TGCVector3.Empty;
+        
             //Configuro donde esta la posicion de la camara y hacia donde mira.
-            Camara.SetCamera(cameraPosition, lookAt);
+            camaraInterna = new TgcThirdPersonCamera(MeshPersonaje.Position, 70, 65);
+            Camara = camaraInterna;
+
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
         }
@@ -92,12 +154,51 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
+            // defino variables de ingreso de datos
+            var input = Input;
+            var movement = TGCVector3.Empty;
 
-            //Capturar Input teclado
-            if (Input.keyPressed(Key.F))
+            //Guardar posicion original antes de cambiarla
+            var originalPos = MeshPersonaje.Position;
+
+
+
+            //Movernos adelante y atras, sobre el eje Z.
+            if (input.keyDown(Key.Up) || input.keyDown(Key.W))
             {
-                BoundingBox = !BoundingBox;
+                movement.Z = 1;
             }
+            else if (input.keyDown(Key.Down) || input.keyDown(Key.S))
+            {
+                movement.Z = -1;
+            }
+
+           
+            //Movernos de izquierda a derecha, sobre el eje X.
+            if (input.keyDown(Key.Left) || input.keyDown(Key.A))
+            {
+                movement.X = 1;
+            }
+            else if (input.keyDown(Key.Right) || input.keyDown(Key.D))
+            {
+                movement.X = -1;
+            }
+
+            //Movernos adelante y atras, sobre el eje Z.
+            if (input.keyDown(Key.Up) || input.keyDown(Key.W))
+            {
+                movement.Z = -1;
+            }
+            else if (input.keyDown(Key.Down) || input.keyDown(Key.S))
+            {
+                movement.Z = 1;
+            }
+
+            //Multiplicar movimiento por velocidad y elapsedTime
+            movement *= MOVEMENT_SPEED * ElapsedTime;
+            MeshPersonaje.Move(movement);
+
+
 
             //Capturar Input Mouse
             if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
@@ -113,10 +214,15 @@ namespace TGC.Group.Model
                     Camara.SetCamera(new TGCVector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
                 }
             }
+            camaraInterna.Target = MeshPersonaje.Position;
 
             PostUpdate();
-        }
+         
 
+        
+        }
+       
+        
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aquí todo el código referido al renderizado.
@@ -137,18 +243,20 @@ namespace TGC.Group.Model
             //A modo ejemplo realizamos toda las multiplicaciones, pero aquí solo nos hacia falta la traslación.
             //Finalmente invocamos al render de la caja
             Box.Render();
+            Scene.RenderAll();
 
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
-            Mesh.UpdateMeshTransform();
+            MeshPersonaje.UpdateMeshTransform();
             //Render del mesh
-            Mesh.Render();
+            MeshPersonaje.Render();
+            MeshScena.Render();
 
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (BoundingBox)
             {
                 Box.BoundingBox.Render();
-                Mesh.BoundingBox.Render();
+                MeshPersonaje.BoundingBox.Render();
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
@@ -165,7 +273,9 @@ namespace TGC.Group.Model
             //Dispose de la caja.
             Box.Dispose();
             //Dispose del mesh.
-            Mesh.Dispose();
+            MeshPersonaje.Dispose();
+            MeshScena.Dispose();
+            Scene.DisposeAll();
         }
     }
 }
