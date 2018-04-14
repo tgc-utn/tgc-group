@@ -32,18 +32,13 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        //Caja que se muestra en el ejemplo.
-        private TGCBox Box { get; set; }
+        // Mesh del jugador.
+        private TgcSkeletalMesh meshJugador { get; set; }
 
-        //Mesh de TgcLogo.
-        private TgcSkeletalMesh mesh { get; set; }
-
+        // Escena de la ciudad.
         private TgcScene scene { get; set; }
 
         private TGCVector3 cameraOffset;
-
-        //Boleano para ver si dibujamos el boundingbox
-        private bool BoundingBox { get; set; }
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -55,22 +50,6 @@ namespace TGC.Group.Model
         {
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
-
-            //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
-            //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
-            var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
-
-            //Cargamos una textura, tener en cuenta que cargar una textura significa crear una copia en memoria.
-            //Es importante cargar texturas en Init, si se hace en el render loop podemos tener grandes problemas si instanciamos muchas.
-            var texture = TgcTexture.createTexture(pathTexturaCaja);
-
-            //Creamos una caja 3D ubicada de dimensiones (5, 10, 5) y la textura como color.
-            var size = new TGCVector3(5, 10, 5);
-            //Construimos una caja según los parámetros, por defecto la misma se crea con centro en el origen y se recomienda así para facilitar las transformaciones.
-            Box = TGCBox.fromSize(size, texture);
-            //Posición donde quiero que este la caja, es común que se utilicen estructuras internas para las transformaciones.
-            //Entonces actualizamos la posición lógica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
-            Box.Position = new TGCVector3(-25, 0, 0);
 
             //Cargo el unico mesh que tiene la escena.
             string humanDir = MediaDir + "BasicHuman\\";
@@ -89,11 +68,11 @@ namespace TGC.Group.Model
             humanAnimsDir = humanAnims.Select(s => humanDir + "Animations\\" + s + "-TgcSkeletalAnim.xml").ToArray<string>();
 
             // cargo el humano
-            mesh = new TgcSkeletalLoader().loadMeshAndAnimationsFromFile(humanMeshDir, humanAnimsDir);
-            mesh.buildSkletonMesh();
+            meshJugador = new TgcSkeletalLoader().loadMeshAndAnimationsFromFile(humanMeshDir, humanAnimsDir);
+            meshJugador.buildSkletonMesh();
             //Defino una escala en el modelo logico del mesh que es muy grande.
-            mesh.playAnimation(humanAnims[0]);
-            mesh.Position = new TGCVector3(0, 10, 0);
+            meshJugador.playAnimation(humanAnims[0]);
+            meshJugador.Position = new TGCVector3(0, 10, 0);
 
             scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Ciudad\\Ciudad-TgcScene.xml");
 
@@ -110,15 +89,9 @@ namespace TGC.Group.Model
             PreUpdate();
 
             // seteo la posicion de la camara
-            var cameraPosition = mesh.Position + cameraOffset;
-            var lookAt = mesh.Position;
+            var cameraPosition = meshJugador.Position + cameraOffset;
+            var lookAt = meshJugador.Position;
             Camara.SetCamera(cameraPosition, lookAt);
-
-            //Capturar Input teclado
-            if (Input.keyPressed(Key.F))
-            {
-                BoundingBox = !BoundingBox;
-            }
 
             TGCVector3 movement = new TGCVector3(0, 0, 0);
             if (Input.keyDown(Key.UpArrow)) {
@@ -128,7 +101,7 @@ namespace TGC.Group.Model
             }
 
             movement = movement * 1000 * ElapsedTime;
-            mesh.Move(movement);
+            meshJugador.Move(movement);
 
             PostUpdate();
         }
@@ -147,27 +120,13 @@ namespace TGC.Group.Model
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
             DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.OrangeRed);
 
-            //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
-            //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
-            Box.Transform = TGCMatrix.Scaling(Box.Scale) * TGCMatrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) * TGCMatrix.Translation(Box.Position);
-            //A modo ejemplo realizamos toda las multiplicaciones, pero aquí solo nos hacia falta la traslación.
-            //Finalmente invocamos al render de la caja
-            Box.Render();
-
             scene.RenderAll();
 
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
-            mesh.UpdateMeshTransform();
+            meshJugador.UpdateMeshTransform();
             //Render del mesh
-            mesh.Render();
-
-            //Render de BoundingBox, muy útil para debug de colisiones.
-            if (BoundingBox)
-            {
-                Box.BoundingBox.Render();
-                mesh.BoundingBox.Render();
-            }
+            meshJugador.Render();
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
@@ -180,10 +139,8 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Dispose()
         {
-            //Dispose de la caja.
-            Box.Dispose();
-            //Dispose del mesh.
-            mesh.Dispose();
+            meshJugador.Dispose();
+            scene.DisposeAll();
         }
     }
 }
