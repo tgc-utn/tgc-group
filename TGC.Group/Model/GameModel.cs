@@ -33,10 +33,10 @@ namespace TGC.Group.Model
         }
 
         // Mesh del jugador.
-        private TgcSkeletalMesh meshJugador { get; set; }
+        private TgcSkeletalMesh personaje;
 
         // Escena de la ciudad.
-        private TgcScene scene { get; set; }
+        private TgcScene scene;
 
         private TGCVector3 cameraOffset;
 
@@ -51,32 +51,26 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
-            //Cargo el unico mesh que tiene la escena.
-            string humanDir = MediaDir + "BasicHuman\\";
+            var skeletalLoader = new TgcSkeletalLoader();
+            personaje = skeletalLoader.loadMeshAndAnimationsFromFile(
 
-            // directorio del mesh base del humano
-            string humanMeshDir = humanDir + "BasicHuman-TgcSkeletalMesh.xml";
+                
+                MediaDir + "Robot\\Robot-TgcSkeletalMesh.xml",
+                MediaDir + "Robot\\",
+                new[]
+                {
+                     MediaDir + "Robot\\Caminando-TgcSkeletalAnim.xml",
+                     MediaDir + "Robot\\Parado-TgcSkeletalAnim.xml"
+                });
 
-            // prepara la lista de animaciones
-            // TODO: poner el resto de las animaciones?
-            string[] humanAnims = {
-                "StandBy"
-            };
-            string[] humanAnimsDir = new string[humanAnims.Length];
-
-            // convierto de nombre de animacion a directorio
-            humanAnimsDir = humanAnims.Select(s => humanDir + "Animations\\" + s + "-TgcSkeletalAnim.xml").ToArray<string>();
-
-            // cargo el humano
-            meshJugador = new TgcSkeletalLoader().loadMeshAndAnimationsFromFile(humanMeshDir, humanAnimsDir);
-            meshJugador.buildSkletonMesh();
-            //Defino una escala en el modelo logico del mesh que es muy grande.
-            meshJugador.playAnimation(humanAnims[0]);
-            meshJugador.Position = new TGCVector3(0, 10, 0);
+            personaje.buildSkletonMesh();
+            personaje.playAnimation("Parado", true);
+            personaje.Scale = new TGCVector3(0.5f,0.5f,0.5f);
+            personaje.Position = new TGCVector3(0, 10, 0);
 
             scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Ciudad\\Ciudad-TgcScene.xml");
 
-            cameraOffset = new TGCVector3(0, 200, 150);
+            cameraOffset = new TGCVector3(0, 200, 300);
         }
 
         /// <summary>
@@ -89,19 +83,46 @@ namespace TGC.Group.Model
             PreUpdate();
 
             // seteo la posicion de la camara
-            var cameraPosition = meshJugador.Position + cameraOffset;
-            var lookAt = meshJugador.Position;
+            var cameraPosition = personaje.Position + cameraOffset;
+            var lookAt = personaje.Position;
             Camara.SetCamera(cameraPosition, lookAt);
 
+            var moving = false;
+            var jumpPos = 0;
+
             TGCVector3 movement = new TGCVector3(0, 0, 0);
-            if (Input.keyDown(Key.UpArrow)) {
-                movement.Z -= 1;
-            } else if (Input.keyDown(Key.DownArrow)) {
-                movement.Z += 1;
+
+            if (Input.keyDown(Key.UpArrow) || Input.keyDown(Key.W)) {
+                 movement.Z -= 1;
+                 moving = true;
+            }
+            else if (Input.keyDown(Key.DownArrow) || Input.keyDown(Key.S)) {
+               movement.Z += 1;
+               moving = true;
+            }
+                
+            else if (Input.keyDown(Key.RightArrow) || Input.keyDown(Key.D)) {
+                movement.X -= 1;
+                moving = true;
+            }
+                
+            else if (Input.keyDown(Key.LeftArrow) || Input.keyDown(Key.A))  {
+                movement.X += 1;
+                moving = true;
             }
 
-            movement = movement * 1000 * ElapsedTime;
-            meshJugador.Move(movement);
+            if (moving) {
+
+                personaje.playAnimation("Caminando", true);
+            }
+
+            else {
+
+                personaje.playAnimation("Parado", true);
+            }
+
+            movement = movement * 300 * ElapsedTime;
+            personaje.Move(movement);
 
             PostUpdate();
         }
@@ -116,17 +137,13 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            //Dibuja un texto por pantalla
-            DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
-            DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.OrangeRed);
-
             scene.RenderAll();
 
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
-            meshJugador.UpdateMeshTransform();
+            personaje.UpdateMeshTransform();
             //Render del mesh
-            meshJugador.Render();
+            personaje.Render();
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
@@ -139,7 +156,7 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Dispose()
         {
-            meshJugador.Dispose();
+            personaje.Dispose();
             scene.DisposeAll();
         }
     }
