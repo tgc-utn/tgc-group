@@ -35,17 +35,14 @@ namespace TGC.Group.Model
         private CamaraEnTerceraPersona camaraInterna;
         private float velocidadVehiculo = 50f;
         private TGCBox cubo;
+        private TgcPlane piso;
 
-
-
-        /// <summary>
-        ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
-        ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
-        ///     procesamiento que podemos pre calcular para nuestro juego.
-        ///     Borrar el codigo ejemplo no utilizado.
-        /// </summary>
         public override void Init()
         {
+            //Crear piso
+            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\pasto.jpg");
+            piso = new TgcPlane(new TGCVector3(-500, 0, -500), new TGCVector3(1000, 0, 1000), TgcPlane.Orientations.XZplane, pisoTexture);
+
             var loader = new TgcSceneLoader();
             var scene = loader.loadSceneFromFile(MediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml");
             auto = scene.Meshes[0];
@@ -54,17 +51,11 @@ namespace TGC.Group.Model
             //cubo
             cubo = TGCBox.fromSize(new TGCVector3(-50, 10, -20), new TGCVector3(15, 15, 15), Color.Black);
 
-            //Configurar camara en Tercer Persona
             camaraInterna = new CamaraEnTerceraPersona(auto.Position, 30, -75);
             Camara = camaraInterna;
 
         }
 
-        /// <summary>
-        ///     Se llama en cada frame.
-        ///     Se debe escribir toda la lógica de computo del modelo, así como también verificar entradas del usuario y reacciones
-        ///     ante ellas.
-        /// </summary>
         public override void Update()
         {
             PreUpdate();
@@ -121,17 +112,13 @@ namespace TGC.Group.Model
             PostUpdate();
         }
 
-        /// <summary>
-        ///     Se llama cada vez que hay que refrescar la pantalla.
-        ///     Escribir aquí todo el código referido al renderizado.
-        ///     Borrar todo lo que no haga falta.
-        /// </summary>
         public override void Render()
         {
-            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
+            
             PreRender();
-            //Dibujar todo.
-            //Una vez actualizadas las diferentes posiciones internas solo debemos asignar la matriz de world.
+
+            piso.Render();
+
             auto.Transform =
                 TGCMatrix.Scaling(auto.Scale)
                             * TGCMatrix.RotationYawPitchRoll(auto.Rotation.Y, auto.Rotation.X, auto.Rotation.Z)
@@ -147,14 +134,9 @@ namespace TGC.Group.Model
             PostRender();
         }
 
-        /// <summary>
-        ///     Se llama cuando termina la ejecución del ejemplo.
-        ///     Hacer Dispose() de todos los objetos creados.
-        ///     Es muy importante liberar los recursos, sobretodo los gráficos ya que quedan bloqueados en el device de video.
-        /// </summary>
         public override void Dispose()
         {
-            //Dispose del mesh.
+            //Dispose del auto.
             auto.Dispose();
 
             //Dispose del cubo
