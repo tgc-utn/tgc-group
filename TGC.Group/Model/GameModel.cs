@@ -32,6 +32,8 @@ namespace TGC.Group.Model
         private TGCVector3 aceleracion = new TGCVector3(0, -100f, 0);
         private float Ypiso = 25f;
 
+        private TgcScene scene;
+        private Directorio directorio;
 
 
         //Define direccion del mesh del personaje dependiendo el movimiento
@@ -65,6 +67,11 @@ namespace TGC.Group.Model
             dirPers.CreateDictionary();
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
+            directorio = new Directorio(MediaDir);
+
+
+            var loader = new TgcSceneLoader();
+            scene = loader.loadSceneFromFile(directorio.EscenaSelva);
 
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
@@ -86,19 +93,18 @@ namespace TGC.Group.Model
             BoxPiso.Position = new TGCVector3(-300, -25, -100);
             BoxPiso.BoundingBox.move(TGCVector3.Empty - BoxPiso.Position);
             BoxPiso.updateValues();
+            
+            
             //Cargo el unico mesh que tiene la escena.
-
-
-
             var skeletalLoader = new TgcSkeletalLoader();
             personaje =
                 skeletalLoader.loadMeshAndAnimationsFromFile(
-                    MediaDir + "Media\\SkeletalAnimations\\Robot\\Robot-TgcSkeletalMesh.xml",
-                    MediaDir + "Media\\SkeletalAnimations\\Robot\\",
+                    directorio.RobotSkeletalMesh,
+                    directorio.RobotDirectorio,
                     new[]
                     {
-                        MediaDir + "Media\\SkeletalAnimations\\Robot\\Caminando-TgcSkeletalAnim.xml",
-                        MediaDir + "Media\\SkeletalAnimations\\Robot\\Parado-TgcSkeletalAnim.xml"
+                        directorio.RobotCaminando,
+                        directorio.RobotParado
                     });
 
             //Configurar animacion inicial
@@ -112,7 +118,7 @@ namespace TGC.Group.Model
             //Le cambiamos la textura para diferenciarlo un poco
             personaje.changeDiffuseMaps(new[]
             {
-                TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Media\\SkeletalAnimations\\Robot\\Textures\\uvw.jpg")
+                TgcTexture.createTexture(D3DDevice.Instance.Device, directorio.RobotTextura)
             });
             //Prueba de agregar al robot
             // Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + /*"LogoTGC-TgcScene.xml"*/"Media\\ModelosTgc\\Robot\\Robot-TgcScene.xml").Meshes[0];
@@ -317,7 +323,7 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-   
+            
 
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.GhostWhite);
@@ -330,7 +336,7 @@ namespace TGC.Group.Model
             //Finalmente invocamos al render de la caja
             Box.Render();
             BoxPiso.Render();
-
+            scene.RenderAll();
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
             // Mesh.UpdateMeshTransform();
@@ -383,6 +389,7 @@ namespace TGC.Group.Model
             //Dispose de la caja.
             Box.Dispose();
             personaje.Dispose();
+            scene.DisposeAll();
             //Dispose del mesh.
          //   Mesh.Dispose();
         }
