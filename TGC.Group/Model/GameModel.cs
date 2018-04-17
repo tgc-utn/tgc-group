@@ -77,10 +77,10 @@ namespace TGC.Group.Model
             if (Input.keyDown(Key.D))
             {
                 if(Input.keyDown(Key.W) && ElapsedTime != 0f){
-                    auto.avanzarHaciaLaDerecha(ElapsedTime);
+                    auto.avanzarHaciaLaDerecha(ElapsedTime, camaraInterna);
                 }
                 else if (Input.keyDown(Key.S) && ElapsedTime != 0f) {
-                    auto.retrocederHaciaLaDerecha(ElapsedTime);
+                    auto.retrocederHaciaLaDerecha(ElapsedTime, camaraInterna);
                 }
             }
 
@@ -89,11 +89,11 @@ namespace TGC.Group.Model
             {
                 if (Input.keyDown(Key.W) && ElapsedTime != 0f)
                 {
-                    auto.avanzarHaciaLaIzquierda(ElapsedTime);
+                    auto.avanzarHaciaLaIzquierda(ElapsedTime, camaraInterna);
                 }
                 else if (Input.keyDown(Key.S) && ElapsedTime != 0f)
                 {
-                    auto.retrocederHaciaLaIzquierda(ElapsedTime);
+                    auto.retrocederHaciaLaIzquierda(ElapsedTime, camaraInterna);
                 }
             }
 
@@ -108,6 +108,7 @@ namespace TGC.Group.Model
 
             //Hacer que la camara siga al personaje en su nueva posicion
             camaraInterna.Target = auto.posicion();
+            
             
 
             PostUpdate();

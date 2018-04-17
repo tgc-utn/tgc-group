@@ -39,43 +39,52 @@ namespace TGC.Group.Model
             mesh.Move(-(this.vectorAdelante * CONSTANTE_VELOCIDAD * tiempoTranscurrido));
         }
 
-        public void avanzarHaciaLaDerecha(float tiempoTranscurrido)
+        public void avanzarHaciaLaDerecha(float tiempoTranscurrido, CamaraEnTerceraPersona camara)
         {
+            float rotacionReal = CONSTANTE_ROTACION * tiempoTranscurrido;
             this.avanzar(tiempoTranscurrido);
-            this.rotarEnY(CONSTANTE_ROTACION * tiempoTranscurrido);
+            this.rotarEnY(rotacionReal);
             TGCMatrix matrizDeRotacion = new TGCMatrix();
-            matrizDeRotacion.RotateY(CONSTANTE_ROTACION * tiempoTranscurrido);
+            matrizDeRotacion.RotateY(rotacionReal);
             vectorAdelante.TransformCoordinate(matrizDeRotacion);
+            camara.rotateY(rotacionReal);
+
 
         }
 
-        public void retrocederHaciaLaDerecha(float tiempoTranscurrido)
+        public void retrocederHaciaLaDerecha(float tiempoTranscurrido, CamaraEnTerceraPersona camara)
         {
+            float rotacionReal = -CONSTANTE_ROTACION * tiempoTranscurrido;
             this.retroceder(tiempoTranscurrido);
-            this.rotarEnY(-CONSTANTE_ROTACION * tiempoTranscurrido);
+            this.rotarEnY(rotacionReal);
             TGCMatrix matrizDeRotacion = new TGCMatrix();
-            matrizDeRotacion.RotateY(-CONSTANTE_ROTACION * tiempoTranscurrido);
+            matrizDeRotacion.RotateY(rotacionReal);
             vectorAdelante.TransformCoordinate(matrizDeRotacion);
+            camara.rotateY(rotacionReal);
 
         }
 
-        public void retrocederHaciaLaIzquierda(float tiempoTranscurrido)
+        public void retrocederHaciaLaIzquierda(float tiempoTranscurrido, CamaraEnTerceraPersona camara)
         {
+            float rotacionReal = CONSTANTE_ROTACION * tiempoTranscurrido;
             this.retroceder(tiempoTranscurrido);
-            this.rotarEnY(CONSTANTE_ROTACION * tiempoTranscurrido);
+            this.rotarEnY(rotacionReal);
             TGCMatrix matrizDeRotacion = new TGCMatrix();
-            matrizDeRotacion.RotateY(CONSTANTE_ROTACION * tiempoTranscurrido);
+            matrizDeRotacion.RotateY(rotacionReal);
             vectorAdelante.TransformCoordinate(matrizDeRotacion);
+            camara.rotateY(rotacionReal);
 
         }
 
-        public void avanzarHaciaLaIzquierda(float tiempoTranscurrido)
+        public void avanzarHaciaLaIzquierda(float tiempoTranscurrido, CamaraEnTerceraPersona camara)
         {
+            float rotacionReal = -CONSTANTE_ROTACION * tiempoTranscurrido;
             this.avanzar(tiempoTranscurrido);
-            this.rotarEnY(-CONSTANTE_ROTACION * tiempoTranscurrido);
+            this.rotarEnY(rotacionReal);
             TGCMatrix matrizDeRotacion = new TGCMatrix();
-            matrizDeRotacion.RotateY(-CONSTANTE_ROTACION * tiempoTranscurrido);
+            matrizDeRotacion.RotateY(rotacionReal);
             vectorAdelante.TransformCoordinate(matrizDeRotacion);
+            camara.rotateY(rotacionReal);
 
         }
 
