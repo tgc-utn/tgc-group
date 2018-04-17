@@ -63,7 +63,6 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Init()
         {
-            
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
@@ -101,9 +100,9 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
-            
+
             var moving = false;
-            
+
             TGCVector3 movement = new TGCVector3(0, 0, 0);
 
             if (Input.keyDown(Key.UpArrow) || Input.keyDown(Key.W))
@@ -135,7 +134,7 @@ namespace TGC.Group.Model
                 movement.Z -= 1;
                 moving = true;
             }
-            
+
             else if (Input.keyDown(Key.DownArrow) || Input.keyDown(Key.S))
             {
                 if (movementOrientation != "Backwards")
@@ -191,11 +190,11 @@ namespace TGC.Group.Model
                         camaraInterna.rotateY(90f * ElapsedTime);
                     }
                 }
-            
+
                 movement.X -= 1;
                 moving = true;
             }
-            
+
             else if (Input.keyDown(Key.LeftArrow) || Input.keyDown(Key.A))
             {
                 if (movementOrientation != "Left")
@@ -204,7 +203,7 @@ namespace TGC.Group.Model
                     {
                         personaje.RotateY(halfPi);
                         movementOrientation = "Left";
-                        camaraInterna.rotateY(90f*ElapsedTime);
+                        camaraInterna.rotateY(90f * ElapsedTime);
                     }
 
                     else if (movementOrientation == "Forward")
@@ -234,12 +233,14 @@ namespace TGC.Group.Model
                 }
             }
 
-            if (moving) {
+            if (moving)
+            {
 
                 personaje.playAnimation("Caminando", true);
             }
 
-            else {
+            else
+            {
 
                 personaje.playAnimation("Parado", true);
             }
