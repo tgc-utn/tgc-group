@@ -152,7 +152,7 @@ namespace TGC.Group.Model
             //Cargo la scena del juego
             Scene =
                loader.loadSceneFromFile(MediaDir +
-                                        "Iglesia-TgcScene.xml");
+                                        "Iglesia\\Iglesia-TgcScene.xml");
             MeshScena = Scene.Meshes[0];
             
             //Defino una escala en el modelo logico del mesh que es muy grande.
