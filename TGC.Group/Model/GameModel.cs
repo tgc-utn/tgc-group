@@ -47,6 +47,7 @@ namespace TGC.Group.Model
             var scene = loader.loadSceneFromFile(MediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml");
             auto = scene.Meshes[0];
             auto.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
+            auto.RotateY(FastMath.PI);
 
             //cubo
             cubo = TGCBox.fromSize(new TGCVector3(-50, 10, -20), new TGCVector3(15, 15, 15), Color.Black);
