@@ -32,13 +32,28 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
+        public float convertirARad(float valorAngulo)
+        {
+            return valorAngulo * 3.14159265f / 180f;
+        }
+
+        private Cam camaraInterna;
+
         // Mesh del jugador.
         private TgcSkeletalMesh personaje;
 
         // Escena de la ciudad.
         private TgcScene scene;
 
-        private TGCVector3 cameraOffset;
+        float piValue = 3.1415965f;
+        float quarterPi = 3.1415965f / 4f;
+        float halfPi = 3.1415965f / 2f;
+        float jumpPosMax = 15f;
+        float jumpPos = 0f;
+        float jumpSpeed = 25f;
+        float yAxisSpeed = 0f;
+        float rotationSpeed = 25f;
+        string movementOrientation = "Forward";
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -54,7 +69,7 @@ namespace TGC.Group.Model
             var skeletalLoader = new TgcSkeletalLoader();
             personaje = skeletalLoader.loadMeshAndAnimationsFromFile(
 
-                
+
                 MediaDir + "Robot\\Robot-TgcSkeletalMesh.xml",
                 MediaDir + "Robot\\",
                 new[]
@@ -65,50 +80,157 @@ namespace TGC.Group.Model
 
             personaje.buildSkletonMesh();
             personaje.playAnimation("Parado", true);
-            personaje.Scale = new TGCVector3(0.5f,0.5f,0.5f);
+            personaje.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
             personaje.Position = new TGCVector3(0, 10, 0);
 
             scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Ciudad\\Ciudad-TgcScene.xml");
 
-            cameraOffset = new TGCVector3(0, 200, 300);
+            camaraInterna = new Cam(personaje.Position, 220, 270);
+            var lookAt = TGCVector3.Empty;
+            Camara = camaraInterna;
         }
+
 
         /// <summary>
         ///     Se llama en cada frame.
         ///     Se debe escribir toda la lógica de computo del modelo, así como también verificar entradas del usuario y reacciones
         ///     ante ellas.
         /// </summary>
+
         public override void Update()
         {
             PreUpdate();
-
-            // seteo la posicion de la camara
-            var cameraPosition = personaje.Position + cameraOffset;
-            var lookAt = personaje.Position;
-            Camara.SetCamera(cameraPosition, lookAt);
-
+            
             var moving = false;
-            var jumpPos = 0;
-
+            
             TGCVector3 movement = new TGCVector3(0, 0, 0);
 
-            if (Input.keyDown(Key.UpArrow) || Input.keyDown(Key.W)) {
-                 movement.Z -= 1;
-                 moving = true;
+            if (Input.keyDown(Key.UpArrow) || Input.keyDown(Key.W))
+            {
+                if (movementOrientation != "Forward")
+                {
+                    if (movementOrientation == "Backwards")
+                    {
+                        personaje.RotateY(piValue);
+                        movementOrientation = "Forward";
+                        camaraInterna.rotateY(180f * ElapsedTime);
+                    }
+
+                    else if (movementOrientation == "Left")
+                    {
+                        personaje.RotateY(halfPi);
+                        movementOrientation = "Forward";
+                        camaraInterna.rotateY(90f * ElapsedTime);
+                    }
+
+                    else if (movementOrientation == "Right")
+                    {
+                        personaje.RotateY(-halfPi);
+                        movementOrientation = "Forward";
+                        camaraInterna.rotateY(-90f * ElapsedTime);
+                    }
+                }
+
+                movement.Z -= 1;
+                moving = true;
             }
-            else if (Input.keyDown(Key.DownArrow) || Input.keyDown(Key.S)) {
-               movement.Z += 1;
-               moving = true;
+            
+            else if (Input.keyDown(Key.DownArrow) || Input.keyDown(Key.S))
+            {
+                if (movementOrientation != "Backwards")
+                {
+                    if (movementOrientation == "Forward")
+                    {
+                        personaje.RotateY(piValue);
+                        movementOrientation = "Backwards";
+                        camaraInterna.rotateY(180f * ElapsedTime);
+                    }
+
+                    else if (movementOrientation == "Left")
+                    {
+                        personaje.RotateY(-halfPi);
+                        movementOrientation = "Backwards";
+                        camaraInterna.rotateY(-90f * ElapsedTime);
+                    }
+
+                    else if (movementOrientation == "Right")
+                    {
+                        personaje.RotateY(halfPi);
+                        movementOrientation = "Backwards";
+                        camaraInterna.rotateY(90f * ElapsedTime);
+                    }
+                }
+
+                movement.Z += 1;
+                moving = true;
             }
-                
-            else if (Input.keyDown(Key.RightArrow) || Input.keyDown(Key.D)) {
+
+            else if (Input.keyDown(Key.RightArrow) || Input.keyDown(Key.D))
+            {
+                if (movementOrientation != "Right")
+                {
+                    if (movementOrientation == "Backwards")
+                    {
+                        personaje.RotateY(-halfPi);
+                        movementOrientation = "Right";
+                        camaraInterna.rotateY(-90f * ElapsedTime);
+                    }
+
+                    else if (movementOrientation == "Left")
+                    {
+                        personaje.RotateY(-piValue);
+                        movementOrientation = "Right";
+                        camaraInterna.rotateY(180f * ElapsedTime);
+                    }
+
+                    else if (movementOrientation == "Forward")
+                    {
+                        personaje.RotateY(halfPi);
+                        movementOrientation = "Right";
+                        camaraInterna.rotateY(90f * ElapsedTime);
+                    }
+                }
+            
                 movement.X -= 1;
                 moving = true;
             }
-                
-            else if (Input.keyDown(Key.LeftArrow) || Input.keyDown(Key.A))  {
+            
+            else if (Input.keyDown(Key.LeftArrow) || Input.keyDown(Key.A))
+            {
+                if (movementOrientation != "Left")
+                {
+                    if (movementOrientation == "Backwards")
+                    {
+                        personaje.RotateY(halfPi);
+                        movementOrientation = "Left";
+                        camaraInterna.rotateY(90f*ElapsedTime);
+                    }
+
+                    else if (movementOrientation == "Forward")
+                    {
+                        personaje.RotateY(-halfPi);
+                        movementOrientation = "Left";
+                        camaraInterna.rotateY(-90f * ElapsedTime);
+                    }
+
+                    else if (movementOrientation == "Right")
+                    {
+                        personaje.RotateY(piValue);
+                        movementOrientation = "Left";
+                        camaraInterna.rotateY(180f * ElapsedTime);
+                    }
+                }
+
                 movement.X += 1;
                 moving = true;
+            }
+
+            else if (Input.keyUp(Key.Space))
+            {
+                if (jumpPos < jumpPosMax)
+                {
+                    yAxisSpeed = jumpSpeed;
+                }
             }
 
             if (moving) {
@@ -121,8 +243,10 @@ namespace TGC.Group.Model
                 personaje.playAnimation("Parado", true);
             }
 
-            movement = movement * 300 * ElapsedTime;
+            movement = movement * 220f * ElapsedTime;
             personaje.Move(movement);
+
+            camaraInterna.Target = personaje.Position;
 
             PostUpdate();
         }
@@ -143,7 +267,7 @@ namespace TGC.Group.Model
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
             personaje.UpdateMeshTransform();
             //Render del mesh
-            personaje.Render();
+            personaje.animateAndRender(ElapsedTime);
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
