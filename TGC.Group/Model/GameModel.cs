@@ -31,9 +31,8 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        private TgcMesh auto { get; set; }
+        private Vehiculo auto;
         private CamaraEnTerceraPersona camaraInterna;
-        private float velocidadVehiculo = 50f;
         private TGCBox cubo;
         private TgcPlane piso;
 
@@ -43,16 +42,14 @@ namespace TGC.Group.Model
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\pasto.jpg");
             piso = new TgcPlane(new TGCVector3(-500, 0, -500), new TGCVector3(1000, 0, 1000), TgcPlane.Orientations.XZplane, pisoTexture);
 
-            var loader = new TgcSceneLoader();
-            var scene = loader.loadSceneFromFile(MediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml");
-            auto = scene.Meshes[0];
-            auto.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
-            auto.RotateY(FastMath.PI);
+            auto = new Vehiculo(MediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml");
+            auto.escalar(new TGCVector3(0.1f, 0.1f, 0.1f));
+            auto.rotarEnY(FastMath.PI);
 
             //cubo
             cubo = TGCBox.fromSize(new TGCVector3(-50, 10, -20), new TGCVector3(15, 15, 15), Color.Black);
 
-            camaraInterna = new CamaraEnTerceraPersona(auto.Position, 30, -75);
+            camaraInterna = new CamaraEnTerceraPersona(auto.posicion(), 30, -75);
             Camara = camaraInterna;
 
         }
@@ -61,54 +58,55 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
-            float velocidadReal = this.velocidadVehiculo * ElapsedTime;
-
-            //Calcular proxima posicion de personaje segun Input
-            bool moving = false;
             TGCVector3 movement = TGCVector3.Empty;
 
             //Adelante
-            if (Input.keyDown(Key.W))
+            if (Input.keyDown(Key.W) && !(Input.keyDown(Key.D) || Input.keyDown(Key.A)))
             {
-                movement.Z = velocidadReal;
-                moving = true;
+                auto.avanzar(ElapsedTime);
+
             }
 
             //Atras
-            if (Input.keyDown(Key.S))
+            if (Input.keyDown(Key.S) && !(Input.keyDown(Key.D) || Input.keyDown(Key.A)))
             {
-                movement.Z = -velocidadReal;
-                moving = true;
+                auto.retroceder(ElapsedTime);
             }
 
             //Derecha
             if (Input.keyDown(Key.D))
             {
-                movement.X = velocidadReal;
-                moving = true;
+                if(Input.keyDown(Key.W) && ElapsedTime != 0f){
+                    auto.avanzarHaciaLaDerecha(ElapsedTime);
+                }
+                else if (Input.keyDown(Key.S) && ElapsedTime != 0f) {
+                    auto.retrocederHaciaLaDerecha(ElapsedTime);
+                }
             }
 
-            //Izquierda
+            //Derecha
             if (Input.keyDown(Key.A))
             {
-                movement.X = -velocidadReal;
-                moving = true;
+                if (Input.keyDown(Key.W) && ElapsedTime != 0f)
+                {
+                    auto.avanzarHaciaLaIzquierda(ElapsedTime);
+                }
+                else if (Input.keyDown(Key.S) && ElapsedTime != 0f)
+                {
+                    auto.retrocederHaciaLaIzquierda(ElapsedTime);
+                }
             }
+
             //Salto
             if (Input.keyDown(Key.Space))
             {
-                movement.Y = velocidadReal;
-                moving = true;
+                auto.saltar();
             }
 
-            //Si hubo desplazamiento
-            if (moving)
-            {
-                //Aplicar movimiento, internamente suma valores a la posicion actual del mesh.
-                auto.Move(movement);
-            }
+
             //Hacer que la camara siga al personaje en su nueva posicion
-            camaraInterna.Target = auto.Position;
+            camaraInterna.Target = auto.posicion();
+            
 
             PostUpdate();
         }
@@ -120,10 +118,8 @@ namespace TGC.Group.Model
 
             piso.Render();
 
-            auto.Transform =
-                TGCMatrix.Scaling(auto.Scale)
-                            * TGCMatrix.RotationYawPitchRoll(auto.Rotation.Y, auto.Rotation.X, auto.Rotation.Z)
-                            * TGCMatrix.Translation(auto.Position);
+            auto.transformar();
+            
             auto.Render();
 
             cubo.Transform =
@@ -138,7 +134,7 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             //Dispose del auto.
-            auto.Dispose();
+            auto.dispose();
 
             //Dispose del cubo
             cubo.Dispose();
