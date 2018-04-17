@@ -100,8 +100,10 @@ namespace TGC.Group.Model
             //Salto
             if (Input.keyDown(Key.Space))
             {
-                auto.saltar();
+                auto.saltar(ElapsedTime);
             }
+
+            auto.actualizarSalto(ElapsedTime);
 
 
             //Hacer que la camara siga al personaje en su nueva posicion
