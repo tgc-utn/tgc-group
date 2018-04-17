@@ -76,7 +76,7 @@ namespace TGC.Group.Model
             //Derecha
             if (Input.keyDown(Key.D))
             {
-                if(Input.keyDown(Key.W) && ElapsedTime != 0f){
+                if(Input.keyDown(Key.W)){
                     auto.avanzarHaciaLaDerecha(ElapsedTime, camaraInterna);
                 }
                 else if (Input.keyDown(Key.S) && ElapsedTime != 0f) {
@@ -87,11 +87,11 @@ namespace TGC.Group.Model
             //Derecha
             if (Input.keyDown(Key.A))
             {
-                if (Input.keyDown(Key.W) && ElapsedTime != 0f)
+                if (Input.keyDown(Key.W))
                 {
                     auto.avanzarHaciaLaIzquierda(ElapsedTime, camaraInterna);
                 }
-                else if (Input.keyDown(Key.S) && ElapsedTime != 0f)
+                else if (Input.keyDown(Key.S))
                 {
                     auto.retrocederHaciaLaIzquierda(ElapsedTime, camaraInterna);
                 }
