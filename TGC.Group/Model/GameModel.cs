@@ -8,6 +8,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Group.Model;
+using TGC.Group.Model.Vehiculos;
 
 namespace TGC.Group.Model
 {
@@ -31,7 +32,8 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        private Vehiculo auto;
+        //private VehiculoLiviano auto;
+        private VehiculoPesado auto;
         private CamaraEnTerceraPersona camaraInterna;
         private TGCBox cubo;
         private TgcPlane piso;
@@ -42,7 +44,8 @@ namespace TGC.Group.Model
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\pasto.jpg");
             piso = new TgcPlane(new TGCVector3(-500, 0, -500), new TGCVector3(1000, 0, 1000), TgcPlane.Orientations.XZplane, pisoTexture);
 
-            auto = new Vehiculo(MediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml");
+            //auto = new VehiculoLiviano(MediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml");
+            auto = new VehiculoPesado(MediaDir + "meshCreator\\meshes\\Vehiculos\\CamionTroncos\\CamionDeTroncos-TgcScene.xml");
             auto.escalar(new TGCVector3(0.1f, 0.1f, 0.1f));
             auto.rotarEnY(FastMath.PI);
 

@@ -10,7 +10,7 @@ namespace TGC.Group.Model.Vehiculos
     {
         public VehiculoLiviano(string rutaAMesh) : base(rutaAMesh)
         {
-
+            
         }
     }
 }

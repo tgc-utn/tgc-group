@@ -9,13 +9,13 @@ using TGC.Core.Example;
 
 namespace TGC.Group.Model
 {
-    class Vehiculo
+    abstract class Vehiculo
     {   
         private TgcMesh mesh;
         private TGCVector3 vectorAdelante;
-        private const float CONSTANTE_ROTACION = 1f;
-        private const float CONSTANTE_VELOCIDAD = 150f;
-        private const float CONSTANTE_SALTO = 70f;
+        protected float velocidadRotacion = 1f;
+        protected float velocidadTraslado = 150f;
+        protected float velocidadSalto = 70f;
         private bool subiendo, bajando;
         private const float ALTURA_SALTO = 30f;
 
@@ -31,17 +31,17 @@ namespace TGC.Group.Model
 
         public void avanzar(float tiempoTranscurrido)
         {
-            mesh.Move(this.vectorAdelante * CONSTANTE_VELOCIDAD * tiempoTranscurrido);
+            mesh.Move(this.vectorAdelante * this.velocidadTraslado * tiempoTranscurrido);
         }
 
         public void retroceder(float tiempoTranscurrido)
         {
-            mesh.Move(-(this.vectorAdelante * CONSTANTE_VELOCIDAD * tiempoTranscurrido));
+            mesh.Move(-(this.vectorAdelante * this.velocidadTraslado * tiempoTranscurrido));
         }
 
         public void avanzarHaciaLaDerecha(float tiempoTranscurrido, CamaraEnTerceraPersona camara)
         {
-            float rotacionReal = CONSTANTE_ROTACION * tiempoTranscurrido;
+            float rotacionReal = this.velocidadRotacion * tiempoTranscurrido;
             this.avanzar(tiempoTranscurrido);
             this.rotarEnY(rotacionReal);
             TGCMatrix matrizDeRotacion = new TGCMatrix();
@@ -54,7 +54,7 @@ namespace TGC.Group.Model
 
         public void retrocederHaciaLaDerecha(float tiempoTranscurrido, CamaraEnTerceraPersona camara)
         {
-            float rotacionReal = -CONSTANTE_ROTACION * tiempoTranscurrido;
+            float rotacionReal = -this.velocidadRotacion * tiempoTranscurrido;
             this.retroceder(tiempoTranscurrido);
             this.rotarEnY(rotacionReal);
             TGCMatrix matrizDeRotacion = new TGCMatrix();
@@ -66,7 +66,7 @@ namespace TGC.Group.Model
 
         public void retrocederHaciaLaIzquierda(float tiempoTranscurrido, CamaraEnTerceraPersona camara)
         {
-            float rotacionReal = CONSTANTE_ROTACION * tiempoTranscurrido;
+            float rotacionReal = this.velocidadRotacion * tiempoTranscurrido;
             this.retroceder(tiempoTranscurrido);
             this.rotarEnY(rotacionReal);
             TGCMatrix matrizDeRotacion = new TGCMatrix();
@@ -78,7 +78,7 @@ namespace TGC.Group.Model
 
         public void avanzarHaciaLaIzquierda(float tiempoTranscurrido, CamaraEnTerceraPersona camara)
         {
-            float rotacionReal = -CONSTANTE_ROTACION * tiempoTranscurrido;
+            float rotacionReal = -this.velocidadRotacion * tiempoTranscurrido;
             this.avanzar(tiempoTranscurrido);
             this.rotarEnY(rotacionReal);
             TGCMatrix matrizDeRotacion = new TGCMatrix();
@@ -117,7 +117,7 @@ namespace TGC.Group.Model
         {
             if(!subiendo && !bajando)
             {
-                TGCVector3 nuevaPosicion = new TGCVector3(0, 1, 0) * CONSTANTE_SALTO * tiempoTranscurrido;
+                TGCVector3 nuevaPosicion = new TGCVector3(0, 1, 0) * this.velocidadSalto * tiempoTranscurrido;
                 mesh.Move(this.minimaAlturaEntreVectores(new TGCVector3(0, ALTURA_SALTO, 0), nuevaPosicion));
                 this.estaSubiendo();
             }
@@ -125,27 +125,27 @@ namespace TGC.Group.Model
 
         public void estaSubiendo()
         {
-            subiendo = true;
-            bajando = false;
+            this.subiendo = true;
+            this.bajando = false;
         }
 
         public void estaBajando()
         {
-            subiendo = false;
-            bajando = true;
+            this.subiendo = false;
+            this.bajando = true;
         }
 
         public void terminoElSalto()
         {
-            subiendo = false;
-            bajando = false;
+            this.subiendo = false;
+            this.bajando = false;
         }
 
         public void actualizarSalto(float tiempoTranscurrido)
         {
-            if (subiendo)
+            if (this.subiendo)
             {
-                TGCVector3 nuevaPosicion = new TGCVector3(0, 1, 0) * CONSTANTE_SALTO * tiempoTranscurrido;
+                TGCVector3 nuevaPosicion = new TGCVector3(0, 1, 0) * this.velocidadSalto * tiempoTranscurrido;
                 nuevaPosicion = (mesh.Position.Y + nuevaPosicion.Y) > ALTURA_SALTO? new TGCVector3(0, ALTURA_SALTO - mesh.Position.Y, 0) : nuevaPosicion;
                 mesh.Move(nuevaPosicion);
                 if (mesh.Position.Y == ALTURA_SALTO)
@@ -156,7 +156,7 @@ namespace TGC.Group.Model
             }
             else if(bajando)
             {
-                TGCVector3 nuevaPosicion = new TGCVector3(0, -1, 0) * CONSTANTE_SALTO * tiempoTranscurrido;
+                TGCVector3 nuevaPosicion = new TGCVector3(0, -1, 0) * this.velocidadSalto * tiempoTranscurrido;
                 nuevaPosicion = (mesh.Position.Y + nuevaPosicion.Y) < 0 ? new TGCVector3(0, -mesh.Position.Y, 0) : nuevaPosicion;
                 mesh.Move(nuevaPosicion);
                 if (mesh.Position.Y == 0)
