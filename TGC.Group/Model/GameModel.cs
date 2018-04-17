@@ -48,6 +48,7 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Init()
         {
+            
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
@@ -68,7 +69,7 @@ namespace TGC.Group.Model
             personaje.Scale = new TGCVector3(0.5f,0.5f,0.5f);
             personaje.Position = new TGCVector3(0, 10, 0);
 
-            scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Ciudad\\Ciudad-TgcScene.xml");
+            scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Jungla\\Jungla -TgcScene.xml");
 
             cameraOffset = new TGCVector3(0, 200, 300);
         }
