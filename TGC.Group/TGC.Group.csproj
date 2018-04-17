@@ -87,11 +87,16 @@
     </Compile>
     <Compile Include="Model\Cam.cs" />
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="obj\Debug\TGC.Group.Form.GameForm.resources" />
+    <EmbeddedResource Include="obj\Debug\TGC.Group.Properties.Resources.resources" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -102,6 +107,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="bin\Debug\TGC.Group.exe.config" />
     <None Include="Game.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Game.Designer.cs</LastGenOutput>
@@ -124,6 +130,12 @@
     <None Include="Media\BasicHuman\Quake2Scout_InitialPose.max" />
     <None Include="Media\BasicHuman\WomanJeans_InitialPose.max" />
     <None Include="Media\Ciudad\Ciudad.max" />
+    <None Include="obj\Debug\build.force" />
+    <None Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="obj\Debug\TGC.Group.csproj.CopyComplete" />
+    <None Include="obj\Debug\TGC.Group.csproj.CoreCompileInputs.cache" />
+    <None Include="obj\Debug\TGC.Group.csproj.GenerateResource.cache" />
+    <None Include="obj\Debug\TGC.Group.csprojResolveAssemblyReference.cache" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -175,6 +187,29 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="bin\Debug\Microsoft.DirectX.Direct3D.dll" />
+    <Content Include="bin\Debug\Microsoft.DirectX.Direct3D.xml" />
+    <Content Include="bin\Debug\Microsoft.DirectX.Direct3DX.dll" />
+    <Content Include="bin\Debug\Microsoft.DirectX.Direct3DX.xml" />
+    <Content Include="bin\Debug\Microsoft.DirectX.DirectInput.dll" />
+    <Content Include="bin\Debug\Microsoft.DirectX.DirectInput.xml" />
+    <Content Include="bin\Debug\Microsoft.DirectX.DirectSound.dll" />
+    <Content Include="bin\Debug\Microsoft.DirectX.DirectSound.xml" />
+    <Content Include="bin\Debug\Microsoft.DirectX.dll" />
+    <Content Include="bin\Debug\Microsoft.DirectX.xml" />
+    <Content Include="bin\Debug\Shaders\TgcKeyFrameMeshShader.fx" />
+    <Content Include="bin\Debug\Shaders\TgcMeshPhongShader.fx" />
+    <Content Include="bin\Debug\Shaders\TgcMeshPointLightShader.fx" />
+    <Content Include="bin\Debug\Shaders\TgcMeshShader.fx" />
+    <Content Include="bin\Debug\Shaders\TgcMeshSpotLightShader.fx" />
+    <Content Include="bin\Debug\Shaders\TgcSkeletalMeshPointLightShader.fx" />
+    <Content Include="bin\Debug\Shaders\TgcSkeletalMeshShader.fx" />
+    <Content Include="bin\Debug\Shaders\Varios.fx" />
+    <Content Include="bin\Debug\TGC.Core.dll" />
+    <Content Include="bin\Debug\TGC.Core.pdb" />
+    <Content Include="bin\Debug\TGC.Core.xml" />
+    <Content Include="bin\Debug\TGC.Group.exe" />
+    <Content Include="bin\Debug\TGC.Group.pdb" />
     <Content Include="Media\BasicHuman\Animations\CrouchWalk-TgcSkeletalAnim.xml" />
     <Content Include="Media\BasicHuman\Animations\FlyingKick-TgcSkeletalAnim.xml" />
     <Content Include="Media\BasicHuman\Animations\HighKick-TgcSkeletalAnim.xml" />
@@ -246,6 +281,24 @@
     <Content Include="Media\Jungla\Textures\SassiWall1.jpg" />
     <Content Include="Media\Jungla\Textures\WoodTexture.jpg" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
+    <Content Include="Media\Robot\Arrojar-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\Caminando-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\Correr-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\Empujar-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\Parado-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\PasoDerecho-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\PasoIzquierdo-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\Patear-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\Pegar-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\Robot-TgcSkeletalMesh.xml" />
+    <Content Include="Media\Robot\Textures\uvw.jpg" />
+    <Content Include="Media\Robot\Textures\uvwGreen.jpg" />
+    <Content Include="obj\Debug\TGC.Group.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\Debug\TGC.Group.exe" />
+    <Content Include="obj\Debug\TGC.Group.pdb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="obj\Debug\TempPE\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

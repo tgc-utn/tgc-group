@@ -11,7 +11,6 @@ using TGC.Core.SceneLoader;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.Textures;
 
-
 namespace TGC.Group.Model
 {
     /// <summary>
@@ -38,7 +37,7 @@ namespace TGC.Group.Model
 
         float convertirARad(float angulo)
         {
-            return angulo * 3.1415965f / 180f;
+            return FastMath.PI * angulo / 180f; 
         }
 
         // Mesh del jugador.
@@ -47,9 +46,9 @@ namespace TGC.Group.Model
         // Escena de la ciudad.
         private TgcScene scene;
 
-        float piValue = 3.1415965f;
-        float quarterPi = 3.1415965f / 4f;
-        float halfPi = 3.1415965f / 2f;
+        float piValue = FastMath.PI;
+        float quarterPi = FastMath.PI;
+        float halfPi = FastMath.PI_HALF;
         string movementOrientation = "Forward";
 
         /// <summary>
@@ -78,11 +77,11 @@ namespace TGC.Group.Model
             personaje.buildSkletonMesh();
             personaje.playAnimation("Parado", true);
             personaje.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
-            personaje.Position = new TGCVector3(0, 10, 0);
+            personaje.Position = new TGCVector3(300, -85, 0);
 
             scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Jungla\\Jungla -TgcScene.xml");
 
-            camaraInterna = new Cam(personaje.Position, 220, 270);
+            camaraInterna = new Cam(personaje.Position, 140, 300);
             var lookAt = TGCVector3.Empty;
             Camara = camaraInterna;
         }
@@ -101,6 +100,7 @@ namespace TGC.Group.Model
             var moving = false;
 
             TGCVector3 movement = new TGCVector3(0, 0, 0);
+
 
             /* if (Input.keyDown(Key.UpArrow) || Input.keyDown(Key.W))
              {
@@ -238,35 +238,45 @@ namespace TGC.Group.Model
              movement = movement * 220f * ElapsedTime;
              personaje.Move(movement);
      */
-            var velocidadCaminar = 12000f*ElapsedTime;
-            var velocidadRotacion = 180f;
+
+            var velocidadCaminar = 50000f * ElapsedTime;
+            var velocidadRotacion = 130f;
 
             var moveForward = 0f;
             float rotate = 0;
             var rotating = false;
 
-            if (Input.keyDown(Key.W))
+            //Adelante
+            if (Input.keyDown(Key.W) || Input.keyDown(Key.UpArrow)) //Ritmo normal
             {
                 moveForward = -velocidadCaminar;
+                if (Input.keyDown(Key.LeftShift)) //Correr, le duplica la velocidad
+                {
+                    moveForward *= 2;
+                }
+                if (Input.keyDown(Key.CapsLock)) //Caminar, le reduce la velocidad a un cuarto
+                {
+                    moveForward /= 4;
+                }
                 moving = true;
             }
 
             //Atras
-            if (Input.keyDown(Key.S))
+            if (Input.keyDown(Key.S) || Input.keyDown(Key.DownArrow))
             {
                 moveForward = velocidadCaminar;
                 moving = true;
             }
 
             //Derecha
-            if (Input.keyDown(Key.D))
+            if (Input.keyDown(Key.D) || Input.keyDown(Key.RightArrow))
             {
                 rotate = velocidadRotacion;
                 rotating = true;
             }
 
             //Izquierda
-            if (Input.keyDown(Key.A))
+            if (Input.keyDown(Key.A) || Input.keyDown(Key.LeftArrow))
             {
                 rotate = -velocidadRotacion;
                 rotating = true;
