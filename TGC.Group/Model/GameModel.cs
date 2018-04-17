@@ -52,8 +52,8 @@ namespace TGC.Group.Model
         //Caja que se muestra en el ejemplo.
         private TGCBox Box { get; set; }
         private TGCBox BoxPiso { get; set; }
+        private TgcMesh MeshPiso { get; set; }
 
-        //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
 
         /// <summary>
@@ -72,30 +72,26 @@ namespace TGC.Group.Model
 
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(directorio.EscenaSelva);
-
+            MeshPiso = scene.Meshes.Find(x => x.Name == "Piso");
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
             var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
 
-            //Cargamos una textura, tener en cuenta que cargar una textura significa crear una copia en memoria.
-            //Es importante cargar texturas en Init, si se hace en el render loop podemos tener grandes problemas si instanciamos muchas.
             var texture = TgcTexture.createTexture(pathTexturaCaja);
 
-            //Creamos una caja 3D ubicada de dimensiones (5, 10, 5) y la textura como color.
             var size = new TGCVector3(100, 50, 100);
-            //Construimos una caja según los parámetros, por defecto la misma se crea con centro en el origen y se recomienda así para facilitar las transformaciones.
             Box = TGCBox.fromSize(size, texture);
+
             BoxPiso = TGCBox.fromSize(new TGCVector3(1000, 50, 1000), texture);
-            //Posición donde quiero que este la caja, es común que se utilicen estructuras internas para las transformaciones.
-            //Entonces actualizamos la posición lógica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
             Box.Position = new TGCVector3(-200, Ypiso, 0);
 
             BoxPiso.Position = new TGCVector3(-300, -25, -100);
             BoxPiso.BoundingBox.move(TGCVector3.Empty - BoxPiso.Position);
             BoxPiso.updateValues();
-            
-            
-            //Cargo el unico mesh que tiene la escena.
+
+            MeshPiso.BoundingBox.move(TGCVector3.Empty - MeshPiso.Position);
+
+
             var skeletalLoader = new TgcSkeletalLoader();
             personaje =
                 skeletalLoader.loadMeshAndAnimationsFromFile(
@@ -110,7 +106,7 @@ namespace TGC.Group.Model
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
             //Posicion inicial
-            personaje.Position = new TGCVector3(0, Ypiso, 0);
+            personaje.Position = new TGCVector3(0, Ypiso+10, 0);
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = true;
             //Rotar al robot en el Init para que mire hacia el otro lado
@@ -120,11 +116,7 @@ namespace TGC.Group.Model
             {
                 TgcTexture.createTexture(D3DDevice.Instance.Device, directorio.RobotTextura)
             });
-            //Prueba de agregar al robot
-            // Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + /*"LogoTGC-TgcScene.xml"*/"Media\\ModelosTgc\\Robot\\Robot-TgcScene.xml").Meshes[0];
 
-            //Defino una escala en el modelo logico del mesh que es muy grande.
-            // Mesh.Scale = new TGCVector3(0.4f, 0.4f, 0.4f);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
@@ -156,13 +148,13 @@ namespace TGC.Group.Model
             bool OnGround = false;
             bool onObject = false;
 
+
             //(Si el personaje aparece en cualquier lado descomentar esto)
             while (ElapsedTime > 1)
             {
                 ElapsedTime = ElapsedTime / 10;
             };
 
-            //Capturar Input teclado
             if (Input.keyPressed(Key.F))
             {
                 BoundingBox = !BoundingBox;
@@ -265,24 +257,25 @@ namespace TGC.Group.Model
             var perPos = personaje.Position;
             var posOriginal = perPos;
 
-            velocidad = velocidad + ElapsedTime * aceleracion;
-            perPos = perPos + velocidad * ElapsedTime;
-            perPos.Y -= coeficienteDeSalto;
-            personaje.Move(perPos - personaje.Position);
+            //if (posOriginal.Y > 0) DESCOMENTAR ESTE IF SI QUERES SACAR LA COLISION CON EL PISO SIN CAER AL INFINITO
+            //{
+                velocidad = velocidad + ElapsedTime * aceleracion;
+                perPos = perPos + velocidad * ElapsedTime;
+                perPos.Y -= coeficienteDeSalto;
+                personaje.Move(perPos - personaje.Position);
 
-            if (aCollisionFound(personaje, Box))
-            {
-                onObject = true;
-                personaje.Position = posOriginal;
-                //personaje.playAnimation("Parado", true);
-            }
+                if (aCollisionFound(personaje, Box))
+                {
+                    onObject = true;
+                    personaje.Position = posOriginal;
+                }
 
-            if (aCollisionFound(personaje, BoxPiso))
-            {
-                OnGround = true;
-                personaje.Position = posOriginal;
-                //personaje.playAnimation("Parado", true);
-            }
+                if (aCollisionFound(personaje, MeshPiso))
+                {
+                    OnGround = true;
+                    personaje.Position = posOriginal;
+                }
+            //}
 
             var boxPosition = Box.Position;
 
@@ -335,7 +328,7 @@ namespace TGC.Group.Model
             //A modo ejemplo realizamos toda las multiplicaciones, pero aquí solo nos hacia falta la traslación.
             //Finalmente invocamos al render de la caja
             Box.Render();
-            BoxPiso.Render();
+            //BoxPiso.Render();
             scene.RenderAll();
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
@@ -347,7 +340,7 @@ namespace TGC.Group.Model
             if (BoundingBox)
             {
                 Box.BoundingBox.Render();
-          
+                MeshPiso.BoundingBox.Render();
             }
 
             personaje.animateAndRender(ElapsedTime);
@@ -361,12 +354,12 @@ namespace TGC.Group.Model
             PostRender();
         }
 
-        public bool aCollisionFound(TgcSkeletalMesh personaje, TGCBox Box)
+        public bool aCollisionFound(TgcSkeletalMesh personaje, TGCBox aBox)
         {
             var collisionFound = false;
 
             //Ejecutar algoritmo de detección de colisiones
-            var collisionResult = TgcCollisionUtils.classifyBoxBox(personaje.BoundingBox, Box.BoundingBox);
+            var collisionResult = TgcCollisionUtils.classifyBoxBox(personaje.BoundingBox, aBox.BoundingBox);
 
             //Hubo colisión con un objeto. 
             if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
@@ -378,6 +371,23 @@ namespace TGC.Group.Model
             return collisionFound;
         }
 
+
+        public bool aCollisionFound(TgcSkeletalMesh personaje, TgcMesh mesh)
+        {
+            var collisionFound = false;
+
+            //Ejecutar algoritmo de detección de colisiones
+            var collisionResult = TgcCollisionUtils.classifyBoxBox(personaje.BoundingBox, mesh.BoundingBox);
+
+            //Hubo colisión con un objeto. 
+            if (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera)
+            {
+                collisionFound = true;
+            }
+
+            //Si hubo alguna colisión, entonces restaurar la posición original del mesh
+            return collisionFound;
+        }
 
         /// <summary>
         ///     Se llama cuando termina la ejecución del ejemplo.
