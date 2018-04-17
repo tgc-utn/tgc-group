@@ -21,6 +21,7 @@ namespace TGC.Group.Model
     {
 
         public string EscenaSelva {get;set;}
+        public string EscenaArena { get; set; }
 
         public string RobotDirectorio { get; set; }
         public string RobotSkeletalMesh { get; set; }
@@ -33,22 +34,14 @@ namespace TGC.Group.Model
 
 
             EscenaSelva = mediaDir + "MeshCreator\\Scenes\\Selva\\Selva-TgcScene.xml" ;
+            EscenaArena = mediaDir + "MeshCreator\\Scenes\\Arena\\Arena-TgcScene.xml";
 
             RobotDirectorio = mediaDir + "SkeletalAnimations\\Robot\\";
             RobotSkeletalMesh = RobotDirectorio + "Robot-TgcSkeletalMesh.xml";
             RobotCaminando = RobotDirectorio + "Caminando-TgcSkeletalAnim.xml";
             RobotParado = RobotDirectorio + "Parado-TgcSkeletalAnim.xml";
-            RobotTextura = RobotDirectorio + "Textures\\uvw.jpg";
+            RobotTextura = RobotDirectorio + "Textures\\uvwGreen.jpg";
         }
 
-        /*
-         *  MediaDir + "Media\\SkeletalAnimations\\Robot\\Robot-TgcSkeletalMesh.xml",
-                    MediaDir + "Media\\SkeletalAnimations\\Robot\\",
-                    new[]
-                    {
-                        MediaDir + "Media\\SkeletalAnimations\\Robot\\Caminando-TgcSkeletalAnim.xml",
-                        MediaDir + "Media\\SkeletalAnimations\\Robot\\Parado-TgcSkeletalAnim.xml"
-                    });
-         * */
     }
 }

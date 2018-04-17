@@ -20,11 +20,18 @@ namespace TGC.Group.Model
     /// </summary>
     public class GameModel : TgcExample
     {
+        public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
+        {
+            Category = Game.Default.Category;
+            Name = Game.Default.Name;
+            Description = Game.Default.Description;
+        }
         /// <summary>
         ///     Constructor del juego.
         /// </summary>
         /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
         /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
+        private Directorio directorio;
         private TgcSkeletalMesh personaje;
         private TgcThirdPersonCamera camaraInterna;
         private Calculos calculo = new Calculos();
@@ -32,28 +39,25 @@ namespace TGC.Group.Model
         private TGCVector3 aceleracion = new TGCVector3(0, -100f, 0);
         private float Ypiso = 25f;
 
-        private TgcScene scene;
-        private Directorio directorio;
-
-
+       
         //Define direccion del mesh del personaje dependiendo el movimiento
         private Personaje dirPers = new Personaje();
 
         private float BoxMoveDirection = 1f;
         private float BoxMoveSpeed = 25f;
 
-        public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
-        {
-            Category = Game.Default.Category;
-            Name = Game.Default.Name;
-            Description = Game.Default.Description;
-        }
 
         //Caja que se muestra en el ejemplo.
         private TGCBox Box { get; set; }
         private TGCBox BoxPiso { get; set; }
+
+
         private TgcMesh MeshPiso { get; set; }
 
+
+        private TgcScene scene;
+
+        
         private bool BoundingBox { get; set; }
 
         /// <summary>
@@ -67,11 +71,13 @@ namespace TGC.Group.Model
             dirPers.CreateDictionary();
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
-            directorio = new Directorio(MediaDir);
 
+            //Objeto que conoce todos los path de MediaDir
+            directorio = new Directorio(MediaDir);
 
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(directorio.EscenaSelva);
+            
             MeshPiso = scene.Meshes.Find(x => x.Name == "Piso");
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
@@ -93,15 +99,14 @@ namespace TGC.Group.Model
 
 
             var skeletalLoader = new TgcSkeletalLoader();
-            personaje =
-                skeletalLoader.loadMeshAndAnimationsFromFile(
-                    directorio.RobotSkeletalMesh,
-                    directorio.RobotDirectorio,
-                    new[]
-                    {
-                        directorio.RobotCaminando,
-                        directorio.RobotParado
-                    });
+            personaje = skeletalLoader.loadMeshAndAnimationsFromFile(
+                                                                    directorio.RobotSkeletalMesh,
+                                                                    directorio.RobotDirectorio,
+                                                                    new[]
+                                                                    {
+                                                                        directorio.RobotCaminando,
+                                                                        directorio.RobotParado
+                                                                    });
 
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
@@ -123,7 +128,7 @@ namespace TGC.Group.Model
             //El framework maneja una cámara estática, pero debe ser inicializada.
             //Posición de la camara.
 
-            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 200, -900);
+            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 400, -900);
             //Quiero que la camara mire hacia el origen (0,0,0).
             var lookAt = TGCVector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
@@ -252,6 +257,9 @@ namespace TGC.Group.Model
             else {
                 if (animation != "Caminando") animation = "Parado";
             }
+
+
+
             personaje.playAnimation(animation, true);
 
             var perPos = personaje.Position;
@@ -337,18 +345,15 @@ namespace TGC.Group.Model
             //Mesh.Render();
 
             //Render de BoundingBox, muy útil para debug de colisiones.
+            personaje.animateAndRender(ElapsedTime);
             if (BoundingBox)
             {
                 Box.BoundingBox.Render();
                 MeshPiso.BoundingBox.Render();
-            }
-
-            personaje.animateAndRender(ElapsedTime);
-            if (BoundingBox)
-            {
+                scene.BoundingBox.Render();
                 personaje.BoundingBox.Render();
-            }
 
+            }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
