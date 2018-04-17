@@ -1,4 +1,5 @@
 using Microsoft.DirectX.DirectInput;
+using Microsoft.DirectX.Direct3D;
 using System.Drawing;
 using System.Linq;
 using TGC.Core.Direct3D;
@@ -9,6 +10,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.Textures;
+
 
 namespace TGC.Group.Model
 {
@@ -32,12 +34,12 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        public float convertirARad(float valorAngulo)
-        {
-            return valorAngulo * 3.14159265f / 180f;
-        }
-
         private Cam camaraInterna;
+
+        float convertirARad(float angulo)
+        {
+            return angulo * 3.1415965f / 180f;
+        }
 
         // Mesh del jugador.
         private TgcSkeletalMesh personaje;
@@ -48,11 +50,6 @@ namespace TGC.Group.Model
         float piValue = 3.1415965f;
         float quarterPi = 3.1415965f / 4f;
         float halfPi = 3.1415965f / 2f;
-        float jumpPosMax = 15f;
-        float jumpPos = 0f;
-        float jumpSpeed = 25f;
-        float yAxisSpeed = 0f;
-        float rotationSpeed = 25f;
         string movementOrientation = "Forward";
 
         /// <summary>
@@ -105,154 +102,205 @@ namespace TGC.Group.Model
 
             TGCVector3 movement = new TGCVector3(0, 0, 0);
 
-            if (Input.keyDown(Key.UpArrow) || Input.keyDown(Key.W))
+            /* if (Input.keyDown(Key.UpArrow) || Input.keyDown(Key.W))
+             {
+                 if (movementOrientation != "Forward")
+                 {
+                     if (movementOrientation == "Backwards")
+                     {
+                         personaje.RotateY(piValue);
+                         movementOrientation = "Forward";
+                         camaraInterna.rotateY(180f * ElapsedTime);
+
+                     }
+
+                     else if (movementOrientation == "Left")
+                     {
+                         personaje.RotateY(halfPi);
+                         movementOrientation = "Forward";
+                         camaraInterna.rotateY(90f * ElapsedTime);
+                     }
+
+                     else if (movementOrientation == "Right")
+                     {
+                         personaje.RotateY(-halfPi);
+                         movementOrientation = "Forward";
+                         camaraInterna.rotateY(-90f * ElapsedTime);
+                     }
+                 }
+
+                 movement.Z -= 1;
+                 moving = true;
+             }
+
+             else if (Input.keyDown(Key.DownArrow) || Input.keyDown(Key.S))
+             {
+                 if (movementOrientation != "Backwards")
+                 {
+                     if (movementOrientation == "Forward")
+                     {
+                         personaje.RotateY(piValue);
+                         movementOrientation = "Backwards";
+                         camaraInterna.rotateY(180f * ElapsedTime);
+                     }
+
+                     else if (movementOrientation == "Left")
+                     {
+                         personaje.RotateY(-halfPi);
+                         movementOrientation = "Backwards";
+                         camaraInterna.rotateY(-90f * ElapsedTime);
+                     }
+
+                     else if (movementOrientation == "Right")
+                     {
+                         personaje.RotateY(halfPi);
+                         movementOrientation = "Backwards";
+                         camaraInterna.rotateY(90f * ElapsedTime);
+                     }
+                 }
+
+                 movement.Z += 1;
+                 moving = true;
+             }
+
+             else if (Input.keyDown(Key.RightArrow) || Input.keyDown(Key.D))
+             {
+                 if (movementOrientation != "Right")
+                 {
+                     if (movementOrientation == "Backwards")
+                     {
+                         personaje.RotateY(-halfPi);
+                         movementOrientation = "Right";
+                         camaraInterna.rotateY(-90f * ElapsedTime);
+                     }
+
+                     else if (movementOrientation == "Left")
+                     {
+                         personaje.RotateY(-piValue);
+                         movementOrientation = "Right";
+                         camaraInterna.rotateY(180f * ElapsedTime);
+                     }
+
+                     else if (movementOrientation == "Forward")
+                     {
+                         personaje.RotateY(halfPi);
+                         movementOrientation = "Right";
+                         camaraInterna.rotateY(90f * ElapsedTime);
+                     }
+                 }
+
+                 movement.X -= 1;
+                 moving = true;
+             }
+
+             else if (Input.keyDown(Key.LeftArrow) || Input.keyDown(Key.A))
+             {
+                 if (movementOrientation != "Left")
+                 {
+                     if (movementOrientation == "Backwards")
+                     {
+                         personaje.RotateY(halfPi);
+                         movementOrientation = "Left";
+                         camaraInterna.rotateY(90f * ElapsedTime);
+                     }
+
+                     else if (movementOrientation == "Forward")
+                     {
+                         personaje.RotateY(-halfPi);
+                         movementOrientation = "Left";
+                         camaraInterna.rotateY(-90f * ElapsedTime);
+                     }
+
+                     else if (movementOrientation == "Right")
+                     {
+                         personaje.RotateY(piValue);
+                         movementOrientation = "Left";
+                         camaraInterna.rotateY(180f * ElapsedTime);
+                     }
+                 }
+
+                 movement.X += 1;
+                 moving = true;
+             }
+
+             if (moving)
+             {
+
+                 personaje.playAnimation("Caminando", true);
+             }
+
+             else
+             {
+
+                 personaje.playAnimation("Parado", true);
+             }
+
+             movement = movement * 220f * ElapsedTime;
+             personaje.Move(movement);
+     */
+            var velocidadCaminar = 12000f*ElapsedTime;
+            var velocidadRotacion = 180f;
+
+            var moveForward = 0f;
+            float rotate = 0;
+            var rotating = false;
+
+            if (Input.keyDown(Key.W))
             {
-                if (movementOrientation != "Forward")
-                {
-                    if (movementOrientation == "Backwards")
-                    {
-                        personaje.RotateY(piValue);
-                        movementOrientation = "Forward";
-                        camaraInterna.rotateY(180f * ElapsedTime);
-                    }
-
-                    else if (movementOrientation == "Left")
-                    {
-                        personaje.RotateY(halfPi);
-                        movementOrientation = "Forward";
-                        camaraInterna.rotateY(90f * ElapsedTime);
-                    }
-
-                    else if (movementOrientation == "Right")
-                    {
-                        personaje.RotateY(-halfPi);
-                        movementOrientation = "Forward";
-                        camaraInterna.rotateY(-90f * ElapsedTime);
-                    }
-                }
-
-                movement.Z -= 1;
+                moveForward = -velocidadCaminar;
                 moving = true;
             }
 
-            else if (Input.keyDown(Key.DownArrow) || Input.keyDown(Key.S))
+            //Atras
+            if (Input.keyDown(Key.S))
             {
-                if (movementOrientation != "Backwards")
-                {
-                    if (movementOrientation == "Forward")
-                    {
-                        personaje.RotateY(piValue);
-                        movementOrientation = "Backwards";
-                        camaraInterna.rotateY(180f * ElapsedTime);
-                    }
-
-                    else if (movementOrientation == "Left")
-                    {
-                        personaje.RotateY(-halfPi);
-                        movementOrientation = "Backwards";
-                        camaraInterna.rotateY(-90f * ElapsedTime);
-                    }
-
-                    else if (movementOrientation == "Right")
-                    {
-                        personaje.RotateY(halfPi);
-                        movementOrientation = "Backwards";
-                        camaraInterna.rotateY(90f * ElapsedTime);
-                    }
-                }
-
-                movement.Z += 1;
+                moveForward = velocidadCaminar;
                 moving = true;
             }
 
-            else if (Input.keyDown(Key.RightArrow) || Input.keyDown(Key.D))
+            //Derecha
+            if (Input.keyDown(Key.D))
             {
-                if (movementOrientation != "Right")
-                {
-                    if (movementOrientation == "Backwards")
-                    {
-                        personaje.RotateY(-halfPi);
-                        movementOrientation = "Right";
-                        camaraInterna.rotateY(-90f * ElapsedTime);
-                    }
-
-                    else if (movementOrientation == "Left")
-                    {
-                        personaje.RotateY(-piValue);
-                        movementOrientation = "Right";
-                        camaraInterna.rotateY(180f * ElapsedTime);
-                    }
-
-                    else if (movementOrientation == "Forward")
-                    {
-                        personaje.RotateY(halfPi);
-                        movementOrientation = "Right";
-                        camaraInterna.rotateY(90f * ElapsedTime);
-                    }
-                }
-
-                movement.X -= 1;
-                moving = true;
+                rotate = velocidadRotacion;
+                rotating = true;
             }
 
-            else if (Input.keyDown(Key.LeftArrow) || Input.keyDown(Key.A))
+            //Izquierda
+            if (Input.keyDown(Key.A))
             {
-                if (movementOrientation != "Left")
-                {
-                    if (movementOrientation == "Backwards")
-                    {
-                        personaje.RotateY(halfPi);
-                        movementOrientation = "Left";
-                        camaraInterna.rotateY(90f * ElapsedTime);
-                    }
-
-                    else if (movementOrientation == "Forward")
-                    {
-                        personaje.RotateY(-halfPi);
-                        movementOrientation = "Left";
-                        camaraInterna.rotateY(-90f * ElapsedTime);
-                    }
-
-                    else if (movementOrientation == "Right")
-                    {
-                        personaje.RotateY(piValue);
-                        movementOrientation = "Left";
-                        camaraInterna.rotateY(180f * ElapsedTime);
-                    }
-                }
-
-                movement.X += 1;
-                moving = true;
+                rotate = -velocidadRotacion;
+                rotating = true;
             }
 
-            else if (Input.keyUp(Key.Space))
+            //Si hubo rotacion
+            if (rotating)
             {
-                if (jumpPos < jumpPosMax)
-                {
-                    yAxisSpeed = jumpSpeed;
-                }
+                //Rotar personaje y la camara, hay que multiplicarlo por el tiempo transcurrido para no atarse a la velocidad el hardware
+                var rotAngle = convertirARad(rotate * ElapsedTime);
+                personaje.RotateY(rotAngle);
+                camaraInterna.rotateY(rotAngle);
             }
 
+            //Si hubo desplazamiento
             if (moving)
             {
-
+                //Activar animacion de caminando
                 personaje.playAnimation("Caminando", true);
             }
 
             else
             {
-
                 personaje.playAnimation("Parado", true);
             }
+                //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
+                var lastPos = personaje.Position;
 
-            movement = movement * 220f * ElapsedTime;
-            personaje.Move(movement);
+                personaje.MoveOrientedY(moveForward * ElapsedTime);
 
-            camaraInterna.Target = personaje.Position;
+                camaraInterna.Target = personaje.Position;
 
-            PostUpdate();
-        }
-
+                PostUpdate();
+            }
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aquí todo el código referido al renderizado.
