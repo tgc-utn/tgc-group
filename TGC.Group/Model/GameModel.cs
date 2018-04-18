@@ -314,7 +314,6 @@ namespace TGC.Group.Model
             camaraInterna.Target = personaje.Position;
             PostUpdate();
         }
-<<<<<<< HEAD
 
         private void flip()
         {
@@ -323,8 +322,6 @@ namespace TGC.Group.Model
             //Es solo un comentario de relleno
         }
 
-=======
->>>>>>> master
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aquí todo el código referido al renderizado.
