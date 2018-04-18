@@ -33,7 +33,6 @@ namespace TGC.Group.Model
         }
 
         private VehiculoLiviano auto;
-        //private VehiculoPesado auto;
         private CamaraEnTerceraPersona camaraInterna;
         private TGCBox cubo;
         private TgcPlane piso;
@@ -44,14 +43,23 @@ namespace TGC.Group.Model
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\pasto.jpg");
             piso = new TgcPlane(new TGCVector3(-500, 0, -500), new TGCVector3(1000, 0, 1000), TgcPlane.Orientations.XZplane, pisoTexture);
 
+            //creo el vehiculo liviano
+            //si quiero crear un vehiculo pesado (camion) hago esto
+            // VehiculoPesado camion = new VehiculoPesado(rutaAMesh);
+            // se hace esta distinción de vehiculo liviano y pesado por que cada uno tiene diferentes velocidades,
+            // peso, salto, etc.
             auto = new VehiculoLiviano(MediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml");
-            //auto = new VehiculoPesado(MediaDir + "meshCreator\\meshes\\Vehiculos\\CamionTroncos\\CamionDeTroncos-TgcScene.xml");
+            //lo escale por que el vehiculo se veia muy chico. pero se podria acercar la camara de ultima
             auto.escalar(new TGCVector3(0.1f, 0.1f, 0.1f));
+            //lo roto 180 grados por que sino, el frente queda mirando a la camara
             auto.rotarEnY(FastMath.PI);
 
-            //cubo
+            //creo un cubo para tomarlo de referencia (para ver como se mueve el auto)
             cubo = TGCBox.fromSize(new TGCVector3(-50, 10, -20), new TGCVector3(15, 15, 15), Color.Black);
 
+            //creo la camara en tercera persona (la clase CamaraEnTerceraPersona hereda de la clase real del framework
+            //que te permite configurar la posicion, el lookat, etc. Lo que hacemos al heredar, es reescribir algunos
+            //metodos y setear valores default para que la camara quede mirando al auto en 3era persona
             camaraInterna = new CamaraEnTerceraPersona(auto.posicion(), 30, -75);
             Camara = camaraInterna;
 
@@ -61,33 +69,37 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
-            TGCVector3 movement = TGCVector3.Empty;
-
-            //Adelante
+            //si el usuario teclea la W y ademas no tecla la D o la A
             if (Input.keyDown(Key.W) && !(Input.keyDown(Key.D) || Input.keyDown(Key.A)))
             {
+                //hago avanzar al auto hacia adelante. Le paso el Elapsed Time que se utiliza para
+                //multiplicarlo a la velocidad del auto y no depender del hardware del computador
                 auto.avanzar(ElapsedTime);
 
             }
 
-            //Atras
+            //lo mismo que para avanzar pero para retroceder
             if (Input.keyDown(Key.S) && !(Input.keyDown(Key.D) || Input.keyDown(Key.A)))
             {
                 auto.retroceder(ElapsedTime);
             }
 
-            //Derecha
+            //si el usuario teclea D
             if (Input.keyDown(Key.D))
             {
+                //pregunto si además teclea W (así tomo la decisión de girar a la derecha) o
+                // si tecleo S (asi tomo la decision de girar a la derecha en retroceso)
+                //le paso la camara para que una vez que el auto gire un determinado angulo,
+                //la camara acompañe ese giro
                 if(Input.keyDown(Key.W)){
                     auto.avanzarHaciaLaDerecha(ElapsedTime, camaraInterna);
                 }
-                else if (Input.keyDown(Key.S) && ElapsedTime != 0f) {
+                else if (Input.keyDown(Key.S)) {
                     auto.retrocederHaciaLaDerecha(ElapsedTime, camaraInterna);
                 }
             }
 
-            //Derecha
+            //lo mismo que arriba
             if (Input.keyDown(Key.A))
             {
                 if (Input.keyDown(Key.W))
@@ -100,19 +112,18 @@ namespace TGC.Group.Model
                 }
             }
 
-            //Salto
+            //Si apreta espacio, salta
             if (Input.keyDown(Key.Space))
             {
                 auto.saltar(ElapsedTime);
             }
 
+            //esto es algo turbio que tengo que hacer, por que sino es imposible modelar el salto
             auto.actualizarSalto(ElapsedTime);
 
 
             //Hacer que la camara siga al personaje en su nueva posicion
-            camaraInterna.Target = auto.posicion();
-            
-            
+            camaraInterna.Target = auto.posicion();  
 
             PostUpdate();
         }
