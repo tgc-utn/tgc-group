@@ -85,9 +85,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
-    <Compile Include="Model\CameraClass.cs" />
+    <Compile Include="Model\Camara.cs" />
     <Compile Include="Model\Calculos.cs" />
     <Compile Include="Model\Directorio.cs" />
+    <Compile Include="Model\Escenario.cs" />
     <Compile Include="Model\Personaje.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Program.cs" />

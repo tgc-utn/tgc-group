@@ -9,6 +9,7 @@ using TGC.Core.Textures;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.Collision;
 using System;
+using System.Collections.Generic;
 
 namespace TGC.Group.Model
 {
@@ -46,16 +47,13 @@ namespace TGC.Group.Model
         private float BoxMoveDirection = 1f;
         private float BoxMoveSpeed = 25f;
 
+        private Escenario escenario;
 
-        //Caja que se muestra en el ejemplo.
         private TGCBox Box { get; set; }
-        private TGCBox BoxPiso { get; set; }
+        private TgcMesh piso { get; set; }
 
 
-        private TgcMesh MeshPiso { get; set; }
-
-
-        private TgcScene scene;
+        
 
         
         private bool BoundingBox { get; set; }
@@ -69,33 +67,29 @@ namespace TGC.Group.Model
         public override void Init()
         {
             dirPers.CreateDictionary();
+            
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
             //Objeto que conoce todos los path de MediaDir
             directorio = new Directorio(MediaDir);
 
-            var loader = new TgcSceneLoader();
-            scene = loader.loadSceneFromFile(directorio.EscenaSelva);
-            
-            MeshPiso = scene.Meshes.Find(x => x.Name == "Piso");
+            escenario = new Escenario(directorio.EscenaSelva);
+            piso = escenario.Piso();
+
+           
+
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
             var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
-
             var texture = TgcTexture.createTexture(pathTexturaCaja);
-
             var size = new TGCVector3(100, 50, 100);
             Box = TGCBox.fromSize(size, texture);
-
-            BoxPiso = TGCBox.fromSize(new TGCVector3(1000, 50, 1000), texture);
             Box.Position = new TGCVector3(-200, Ypiso, 0);
 
-            BoxPiso.Position = new TGCVector3(-300, -25, -100);
-            BoxPiso.BoundingBox.move(TGCVector3.Empty - BoxPiso.Position);
-            BoxPiso.updateValues();
+          
 
-            MeshPiso.BoundingBox.move(TGCVector3.Empty - MeshPiso.Position);
+            piso.BoundingBox.move(TGCVector3.Empty - piso.Position);
 
 
             var skeletalLoader = new TgcSkeletalLoader();
@@ -128,7 +122,7 @@ namespace TGC.Group.Model
             //El framework maneja una cámara estática, pero debe ser inicializada.
             //Posición de la camara.
 
-            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 400, -900);
+            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 800, -2000);
             //Quiero que la camara mire hacia el origen (0,0,0).
             var lookAt = TGCVector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
@@ -265,7 +259,7 @@ namespace TGC.Group.Model
             var perPos = personaje.Position;
             var posOriginal = perPos;
 
-            //if (posOriginal.Y > 0) DESCOMENTAR ESTE IF SI QUERES SACAR LA COLISION CON EL PISO SIN CAER AL INFINITO
+            //if (posOriginal.Y > 0) //DESCOMENTAR ESTE IF SI QUERES SACAR LA COLISION CON EL PISO SIN CAER AL INFINITO
             //{
                 velocidad = velocidad + ElapsedTime * aceleracion;
                 perPos = perPos + velocidad * ElapsedTime;
@@ -278,12 +272,16 @@ namespace TGC.Group.Model
                     personaje.Position = posOriginal;
                 }
 
-                if (aCollisionFound(personaje, MeshPiso))
+                if (aCollisionFound(personaje, piso))
                 {
                     OnGround = true;
                     personaje.Position = posOriginal;
                 }
-            //}
+
+                
+
+                
+           // }
 
             var boxPosition = Box.Position;
 
@@ -312,6 +310,9 @@ namespace TGC.Group.Model
 
             //Camara sigue al personaje
             camaraInterna.Target = personaje.Position;
+
+           
+
             PostUpdate();
         }
 
@@ -345,7 +346,7 @@ namespace TGC.Group.Model
             //Finalmente invocamos al render de la caja
             Box.Render();
             //BoxPiso.Render();
-            scene.RenderAll();
+            escenario.RenderAll();
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
             // Mesh.UpdateMeshTransform();
@@ -357,11 +358,14 @@ namespace TGC.Group.Model
             if (BoundingBox)
             {
                 Box.BoundingBox.Render();
-                MeshPiso.BoundingBox.Render();
-                scene.BoundingBox.Render();
+                piso.BoundingBox.Render();
+                
                 personaje.BoundingBox.Render();
 
+                escenario.RenderizarBoundingBoxes();
             }
+
+            
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
@@ -409,12 +413,11 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Dispose()
         {
-            //Dispose de la caja.
+           
             Box.Dispose();
             personaje.Dispose();
-            scene.DisposeAll();
-            //Dispose del mesh.
-         //   Mesh.Dispose();
+            escenario.DisposeAll();
+            
         }
     }
 }
