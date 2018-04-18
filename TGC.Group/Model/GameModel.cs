@@ -77,7 +77,9 @@ namespace TGC.Group.Model
 
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(directorio.EscenaSelva);
-            
+
+            //scene.Meshes.ForEach(x => Console.WriteLine(x.Name));
+
             MeshPiso = scene.Meshes.Find(x => x.Name == "Piso");
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
@@ -312,6 +314,9 @@ namespace TGC.Group.Model
 
             //Camara sigue al personaje
             camaraInterna.Target = personaje.Position;
+
+           
+
             PostUpdate();
         }
         /// <summary>
@@ -350,10 +355,14 @@ namespace TGC.Group.Model
             {
                 Box.BoundingBox.Render();
                 MeshPiso.BoundingBox.Render();
-                scene.BoundingBox.Render();
+                
                 personaje.BoundingBox.Render();
 
+                scene.BoundingBox.Render();
+
             }
+
+            
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
@@ -401,12 +410,11 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Dispose()
         {
-            //Dispose de la caja.
+           
             Box.Dispose();
             personaje.Dispose();
             scene.DisposeAll();
-            //Dispose del mesh.
-         //   Mesh.Dispose();
+            
         }
     }
 }
