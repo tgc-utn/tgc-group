@@ -25,7 +25,7 @@ namespace TGC.Group.Model
 
         public float AnguloARadianes(float angulo, float timeLapse)
         {
-            return ((angulo * timeLapse) * 3.14159265f) / 180f;
+            return ((angulo * 3.14159265f) / 180f) * timeLapse;
         }
 
         public bool VectoresParalelos(TGCVector3 v1, TGCVector3 v2)
