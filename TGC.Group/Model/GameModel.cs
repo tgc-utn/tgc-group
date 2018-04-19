@@ -36,12 +36,19 @@ namespace TGC.Group.Model
         private CamaraEnTerceraPersona camaraInterna;
         private TGCBox cubo;
         private TgcPlane piso;
+        private TgcScene scene;
 
         public override void Init()
         {
             //Crear piso
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, MediaDir + "Texturas\\pasto.jpg");
             piso = new TgcPlane(new TGCVector3(-500, 0, -500), new TGCVector3(1000, 0, 1000), TgcPlane.Orientations.XZplane, pisoTexture);
+
+            //en caso de querer cargar una escena
+            //TgcSceneLoader loader = new TgcSceneLoader();
+            //scene = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Scenes\\Ciudad\\Ciudad-TgcScene.xml");
+            
+            
 
             //creo el vehiculo liviano
             //si quiero crear un vehiculo pesado (camion) hago esto
@@ -128,7 +135,9 @@ namespace TGC.Group.Model
             PreRender();
 
             piso.Render();
-            
+
+            //scene.RenderAll();
+
             auto.Render();
 
             cubo.Transform =
