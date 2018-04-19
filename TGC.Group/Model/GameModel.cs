@@ -319,6 +319,14 @@ namespace TGC.Group.Model
 
             PostUpdate();
         }
+
+        private void flip()
+        {
+            camaraInterna.Flip();
+            personaje.RotateY(3.1415f);
+            //Es solo un comentario de relleno
+        }
+
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aquí todo el código referido al renderizado.
