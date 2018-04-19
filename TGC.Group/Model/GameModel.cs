@@ -51,8 +51,8 @@ namespace TGC.Group.Model
             auto = new VehiculoLiviano(MediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml");
             //lo escale por que el vehiculo se veia muy chico. pero se podria acercar la camara de ultima
             auto.escalar(new TGCVector3(0.1f, 0.1f, 0.1f));
-            //lo roto 180 grados por que sino, el frente queda mirando a la camara
-            auto.rotarEnY(FastMath.PI);
+            
+            
 
             //creo un cubo para tomarlo de referencia (para ver como se mueve el auto)
             cubo = TGCBox.fromSize(new TGCVector3(-50, 10, -20), new TGCVector3(15, 15, 15), Color.Black);
@@ -72,7 +72,7 @@ namespace TGC.Group.Model
             auto.setElapsedTime(ElapsedTime);
 
             //si el usuario teclea la W y ademas no tecla la D o la A
-            if (Input.keyDown(Key.W) && !(Input.keyDown(Key.D) || Input.keyDown(Key.A)))
+            if (Input.keyDown(Key.W))
             {
                 //hago avanzar al auto hacia adelante. Le paso el Elapsed Time que se utiliza para
                 //multiplicarlo a la velocidad del auto y no depender del hardware del computador
@@ -81,7 +81,7 @@ namespace TGC.Group.Model
             }
 
             //lo mismo que para avanzar pero para retroceder
-            if (Input.keyDown(Key.S) && !(Input.keyDown(Key.D) || Input.keyDown(Key.A)))
+            if (Input.keyDown(Key.S))
             {
                 auto.retroceder();
             }
@@ -89,28 +89,24 @@ namespace TGC.Group.Model
             //si el usuario teclea D
             if (Input.keyDown(Key.D))
             {
-                //pregunto si además teclea W (así tomo la decisión de girar a la derecha) o
-                // si tecleo S (asi tomo la decision de girar a la derecha en retroceso)
-                //le paso la camara para que una vez que el auto gire un determinado angulo,
-                //la camara acompañe ese giro
-                if(Input.keyDown(Key.W)){
-                    auto.avanzarHaciaLaDerecha(camaraInterna);
+                if (Input.keyDown(Key.W))
+                {
+                    auto.doblarALaDerecha(camaraInterna);
                 }
-                else if (Input.keyDown(Key.S)) {
-                    auto.retrocederHaciaLaDerecha(camaraInterna);
+                else if(Input.keyDown(Key.S))
+                {
+                    auto.doblarALaIzquierda(camaraInterna);
                 }
-            }
-
-            //lo mismo que arriba
-            if (Input.keyDown(Key.A))
+                
+            }else if (Input.keyDown(Key.A))
             {
                 if (Input.keyDown(Key.W))
                 {
-                    auto.avanzarHaciaLaIzquierda(camaraInterna);
+                    auto.doblarALaIzquierda(camaraInterna);
                 }
                 else if (Input.keyDown(Key.S))
                 {
-                    auto.retrocederHaciaLaIzquierda(camaraInterna);
+                    auto.doblarALaDerecha(camaraInterna);
                 }
             }
 
