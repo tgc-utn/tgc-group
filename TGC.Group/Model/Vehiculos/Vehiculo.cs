@@ -53,7 +53,10 @@ namespace TGC.Group.Model
             this.mesh = scene.Meshes[0];
             //lo roto 180 grados por que sino, el frente queda mirando a la camara
             mesh.RotateY(FastMath.PI);
+            //lo escale por que el vehiculo se veia muy chico. pero se podria acercar la camara de ultima
+            mesh.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
         }
+
         //aca se pudre todo por que todos los moviemientos del vehiculo son con vectores
 
         public void avanzar()
@@ -187,7 +190,9 @@ namespace TGC.Group.Model
             }
         }
 
-        //funciones para usar en el Render y Dispose
+        //esta funcion si no la invoco, el ejemplo funciona igual
+        //por las dudas la dejo aca
+        /*
         public void transformar()
         {
             mesh.Transform =
@@ -196,6 +201,7 @@ namespace TGC.Group.Model
                             * TGCMatrix.Translation(mesh.Position);
             
         }
+        */
 
         private float distanciaDelPiso()
         {
