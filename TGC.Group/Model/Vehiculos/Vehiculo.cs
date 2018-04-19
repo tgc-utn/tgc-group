@@ -17,6 +17,8 @@ namespace TGC.Group.Model
         private TgcMesh mesh;
         //lo necesito para saber la direccion en que mira el frente del auto
         private TGCVector3 vectorAdelante;
+        //lo necesito para saber si el auto esta saltando o esta cayendo del salto
+        private TGCVector3 vectorSalto;
         //velocidades de rotacion, traslado y salto, en las clases hijas se modifican segun
         // el tipo de vehiculo
         protected float velocidadRotacion = 1f;
@@ -34,6 +36,7 @@ namespace TGC.Group.Model
         {
             //inicializo todo
             vectorAdelante = new TGCVector3(0, 0, 1);
+            vectorSalto = new TGCVector3(0, 1, 0);
             TgcSceneLoader loader = new TgcSceneLoader();
             TgcScene scene = loader.loadSceneFromFile(rutaAMesh);
             this.mesh = scene.Meshes[0];
@@ -160,43 +163,40 @@ namespace TGC.Group.Model
         public void saltar()
         {
             //verifico si el auto no esta en pleno salto, ni cayendo del mismo
-            if(!subiendo && !bajando)
+            if(!this.estaSubiendo() && !this.estaBajando())
             {
                 //calculo el vector que le tengo que sumar al vector posicion del vehiculo para realizar la
                 //transformacion
-                TGCVector3 nuevaPosicion = new TGCVector3(0, 1, 0) * this.velocidadSalto * this.elapsedTime;
+                TGCVector3 nuevaPosicion = this.vectorSalto * this.velocidadSalto * this.elapsedTime;
                 //transformo
                 mesh.Move(this.minimaAlturaEntreVectores(new TGCVector3(0, ALTURA_SALTO, 0), nuevaPosicion));
                 //ahora indico que el auto esta en pleno salto
-                this.estaSubiendo();
+                
             }
         }
 
-        public void estaSubiendo()
+        private void cambiarDireccionVectorSalto()
         {
-            this.subiendo = true;
-            this.bajando = false;
+            this.vectorSalto.Y = -this.vectorSalto.Y;
         }
 
-        public void estaBajando()
+        public bool estaSubiendo()
         {
-            this.subiendo = false;
-            this.bajando = true;
+            return this.distanciaDelPiso() > 0 && this.vectorSalto.Y > 0;
         }
 
-        public void terminoElSalto()
+        public bool estaBajando()
         {
-            this.subiendo = false;
-            this.bajando = false;
+            return this.distanciaDelPiso() > 0 && this.vectorSalto.Y < 0;
         }
 
         public void actualizarSalto()
         {
             //si el auto esta en pleno salto
-            if (this.subiendo)
+            if (this.estaSubiendo())
             {
                 //calcula el nuevo desplazamiento hacia arriba que tiene que realizar
-                TGCVector3 nuevaPosicion = new TGCVector3(0, 1, 0) * this.velocidadSalto * this.elapsedTime;
+                TGCVector3 nuevaPosicion = this.vectorSalto * this.velocidadSalto * this.elapsedTime;
                 //si ese desplazamiento es mayor al permitido (ALTURA_SALTO) entonces solo salta hasta la altura maxima
                 //caso contrario, desplazate hacia arriba lo que tenias pensado desplazar
                 nuevaPosicion = (mesh.Position.Y + nuevaPosicion.Y) > ALTURA_SALTO? new TGCVector3(0, ALTURA_SALTO - mesh.Position.Y, 0) : nuevaPosicion;
@@ -205,19 +205,19 @@ namespace TGC.Group.Model
                 //si llegue a la altura maxima, indicar que el auto esta bajando
                 if (mesh.Position.Y == ALTURA_SALTO)
                 {
-                    this.estaBajando();
+                    this.cambiarDireccionVectorSalto();
                 }    
                 
             }
             //lo mismo que arriba
-            else if(bajando)
+            else if(this.estaBajando())
             {
-                TGCVector3 nuevaPosicion = new TGCVector3(0, -1, 0) * this.velocidadSalto * this.elapsedTime;
+                TGCVector3 nuevaPosicion = this.vectorSalto * this.velocidadSalto * this.elapsedTime;
                 nuevaPosicion = (mesh.Position.Y + nuevaPosicion.Y) < 0 ? new TGCVector3(0, -mesh.Position.Y, 0) : nuevaPosicion;
                 mesh.Move(nuevaPosicion);
                 if (mesh.Position.Y == 0)
                 {
-                    this.terminoElSalto();
+                    this.cambiarDireccionVectorSalto();
                 }
                 
             }
@@ -231,6 +231,11 @@ namespace TGC.Group.Model
                             * TGCMatrix.RotationYawPitchRoll(mesh.Rotation.Y, mesh.Rotation.X, mesh.Rotation.Z)
                             * TGCMatrix.Translation(mesh.Position);
             
+        }
+
+        private float distanciaDelPiso()
+        {
+            return mesh.Position.Y;
         }
 
         public void setElapsedTime(float time)
