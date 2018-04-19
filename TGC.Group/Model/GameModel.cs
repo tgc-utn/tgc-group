@@ -69,19 +69,21 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
+            auto.setElapsedTime(ElapsedTime);
+
             //si el usuario teclea la W y ademas no tecla la D o la A
             if (Input.keyDown(Key.W) && !(Input.keyDown(Key.D) || Input.keyDown(Key.A)))
             {
                 //hago avanzar al auto hacia adelante. Le paso el Elapsed Time que se utiliza para
                 //multiplicarlo a la velocidad del auto y no depender del hardware del computador
-                auto.avanzar(ElapsedTime);
+                auto.avanzar();
 
             }
 
             //lo mismo que para avanzar pero para retroceder
             if (Input.keyDown(Key.S) && !(Input.keyDown(Key.D) || Input.keyDown(Key.A)))
             {
-                auto.retroceder(ElapsedTime);
+                auto.retroceder();
             }
 
             //si el usuario teclea D
@@ -92,10 +94,10 @@ namespace TGC.Group.Model
                 //le paso la camara para que una vez que el auto gire un determinado angulo,
                 //la camara acompañe ese giro
                 if(Input.keyDown(Key.W)){
-                    auto.avanzarHaciaLaDerecha(ElapsedTime, camaraInterna);
+                    auto.avanzarHaciaLaDerecha(camaraInterna);
                 }
                 else if (Input.keyDown(Key.S)) {
-                    auto.retrocederHaciaLaDerecha(ElapsedTime, camaraInterna);
+                    auto.retrocederHaciaLaDerecha(camaraInterna);
                 }
             }
 
@@ -104,22 +106,22 @@ namespace TGC.Group.Model
             {
                 if (Input.keyDown(Key.W))
                 {
-                    auto.avanzarHaciaLaIzquierda(ElapsedTime, camaraInterna);
+                    auto.avanzarHaciaLaIzquierda(camaraInterna);
                 }
                 else if (Input.keyDown(Key.S))
                 {
-                    auto.retrocederHaciaLaIzquierda(ElapsedTime, camaraInterna);
+                    auto.retrocederHaciaLaIzquierda(camaraInterna);
                 }
             }
 
             //Si apreta espacio, salta
             if (Input.keyDown(Key.Space))
             {
-                auto.saltar(ElapsedTime);
+                auto.saltar();
             }
 
             //esto es algo turbio que tengo que hacer, por que sino es imposible modelar el salto
-            auto.actualizarSalto(ElapsedTime);
+            auto.actualizarSalto();
 
 
             //Hacer que la camara siga al personaje en su nueva posicion

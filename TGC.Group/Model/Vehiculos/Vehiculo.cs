@@ -27,6 +27,8 @@ namespace TGC.Group.Model
         private bool subiendo, bajando;
         //maxima altura que puede saltar un vehiculo
         private const float ALTURA_SALTO = 30f;
+        //tiempo transcurrido desde el ultimo render, se usa para hacer calculos de velocidad
+        private float elapsedTime;
 
         public Vehiculo(string rutaAMesh)
         {
@@ -41,7 +43,7 @@ namespace TGC.Group.Model
 
         //aca se pudre todo por que todos los moviemientos del vehiculo son con vectores
 
-        public void avanzar(float tiempoTranscurrido)
+        public void avanzar()
         {
             //lo que hace Move es sumarle a la posicion del mesh, un vector que le paso
             // ejemplo: suponete que el auto esta ubicado en el (0, 0, 0), si lo quiero
@@ -53,22 +55,22 @@ namespace TGC.Group.Model
             //Ahora suponete que el vehiculo se encuentra en (35, 0, -6) y el vectorAdelante
             //ésta apuntando al (1, 0, 1) entonces se pone más picante la cosa por que no entendes
             //nada pero en realidad es lo mismo que en el ejemplo anterior: (35, 0, -6) + (1, 0, 1) = (36, 0, -5)
-            mesh.Move(this.vectorAdelante * this.velocidadTraslado * tiempoTranscurrido);
+            mesh.Move(this.vectorAdelante * this.velocidadTraslado * this.elapsedTime);
         }
 
-        public void retroceder(float tiempoTranscurrido)
+        public void retroceder()
         {
             //lo mismo que en el anterior nada más que cambio el sentido del vector adelante
-            mesh.Move(-(this.vectorAdelante * this.velocidadTraslado * tiempoTranscurrido));
+            mesh.Move(-(this.vectorAdelante * this.velocidadTraslado * this.elapsedTime));
         }
 
-        public void avanzarHaciaLaDerecha(float tiempoTranscurrido, CamaraEnTerceraPersona camara)
+        public void avanzarHaciaLaDerecha(CamaraEnTerceraPersona camara)
         {
             //aca como se que voy a avanzar girando a la derecha, lo que hago es:
             //1. Avanzo comunmente como si hiria para adelante, esto lo que va a hacer es
             //avanzar una distancia muy chica
-            float rotacionReal = this.velocidadRotacion * tiempoTranscurrido;
-            this.avanzar(tiempoTranscurrido);
+            float rotacionReal = this.velocidadRotacion * this.elapsedTime;
+            this.avanzar();
             //2. Giro el MESH, es decir, el vehiculo físico
             this.rotarEnY(rotacionReal);
             //3. Creo una matrix de rotacion que gira una coordenada a un cierto angulo (en este
@@ -83,11 +85,11 @@ namespace TGC.Group.Model
 
         }
 
-        public void retrocederHaciaLaDerecha(float tiempoTranscurrido, CamaraEnTerceraPersona camara)
+        public void retrocederHaciaLaDerecha(CamaraEnTerceraPersona camara)
         {
             //lo mismo que antes
-            float rotacionReal = -this.velocidadRotacion * tiempoTranscurrido;
-            this.retroceder(tiempoTranscurrido);
+            float rotacionReal = -this.velocidadRotacion * this.elapsedTime;
+            this.retroceder();
             this.rotarEnY(rotacionReal);
             TGCMatrix matrizDeRotacion = new TGCMatrix();
             matrizDeRotacion.RotateY(rotacionReal);
@@ -96,11 +98,11 @@ namespace TGC.Group.Model
 
         }
 
-        public void retrocederHaciaLaIzquierda(float tiempoTranscurrido, CamaraEnTerceraPersona camara)
+        public void retrocederHaciaLaIzquierda(CamaraEnTerceraPersona camara)
         {
             //lo mismo que antes
-            float rotacionReal = this.velocidadRotacion * tiempoTranscurrido;
-            this.retroceder(tiempoTranscurrido);
+            float rotacionReal = this.velocidadRotacion * this.elapsedTime;
+            this.retroceder();
             this.rotarEnY(rotacionReal);
             TGCMatrix matrizDeRotacion = new TGCMatrix();
             matrizDeRotacion.RotateY(rotacionReal);
@@ -109,11 +111,11 @@ namespace TGC.Group.Model
 
         }
 
-        public void avanzarHaciaLaIzquierda(float tiempoTranscurrido, CamaraEnTerceraPersona camara)
+        public void avanzarHaciaLaIzquierda(CamaraEnTerceraPersona camara)
         {
             //lo mismo que antes
-            float rotacionReal = -this.velocidadRotacion * tiempoTranscurrido;
-            this.avanzar(tiempoTranscurrido);
+            float rotacionReal = -this.velocidadRotacion * this.elapsedTime;
+            this.avanzar();
             this.rotarEnY(rotacionReal);
             TGCMatrix matrizDeRotacion = new TGCMatrix();
             matrizDeRotacion.RotateY(rotacionReal);
@@ -155,14 +157,14 @@ namespace TGC.Group.Model
         //cuando el usuario apreta por primera vez el boton de saltar, entra por este metodo y realiza la lógica
         //luego hasta que el auto no ascienda y descienda hasta llegar nuevamente al piso, por más que el usuario
         //siga apretando espacio, el auto no va a hacer nada.
-        public void saltar(float tiempoTranscurrido)
+        public void saltar()
         {
             //verifico si el auto no esta en pleno salto, ni cayendo del mismo
             if(!subiendo && !bajando)
             {
                 //calculo el vector que le tengo que sumar al vector posicion del vehiculo para realizar la
                 //transformacion
-                TGCVector3 nuevaPosicion = new TGCVector3(0, 1, 0) * this.velocidadSalto * tiempoTranscurrido;
+                TGCVector3 nuevaPosicion = new TGCVector3(0, 1, 0) * this.velocidadSalto * this.elapsedTime;
                 //transformo
                 mesh.Move(this.minimaAlturaEntreVectores(new TGCVector3(0, ALTURA_SALTO, 0), nuevaPosicion));
                 //ahora indico que el auto esta en pleno salto
@@ -188,13 +190,13 @@ namespace TGC.Group.Model
             this.bajando = false;
         }
 
-        public void actualizarSalto(float tiempoTranscurrido)
+        public void actualizarSalto()
         {
             //si el auto esta en pleno salto
             if (this.subiendo)
             {
                 //calcula el nuevo desplazamiento hacia arriba que tiene que realizar
-                TGCVector3 nuevaPosicion = new TGCVector3(0, 1, 0) * this.velocidadSalto * tiempoTranscurrido;
+                TGCVector3 nuevaPosicion = new TGCVector3(0, 1, 0) * this.velocidadSalto * this.elapsedTime;
                 //si ese desplazamiento es mayor al permitido (ALTURA_SALTO) entonces solo salta hasta la altura maxima
                 //caso contrario, desplazate hacia arriba lo que tenias pensado desplazar
                 nuevaPosicion = (mesh.Position.Y + nuevaPosicion.Y) > ALTURA_SALTO? new TGCVector3(0, ALTURA_SALTO - mesh.Position.Y, 0) : nuevaPosicion;
@@ -210,7 +212,7 @@ namespace TGC.Group.Model
             //lo mismo que arriba
             else if(bajando)
             {
-                TGCVector3 nuevaPosicion = new TGCVector3(0, -1, 0) * this.velocidadSalto * tiempoTranscurrido;
+                TGCVector3 nuevaPosicion = new TGCVector3(0, -1, 0) * this.velocidadSalto * this.elapsedTime;
                 nuevaPosicion = (mesh.Position.Y + nuevaPosicion.Y) < 0 ? new TGCVector3(0, -mesh.Position.Y, 0) : nuevaPosicion;
                 mesh.Move(nuevaPosicion);
                 if (mesh.Position.Y == 0)
@@ -229,6 +231,11 @@ namespace TGC.Group.Model
                             * TGCMatrix.RotationYawPitchRoll(mesh.Rotation.Y, mesh.Rotation.X, mesh.Rotation.Z)
                             * TGCMatrix.Translation(mesh.Position);
             
+        }
+
+        public void setElapsedTime(float time)
+        {
+            this.elapsedTime = time;
         }
 
         public void Render()
