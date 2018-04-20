@@ -28,6 +28,7 @@ namespace TGC.Group.Model
         public string RobotSkeletalMesh { get; set; }
         public string RobotCaminando { get; set; }
         public string RobotParado { get; set; }
+        public string RobotSaltando { get; set; }
         public string RobotTextura { get; set; }
 
         public Directorio(string mediaDir)
@@ -43,6 +44,7 @@ namespace TGC.Group.Model
             RobotCaminando = RobotDirectorio + "Caminando-TgcSkeletalAnim.xml";
             RobotParado = RobotDirectorio + "Parado-TgcSkeletalAnim.xml";
             RobotTextura = RobotDirectorio + "Textures\\uvwGreen.jpg";
+            
         }
 
     }

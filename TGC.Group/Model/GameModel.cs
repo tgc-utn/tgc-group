@@ -39,7 +39,10 @@ namespace TGC.Group.Model
         private TGCVector3 aceleracion = new TGCVector3(0, -100f, 0);
         private float Ypiso = 25f;
         private float anguloMovido;
-       
+
+        bool OnGround = true;
+        bool onObject = false;
+
         //Define direccion del mesh del personaje dependiendo el movimiento
         private Personaje dirPers = new Personaje();
 
@@ -107,7 +110,7 @@ namespace TGC.Group.Model
                                                                     new[]
                                                                     {
                                                                         directorio.RobotCaminando,
-                                                                        directorio.RobotParado
+                                                                        directorio.RobotParado,
                                                                     });
 
             //Configurar animacion inicial
@@ -146,14 +149,13 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Update()
         {
-            PreUpdate();
-
+            PreUpdate();      
+            
             var velocidadCaminar = 300f;
             var velocidadCaminarID = 300f;
             var velocidadSalto = 200f;
             var coeficienteDeSalto = 0.2f;
-            bool OnGround = false;
-            bool onObject = false;
+            
 
 
             //(Si el personaje aparece en cualquier lado descomentar esto)
@@ -167,10 +169,24 @@ namespace TGC.Group.Model
                 BoundingBox = !BoundingBox;
             }
 
+
+            /*****************************MOVIMIENTOS********************************/
+
             var moveForward = 0f;
             var moveID = 0f;
             var moving = false;
             var movingID = false;
+
+            //Saltar
+            if (Input.keyPressed(Key.Space))
+            {
+                if (OnGround || onObject)
+                {
+                    velocidad.Y = velocidadSalto;
+                    OnGround = false;
+                    onObject = false;
+                }
+            }
 
             //Adelante
             if (Input.keyDown(Key.W))
@@ -257,27 +273,6 @@ namespace TGC.Group.Model
                 personaje.RotateY(anguloMovido);
             }
             
-
-
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             //Ejecución de movimiento
             if (moving)
             {
@@ -327,16 +322,13 @@ namespace TGC.Group.Model
             else {
                 if (animation != "Caminando") animation = "Parado";
             }
-
-
-
             personaje.playAnimation(animation, true);
-
+            /********************************EJECUCION MOVIMIENTOS************************************************************************/
             var perPos = personaje.Position;
             var posOriginal = perPos;
 
-            if (posOriginal.Y > 0) //DESCOMENTAR ESTE IF SI QUERES SACAR LA COLISION CON EL PISO SIN CAER AL INFINITO
-            {
+           // if (posOriginal.Y > 0) //DESCOMENTAR ESTE IF SI QUERES SACAR LA COLISION CON EL PISO SIN CAER AL INFINITO
+            //{
                 velocidad = velocidad + ElapsedTime * aceleracion;
                 perPos = perPos + velocidad * ElapsedTime;
                 perPos.Y -= coeficienteDeSalto;
@@ -345,15 +337,17 @@ namespace TGC.Group.Model
                 if (aCollisionFound(personaje, Box))
                 {
                     onObject = true;
+                    OnGround = false;
                     personaje.Position = posOriginal;
                 }
 
                 if (aCollisionFound(personaje, MeshPiso))
                 {
                     OnGround = true;
+                    onObject = false;
                     personaje.Position = posOriginal;
                 }
-            }
+            //}
 
             var boxPosition = Box.Position;
 
@@ -368,22 +362,10 @@ namespace TGC.Group.Model
             {
                 personaje.Move(0, BoxMoveSpeed * BoxMoveDirection * ElapsedTime, 0);
             }
-
-
-            //Saltar
-            if (Input.keyPressed(Key.Space))
-            {
-                if (OnGround || onObject)
-                {
-                    velocidad.Y = velocidadSalto;
-                    OnGround = false;
-                }
-            }
+            
 
             //Camara sigue al personaje
             camaraInterna.Target = personaje.Position;
-
-           
 
             PostUpdate();
         }
@@ -403,9 +385,11 @@ namespace TGC.Group.Model
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.GhostWhite);
             DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.GhostWhite);
-           /* DrawText.drawText("Angulo actual: " + dirPers.angleDir.angulo, 0, 45, Color.GhostWhite);
-            DrawText.drawText("Angulo actual rad: " + dirPers.angleDir.anguloRad, 0, 60, Color.GhostWhite);
-            DrawText.drawText("Angulo movido rad: " + anguloMovido, 0, 75, Color.GhostWhite); para validar correcto movimiento*/
+            /*DrawText.drawText("OnGround: " + OnGround, 0, 45, Color.GhostWhite);
+            DrawText.drawText("OnObject: " + onObject, 0, 60, Color.GhostWhite); para validar saltos correctos*/
+            /* DrawText.drawText("Angulo actual: " + dirPers.angleDir.angulo, 0, 45, Color.GhostWhite);
+             DrawText.drawText("Angulo actual rad: " + dirPers.angleDir.anguloRad, 0, 60, Color.GhostWhite);
+             DrawText.drawText("Angulo movido rad: " + anguloMovido, 0, 75, Color.GhostWhite); para validar correcto movimiento*/
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
