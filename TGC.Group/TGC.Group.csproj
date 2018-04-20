@@ -74,6 +74,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SphereCollisionUtils\BoundingBoxCollider.cs" />
+    <Compile Include="SphereCollisionUtils\Collider.cs" />
+    <Compile Include="SphereCollisionUtils\SphereCollisionManager.cs" />
+    <Compile Include="SphereCollisionUtils\SphereTriangleCollisionManager.cs" />
+    <Compile Include="SphereCollisionUtils\TriangleMeshCollider.cs" />
     <Compile Include="VectorMovement\DirectionAngle.cs" />
     <Compile Include="VectorMovement\DownDirection.cs" />
     <Compile Include="VectorMovement\DownLeftDirection.cs" />

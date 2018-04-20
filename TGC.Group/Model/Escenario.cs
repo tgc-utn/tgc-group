@@ -28,11 +28,11 @@ namespace TGC.Group.Model
 
         public List<TgcMesh> Rocas()=> scene.Meshes.FindAll(x => x.Layer == "ROCAS");
         
-        public TgcMesh Piso() =>scene.Meshes.Find(x => x.Name == "Piso");
+       public List<TgcMesh> Pisos() => scene.Meshes.FindAll(x => x.Layer == "PISOS");
         
         public List<TgcMesh> MeshesColisionables()
         {
-            return Paredes().Concat(Rocas()).ToList();
+           return Paredes().Concat(Rocas()).Concat(Pisos()).ToList();
         }
 
         public void RenderizarBoundingBoxes()
