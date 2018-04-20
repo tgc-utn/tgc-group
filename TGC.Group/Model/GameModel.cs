@@ -38,7 +38,7 @@ namespace TGC.Group.Model
         private TGCVector3 velocidad = TGCVector3.Empty;
         private TGCVector3 aceleracion = new TGCVector3(0, -100f, 0);
         private float Ypiso = 25f;
-
+        private float anguloMovido;
        
         //Define direccion del mesh del personaje dependiendo el movimiento
         private Personaje dirPers = new Personaje();
@@ -68,7 +68,7 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Init()
         {
-            dirPers.CreateDictionary();
+            //           dirPers.CreateDictionary();
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
@@ -113,11 +113,11 @@ namespace TGC.Group.Model
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
             //Posicion inicial
-            personaje.Position = new TGCVector3(0, Ypiso+10, 0);
+            personaje.Position = new TGCVector3(0, Ypiso + 10, 0);
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = true;
             //Rotar al robot en el Init para que mire hacia el otro lado
-            personaje.RotateY(3.1415f);
+            personaje.RotateY(calculo.AnguloARadianes(180f,1f));
             //Le cambiamos la textura para diferenciarlo un poco
             personaje.changeDiffuseMaps(new[]
             {
@@ -177,8 +177,8 @@ namespace TGC.Group.Model
             {
                 moveForward = -velocidadCaminar;
                 moving = true;
-                personaje.RotateY(dirPers.RotationAngle(Key.W));
-                dirPers.turnForward();
+                anguloMovido = dirPers.RotationAngle(Key.W);
+                personaje.RotateY(anguloMovido);
             }
 
             //Atras
@@ -186,8 +186,8 @@ namespace TGC.Group.Model
             {
                 moveForward = -velocidadCaminar;
                 moving = true;
-                personaje.RotateY(dirPers.RotationAngle(Key.S));
-                dirPers.turnBackwards();
+                anguloMovido = dirPers.RotationAngle(Key.S);
+                personaje.RotateY(anguloMovido);
             }
 
             //Derecha
@@ -195,8 +195,8 @@ namespace TGC.Group.Model
             {
                 moveID = velocidadCaminarID;
                 movingID = true;
-                personaje.RotateY(dirPers.RotationAngle(Key.D));
-                dirPers.turnRight();
+                anguloMovido = dirPers.RotationAngle(Key.D);
+                personaje.RotateY(anguloMovido);
             }
 
             //Izquierda
@@ -204,8 +204,8 @@ namespace TGC.Group.Model
             {
                 moveID = -velocidadCaminarID;
                 movingID = true;
-                personaje.RotateY(dirPers.RotationAngle(Key.A));
-                dirPers.turnLeft();
+                anguloMovido = dirPers.RotationAngle(Key.A);
+                personaje.RotateY(anguloMovido);
             }
 
             var animation = "";
@@ -268,7 +268,7 @@ namespace TGC.Group.Model
             var posOriginal = perPos;
 
             //if (posOriginal.Y > 0) DESCOMENTAR ESTE IF SI QUERES SACAR LA COLISION CON EL PISO SIN CAER AL INFINITO
-            //{
+           // {
                 velocidad = velocidad + ElapsedTime * aceleracion;
                 perPos = perPos + velocidad * ElapsedTime;
                 perPos.Y -= coeficienteDeSalto;
@@ -284,8 +284,8 @@ namespace TGC.Group.Model
                 {
                     OnGround = true;
                     personaje.Position = posOriginal;
-                }
-            //}
+             //   }
+            }
 
             var boxPosition = Box.Position;
 
@@ -320,13 +320,6 @@ namespace TGC.Group.Model
             PostUpdate();
         }
 
-        private void flip()
-        {
-            camaraInterna.Flip();
-            personaje.RotateY(3.1415f);
-            //Es solo un comentario de relleno
-        }
-
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aquí todo el código referido al renderizado.
@@ -342,7 +335,10 @@ namespace TGC.Group.Model
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.GhostWhite);
             DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.GhostWhite);
-           
+           /* DrawText.drawText("Angulo actual: " + dirPers.angleDir.angulo, 0, 45, Color.GhostWhite);
+            DrawText.drawText("Angulo actual rad: " + dirPers.angleDir.anguloRad, 0, 60, Color.GhostWhite);
+            DrawText.drawText("Angulo movido rad: " + anguloMovido, 0, 75, Color.GhostWhite); para validar correcto movimiento*/
+
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
             Box.Transform = TGCMatrix.Scaling(Box.Scale) * TGCMatrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) * TGCMatrix.Translation(Box.Position);

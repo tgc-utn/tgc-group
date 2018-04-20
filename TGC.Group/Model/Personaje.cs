@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.DirectX.DirectInput;
+using TGC.Group.VectorMovement;
+
 
 namespace TGC.Group.Model
 {
@@ -11,86 +13,61 @@ namespace TGC.Group.Model
     {
 
         private Calculos calculo = new Calculos();
-        private Dictionary<String, bool> direccionPersonaje { get; set; } = new Dictionary<string, bool>();
 
-        public void CreateDictionary()
-        {
-            direccionPersonaje.Add("facingForward", true);
-            direccionPersonaje.Add("facingBackwards", false);
-            direccionPersonaje.Add("facingRight", false);
-            direccionPersonaje.Add("facingLeft", false);
-        }
+        private DirectionVector angleDir = new DirectionVector(90f);
+        private DirectionVector upDir = new UpDirection();
+        private DirectionVector downDir = new DownDirection();
+        private DirectionVector rightDir = new RightDirection();
+        private DirectionVector leftDir = new LeftDirection();
+        private DirectionVector downRightDir = new DownRightDirection();
+        private DirectionVector downLeftDir = new DownLeftDirection();
+        private DirectionVector upRightDir = new UpRightDirection();
+        private DirectionVector upLeftDir = new UpLeftDirection();
+        private float anguloMovido;
+
+
         public float RotationAngle(Key input)
         {
-
             //Input W
-            if(input == Key.W && !direccionPersonaje["facingForward"])
+            if(input == Key.W && angleDir.angulo != upDir.angulo)
             {
-                if (direccionPersonaje["facingBackwards"]) return calculo.AnguloARadianes(180f, 1f);
-                if (direccionPersonaje["facingRight"]) return calculo.AnguloARadianes(-90f, 1f);
-                if (direccionPersonaje["facingLeft"]) return calculo.AnguloARadianes(90f, 1f);
+
+                anguloMovido = calculo.MovementAngle(angleDir, upDir);
+                angleDir.angulo = upDir.angulo;
+                angleDir.anguloRad = upDir.anguloRad;
+                return anguloMovido;
             }
 
             //Input S
-            if(input == Key.S && !direccionPersonaje["facingBackwards"])
+            if (input == Key.S && angleDir.angulo != downDir.angulo)
             {
-                if (direccionPersonaje["facingForward"]) return calculo.AnguloARadianes(180f, 1f);
-                if (direccionPersonaje["facingRight"]) return calculo.AnguloARadianes(90f, 1f);
-                if (direccionPersonaje["facingLeft"]) return calculo.AnguloARadianes(-90f, 1f);
-            }
 
+                anguloMovido = calculo.MovementAngle(angleDir, downDir);
+                angleDir.angulo = downDir.angulo;
+                angleDir.anguloRad = downDir.anguloRad;
+                return anguloMovido;
+            }
             //Input A
-            if(input == Key.A && !direccionPersonaje["facingLeft"])
+            if (input == Key.A && angleDir.angulo != leftDir.angulo)
             {
-                if (direccionPersonaje["facingForward"]) return calculo.AnguloARadianes(-90f, 1f);
-                if (direccionPersonaje["facingRight"]) return calculo.AnguloARadianes(180f, 1f);
-                if (direccionPersonaje["facingBackwards"]) return calculo.AnguloARadianes(90f, 1f);
+
+                anguloMovido =  calculo.MovementAngle(angleDir, leftDir);
+                angleDir.angulo = leftDir.angulo;
+                angleDir.anguloRad = leftDir.anguloRad;
+                return anguloMovido;
             }
             //Input D
-            if(input == Key.D && !direccionPersonaje["facingRight"])
+            if (input == Key.D && angleDir.angulo != rightDir.angulo)
             {
-                if (direccionPersonaje["facingForward"]) return calculo.AnguloARadianes(90f, 1f);
-                if (direccionPersonaje["facingLeft"]) return calculo.AnguloARadianes(180f, 1f);
-                if (direccionPersonaje["facingBackwards"]) return calculo.AnguloARadianes(-90f, 1f);
+                anguloMovido = calculo.MovementAngle(angleDir, rightDir);
+                angleDir.angulo = rightDir.angulo;
+                angleDir.anguloRad = rightDir.anguloRad;
+                return anguloMovido;
+                
             }
             return 0f;
         }
-
-        public void turnForward()
-        {
-
-            direccionPersonaje["facingForward"] = true;
-            direccionPersonaje["facingBackwards"] = false;
-            direccionPersonaje["facingRight"] = false;
-            direccionPersonaje["facingLeft"] = false;
-        }
-
-        public void turnBackwards()
-        {
-            direccionPersonaje["facingForward"] = false;
-            direccionPersonaje["facingBackwards"] = true;
-            direccionPersonaje["facingRight"] = false;
-            direccionPersonaje["facingLeft"] = false;
-
-        }
-
-        public void turnRight()
-        {
-            direccionPersonaje ["facingForward"] = false;
-            direccionPersonaje ["facingBackwards"] = false;
-            direccionPersonaje ["facingRight"] = true;
-            direccionPersonaje ["facingLeft"] = false;
-
-        }
-
-        public void turnLeft()
-        {
-            direccionPersonaje["facingForward"] = false;
-            direccionPersonaje["facingBackwards"] = false;
-            direccionPersonaje["facingRight"] = false;
-            direccionPersonaje["facingLeft"] = true;
-
-        }
+      
 
 
 

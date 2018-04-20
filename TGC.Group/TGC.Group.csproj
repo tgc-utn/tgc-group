@@ -74,6 +74,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="VectorMovement\DirectionVector.cs" />
+    <Compile Include="VectorMovement\DownDirection.cs" />
+    <Compile Include="VectorMovement\DownLeftDirection.cs" />
+    <Compile Include="VectorMovement\DownRightDirection.cs" />
     <Compile Include="Form\GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -85,6 +89,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="VectorMovement\LeftDirection.cs" />
     <Compile Include="Model\CameraClass.cs" />
     <Compile Include="Model\Calculos.cs" />
     <Compile Include="Model\Directorio.cs" />
@@ -92,6 +97,10 @@
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VectorMovement\RightDirection.cs" />
+    <Compile Include="VectorMovement\UpDirection.cs" />
+    <Compile Include="VectorMovement\UpLeftDirection.cs" />
+    <Compile Include="VectorMovement\UpRightDirection.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
     </EmbeddedResource>
