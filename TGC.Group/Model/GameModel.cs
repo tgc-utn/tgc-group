@@ -9,6 +9,7 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Group.Model;
 using TGC.Group.Model.Vehiculos;
+using TGC.Core.Text;
 
 namespace TGC.Group.Model
 {
@@ -39,7 +40,7 @@ namespace TGC.Group.Model
 
         public override void Init()
         {
-
+            
             //en caso de querer cargar una escena
             TgcSceneLoader loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Scenes\\CiudadBerreta\\CiudadBerreta-TgcScene.xml");
@@ -58,7 +59,7 @@ namespace TGC.Group.Model
             //creo la camara en tercera persona (la clase CamaraEnTerceraPersona hereda de la clase real del framework
             //que te permite configurar la posicion, el lookat, etc. Lo que hacemos al heredar, es reescribir algunos
             //metodos y setear valores default para que la camara quede mirando al auto en 3era persona
-            camaraInterna = new CamaraEnTerceraPersona(auto.posicion(), 30, -75);
+            camaraInterna = new CamaraEnTerceraPersona(auto.posicion(), 15, -50);
             Camara = camaraInterna;
 
         }
@@ -112,6 +113,11 @@ namespace TGC.Group.Model
             if (Input.keyDown(Key.Space))
             {
                 auto.saltar();
+            }
+
+            if (!Input.keyDown(Key.W) && !Input.keyDown(Key.S))
+            {
+                auto.actualizarVelocidad();
             }
 
             //esto es algo turbio que tengo que hacer, por que sino es imposible modelar el salto

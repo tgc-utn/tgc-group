@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Example;
+using TGC.Core.Input;
+using TGC.Core.Text;
+using System.Drawing;
+using Microsoft.DirectX.DirectInput;
 
 namespace TGC.Group.Model
 {
@@ -13,7 +17,7 @@ namespace TGC.Group.Model
     {
         //las velocidades actuales se van usar despues para modelar un mejor movimiento del aut0
         //pd: ahora no se usan
-        private float velocidadActual;
+        private float velocidadActual = 0;
         private float velocidadActualDeSalto;
         //utilizo un mesh como atributo para abstraernos de que es una sopa de triangulos
         //de esta forma, le mandamos mensajes al vehiculo como (avanzar, retroceder, etc)
@@ -31,6 +35,7 @@ namespace TGC.Group.Model
         protected float velocidadSalto = 70f;
         //maxima altura que puede saltar un vehiculo
         protected float alturaMaximaDeSalto = 30f;
+        protected float velocidadMaxima = 150f;
         //tiempo transcurrido desde el ultimo render, se usa para hacer calculos de velocidad
         private float elapsedTime;
 
@@ -73,13 +78,81 @@ namespace TGC.Group.Model
             //nada pero en realidad es lo mismo que en el ejemplo anterior: 
             // (35, 0, -6) + (1, 0, 2) * 10 * t = (35 + 10t, 0, -6 + 20t) sabiendo
             //que siempre se desplaza 10 unidades
-            mesh.Move(this.vectorAdelante * this.velocidadDeAvance * this.elapsedTime);
+            this.velocidadActual = this.velocidadFisica();
+            mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
+            
+            
+        }
+
+        private float velocidadFisica()
+        {
+
+            if(this.velocidadActual > this.velocidadMaxima)
+            {
+                this.velocidadActual = this.velocidadMaxima;
+                return this.velocidadMaxima;
+            }
+            else if(this.velocidadActual < -this.velocidadMaxima)
+            {
+                this.velocidadActual = -this.velocidadMaxima;
+                return this.velocidadMaxima;
+            }
+
+               if(this.velocidadActual == 0)
+               {
+                   this.velocidadActual = 40f;
+
+               }
+               else
+               {
+                   this.velocidadActual *= 1.001f;
+               }
+             
+            return System.Math.Abs(this.velocidadActual);
         }
 
         public void retroceder()
         {
             //lo mismo que en el anterior nada más que cambio el sentido del vector adelante
-            mesh.Move(-(this.vectorAdelante * this.velocidadDeRetroceso * this.elapsedTime));
+            this.velocidadActual = -this.velocidadFisica();
+            mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
+        }
+
+        public void actualizarVelocidad()
+        {
+            this.velocidadActual /= 1.005f;
+            if (this.velocidadActual > 1 || this.velocidadActual < -1)
+            {              
+                mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
+            }
+            else if (this.velocidadActual == 0)
+            {
+                return;
+            }
+            else
+            {
+                this.velocidadActual = 0;
+                System.Console.WriteLine("seteamos la velocidad a 0");
+            }
+        }
+
+        public void actualizarVelocidadRetroceso()
+        {
+
+            if (this.velocidadActual > 1)
+            {
+                this.velocidadActual /= 1.005f;
+                mesh.Move(-this.vectorAdelante * this.velocidadActual * this.elapsedTime);
+            }
+            else if (this.velocidadActual == 0)
+            {
+                return;
+            }
+            else
+            {
+                this.velocidadActual = 0;
+                System.Console.WriteLine("seteamos la velocidad a 0");
+            }
         }
 
         public void doblarALaDerecha(CamaraEnTerceraPersona camara)
@@ -208,8 +281,16 @@ namespace TGC.Group.Model
             return mesh.Position.Y;
         }
 
+        public TGCVector3 getVectorAdelante()
+        {
+            return this.vectorAdelante;
+        }
+
         public void setElapsedTime(float time)
         {
+            //TgcText2D texto = new TgcText2D();
+            //texto.drawText("hola", 10, 30, Color.Red);
+            //texto.render();
             this.elapsedTime = time;
         }
 
