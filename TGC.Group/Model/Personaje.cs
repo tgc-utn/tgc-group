@@ -26,49 +26,54 @@ namespace TGC.Group.Model
         private float anguloMovido;
 
 
+       
+
+        //Para 1 tecla
+        private bool validateMovement(Key i, Key valida, DirectionVector validationAngle)
+        {
+            return i == valida && angleDir.angulo != validationAngle.angulo;
+        }
         public float RotationAngle(Key input)
         {
             //Input W
-            if(input == Key.W && angleDir.angulo != upDir.angulo)
-            {
-
-                anguloMovido = calculo.MovementAngle(angleDir, upDir);
-                angleDir.angulo = upDir.angulo;
-                angleDir.anguloRad = upDir.anguloRad;
-                return anguloMovido;
-            }
-
+            if (validateMovement(input, Key.W, upDir)) return setAngle(upDir);
             //Input S
-            if (input == Key.S && angleDir.angulo != downDir.angulo)
-            {
-
-                anguloMovido = calculo.MovementAngle(angleDir, downDir);
-                angleDir.angulo = downDir.angulo;
-                angleDir.anguloRad = downDir.anguloRad;
-                return anguloMovido;
-            }
+            if (validateMovement(input, Key.S, downDir)) return setAngle(downDir);
             //Input A
-            if (input == Key.A && angleDir.angulo != leftDir.angulo)
-            {
-
-                anguloMovido =  calculo.MovementAngle(angleDir, leftDir);
-                angleDir.angulo = leftDir.angulo;
-                angleDir.anguloRad = leftDir.anguloRad;
-                return anguloMovido;
-            }
+            if (validateMovement(input, Key.A, leftDir)) return setAngle(leftDir);
             //Input D
-            if (input == Key.D && angleDir.angulo != rightDir.angulo)
-            {
-                anguloMovido = calculo.MovementAngle(angleDir, rightDir);
-                angleDir.angulo = rightDir.angulo;
-                angleDir.anguloRad = rightDir.anguloRad;
-                return anguloMovido;
-                
-            }
+            if (validateMovement(input, Key.D, rightDir)) return setAngle(rightDir);
             return 0f;
         }
-      
+        //Para 2 teclas
+        private bool validateMovement(Key i1, Key i2, Key valida1, Key valida2, DirectionVector validationAngle)
+        {
+            return (i1 == valida1 && i2 == valida2 || i1 == valida2 && i2 == valida1) && angleDir.angulo != validationAngle.angulo;
+        }
+        public float RotationAngle(Key input1, Key input2)
+        {
 
+            //Input W-D
+            if (validateMovement(input1, input2, Key.W, Key.D, upRightDir)) return setAngle(upRightDir);
+            //Input W-A
+            if (validateMovement(input1, input2, Key.W, Key.A, upLeftDir)) return setAngle(upLeftDir);
+            //Input S-D
+            if (validateMovement(input1, input2, Key.S, Key.D, downRightDir)) return setAngle(downRightDir);
+            //Input S-A
+            if (validateMovement(input1, input2, Key.S, Key.A, downLeftDir)) return setAngle(downLeftDir);
+            return 0f;
+        }
+        //Actualiza ángulo director del personaje
+        private float setAngle(DirectionVector d1)
+        {
+            anguloMovido = calculo.MovementAngle(angleDir, d1);
+            angleDir.angulo = d1.angulo;
+            angleDir.anguloRad = d1.anguloRad;
+            return anguloMovido;
+
+        }
+
+        
 
 
 

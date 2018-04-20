@@ -8,6 +8,6 @@ namespace TGC.Group.VectorMovement
 {
     class UpRightDirection : DirectionVector
     {
-        public UpRightDirection() : base(45f) { }
+        public UpRightDirection() : base(135f) { }
     }
 }

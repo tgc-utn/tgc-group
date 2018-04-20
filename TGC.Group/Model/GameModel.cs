@@ -210,7 +210,75 @@ namespace TGC.Group.Model
 
             var animation = "";
 
-            //Movimiento adelante-atrás
+            //Diagonales
+            //UpLeft
+            if(Input.keyDown(Key.W) && Input.keyDown(Key.A))
+            {
+                moveID = -velocidadCaminarID / 2;
+                movingID = true;
+                moveForward = -velocidadCaminar / 2;
+                moving = true;
+
+                anguloMovido = dirPers.RotationAngle(Key.W, Key.A);
+                personaje.RotateY(anguloMovido);
+
+            }
+            //UpRight
+            if (Input.keyDown(Key.W) && Input.keyDown(Key.D))
+            {
+                moveID = velocidadCaminarID / 2;
+                movingID = true;
+                moveForward = -velocidadCaminar / 2;
+                moving = true;
+
+                anguloMovido = dirPers.RotationAngle(Key.W, Key.D);
+                personaje.RotateY(anguloMovido);
+            }
+            //DownLeft
+            if (Input.keyDown(Key.S) && Input.keyDown(Key.A))
+            {
+                moveID = -velocidadCaminarID / 2;
+                movingID = true;
+                moveForward = -velocidadCaminar / 2;
+                moving = true;
+
+                anguloMovido = dirPers.RotationAngle(Key.S, Key.A);
+                personaje.RotateY(anguloMovido);
+            }
+            //DownRight
+            if (Input.keyDown(Key.S) && Input.keyDown(Key.D))
+            {
+                moveID = velocidadCaminarID / 2;
+                movingID = true;
+                moveForward = -velocidadCaminar / 2;
+                moving = true;
+
+                anguloMovido = dirPers.RotationAngle(Key.S, Key.D);
+                personaje.RotateY(anguloMovido);
+            }
+            
+
+
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //Ejecución de movimiento
             if (moving)
             {
                 //Activar animacion de caminando
@@ -267,8 +335,8 @@ namespace TGC.Group.Model
             var perPos = personaje.Position;
             var posOriginal = perPos;
 
-            //if (posOriginal.Y > 0) DESCOMENTAR ESTE IF SI QUERES SACAR LA COLISION CON EL PISO SIN CAER AL INFINITO
-           // {
+            if (posOriginal.Y > 0) //DESCOMENTAR ESTE IF SI QUERES SACAR LA COLISION CON EL PISO SIN CAER AL INFINITO
+            {
                 velocidad = velocidad + ElapsedTime * aceleracion;
                 perPos = perPos + velocidad * ElapsedTime;
                 perPos.Y -= coeficienteDeSalto;
@@ -284,7 +352,7 @@ namespace TGC.Group.Model
                 {
                     OnGround = true;
                     personaje.Position = posOriginal;
-             //   }
+                }
             }
 
             var boxPosition = Box.Position;
