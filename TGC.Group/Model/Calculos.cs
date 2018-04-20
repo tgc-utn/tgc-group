@@ -5,6 +5,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.SkeletalAnimation;
+using TGC.Group.VectorMovement;
 
 
 
@@ -36,5 +37,9 @@ namespace TGC.Group.Model
             return v1.Y / v2.Y == constPar && v1.Z / v2.Z == constPar;
         }
 
+        public float MovementAngle(DirectionAngle anguloActual, DirectionAngle nuevoAngulo)
+        {
+            return nuevoAngulo.anguloRad - anguloActual.anguloRad;
+        }
     }
 }

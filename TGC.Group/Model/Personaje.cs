@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.DirectX.DirectInput;
+using TGC.Group.VectorMovement;
+
 
 namespace TGC.Group.Model
 {
@@ -11,87 +13,67 @@ namespace TGC.Group.Model
     {
 
         private Calculos calculo = new Calculos();
-        private Dictionary<String, bool> direccionPersonaje { get; set; } = new Dictionary<string, bool>();
 
-        public void CreateDictionary()
+        private DirectionAngle angleDir = new DirectionAngle(90f);
+        private DirectionAngle upDir = new UpDirection();
+        private DirectionAngle downDir = new DownDirection();
+        private DirectionAngle rightDir = new RightDirection();
+        private DirectionAngle leftDir = new LeftDirection();
+        private DirectionAngle downRightDir = new DownRightDirection();
+        private DirectionAngle downLeftDir = new DownLeftDirection();
+        private DirectionAngle upRightDir = new UpRightDirection();
+        private DirectionAngle upLeftDir = new UpLeftDirection();
+        private float anguloMovido;
+
+
+       
+
+        //Para 1 tecla
+        private bool validateMovement(Key i, Key valida, DirectionAngle validationAngle)
         {
-            direccionPersonaje.Add("facingForward", true);
-            direccionPersonaje.Add("facingBackwards", false);
-            direccionPersonaje.Add("facingRight", false);
-            direccionPersonaje.Add("facingLeft", false);
+            return i == valida && angleDir.angulo != validationAngle.angulo;
         }
         public float RotationAngle(Key input)
         {
-
             //Input W
-            if(input == Key.W && !direccionPersonaje["facingForward"])
-            {
-                if (direccionPersonaje["facingBackwards"]) return calculo.AnguloARadianes(180f, 1f);
-                if (direccionPersonaje["facingRight"]) return calculo.AnguloARadianes(-90f, 1f);
-                if (direccionPersonaje["facingLeft"]) return calculo.AnguloARadianes(90f, 1f);
-            }
-
+            if (validateMovement(input, Key.W, upDir)) return setAngle(upDir);
             //Input S
-            if(input == Key.S && !direccionPersonaje["facingBackwards"])
-            {
-                if (direccionPersonaje["facingForward"]) return calculo.AnguloARadianes(180f, 1f);
-                if (direccionPersonaje["facingRight"]) return calculo.AnguloARadianes(90f, 1f);
-                if (direccionPersonaje["facingLeft"]) return calculo.AnguloARadianes(-90f, 1f);
-            }
-
+            if (validateMovement(input, Key.S, downDir)) return setAngle(downDir);
             //Input A
-            if(input == Key.A && !direccionPersonaje["facingLeft"])
-            {
-                if (direccionPersonaje["facingForward"]) return calculo.AnguloARadianes(-90f, 1f);
-                if (direccionPersonaje["facingRight"]) return calculo.AnguloARadianes(180f, 1f);
-                if (direccionPersonaje["facingBackwards"]) return calculo.AnguloARadianes(90f, 1f);
-            }
+            if (validateMovement(input, Key.A, leftDir)) return setAngle(leftDir);
             //Input D
-            if(input == Key.D && !direccionPersonaje["facingRight"])
-            {
-                if (direccionPersonaje["facingForward"]) return calculo.AnguloARadianes(90f, 1f);
-                if (direccionPersonaje["facingLeft"]) return calculo.AnguloARadianes(180f, 1f);
-                if (direccionPersonaje["facingBackwards"]) return calculo.AnguloARadianes(-90f, 1f);
-            }
+            if (validateMovement(input, Key.D, rightDir)) return setAngle(rightDir);
             return 0f;
         }
-
-        public void turnForward()
+        //Para 2 teclas
+        private bool validateMovement(Key i1, Key i2, Key valida1, Key valida2, DirectionAngle validationAngle)
         {
-
-            direccionPersonaje["facingForward"] = true;
-            direccionPersonaje["facingBackwards"] = false;
-            direccionPersonaje["facingRight"] = false;
-            direccionPersonaje["facingLeft"] = false;
+            return (i1 == valida1 && i2 == valida2 || i1 == valida2 && i2 == valida1) && angleDir.angulo != validationAngle.angulo;
         }
-
-        public void turnBackwards()
+        public float RotationAngle(Key input1, Key input2)
         {
-            direccionPersonaje["facingForward"] = false;
-            direccionPersonaje["facingBackwards"] = true;
-            direccionPersonaje["facingRight"] = false;
-            direccionPersonaje["facingLeft"] = false;
 
+            //Input W-D
+            if (validateMovement(input1, input2, Key.W, Key.D, upRightDir)) return setAngle(upRightDir);
+            //Input W-A
+            if (validateMovement(input1, input2, Key.W, Key.A, upLeftDir)) return setAngle(upLeftDir);
+            //Input S-D
+            if (validateMovement(input1, input2, Key.S, Key.D, downRightDir)) return setAngle(downRightDir);
+            //Input S-A
+            if (validateMovement(input1, input2, Key.S, Key.A, downLeftDir)) return setAngle(downLeftDir);
+            return 0f;
         }
-
-        public void turnRight()
+        //Actualiza ángulo director del personaje
+        private float setAngle(DirectionAngle d1)
         {
-            direccionPersonaje ["facingForward"] = false;
-            direccionPersonaje ["facingBackwards"] = false;
-            direccionPersonaje ["facingRight"] = true;
-            direccionPersonaje ["facingLeft"] = false;
-
-        }
-
-        public void turnLeft()
-        {
-            direccionPersonaje["facingForward"] = false;
-            direccionPersonaje["facingBackwards"] = false;
-            direccionPersonaje["facingRight"] = false;
-            direccionPersonaje["facingLeft"] = true;
+            anguloMovido = calculo.MovementAngle(angleDir, d1);
+            angleDir.angulo = d1.angulo;
+            angleDir.anguloRad = d1.anguloRad;
+            return anguloMovido;
 
         }
 
+        
 
 
 
