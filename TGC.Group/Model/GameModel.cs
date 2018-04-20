@@ -64,12 +64,20 @@ namespace TGC.Group.Model
         private bool BoundingBox { get; set; }
 
         private float jumping;
-        /// <summary>
-        ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
-        ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
-        ///     procesamiento que podemos pre calcular para nuestro juego.
-        ///     Borrar el codigo ejemplo no utilizado.
-        /// </summary>
+        private bool jump = false;
+        private bool moving;
+
+        public void RotateMesh(Key input)
+        {
+            moving = true;
+            personaje.RotateY(dirPers.RotationAngle(input));
+        }
+        public void RotateMesh(Key i1, Key i2)
+        {
+            moving = true;
+            personaje.RotateY(dirPers.RotationAngle(i1,i2));
+        }
+        
         public override void Init()
         {
 
@@ -122,7 +130,7 @@ namespace TGC.Group.Model
             //El framework maneja una cámara estática, pero debe ser inicializada.
             //Posición de la camara.
 
-            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 200, -900);
+            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 500, -900);
             //Quiero que la camara mire hacia el origen (0,0,0).
             var lookAt = TGCVector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
@@ -142,19 +150,13 @@ namespace TGC.Group.Model
 
             //obtener velocidades de Modifiers
             var velocidadCaminar = 300f;
-            var velocidadCaminarID = 300f;
+           // var velocidadSalto = 1000f;
 
-            var velocidadRotacion = 300f;
            
             //Calcular proxima posicion de personaje segun Input
             var moveForward = 0f;
-            var moveID = 0f;
- 
-            var moving = false;
-            var movingID = false;
-
-            var rotating = false;
-            float jump = 0;
+            moving = false;
+            //float jump = 0;
 
             while (ElapsedTime > 1)
             {
@@ -168,129 +170,42 @@ namespace TGC.Group.Model
 
 
             //Adelante
-            if (Input.keyDown(Key.W))
-            {
-                moveForward = -velocidadCaminar;
-                moving = true;
-                anguloMovido = dirPers.RotationAngle(Key.W);
-                personaje.RotateY(anguloMovido);
-            }
-
+            if (Input.keyDown(Key.W)) RotateMesh(Key.W);
             //Atras
-            if (Input.keyDown(Key.S))
-            {
-                moveForward = velocidadCaminar;
-                moving = true;
-                anguloMovido = dirPers.RotationAngle(Key.S);
-                personaje.RotateY(anguloMovido);
-            }
-
+            if (Input.keyDown(Key.S)) RotateMesh(Key.S);
             //Derecha
-            if (Input.keyDown(Key.D))
-            {
-                moveID = velocidadCaminarID;
-                movingID = true;
-                anguloMovido = dirPers.RotationAngle(Key.D);
-                personaje.RotateY(anguloMovido);
-            }
-
+            if (Input.keyDown(Key.D)) RotateMesh(Key.D);
             //Izquierda
-            if (Input.keyDown(Key.A))
-            {
-                moveID = -velocidadCaminarID;
-                movingID = true;
-                anguloMovido = dirPers.RotationAngle(Key.A);
-                personaje.RotateY(anguloMovido);
-            }
-
-            //Jump
-            if (Input.keyUp(Key.Space) && jumping < 30)
-            {
-                jumping = 30;
-            }
-            if (Input.keyUp(Key.Space) || jumping > 0)
-            {
-                jumping -= 30 * ElapsedTime;
-                jump = jumping;
-                moving = true;
-            }
-
-            //Diagonales
+            if (Input.keyDown(Key.A)) RotateMesh(Key.A);
             //UpLeft
-            if (Input.keyDown(Key.W) && Input.keyDown(Key.A))
-            {
-                moveID = -velocidadCaminarID / 2;
-                movingID = true;
-                moveForward = -velocidadCaminar / 2;
-                moving = true;
-
-                anguloMovido = dirPers.RotationAngle(Key.W, Key.A);
-                personaje.RotateY(anguloMovido);
-
-            }
+            if (Input.keyDown(Key.W) && Input.keyDown(Key.A)) RotateMesh(Key.W,Key.A);
             //UpRight
-            if (Input.keyDown(Key.W) && Input.keyDown(Key.D))
-            {
-                moveID = velocidadCaminarID / 2;
-                movingID = true;
-                moveForward = -velocidadCaminar / 2;
-                moving = true;
-
-                anguloMovido = dirPers.RotationAngle(Key.W, Key.D);
-                personaje.RotateY(anguloMovido);
-            }
+            if (Input.keyDown(Key.W) && Input.keyDown(Key.D)) RotateMesh(Key.W, Key.D);
             //DownLeft
-            if (Input.keyDown(Key.S) && Input.keyDown(Key.A))
-            {
-                moveID = -velocidadCaminarID / 2;
-                movingID = true;
-                moveForward = -velocidadCaminar / 2;
-                moving = true;
-
-                anguloMovido = dirPers.RotationAngle(Key.S, Key.A);
-                personaje.RotateY(anguloMovido);
-            }
+            if (Input.keyDown(Key.S) && Input.keyDown(Key.A)) RotateMesh(Key.S, Key.A);
             //DownRight
-            if (Input.keyDown(Key.S) && Input.keyDown(Key.D))
-            {
-                moveID = velocidadCaminarID / 2;
-                movingID = true;
-                moveForward = -velocidadCaminar / 2;
-                moving = true;
-
-                anguloMovido = dirPers.RotationAngle(Key.S, Key.D);
-                personaje.RotateY(anguloMovido);
-            }
-
+            if (Input.keyDown(Key.S) && Input.keyDown(Key.D)) RotateMesh(Key.S, Key.D);
+            //TODO: JUMP
+            
             var animacion = "";
-
-            //Si hubo desplazamiento
-            if (moving || movingID)
-            {
-                //Activar animacion de caminando
-                animacion = "Caminando";
-            }
-
-            //Si no se esta moviendo, activar animacion de Parado
-            else
-            {
-                animacion = "Parado";
-            }
 
             //Vector de movimiento
             var movementVector = TGCVector3.Empty;
-            if (moving || movingID)
+
+
+            //Y esta en 0f porque el salto no logre hacerlo funcionar
+            if (moving)
             {
-                //Aplicar movimiento, desplazarse en base a la rotacion actual del personaje
-                movementVector = new TGCVector3(FastMath.Sin(personaje.Rotation.Y) * moveForward, jump,
-                    FastMath.Cos(personaje.Rotation.Y) * moveForward);
+                animacion = "Caminando";
+                moveForward = -velocidadCaminar;
+                movementVector = new TGCVector3(FastMath.Sin(personaje.Rotation.Y) * moveForward * ElapsedTime, 0f, FastMath.Cos(personaje.Rotation.Y) * moveForward * ElapsedTime);
             }
+            else animacion = "Parado";
 
             
-
             //Mover personaje con detección de colisiones, sliding y gravedad
             var realMovement = collisionManager.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
-            personaje.Move(realMovement);
+            personaje.Move(movementVector); // PONGO MOVEMENT VECTOR PARA QUE PRUEBES EL MOVIMIENTO, SI PONES REAL MOVEMENT QUEDA TRABADO PORQUE LA ESFERA COLISIONA CON TODO
 
             //Ejecuta la animacion del personaje
             personaje.playAnimation(animacion, true);
@@ -327,9 +242,9 @@ namespace TGC.Group.Model
         {
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
-            
-            
-            
+
+
+            DrawText.drawText("Posicion Actual: " + personaje.Position, 0, 30, Color.GhostWhite);
             escenario.RenderAll();
 
             foreach (var mesh in objectsInFront)

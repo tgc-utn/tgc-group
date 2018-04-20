@@ -45,6 +45,7 @@ namespace TGC.Group.Model
             if (validateMovement(input, Key.D, rightDir)) return setAngle(rightDir);
             return 0f;
         }
+
         //Para 2 teclas
         private bool validateMovement(Key i1, Key i2, Key valida1, Key valida2, DirectionAngle validationAngle)
         {
