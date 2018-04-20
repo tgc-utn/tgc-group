@@ -1,5 +1,6 @@
 using Microsoft.DirectX.DirectInput;
 using System.Drawing;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
@@ -10,6 +11,9 @@ using TGC.Core.SkeletalAnimation;
 using TGC.Core.Collision;
 using System;
 using System.Collections.Generic;
+
+
+
 
 namespace TGC.Group.Model
 {
@@ -27,15 +31,14 @@ namespace TGC.Group.Model
             Name = Game.Default.Name;
             Description = Game.Default.Description;
         }
-        /// <summary>
-        ///     Constructor del juego.
-        /// </summary>
-        /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
-        /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
+        
         private Directorio directorio;
+
         private TgcSkeletalMesh personaje;
         private TgcThirdPersonCamera camaraInterna;
+
         private Calculos calculo = new Calculos();
+
         private TGCVector3 velocidad = TGCVector3.Empty;
         private TGCVector3 aceleracion = new TGCVector3(0, -100f, 0);
         private float Ypiso = 25f;
@@ -46,19 +49,17 @@ namespace TGC.Group.Model
 
         //Define direccion del mesh del personaje dependiendo el movimiento
         private Personaje dirPers = new Personaje();
-
-        private float BoxMoveDirection = 1f;
-        private float BoxMoveSpeed = 25f;
-
         private Escenario escenario;
 
         private TGCBox Box { get; set; }
         private TgcMesh piso { get; set; }
 
-
+        private readonly List<TgcMesh> objectsBehind = new List<TgcMesh>();
+        private readonly List<TgcMesh> objectsInFront = new List<TgcMesh>();
+        private List<TgcBoundingAxisAlignBox> objetosColisionables = new List<TgcBoundingAxisAlignBox>();
+        private TgcBoundingSphere esferaPersonaje;
         
 
-        
         private bool BoundingBox { get; set; }
 
         /// <summary>
@@ -76,33 +77,16 @@ namespace TGC.Group.Model
             //Objeto que conoce todos los path de MediaDir
             directorio = new Directorio(MediaDir);
 
+            //Cagar escenario especifico para el juego.
             escenario = new Escenario(directorio.EscenaSelva);
-            piso = escenario.Piso();
-
-           
-
-            //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
-            //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
-            var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
-            var texture = TgcTexture.createTexture(pathTexturaCaja);
-            var size = new TGCVector3(100, 50, 100);
-            Box = TGCBox.fromSize(size, texture);
-            Box.Position = new TGCVector3(-200, Ypiso, 0);
-
-          
-
-            piso.BoundingBox.move(TGCVector3.Empty - piso.Position);
-
-
+            
+            //Cargar personaje con animaciones
             var skeletalLoader = new TgcSkeletalLoader();
-            personaje = skeletalLoader.loadMeshAndAnimationsFromFile(
-                                                                    directorio.RobotSkeletalMesh,
-                                                                    directorio.RobotDirectorio,
-                                                                    new[]
-                                                                    {
-                                                                        directorio.RobotCaminando,
-                                                                        directorio.RobotParado,
-                                                                    });
+            var pathAnimacionesPersonaje = new[] { directorio.RobotCaminando, directorio.RobotParado, };
+            personaje = skeletalLoader.
+                        loadMeshAndAnimationsFromFile(directorio.RobotSkeletalMesh,
+                                                      directorio.RobotDirectorio,
+                                                      pathAnimacionesPersonaje);
 
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
@@ -111,12 +95,22 @@ namespace TGC.Group.Model
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = true;
             //Rotar al robot en el Init para que mire hacia el otro lado
-            personaje.RotateY(calculo.AnguloARadianes(180f,1f));
+            personaje.RotateY(calculo.AnguloARadianes(180f, 1f));
             //Le cambiamos la textura para diferenciarlo un poco
             personaje.changeDiffuseMaps(new[]
             {
                 TgcTexture.createTexture(D3DDevice.Instance.Device, directorio.RobotTextura)
             });
+            esferaPersonaje = new TgcBoundingSphere(personaje.BoundingBox.calculateBoxCenter(), personaje.BoundingBox.calculateBoxRadius());
+
+            objetosColisionables.Clear();
+            foreach(var objetoColisionable in escenario.MeshesColisionables())
+            {
+                objetosColisionables.Add(objetoColisionable.BoundingBox);
+            }
+
+         
+            
 
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
@@ -147,8 +141,6 @@ namespace TGC.Group.Model
             var velocidadSalto = 200f;
             var coeficienteDeSalto = 0.2f;
             
-
-
             //(Si el personaje aparece en cualquier lado descomentar esto)
             while (ElapsedTime > 1)
             {
@@ -263,103 +255,28 @@ namespace TGC.Group.Model
                 anguloMovido = dirPers.RotationAngle(Key.S, Key.D);
                 personaje.RotateY(anguloMovido);
             }
-            
+
             //Ejecución de movimiento
             if (moving)
             {
                 //Activar animacion de caminando
                 animation = "Caminando";
-
-                var originalPos = personaje.Position;
-
-
-                personaje.MoveOrientedY(moveForward * ElapsedTime);
-                var newPos = personaje.Position;
-                //(Temporal) No se movia cuando estaba arria de la caja porque lo contaba como colision
-                personaje.Position += new TGCVector3(0, 1, 0);
-
-                if (aCollisionFound(personaje, Box))
-                {
-                    personaje.Position = originalPos;
-                    animation = "Parado";
-                }
-                else personaje.Position = newPos;
             }
             else animation = "Parado";
 
-            //Movimiento Izq-Der
-            if (movingID)
-            {
-                //Activar animacion de caminando
-                animation = "Caminando";
-
-                var originalPos = personaje.Position;
-
-                personaje.Move(new TGCVector3(moveID, 0f, 0f) * ElapsedTime);
-                var newPos = personaje.Position;
-                //(Temporal) No se movia cuando estaba arria de la caja porque lo contaba como colision
-                personaje.Position += new TGCVector3(0, 1, 0);
-
-                if (aCollisionFound(personaje, Box))
-                {
-                    personaje.Position = originalPos;
-                    if (animation != "Caminando")
-                    {
-                        animation = "Parado";
-                    }
-                }
-                else personaje.Position = newPos;
-            }
-            else {
-                if (animation != "Caminando") animation = "Parado";
-            }
             personaje.playAnimation(animation, true);
             /********************************EJECUCION MOVIMIENTOS************************************************************************/
-            var perPos = personaje.Position;
-            var posOriginal = perPos;
 
-            //if (posOriginal.Y > 0) //DESCOMENTAR ESTE IF SI QUERES SACAR LA COLISION CON EL PISO SIN CAER AL INFINITO
-            //{
-                velocidad = velocidad + ElapsedTime * aceleracion;
-                perPos = perPos + velocidad * ElapsedTime;
-                perPos.Y -= coeficienteDeSalto;
-                personaje.Move(perPos - personaje.Position);
-
-                if (aCollisionFound(personaje, Box))
-                {
-                    onObject = true;
-                    OnGround = false;
-                    personaje.Position = posOriginal;
-                }
-
-                if (aCollisionFound(personaje, piso))
-                {
-                    OnGround = true;
-                    onObject = false;
-                    personaje.Position = posOriginal;
-                }
-
-                
-
-                
-           // }
-
-            var boxPosition = Box.Position;
-
-            if (boxPosition.Y > 150f || Box.Position.Y < -20f)
+            var movementVector = TGCVector3.Empty;
+            if(moving)
             {
-                BoxMoveDirection *= -1;
+                movementVector = new TGCVector3(FastMath.Sin(personaje.Rotation.Y) * moveForward, jump,
+                   FastMath.Cos(personaje.Rotation.Y) * moveForward);
             }
-            boxPosition.Y += BoxMoveSpeed * BoxMoveDirection * ElapsedTime;
-            Box.Position = boxPosition;
 
-            if (onObject)
-            {
-                personaje.Move(0, BoxMoveSpeed * BoxMoveDirection * ElapsedTime, 0);
-            }
-            
 
-            //Camara sigue al personaje
+            //var realMovement;
+           //Camara sigue al personaje
             camaraInterna.Target = personaje.Position;
 
             PostUpdate();

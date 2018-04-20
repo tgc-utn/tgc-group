@@ -30,6 +30,10 @@ namespace TGC.Group.Model
         
         public TgcMesh Piso() =>scene.Meshes.Find(x => x.Name == "Piso");
         
+        public List<TgcMesh> MeshesColisionables()
+        {
+            return Paredes().Concat(Rocas()).ToList();
+        }
 
         public void RenderizarBoundingBoxes()
         {
