@@ -37,7 +37,7 @@ namespace TGC.Group.Model
             return v1.Y / v2.Y == constPar && v1.Z / v2.Z == constPar;
         }
 
-        public float MovementAngle(DirectionVector anguloActual, DirectionVector nuevoAngulo)
+        public float MovementAngle(DirectionAngle anguloActual, DirectionAngle nuevoAngulo)
         {
             return nuevoAngulo.anguloRad - anguloActual.anguloRad;
         }

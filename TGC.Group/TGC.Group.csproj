@@ -74,7 +74,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="VectorMovement\DirectionVector.cs" />
+    <Compile Include="VectorMovement\DirectionAngle.cs" />
     <Compile Include="VectorMovement\DownDirection.cs" />
     <Compile Include="VectorMovement\DownLeftDirection.cs" />
     <Compile Include="VectorMovement\DownRightDirection.cs" />

@@ -14,22 +14,22 @@ namespace TGC.Group.Model
 
         private Calculos calculo = new Calculos();
 
-        private DirectionVector angleDir = new DirectionVector(90f);
-        private DirectionVector upDir = new UpDirection();
-        private DirectionVector downDir = new DownDirection();
-        private DirectionVector rightDir = new RightDirection();
-        private DirectionVector leftDir = new LeftDirection();
-        private DirectionVector downRightDir = new DownRightDirection();
-        private DirectionVector downLeftDir = new DownLeftDirection();
-        private DirectionVector upRightDir = new UpRightDirection();
-        private DirectionVector upLeftDir = new UpLeftDirection();
+        private DirectionAngle angleDir = new DirectionAngle(90f);
+        private DirectionAngle upDir = new UpDirection();
+        private DirectionAngle downDir = new DownDirection();
+        private DirectionAngle rightDir = new RightDirection();
+        private DirectionAngle leftDir = new LeftDirection();
+        private DirectionAngle downRightDir = new DownRightDirection();
+        private DirectionAngle downLeftDir = new DownLeftDirection();
+        private DirectionAngle upRightDir = new UpRightDirection();
+        private DirectionAngle upLeftDir = new UpLeftDirection();
         private float anguloMovido;
 
 
        
 
         //Para 1 tecla
-        private bool validateMovement(Key i, Key valida, DirectionVector validationAngle)
+        private bool validateMovement(Key i, Key valida, DirectionAngle validationAngle)
         {
             return i == valida && angleDir.angulo != validationAngle.angulo;
         }
@@ -46,7 +46,7 @@ namespace TGC.Group.Model
             return 0f;
         }
         //Para 2 teclas
-        private bool validateMovement(Key i1, Key i2, Key valida1, Key valida2, DirectionVector validationAngle)
+        private bool validateMovement(Key i1, Key i2, Key valida1, Key valida2, DirectionAngle validationAngle)
         {
             return (i1 == valida1 && i2 == valida2 || i1 == valida2 && i2 == valida1) && angleDir.angulo != validationAngle.angulo;
         }
@@ -64,7 +64,7 @@ namespace TGC.Group.Model
             return 0f;
         }
         //Actualiza ángulo director del personaje
-        private float setAngle(DirectionVector d1)
+        private float setAngle(DirectionAngle d1)
         {
             anguloMovido = calculo.MovementAngle(angleDir, d1);
             angleDir.angulo = d1.angulo;

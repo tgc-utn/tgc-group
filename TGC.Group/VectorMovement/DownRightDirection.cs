@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TGC.Group.VectorMovement
 {
-    class DownRightDirection : DirectionVector
+    class DownRightDirection : DirectionAngle
     {
         public DownRightDirection() : base(225f) { }
     }

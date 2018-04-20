@@ -7,12 +7,12 @@ using TGC.Group.Model;
 
 namespace TGC.Group.VectorMovement
 {
-    class DirectionVector
+    class DirectionAngle
     {
         public float angulo { get; set; }
         public float anguloRad { get; set; }
         private Calculos calculo = new Calculos();
-        public DirectionVector(float unAngulo)
+        public DirectionAngle(float unAngulo)
         {
             angulo = unAngulo;
             anguloRad = calculo.AnguloARadianes(unAngulo, 1f);
