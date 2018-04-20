@@ -34,7 +34,7 @@ namespace TGC.Group.Model
         protected float velocidadDeRetroceso = 100f;
         protected float velocidadSalto = 70f;
         //maxima altura que puede saltar un vehiculo
-        protected float alturaMaximaDeSalto = 30f;
+        protected float alturaMaximaDeSalto = 50f;
         protected float velocidadMaxima = 150f;
         //tiempo transcurrido desde el ultimo render, se usa para hacer calculos de velocidad
         private float elapsedTime;
@@ -235,14 +235,9 @@ namespace TGC.Group.Model
             //si el auto esta en pleno salto
             if (this.estaSubiendo())
             {
-                //calcula el nuevo desplazamiento hacia arriba que tiene que realizar
-                TGCVector3 nuevaPosicion = this.vectorSalto * this.velocidadSalto * this.elapsedTime;
-                //si ese desplazamiento es mayor al permitido (ALTURA_SALTO) entonces solo salta hasta la altura maxima
-                //caso contrario, segui subiendo lo que tenias pensado subir
+                TGCVector3 nuevaPosicion = this.vectorSalto * this.velocidadFisicaDeSalto() * this.elapsedTime;
                 nuevaPosicion = (mesh.Position.Y + nuevaPosicion.Y) > alturaMaximaDeSalto? new TGCVector3(0, alturaMaximaDeSalto - mesh.Position.Y, 0) : nuevaPosicion;
-                //transformacion
                 mesh.Move(nuevaPosicion);
-                //si llegue a la altura maxima, indicar que el auto esta bajando
                 if (mesh.Position.Y == alturaMaximaDeSalto)
                 {
                     this.cambiarDireccionVectorSalto();
@@ -252,15 +247,32 @@ namespace TGC.Group.Model
             //lo mismo que arriba
             else if(this.estaBajando())
             {
-                TGCVector3 nuevaPosicion = this.vectorSalto * this.velocidadSalto * this.elapsedTime;
+                TGCVector3 nuevaPosicion = this.vectorSalto * this.velocidadFisicaDeCaida() * this.elapsedTime;
                 nuevaPosicion = (mesh.Position.Y + nuevaPosicion.Y) < 0 ? new TGCVector3(0, -mesh.Position.Y, 0) : nuevaPosicion;
                 mesh.Move(nuevaPosicion);
                 if (mesh.Position.Y == 0)
                 {
+                    this.velocidadSalto = 70f;
                     this.cambiarDireccionVectorSalto();
                 }
                 
             }
+        }
+
+        private float velocidadFisicaDeSalto()
+        {
+            if(this.velocidadSalto < 1)
+            {
+                
+                return this.velocidadSalto = 1;
+            }
+            return System.Math.Max(this.velocidadSalto /= 1.001f, 2f);
+
+        }
+
+        private float velocidadFisicaDeCaida()
+        {
+            return this.velocidadSalto *= 1.005f;
         }
 
         //esta funcion si no la invoco, el ejemplo funciona igual
