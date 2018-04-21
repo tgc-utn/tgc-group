@@ -10,6 +10,8 @@ using TGC.Core.Input;
 using TGC.Core.Text;
 using System.Drawing;
 using Microsoft.DirectX.DirectInput;
+using System.Timers;
+using System.Diagnostics;
 
 namespace TGC.Group.Model
 {
@@ -17,8 +19,7 @@ namespace TGC.Group.Model
     {
         //las velocidades actuales se van usar despues para modelar un mejor movimiento del aut0
         //pd: ahora no se usan
-        private float velocidadActual = 0;
-        private float velocidadActualDeSalto;
+        private float velocidadActual;
         //utilizo un mesh como atributo para abstraernos de que es una sopa de triangulos
         //de esta forma, le mandamos mensajes al vehiculo como (avanzar, retroceder, etc)
         //y este se encarga de utilizar el mesh
@@ -30,14 +31,14 @@ namespace TGC.Group.Model
         //velocidades de rotacion, traslado y salto, en las clases hijas se modifican segun
         // el tipo de vehiculo (camion, auto, etc)
         protected float velocidadRotacion = 1f;
-        protected float velocidadDeAvance = 150f;
-        protected float velocidadDeRetroceso = 100f;
         protected float velocidadSalto = 70f;
         //maxima altura que puede saltar un vehiculo
         protected float alturaMaximaDeSalto = 50f;
-        protected float velocidadMaxima = 150f;
+        protected float velocidadMaxima = 300f;
         //tiempo transcurrido desde el ultimo render, se usa para hacer calculos de velocidad
         private float elapsedTime;
+        private float transcurrido;
+        protected float aceleracionAvance = 0.2f;
 
         public Vehiculo(string rutaAMesh)
         {
@@ -45,10 +46,12 @@ namespace TGC.Group.Model
             this.vectorAdelante = new TGCVector3(0, 0, 1);
             this.vectorSalto = new TGCVector3(0, 1, 0);
             this.crearMesh(rutaAMesh);
-            this.velocidadActual = 0f;
-            this.velocidadActualDeSalto = 0f;
+            this.velocidadActual = 0;
             //para que no se rompa todo hago esto por si nos olvidamos de setearlo
             this.elapsedTime = 0;
+            this.transcurrido = 0;
+            //stop = new TimeSpan(DateTime.Now.Ticks);
+            //Console.WriteLine(stop.Subtract(start).TotalMilliseconds);
         }
 
         private void crearMesh(string rutaAMesh)
@@ -78,80 +81,62 @@ namespace TGC.Group.Model
             //nada pero en realidad es lo mismo que en el ejemplo anterior: 
             // (35, 0, -6) + (1, 0, 2) * 10 * t = (35 + 10t, 0, -6 + 20t) sabiendo
             //que siempre se desplaza 10 unidades
+            if (this.velocidadActual == 0){
+                this.iniciarReloj();
+            }
             this.velocidadActual = this.velocidadFisica();
-            mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
+            TGCVector3 cuenta = this.vectorAdelante * this.velocidadActual * this.elapsedTime;
+            System.Console.WriteLine("({0}, {1}, {2}) * {3} * {4} = ({5}, {6}, {7})", this.vectorAdelante.X, this.vectorAdelante.Y, this.vectorAdelante.Z, this.velocidadActual, this.elapsedTime, cuenta.X, cuenta.Y, cuenta.Z);
+            mesh.Move(cuenta);
             
             
+        }
+
+        private void iniciarReloj() {
+            this.transcurrido += this.elapsedTime * 250;
         }
 
         private float velocidadFisica()
         {
+            System.Console.WriteLine("tiempoTranscurrido: {0}", this.tiempoTranscurrido());
+            return System.Math.Min(this.velocidadMaxima, this.velocidadActual + this.aceleracionAvance * this.tiempoTranscurrido());
+        }
 
-            if(this.velocidadActual > this.velocidadMaxima)
-            {
-                this.velocidadActual = this.velocidadMaxima;
-                return this.velocidadMaxima;
-            }
-            else if(this.velocidadActual < -this.velocidadMaxima)
-            {
-                this.velocidadActual = -this.velocidadMaxima;
-                return this.velocidadMaxima;
-            }
+        private float velocidadFisicaRetroceso()
+        {
+            return System.Math.Max(-this.velocidadMaxima, this.velocidadActual + (-this.aceleracionAvance) * tiempoTranscurrido());
+        }
 
-               if(this.velocidadActual == 0)
-               {
-                   this.velocidadActual = 40f;
-
-               }
-               else
-               {
-                   this.velocidadActual *= 1.001f;
-               }
-             
-            return System.Math.Abs(this.velocidadActual);
+        private float tiempoTranscurrido()
+        {
+            return this.transcurrido;
         }
 
         public void retroceder()
         {
+            if (this.velocidadActual == 0)
+            {
+                this.iniciarReloj();
+            }
             //lo mismo que en el anterior nada más que cambio el sentido del vector adelante
-            this.velocidadActual = -this.velocidadFisica();
+            this.velocidadActual = this.velocidadFisicaRetroceso();
             mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
         }
 
         public void actualizarVelocidad()
         {
-            this.velocidadActual /= 1.005f;
-            if (this.velocidadActual > 1 || this.velocidadActual < -1)
-            {              
+            float constanteDesaceleracion = 0.5f;
+            if(this.velocidadActual > 0)
+            {
+                this.velocidadActual -= constanteDesaceleracion;
+                this.velocidadActual = (this.velocidadActual < 0) ? 0 : this.velocidadActual;
                 mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
             }
-            else if (this.velocidadActual == 0)
+            else if(this.velocidadActual < 0)
             {
-                return;
-            }
-            else
-            {
-                this.velocidadActual = 0;
-                System.Console.WriteLine("seteamos la velocidad a 0");
-            }
-        }
-
-        public void actualizarVelocidadRetroceso()
-        {
-
-            if (this.velocidadActual > 1)
-            {
-                this.velocidadActual /= 1.005f;
-                mesh.Move(-this.vectorAdelante * this.velocidadActual * this.elapsedTime);
-            }
-            else if (this.velocidadActual == 0)
-            {
-                return;
-            }
-            else
-            {
-                this.velocidadActual = 0;
-                System.Console.WriteLine("seteamos la velocidad a 0");
+                this.velocidadActual += constanteDesaceleracion;
+                this.velocidadActual = (this.velocidadActual > 0) ? 0 : this.velocidadActual;
+                mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
             }
         }
 
@@ -300,10 +285,18 @@ namespace TGC.Group.Model
 
         public void setElapsedTime(float time)
         {
-            //TgcText2D texto = new TgcText2D();
-            //texto.drawText("hola", 10, 30, Color.Red);
-            //texto.render();
+            TgcText2D texto = new TgcText2D();
+            string dialogo = "Velocidad = {0}km";
+            string.Format(dialogo, this.velocidadActual);
+            texto.drawText(dialogo, 10, 30, Color.Red);
+            texto.render();
             this.elapsedTime = time;
+
+        }
+
+        public float getVelocidadActual()
+        {
+            return this.velocidadActual;
         }
 
         public void Render()

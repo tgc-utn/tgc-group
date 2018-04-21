@@ -37,6 +37,7 @@ namespace TGC.Group.Model
         private CamaraEnTerceraPersona camaraInterna;
         private TGCBox cubo;
         private TgcScene scene;
+        private TgcText2D texto;
 
         public override void Init()
         {
@@ -44,7 +45,6 @@ namespace TGC.Group.Model
             //en caso de querer cargar una escena
             TgcSceneLoader loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Scenes\\CiudadBerreta\\CiudadBerreta-TgcScene.xml");
-            
 
             //creo el vehiculo liviano
             //si quiero crear un vehiculo pesado (camion) hago esto
@@ -67,6 +67,14 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
+
+            texto = new TgcText2D();
+            string dialogo = "Velocidad = {0}km";
+            texto.Text = string.Format(dialogo, auto.getVelocidadActual());
+            //text3.Align = TgcText2D.TextAlign.RIGHT;
+            texto.Position = new Point(55, 15);
+            texto.Size = new Size(0, 0);
+            texto.Color = Color.Gold;
 
             auto.setElapsedTime(ElapsedTime);
 
@@ -134,6 +142,8 @@ namespace TGC.Group.Model
         {
             
             PreRender();
+
+            texto.render();
 
             scene.RenderAll();
 

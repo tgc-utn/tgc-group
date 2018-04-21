@@ -10,7 +10,6 @@ namespace TGC.Group.Model.Vehiculos
     {
         public VehiculoPesado(string rutaAMesh) : base(rutaAMesh)
         {
-            this.velocidadDeAvance *= 0.6f;
             this.velocidadSalto *= 0.8f;
             this.velocidadRotacion *= 0.7f;
         }
