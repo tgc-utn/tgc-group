@@ -37,7 +37,7 @@ namespace TGC.Group.Model
         private CamaraEnTerceraPersona camaraInterna;
         private TGCBox cubo;
         private TgcScene scene;
-        private TgcText2D texto, texto2;
+        private TgcText2D textoVelocidadVehiculo, textoAlturaVehiculo;
 
         public override void Init()
         {
@@ -59,7 +59,7 @@ namespace TGC.Group.Model
             //creo la camara en tercera persona (la clase CamaraEnTerceraPersona hereda de la clase real del framework
             //que te permite configurar la posicion, el lookat, etc. Lo que hacemos al heredar, es reescribir algunos
             //metodos y setear valores default para que la camara quede mirando al auto en 3era persona
-            camaraInterna = new CamaraEnTerceraPersona(auto.posicion(), 15, -50);
+            camaraInterna = new CamaraEnTerceraPersona(auto.posicion(), 15, -70);
             Camara = camaraInterna;
 
         }
@@ -68,21 +68,40 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
-            texto = new TgcText2D();
-            string dialogo = "Velocidad = {0}km";
-            texto.Text = string.Format(dialogo, auto.getVelocidadActual());
-            //text3.Align = TgcText2D.TextAlign.RIGHT;
-            texto.Position = new Point(55, 15);
-            texto.Size = new Size(0, 0);
-            texto.Color = Color.Gold;
+            if (Input.keyDown(Key.RightArrow))
+            {
+                camaraInterna.OffsetHeight += 0.3f;
+            }
+            if (Input.keyDown(Key.LeftArrow))
+            {
+                camaraInterna.OffsetHeight -= 0.3f;
+            }
 
-            texto2 = new TgcText2D();
-            string dialogo2 = "Delta Tiempo = {0}";
-            texto2.Text = string.Format(dialogo2, auto.getDeltaTiempo());
+            if (Input.keyDown(Key.UpArrow))
+            {
+                camaraInterna.OffsetForward += 0.3f;
+            }
+            if (Input.keyDown(Key.DownArrow))
+            {
+                camaraInterna.OffsetForward -= 0.3f;
+            }
+
+            textoVelocidadVehiculo = new TgcText2D();
+            string dialogo = "Velocidad = {0}km";
+            textoVelocidadVehiculo.Text = string.Format(dialogo, auto.getVelocidadActual());
             //text3.Align = TgcText2D.TextAlign.RIGHT;
-            texto2.Position = new Point(55, 25);
-            texto2.Size = new Size(0, 0);
-            texto2.Color = Color.Gold;
+            textoVelocidadVehiculo.Position = new Point(55, 15);
+            textoVelocidadVehiculo.Size = new Size(0, 0);
+            textoVelocidadVehiculo.Color = Color.Gold;
+
+            textoAlturaVehiculo = new TgcText2D();
+            string dialogo2 = "Velocidad salto = {0}";
+            textoAlturaVehiculo.Text = string.Format(dialogo2, auto.getVelocidadActualDeSalto());
+            //text3.Align = TgcText2D.TextAlign.RIGHT;
+            textoAlturaVehiculo.Position = new Point(55, 25);
+            textoAlturaVehiculo.Size = new Size(0, 0);
+            textoAlturaVehiculo.Color = Color.Gold;
+
 
             auto.setElapsedTime(ElapsedTime);
 
@@ -137,8 +156,8 @@ namespace TGC.Group.Model
             
             PreRender();
 
-            texto.render();
-            texto2.render();
+            textoVelocidadVehiculo.render();
+            textoAlturaVehiculo.render();
 
             scene.RenderAll();
 
