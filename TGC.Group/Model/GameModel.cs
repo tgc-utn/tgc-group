@@ -43,10 +43,10 @@ namespace TGC.Group.Model
         private Calculos calculo = new Calculos();
 
         private TGCVector3 velocidad = TGCVector3.Empty;
-        private TGCVector3 aceleracion = new TGCVector3(0, -100f, 0);
+        private TGCVector3 aceleracion = new TGCVector3(0, 0, 0);
         private float Ypiso = 25f;
         private float anguloMovido;
-
+        private bool onGround = true;
 
         //Define direccion del mesh del personaje dependiendo el movimiento
         private Personaje dirPers = new Personaje();
@@ -186,7 +186,16 @@ namespace TGC.Group.Model
             //DownRight
             if (Input.keyDown(Key.S) && Input.keyDown(Key.D)) RotateMesh(Key.S, Key.D);
             //TODO: JUMP
-            
+            if (Input.keyDown(Key.Space) && onGround)
+            {
+                onGround = false;
+                velocidad.Y += 200f;
+                aceleracion.Y = -100f;
+            }
+
+            velocidad = velocidad + ElapsedTime * aceleracion;
+
+
             var animacion = "";
 
             //Vector de movimiento
@@ -194,19 +203,33 @@ namespace TGC.Group.Model
 
 
             //Y esta en 0f porque el salto no logre hacerlo funcionar
+
+            float movX = 0;
+            float movY = (personaje.Position.Y >= 0 ? velocidad.Y * ElapsedTime : 0f);
+            float movZ = 0;
             if (moving)
             {
                 animacion = "Caminando";
                 moveForward = -velocidadCaminar;
-                movementVector = new TGCVector3(FastMath.Sin(personaje.Rotation.Y) * moveForward * ElapsedTime, 0f, FastMath.Cos(personaje.Rotation.Y) * moveForward * ElapsedTime);
+                movX = FastMath.Sin(personaje.Rotation.Y) * moveForward * ElapsedTime;
+                movZ = FastMath.Cos(personaje.Rotation.Y) * moveForward * ElapsedTime;
             }
             else animacion = "Parado";
+
+            movementVector = new TGCVector3(movX, movY, movZ);
 
             
             //Mover personaje con detección de colisiones, sliding y gravedad
             var realMovement = collisionManager.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
             personaje.Move(movementVector); // PONGO MOVEMENT VECTOR PARA QUE PRUEBES EL MOVIMIENTO, SI PONES REAL MOVEMENT QUEDA TRABADO PORQUE LA ESFERA COLISIONA CON TODO
 
+            if(personaje.Position.Y < 0)
+            {
+                aceleracion = TGCVector3.Empty;
+                personaje.Position = new TGCVector3(personaje.Position.X,0,personaje.Position.Z);
+                velocidad = TGCVector3.Empty;
+                onGround = true;
+            }
             //Ejecuta la animacion del personaje
             personaje.playAnimation(animacion, true);
 
@@ -245,6 +268,7 @@ namespace TGC.Group.Model
 
 
             DrawText.drawText("Posicion Actual: " + personaje.Position, 0, 30, Color.GhostWhite);
+
             escenario.RenderAll();
 
             foreach (var mesh in objectsInFront)
