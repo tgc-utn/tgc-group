@@ -37,7 +37,7 @@ namespace TGC.Group.Model
         private CamaraEnTerceraPersona camaraInterna;
         private TGCBox cubo;
         private TgcScene scene;
-        private TgcText2D texto;
+        private TgcText2D texto, texto2;
 
         public override void Init()
         {
@@ -76,6 +76,14 @@ namespace TGC.Group.Model
             texto.Size = new Size(0, 0);
             texto.Color = Color.Gold;
 
+            texto2 = new TgcText2D();
+            string dialogo2 = "Delta Tiempo = {0}";
+            texto2.Text = string.Format(dialogo2, auto.getDeltaTiempo());
+            //text3.Align = TgcText2D.TextAlign.RIGHT;
+            texto2.Position = new Point(55, 25);
+            texto2.Size = new Size(0, 0);
+            texto2.Color = Color.Gold;
+
             auto.setElapsedTime(ElapsedTime);
 
             //si el usuario teclea la W y ademas no tecla la D o la A
@@ -96,25 +104,11 @@ namespace TGC.Group.Model
             //si el usuario teclea D
             if (Input.keyDown(Key.D))
             {
-                if (Input.keyDown(Key.W))
-                {
-                    auto.doblarALaDerecha(camaraInterna);
-                }
-                else if(Input.keyDown(Key.S))
-                {
-                    auto.doblarALaIzquierda(camaraInterna);
-                }
+                auto.doblarALaDerecha(camaraInterna);
                 
             }else if (Input.keyDown(Key.A))
             {
-                if (Input.keyDown(Key.W))
-                {
-                    auto.doblarALaIzquierda(camaraInterna);
-                }
-                else if (Input.keyDown(Key.S))
-                {
-                    auto.doblarALaDerecha(camaraInterna);
-                }
+                auto.doblarALaIzquierda(camaraInterna);
             }
 
             //Si apreta espacio, salta
@@ -144,6 +138,7 @@ namespace TGC.Group.Model
             PreRender();
 
             texto.render();
+            texto2.render();
 
             scene.RenderAll();
 
