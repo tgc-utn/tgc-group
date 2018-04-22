@@ -10,45 +10,36 @@ using TGC.Core.Input;
 using TGC.Core.Text;
 using System.Drawing;
 using Microsoft.DirectX.DirectInput;
+using System.Timers;
+using System.Diagnostics;
 
 namespace TGC.Group.Model
 {
     abstract class Vehiculo
     {
-        //las velocidades actuales se van usar despues para modelar un mejor movimiento del aut0
-        //pd: ahora no se usan
-        private float velocidadActual = 0;
+        private float velocidadActual;
         private float velocidadActualDeSalto;
-        //utilizo un mesh como atributo para abstraernos de que es una sopa de triangulos
-        //de esta forma, le mandamos mensajes al vehiculo como (avanzar, retroceder, etc)
-        //y este se encarga de utilizar el mesh
         private TgcMesh mesh;
-        //lo necesito para saber la direccion en que mira el frente del auto
         private TGCVector3 vectorAdelante;
-        //lo necesito para saber si el auto esta saltando o esta cayendo del salto
-        private TGCVector3 vectorSalto;
-        //velocidades de rotacion, traslado y salto, en las clases hijas se modifican segun
-        // el tipo de vehiculo (camion, auto, etc)
         protected float velocidadRotacion = 1f;
-        protected float velocidadDeAvance = 150f;
-        protected float velocidadDeRetroceso = 100f;
-        protected float velocidadSalto = 70f;
-        //maxima altura que puede saltar un vehiculo
-        protected float alturaMaximaDeSalto = 50f;
-        protected float velocidadMaxima = 150f;
-        //tiempo transcurrido desde el ultimo render, se usa para hacer calculos de velocidad
+        protected float velocidadMaximaDeSalto = 60f;
+        protected float velocidadMaximaDeAvance = 300f;
         private float elapsedTime;
+        private float deltaTiempoAvance;
+        private float deltaTiempoSalto;
+        protected float aceleracionAvance = 0.5f;
+        protected float aceleracionRetroceso = 0.3f;
+        private float aceleracionGravedad = 0.5f;
 
         public Vehiculo(string rutaAMesh)
         {
-            //inicializo todo
             this.vectorAdelante = new TGCVector3(0, 0, 1);
-            this.vectorSalto = new TGCVector3(0, 1, 0);
             this.crearMesh(rutaAMesh);
             this.velocidadActual = 0f;
-            this.velocidadActualDeSalto = 0f;
-            //para que no se rompa todo hago esto por si nos olvidamos de setearlo
-            this.elapsedTime = 0;
+            this.velocidadActualDeSalto = 60f;
+            this.elapsedTime = 0f;
+            this.deltaTiempoAvance = 0f;
+            this.deltaTiempoSalto = 0f;
         }
 
         private void crearMesh(string rutaAMesh)
@@ -56,119 +47,82 @@ namespace TGC.Group.Model
             TgcSceneLoader loader = new TgcSceneLoader();
             TgcScene scene = loader.loadSceneFromFile(rutaAMesh);
             this.mesh = scene.Meshes[0];
-            //lo roto 180 grados por que sino, el frente queda mirando a la camara
             mesh.RotateY(FastMath.PI);
-            //lo escale por que el vehiculo se veia muy chico. pero se podria acercar la camara de ultima
             mesh.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
         }
 
-        //aca se pudre todo por que todos los moviemientos del vehiculo son con vectores
-
         public void avanzar()
         {
-            //lo que hace Move es sumarle a la posicion del mesh, un vector que le paso
-            // ejemplo: suponete que el auto esta ubicado en el (0, 0, 0), si lo quiero
-            // desplazar 10 unidades hacia adelante y el vectorAdelante está en (0, 0, 1)
-            //que es un versor apuntando para el lado de las z positivas entonces la cuenta
-            //seria asi (0, 0, 0) + (0, 0, 1) * 10 * t = (0, 0, 10 * t) teniendo en cuenta
-            // que "t" es el tiempo transcurrido. éste último vector es la nueva posicion
-            //de mi mesh.
-            //Ahora suponete que el vehiculo se encuentra en (35, 0, -6) y el vectorAdelante
-            //ésta apuntando al (1, 0, 2) entonces se pone más picante la cosa por que no entendes
-            //nada pero en realidad es lo mismo que en el ejemplo anterior: 
-            // (35, 0, -6) + (1, 0, 2) * 10 * t = (35 + 10t, 0, -6 + 20t) sabiendo
-            //que siempre se desplaza 10 unidades
+            this.avanzarTiempo();
             this.velocidadActual = this.velocidadFisica();
-            mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
-            
-            
+            TGCVector3 cuenta = this.vectorAdelante * this.velocidadActual * this.elapsedTime;
+            mesh.Move(cuenta);      
+        }
+
+        //sirve para imprimirlo por pantalla
+        public float getVelocidadActualDeSalto()
+        {
+            return this.velocidadActualDeSalto;
         }
 
         private float velocidadFisica()
         {
+            return System.Math.Min(this.velocidadMaximaDeAvance, this.velocidadActual + this.aceleracionAvance * this.deltaTiempoAvance);
+        }
 
-            if(this.velocidadActual > this.velocidadMaxima)
-            {
-                this.velocidadActual = this.velocidadMaxima;
-                return this.velocidadMaxima;
-            }
-            else if(this.velocidadActual < -this.velocidadMaxima)
-            {
-                this.velocidadActual = -this.velocidadMaxima;
-                return this.velocidadMaxima;
-            }
-
-               if(this.velocidadActual == 0)
-               {
-                   this.velocidadActual = 40f;
-
-               }
-               else
-               {
-                   this.velocidadActual *= 1.001f;
-               }
-             
-            return System.Math.Abs(this.velocidadActual);
+        private float velocidadFisicaRetroceso()
+        {
+            return System.Math.Max(-this.velocidadMaximaDeAvance, this.velocidadActual + (-this.aceleracionRetroceso) * this.deltaTiempoAvance);
         }
 
         public void retroceder()
         {
+            this.avanzarTiempo();
             //lo mismo que en el anterior nada más que cambio el sentido del vector adelante
-            this.velocidadActual = -this.velocidadFisica();
+            this.velocidadActual = this.velocidadFisicaRetroceso();
             mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
         }
 
         public void actualizarVelocidad()
         {
-            this.velocidadActual /= 1.005f;
-            if (this.velocidadActual > 1 || this.velocidadActual < -1)
-            {              
+            float constanteDesaceleracion = 0.5f;
+            this.resetearDeltaTiempo();
+            if (this.velocidadActual > 0)
+            {
+                this.velocidadActual -= constanteDesaceleracion;
+                if(this.velocidadActual < 0)
+                {
+                    this.velocidadActual = 0;
+                    this.resetearDeltaTiempo();
+                }
                 mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
             }
-            else if (this.velocidadActual == 0)
-            {
-                return;
-            }
-            else
-            {
-                this.velocidadActual = 0;
-                System.Console.WriteLine("seteamos la velocidad a 0");
+            else if(this.velocidadActual < 0)
+            {  
+                this.velocidadActual += constanteDesaceleracion;
+                if (this.velocidadActual > 0)
+                {
+                    this.velocidadActual = 0;
+                    this.resetearDeltaTiempo();
+                }
+                mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
             }
         }
 
-        public void actualizarVelocidadRetroceso()
+        private void  resetearDeltaTiempo()
         {
-
-            if (this.velocidadActual > 1)
-            {
-                this.velocidadActual /= 1.005f;
-                mesh.Move(-this.vectorAdelante * this.velocidadActual * this.elapsedTime);
-            }
-            else if (this.velocidadActual == 0)
-            {
-                return;
-            }
-            else
-            {
-                this.velocidadActual = 0;
-                System.Console.WriteLine("seteamos la velocidad a 0");
-            }
+            this.deltaTiempoAvance = 0;
         }
 
         public void doblarALaDerecha(CamaraEnTerceraPersona camara)
         {
-            //aca como se que voy a avanzar girando a la derecha, lo que hago es:
-            //1. Calculo la rotacion real, desacoplada del tipo de hardware que usa la pc
+            if (this.velocidadActual == 0) return;
             float rotacionReal = this.velocidadRotacion * this.elapsedTime;
-            //2. Giro el MESH, es decir, el vehiculo físico
+            rotacionReal = (this.velocidadActual > 0) ? rotacionReal : -rotacionReal;
             this.mesh.RotateY(rotacionReal);
-            //3. Creo una matrix de rotacion que gira una coordenada a un cierto angulo (en este
-            // caso "rotacionReal" calculada previamente)
             TGCMatrix matrizDeRotacion = new TGCMatrix();
             matrizDeRotacion.RotateY(rotacionReal);
-            //4. Le aplico la matriz de rotacion al vectorAdelante, para actualizarlo
             vectorAdelante.TransformCoordinate(matrizDeRotacion);
-            //5. Roto tambien la camara para que siga mirando a la parte trasera del auto
             camara.rotateY(rotacionReal);
 
         }
@@ -176,7 +130,9 @@ namespace TGC.Group.Model
         //lo mismo que arriba
         public void doblarALaIzquierda(CamaraEnTerceraPersona camara)
         {
+            if (this.velocidadActual == 0) return;
             float rotacionReal = -this.velocidadRotacion * this.elapsedTime;
+            rotacionReal = (this.velocidadActual < 0) ? -rotacionReal : rotacionReal;
             this.mesh.RotateY(rotacionReal);
             TGCMatrix matrizDeRotacion = new TGCMatrix();
             matrizDeRotacion.RotateY(rotacionReal);
@@ -185,125 +141,83 @@ namespace TGC.Group.Model
 
         }
 
-        //escala el auto, tal vez la saqeu por que no sirve mucho
-        public void escalar(TGCVector3 vector)
-        {
-            mesh.Scale = vector;
-        }
-
-        //devuelve la posicion del auto en el mapa, sirve bastante
+        //devuelve la posicion del auto en el mapa, sirve para la camara
         public TGCVector3 posicion()
         {
             return mesh.Position;
         }
 
-        //aca viene la parte turbia
-        //cuando el usuario apreta por primera vez el boton de saltar, entra por este metodo y realiza la lógica
-        //luego hasta que el auto no termine de realizar el salto, por más que el usuario
-        //siga apretando espacio, el auto no va a hacer nada (va a finalizar el salto actual antes de volver a saltar).
+        private bool estaEnPlenoSalto()
+        {
+            return mesh.Position.Y != 0;
+        }
+
         public void saltar()
         {
-            //verifico si el auto no esta en pleno salto, ni cayendo del mismo
-            if(!this.estaSubiendo() && !this.estaBajando())
+            if(!this.estaEnPlenoSalto())
             {
-                //calculo el vector que le tengo que sumar al vector posicion del vehiculo para realizar la
-                //transformacion
-                TGCVector3 nuevaPosicion = this.vectorSalto * this.velocidadSalto * this.elapsedTime;
-                //transformo
-                mesh.Move(OperacionesConVectores.minimaAlturaEntreVectores(new TGCVector3(0, alturaMaximaDeSalto, 0), nuevaPosicion));
+                this.avanzarTiempoSalto();
+                TGCVector3 nuevaPosicion = new TGCVector3(0, 1, 0);
+                mesh.Move(nuevaPosicion);
                 
             }
         }
 
-        private void cambiarDireccionVectorSalto()
+        public float velocidadFisicaDeSalto()
         {
-            this.vectorSalto.Y = -this.vectorSalto.Y;
+            return this.velocidadActualDeSalto + (-this.aceleracionGravedad) * this.deltaTiempoSalto;
         }
 
-        public bool estaSubiendo()
+        private void resetearDeltaTiempoSalto()
         {
-            return this.distanciaDelPiso() > 0 && this.vectorSalto.Y > 0;
-        }
-
-        public bool estaBajando()
-        {
-            return this.distanciaDelPiso() > 0 && this.vectorSalto.Y < 0;
+            this.deltaTiempoSalto = 0f;
         }
 
         public void actualizarSalto()
         {
-            //si el auto esta en pleno salto
-            if (this.estaSubiendo())
+            if(this.deltaTiempoSalto != 0)
             {
-                TGCVector3 nuevaPosicion = this.vectorSalto * this.velocidadFisicaDeSalto() * this.elapsedTime;
-                nuevaPosicion = (mesh.Position.Y + nuevaPosicion.Y) > alturaMaximaDeSalto? new TGCVector3(0, alturaMaximaDeSalto - mesh.Position.Y, 0) : nuevaPosicion;
-                mesh.Move(nuevaPosicion);
-                if (mesh.Position.Y == alturaMaximaDeSalto)
+                this.velocidadActualDeSalto = this.velocidadFisicaDeSalto();
+                float desplazamientoEnY = this.velocidadActualDeSalto * elapsedTime;
+                desplazamientoEnY = (mesh.Position.Y + desplazamientoEnY < 0)? -mesh.Position.Y : desplazamientoEnY;
+                TGCVector3 nuevoDesplazamiento = new TGCVector3(0, desplazamientoEnY, 0);
+                if (nuevoDesplazamiento.Y == 0f)
                 {
-                    this.cambiarDireccionVectorSalto();
-                }    
-                
-            }
-            //lo mismo que arriba
-            else if(this.estaBajando())
-            {
-                TGCVector3 nuevaPosicion = this.vectorSalto * this.velocidadFisicaDeCaida() * this.elapsedTime;
-                nuevaPosicion = (mesh.Position.Y + nuevaPosicion.Y) < 0 ? new TGCVector3(0, -mesh.Position.Y, 0) : nuevaPosicion;
-                mesh.Move(nuevaPosicion);
-                if (mesh.Position.Y == 0)
-                {
-                    this.velocidadSalto = 70f;
-                    this.cambiarDireccionVectorSalto();
+                    this.resetearDeltaTiempoSalto();
+                    this.velocidadActualDeSalto = this.velocidadMaximaDeSalto;
                 }
-                
+                mesh.Move(nuevoDesplazamiento);
             }
-        }
-
-        private float velocidadFisicaDeSalto()
-        {
-            if(this.velocidadSalto < 1)
-            {
-                
-                return this.velocidadSalto = 1;
-            }
-            return System.Math.Max(this.velocidadSalto /= 1.001f, 2f);
 
         }
 
-        private float velocidadFisicaDeCaida()
+        private void avanzarTiempo()
         {
-            return this.velocidadSalto *= 1.005f;
+            this.deltaTiempoAvance += this.elapsedTime;
         }
 
-        //esta funcion si no la invoco, el ejemplo funciona igual
-        //por las dudas la dejo aca
-        /*
-        public void transformar()
+        private void avanzarTiempoSalto()
         {
-            mesh.Transform =
-                TGCMatrix.Scaling(mesh.Scale)
-                            * TGCMatrix.RotationYawPitchRoll(mesh.Rotation.Y, mesh.Rotation.X, mesh.Rotation.Z)
-                            * TGCMatrix.Translation(mesh.Position);
-            
-        }
-        */
-
-        private float distanciaDelPiso()
-        {
-            return mesh.Position.Y;
-        }
-
-        public TGCVector3 getVectorAdelante()
-        {
-            return this.vectorAdelante;
+            this.deltaTiempoSalto += this.elapsedTime;
         }
 
         public void setElapsedTime(float time)
         {
-            //TgcText2D texto = new TgcText2D();
-            //texto.drawText("hola", 10, 30, Color.Red);
-            //texto.render();
             this.elapsedTime = time;
+            if(this.deltaTiempoAvance != 0)
+            {
+                this.avanzarTiempo();
+            }
+            if (this.deltaTiempoSalto != 0)
+            {
+                this.avanzarTiempoSalto();
+            }
+
+        }
+
+        public float getVelocidadActual()
+        {
+            return this.velocidadActual;
         }
 
         public void Render()
