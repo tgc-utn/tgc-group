@@ -90,8 +90,8 @@ namespace TGC.Group.Model
 
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
-            //Posicion inicial
-            personaje.Position = new TGCVector3(235, Ypiso + 20, -255);
+            //Posicion inicial 2
+            personaje.Position = new TGCVector3(0,Ypiso + 20, -6000);
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = true;
             //Rotar al robot en el Init para que mire hacia el otro lado
@@ -147,6 +147,7 @@ namespace TGC.Group.Model
 
             //obtener velocidades de Modifiers
             var velocidadCaminar = 300f;
+            var coeficienteSalto = 30f;
            // var velocidadSalto = 1000f;
             var moveForward = 0f;
             moving = false;
@@ -164,14 +165,14 @@ namespace TGC.Group.Model
 
             RotarMesh();
 
-            //El 15 tambien deberia ser un modifier del salto
-            if (Input.keyUp(Key.Space) && jumping < 15)
+            
+            if (Input.keyUp(Key.Space) && jumping < coeficienteSalto)
             {
-                jumping = 15;
+                jumping = coeficienteSalto;
             }
             if (Input.keyUp(Key.Space) || jumping > 0)
             {
-                jumping -= 15 * ElapsedTime;
+                jumping -= coeficienteSalto * ElapsedTime;
                 jump = jumping;
                 
             }
@@ -202,13 +203,7 @@ namespace TGC.Group.Model
             var realMovement = collisionManager.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
             personaje.Move(realMovement); 
 
-            if(personaje.Position.Y < 0)
-            {
-                aceleracion = TGCVector3.Empty;
-                personaje.Position = new TGCVector3(personaje.Position.X,0,personaje.Position.Z);
-                velocidad = TGCVector3.Empty;
-                onGround = true;
-            }
+           
             //Ejecuta la animacion del personaje
             personaje.playAnimation(animacion, true);
 
