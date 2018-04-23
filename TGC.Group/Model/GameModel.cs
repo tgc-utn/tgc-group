@@ -43,41 +43,27 @@ namespace TGC.Group.Model
         private Calculos calculo = new Calculos();
 
         private TGCVector3 velocidad = TGCVector3.Empty;
-        private TGCVector3 aceleracion = new TGCVector3(0, 0, 0);
+        private TGCVector3 aceleracion = TGCVector3.Empty;
         private float Ypiso = 25f;
-        private float anguloMovido;
-        private bool onGround = true;
+        
 
         //Define direccion del mesh del personaje dependiendo el movimiento
         private Personaje dirPers = new Personaje();
         private Escenario escenario;
+        
 
-        private TGCBox Box { get; set; }
-        private TgcMesh piso { get; set; }
-
-        private readonly List<TgcMesh> objectsBehind = new List<TgcMesh>();
-        private readonly List<TgcMesh> objectsInFront = new List<TgcMesh>();
+        
         private List<TgcBoundingAxisAlignBox> objetosColisionables = new List<TgcBoundingAxisAlignBox>();
         private TgcBoundingSphere esferaPersonaje;
         private SphereCollisionManager collisionManager;
+        private TgcArrow directionArrow;
 
-        private bool BoundingBox { get; set; }
+        private bool BoundingBox = false;
 
         private float jumping;
-        private bool jump = false;
         private bool moving;
 
-        public void RotateMesh(Key input)
-        {
-            moving = true;
-            personaje.RotateY(dirPers.RotationAngle(input));
-        }
-        public void RotateMesh(Key i1, Key i2)
-        {
-            moving = true;
-            personaje.RotateY(dirPers.RotationAngle(i1,i2));
-        }
-        
+       
         public override void Init()
         {
 
@@ -100,8 +86,8 @@ namespace TGC.Group.Model
 
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
-            //Posicion inicial
-            personaje.Position = new TGCVector3(0, Ypiso + 10, 0);
+            //Posicion inicial 2
+            personaje.Position = new TGCVector3(0,Ypiso + 20, -6000);
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = true;
             //Rotar al robot en el Init para que mire hacia el otro lado
@@ -118,6 +104,13 @@ namespace TGC.Group.Model
             {
                 objetosColisionables.Add(objetoColisionable.BoundingBox);
             }
+
+            //Crear linea para mostrar la direccion del movimiento del personaje
+            directionArrow = new TgcArrow();
+            directionArrow.BodyColor = Color.Red;
+            directionArrow.HeadColor = Color.Green;
+            directionArrow.Thickness = 1;
+            directionArrow.HeadSize = new TGCVector2(10, 20);
 
             collisionManager = new SphereCollisionManager();
             collisionManager.GravityEnabled = true;
@@ -150,13 +143,12 @@ namespace TGC.Group.Model
 
             //obtener velocidades de Modifiers
             var velocidadCaminar = 300f;
-           // var velocidadSalto = 1000f;
-
-           
-            //Calcular proxima posicion de personaje segun Input
+            var coeficienteSalto = 30f;
+            float saltoRealizado = 0;
             var moveForward = 0f;
+
             moving = false;
-            //float jump = 0;
+            var animacion = "";
 
             while (ElapsedTime > 1)
             {
@@ -168,45 +160,30 @@ namespace TGC.Group.Model
                 BoundingBox = !BoundingBox;
             }
 
+            RotarMesh();
 
-            //Adelante
-            if (Input.keyDown(Key.W)) RotateMesh(Key.W);
-            //Atras
-            if (Input.keyDown(Key.S)) RotateMesh(Key.S);
-            //Derecha
-            if (Input.keyDown(Key.D)) RotateMesh(Key.D);
-            //Izquierda
-            if (Input.keyDown(Key.A)) RotateMesh(Key.A);
-            //UpLeft
-            if (Input.keyDown(Key.W) && Input.keyDown(Key.A)) RotateMesh(Key.W,Key.A);
-            //UpRight
-            if (Input.keyDown(Key.W) && Input.keyDown(Key.D)) RotateMesh(Key.W, Key.D);
-            //DownLeft
-            if (Input.keyDown(Key.S) && Input.keyDown(Key.A)) RotateMesh(Key.S, Key.A);
-            //DownRight
-            if (Input.keyDown(Key.S) && Input.keyDown(Key.D)) RotateMesh(Key.S, Key.D);
-            //TODO: JUMP
-            if (Input.keyDown(Key.Space) && onGround)
+            
+            if (Input.keyUp(Key.Space) && jumping < coeficienteSalto)
             {
-                onGround = false;
-                velocidad.Y += 200f;
-                aceleracion.Y = -100f;
+                jumping = coeficienteSalto;
+            }
+            if (Input.keyUp(Key.Space) || jumping > 0)
+            {
+                jumping -= coeficienteSalto * ElapsedTime;
+                saltoRealizado = jumping;
+                
             }
 
+            //No se utiliza
             velocidad = velocidad + ElapsedTime * aceleracion;
 
-
-            var animacion = "";
-
-            //Vector de movimiento
+           //Vector de movimiento
             var movementVector = TGCVector3.Empty;
 
-
-            //Y esta en 0f porque el salto no logre hacerlo funcionar
-
             float movX = 0;
-            float movY = (personaje.Position.Y >= 0 ? velocidad.Y * ElapsedTime : 0f);
+            float movY = saltoRealizado;
             float movZ = 0;
+
             if (moving)
             {
                 animacion = "Caminando";
@@ -216,45 +193,60 @@ namespace TGC.Group.Model
             }
             else animacion = "Parado";
 
-            movementVector = new TGCVector3(movX, movY, movZ);
+           movementVector = new TGCVector3(movX, movY, movZ);
 
-            
             //Mover personaje con detección de colisiones, sliding y gravedad
             var realMovement = collisionManager.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
-            personaje.Move(movementVector); // PONGO MOVEMENT VECTOR PARA QUE PRUEBES EL MOVIMIENTO, SI PONES REAL MOVEMENT QUEDA TRABADO PORQUE LA ESFERA COLISIONA CON TODO
+            personaje.Move(realMovement); 
 
-            if(personaje.Position.Y < 0)
-            {
-                aceleracion = TGCVector3.Empty;
-                personaje.Position = new TGCVector3(personaje.Position.X,0,personaje.Position.Z);
-                velocidad = TGCVector3.Empty;
-                onGround = true;
-            }
+           
             //Ejecuta la animacion del personaje
             personaje.playAnimation(animacion, true);
 
             //Hacer que la camara siga al personaje en su nueva posicion
             camaraInterna.Target = personaje.Position;
 
-            
-            //Ver cual de las mallas se interponen en la visión de la cámara en 3ra persona.
-            objectsBehind.Clear();
-            objectsInFront.Clear();
-            foreach (var mesh in escenario.MeshesColisionables())
-            {
-                TGCVector3 q;
-                if (TgcCollisionUtils.intersectSegmentAABB(Camara.Position, camaraInterna.Target,
-                    mesh.BoundingBox, out q))
-                {
-                    objectsBehind.Add(mesh);
-                }
-                else
-                {
-                    objectsInFront.Add(mesh);
-                }
-            }
+
+            //Actualizar valores de la linea de movimiento
+            directionArrow.PStart = esferaPersonaje.Center;
+            directionArrow.PEnd = esferaPersonaje.Center + TGCVector3.Multiply(movementVector, 50);
+            directionArrow.updateValues();
+
+           
             PostUpdate();
         }
+
+        public void RotarMesh()
+        {
+            //Adelante
+            if (Input.keyDown(Key.W)) RotateMesh(Key.W);
+            //Atras
+            if (Input.keyDown(Key.S)) RotateMesh(Key.S);
+            //Derecha
+            if (Input.keyDown(Key.D)) RotateMesh(Key.D);
+            //Izquierda
+            if (Input.keyDown(Key.A)) RotateMesh(Key.A);
+            //UpLeft
+            if (Input.keyDown(Key.W) && Input.keyDown(Key.A)) RotateMesh(Key.W, Key.A);
+            //UpRight
+            if (Input.keyDown(Key.W) && Input.keyDown(Key.D)) RotateMesh(Key.W, Key.D);
+            //DownLeft
+            if (Input.keyDown(Key.S) && Input.keyDown(Key.A)) RotateMesh(Key.S, Key.A);
+            //DownRight
+            if (Input.keyDown(Key.S) && Input.keyDown(Key.D)) RotateMesh(Key.S, Key.D);
+        }
+
+         public void RotateMesh(Key input)
+        {
+            moving = true;
+            personaje.RotateY(dirPers.RotationAngle(input));
+        }
+        public void RotateMesh(Key i1, Key i2)
+        {
+            moving = true;
+            personaje.RotateY(dirPers.RotationAngle(i1,i2));
+        }
+        
 
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
@@ -266,35 +258,18 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-
             DrawText.drawText("Posicion Actual: " + personaje.Position, 0, 30, Color.GhostWhite);
 
             escenario.RenderAll();
-
-            foreach (var mesh in objectsInFront)
-            {
-                mesh.Render();
-                if (BoundingBox)
-                {
-                    mesh.BoundingBox.Render();
-                }
-            }
-            foreach (var mesh in objectsBehind)
-            {
-                mesh.BoundingBox.Render();
-            }
+            personaje.animateAndRender(ElapsedTime);
 
             if (BoundingBox)
             {
                 esferaPersonaje.Render();
+                escenario.RenderizarBoundingBoxes();
             }
 
-
-            personaje.animateAndRender(ElapsedTime);
-            
-
-            
-
+            directionArrow.Render();
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
