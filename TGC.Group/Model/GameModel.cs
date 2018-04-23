@@ -33,13 +33,13 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
+        private bool interactionBoundary = false;
        
 
         private Directorio directorio;
 
         private TgcSkeletalMesh personaje;
         private TgcThirdPersonCamera camaraInterna;
-
         private Calculos calculo = new Calculos();
 
         private TGCVector3 velocidad = TGCVector3.Empty;
@@ -54,7 +54,9 @@ namespace TGC.Group.Model
 
         
         private List<TgcBoundingAxisAlignBox> objetosColisionables = new List<TgcBoundingAxisAlignBox>();
+        //private TgcBoundingAxisAlignBox personajeBox;
         private TgcBoundingSphere esferaPersonaje;
+        private TGCVector3 scaleBoundingVector;
         private SphereCollisionManager collisionManager;
         private TgcArrow directionArrow;
         private TgcMesh box;
@@ -91,6 +93,8 @@ namespace TGC.Group.Model
             personaje.Position = new TGCVector3(0,Ypiso + 20, -6000);
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = true;
+            
+            
             //Rotar al robot en el Init para que mire hacia el otro lado
             personaje.RotateY(calculo.AnguloARadianes(180f, 1f));
             //Le cambiamos la textura para diferenciarlo un poco
@@ -98,7 +102,11 @@ namespace TGC.Group.Model
             {
                 TgcTexture.createTexture(D3DDevice.Instance.Device, directorio.RobotTextura)
             });
-            esferaPersonaje = new TgcBoundingSphere(personaje.BoundingBox.calculateBoxCenter(), personaje.BoundingBox.calculateBoxRadius());
+
+
+            esferaPersonaje = new TgcBoundingSphere(personaje.BoundingBox.calculateBoxCenter() - new TGCVector3(5f,50f,0f), personaje.BoundingBox.calculateBoxRadius()*0.4f);
+            scaleBoundingVector = new TGCVector3(1.5f, 1f, 1.2f);
+
 
             objetosColisionables.Clear();
             foreach(var objetoColisionable in escenario.MeshesColisionables())
@@ -129,6 +137,7 @@ namespace TGC.Group.Model
             var lookAt = TGCVector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara = camaraInterna;
+           
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
         }
@@ -141,6 +150,8 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
+            personaje.BoundingBox.scaleTranslate(personaje.Position, scaleBoundingVector);
+            //personaje.BoundingBox.transform(TGCMatrix.Scaling(new TGCVector3(100f, 2f, 2f)));
 
             //obtener velocidades de Modifiers
             var velocidadCaminar = 300f;
@@ -163,21 +174,20 @@ namespace TGC.Group.Model
 
             RotarMesh();
 
-
-            if (Input.keyUp(Key.Space) && jumping < coeficienteSalto)
+            if (!interactionBoundary) // Para que no se pueda saltar cuando agarras algun objeto
             {
-                jumping = coeficienteSalto;
+                if (Input.keyUp(Key.Space) && jumping < coeficienteSalto)
+                {
+                    jumping = coeficienteSalto;
+                }
+                if (Input.keyUp(Key.Space) || jumping > 0)
+                {
+                    jumping -= coeficienteSalto * ElapsedTime;
+                    saltoRealizado = jumping;
+                }
             }
-            if (Input.keyUp(Key.Space) || jumping > 0)
-            {
-                jumping -= coeficienteSalto * ElapsedTime;
-                saltoRealizado = jumping;
-            }
 
-
-
-            //No se utiliza
-            velocidad = velocidad + ElapsedTime * aceleracion;
+            
 
             //Vector de movimiento
             var movementVector = TGCVector3.Empty;
@@ -203,37 +213,31 @@ namespace TGC.Group.Model
             collisionManager.GravityForce = new TGCVector3(0, -10, 0);
             collisionManager.SlideFactor = 1.3f;
 
-            //Esto verifica que algo no anda bien con el test
-            //No imprimi ni siquieria las paredes o el piso
-            escenario.MeshesColisionables().ForEach(x =>
-            {
-                if (TgcCollisionUtils.testSphereAABB(esferaPersonaje, x.BoundingBox)) Console.WriteLine(x.Layer);
+            //Si se aprieta R y hay colision pongo el flag en true, tambien sirve para el salto
+            if (Input.keyDown(Key.R) && TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, box.BoundingBox)) interactionBoundary = true;
+            //Si se suelta la R cambio el flag
+            if (Input.keyUp(Key.R)) interactionBoundary = false;
 
-            });
-            
-            
-            if (TgcCollisionUtils.testSphereAABB(esferaPersonaje, box.BoundingBox))
-            {
-               
-                Console.WriteLine("Detectado");
-                box.Move(movementVector);
-                personaje.Move(movementVector);
-            } else { 
-                //Mover personaje con detección de colisiones, sliding y gravedad
-                var realMovement = collisionManager.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
-                personaje.Move(realMovement);
-            }
-           
-           
-            //Ejecuta la animacion del personaje
+            var realMovement = collisionManager.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
+            if (interactionBoundary)
+              {
+                  box.Move(movementVector);
+                  personaje.Move(realMovement);
+              } else  { 
+                  //Mover personaje con detección de colisiones, sliding y gravedad
+                  
+                  personaje.Move(realMovement);
+              }
+
+                //Ejecuta la animacion del personaje
+
             personaje.playAnimation(animacion, true);
-
             //Hacer que la camara siga al personaje en su nueva posicion
             camaraInterna.Target = personaje.Position;
 
 
             //Actualizar valores de la linea de movimiento
-            directionArrow.PStart = esferaPersonaje.Center;
+           directionArrow.PStart = esferaPersonaje.Center;
             directionArrow.PEnd = esferaPersonaje.Center + TGCVector3.Multiply(movementVector, 50);
             directionArrow.updateValues();
 
@@ -292,9 +296,12 @@ namespace TGC.Group.Model
 
             if (BoundingBox)
             {
+            
+                personaje.BoundingBox.Render();
                 esferaPersonaje.Render();
                 escenario.RenderizarBoundingBoxes();
             }
+
 
             directionArrow.Render();
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
