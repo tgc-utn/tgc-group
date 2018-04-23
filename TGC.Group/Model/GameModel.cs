@@ -57,7 +57,7 @@ namespace TGC.Group.Model
         private TgcBoundingSphere esferaPersonaje;
         private SphereCollisionManager collisionManager;
         private TgcArrow directionArrow;
-
+        private TgcMesh box;
         private bool BoundingBox = false;
 
         private float jumping;
@@ -75,7 +75,8 @@ namespace TGC.Group.Model
 
             //Cagar escenario especifico para el juego.
             escenario = new Escenario(directorio.EscenaSelva);
-            
+            box = escenario.Cajas()[0];
+
             //Cargar personaje con animaciones
             var skeletalLoader = new TgcSkeletalLoader();
             var pathAnimacionesPersonaje = new[] { directorio.RobotCaminando, directorio.RobotParado, };
@@ -162,7 +163,7 @@ namespace TGC.Group.Model
 
             RotarMesh();
 
-            
+
             if (Input.keyUp(Key.Space) && jumping < coeficienteSalto)
             {
                 jumping = coeficienteSalto;
@@ -171,13 +172,14 @@ namespace TGC.Group.Model
             {
                 jumping -= coeficienteSalto * ElapsedTime;
                 saltoRealizado = jumping;
-                
             }
+
+
 
             //No se utiliza
             velocidad = velocidad + ElapsedTime * aceleracion;
 
-           //Vector de movimiento
+            //Vector de movimiento
             var movementVector = TGCVector3.Empty;
 
             float movX = 0;
@@ -193,12 +195,35 @@ namespace TGC.Group.Model
             }
             else animacion = "Parado";
 
-           movementVector = new TGCVector3(movX, movY, movZ);
 
-            //Mover personaje con detección de colisiones, sliding y gravedad
-            var realMovement = collisionManager.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
-            personaje.Move(realMovement); 
 
+            movementVector = new TGCVector3(movX, movY, movZ);
+
+            collisionManager.GravityEnabled = true;
+            collisionManager.GravityForce = new TGCVector3(0, -10, 0);
+            collisionManager.SlideFactor = 1.3f;
+
+            //Esto verifica que algo no anda bien con el test
+            //No imprimi ni siquieria las paredes o el piso
+            escenario.MeshesColisionables().ForEach(x =>
+            {
+                if (TgcCollisionUtils.testSphereAABB(esferaPersonaje, x.BoundingBox)) Console.WriteLine(x.Layer);
+
+            });
+            
+            
+            if (TgcCollisionUtils.testSphereAABB(esferaPersonaje, box.BoundingBox))
+            {
+               
+                Console.WriteLine("Detectado");
+                box.Move(movementVector);
+                personaje.Move(movementVector);
+            } else { 
+                //Mover personaje con detección de colisiones, sliding y gravedad
+                var realMovement = collisionManager.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
+                personaje.Move(realMovement);
+            }
+           
            
             //Ejecuta la animacion del personaje
             personaje.playAnimation(animacion, true);
@@ -246,7 +271,9 @@ namespace TGC.Group.Model
             moving = true;
             personaje.RotateY(dirPers.RotationAngle(i1,i2));
         }
-        
+
+       
+
 
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
