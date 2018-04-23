@@ -43,17 +43,14 @@ namespace TGC.Group.Model
         private Calculos calculo = new Calculos();
 
         private TGCVector3 velocidad = TGCVector3.Empty;
-        private TGCVector3 aceleracion = new TGCVector3(0, 0, 0);
+        private TGCVector3 aceleracion = TGCVector3.Empty;
         private float Ypiso = 25f;
-        private float anguloMovido;
-        private bool onGround = true;
+        
 
         //Define direccion del mesh del personaje dependiendo el movimiento
         private Personaje dirPers = new Personaje();
         private Escenario escenario;
-
-        private TGCBox Box { get; set; }
-        private TgcMesh piso { get; set; }
+        
 
         
         private List<TgcBoundingAxisAlignBox> objetosColisionables = new List<TgcBoundingAxisAlignBox>();
@@ -64,7 +61,6 @@ namespace TGC.Group.Model
         private bool BoundingBox = false;
 
         private float jumping;
-        private bool jump = false;
         private bool moving;
 
        
@@ -148,10 +144,11 @@ namespace TGC.Group.Model
             //obtener velocidades de Modifiers
             var velocidadCaminar = 300f;
             var coeficienteSalto = 30f;
-           // var velocidadSalto = 1000f;
+            float saltoRealizado = 0;
             var moveForward = 0f;
+
             moving = false;
-            float jump = 0;
+            var animacion = "";
 
             while (ElapsedTime > 1)
             {
@@ -173,19 +170,18 @@ namespace TGC.Group.Model
             if (Input.keyUp(Key.Space) || jumping > 0)
             {
                 jumping -= coeficienteSalto * ElapsedTime;
-                jump = jumping;
+                saltoRealizado = jumping;
                 
             }
 
+            //No se utiliza
             velocidad = velocidad + ElapsedTime * aceleracion;
 
-            var animacion = "";
-
-            //Vector de movimiento
+           //Vector de movimiento
             var movementVector = TGCVector3.Empty;
 
             float movX = 0;
-            float movY = jump;
+            float movY = saltoRealizado;
             float movZ = 0;
 
             if (moving)
