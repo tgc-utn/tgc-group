@@ -35,7 +35,7 @@ namespace TGC.Group.Model
         {
 
             
-            EscenaSelva = mediaDir + "MeshCreator\\Scenes\\Selva\\Selva-TgcScene.xml" ;
+            EscenaSelva = mediaDir + "MeshCreator\\Scenes\\CrashBandicoot-TgcScene.xml";
             EscenaArena = mediaDir + "MeshCreator\\Scenes\\Arena\\Arena-TgcScene.xml";
             EscenaMontania = mediaDir + "MeshCreator\\Scenes\\Mountains\\Mountains-TgcScene.xml";
 

@@ -35,6 +35,8 @@ namespace TGC.Group.Model
            return Paredes().Concat(Rocas()).Concat(Pisos()).ToList();
         }
 
+       
+
         public void RenderizarBoundingBoxes()
         {
             this.Paredes().ForEach(x => x.BoundingBox.Render());
