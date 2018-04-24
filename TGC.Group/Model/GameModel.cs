@@ -239,18 +239,20 @@ namespace TGC.Group.Model
             if (Input.keyUp(Key.R)) interaccionConCaja = false;
             
            //Mover personaje con detección de colisiones, sliding y gravedad
-            var realMovement = ColisionadorPersonaje.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
+            var movimientoRealPersonaje = ColisionadorPersonaje.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
             
             if (interaccionConCaja && !colisionObjetos())
             {
-                box.Move(movementVector);
+                TGCVector3 movimientoRealCaja = movementVector - movimientoRealPersonaje;
+                box.Move(movimientoRealCaja);
             }
-               personaje.Move(realMovement);
+            personaje.Move(movimientoRealPersonaje);
         }
 
+        //La colision no esta orientada. La caja queda pegada a la pared una vez colisionada
         public bool colisionObjetos()
         {
-            return escenario.Paredes().Exists(x => TgcCollisionUtils.testAABBAABB(box.BoundingBox, x.BoundingBox));
+            return escenario.Paredes().Exists(x =>TgcCollisionUtils.testAABBAABB(box.BoundingBox,x.BoundingBox));
         }
 
         public void RotarMesh()
@@ -297,7 +299,7 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            DrawText.drawText("Posicion Actual: " + personaje.Position, 0, 30, Color.GhostWhite);
+            DrawText.drawText("Posicion Actual: " + personaje.Position + "\n Posicion Caja: " + box.Position, 0, 30, Color.GhostWhite);
 
             escenario.RenderAll();
             personaje.animateAndRender(ElapsedTime);
