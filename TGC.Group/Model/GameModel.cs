@@ -61,6 +61,8 @@ namespace TGC.Group.Model
         
         private TgcArrow directionArrow;
         private TgcMesh box;
+        
+
         private bool BoundingBox = false;
 
         private float jumping;
@@ -216,6 +218,7 @@ namespace TGC.Group.Model
 
             moverMundo(movementVector);
             
+            
 
             //Ejecuta la animacion del personaje
             personaje.playAnimation(animacion, true);
@@ -241,18 +244,64 @@ namespace TGC.Group.Model
            //Mover personaje con detección de colisiones, sliding y gravedad
             var movimientoRealPersonaje = ColisionadorPersonaje.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
             
-            if (interaccionConCaja && !colisionObjetos())
-            {
-                TGCVector3 movimientoRealCaja = movementVector - movimientoRealPersonaje;
-                box.Move(movimientoRealCaja);
-            }
+            if (interaccionConCaja && !colisionObjetos(movementVector))box.Move(movementVector);
+             
             personaje.Move(movimientoRealPersonaje);
         }
 
         //La colision no esta orientada. La caja queda pegada a la pared una vez colisionada
-        public bool colisionObjetos()
+        public bool colisionObjetos(TGCVector3 movementVector)
         {
-            return escenario.Paredes().Exists(x =>TgcCollisionUtils.testAABBAABB(box.BoundingBox,x.BoundingBox));
+            return escenario.Paredes().Exists(pared =>colisionOrientadaObjeto(pared,movementVector));
+        }
+
+        public bool colisionOrientadaObjeto(TgcMesh pared,TGCVector3 movementVector)
+        {
+            bool collisionFound = false;
+            //Solo si existe colision entre la caja y la pared.
+            if (TgcCollisionUtils.testAABBAABB(box.BoundingBox, pared.BoundingBox))
+            {
+                collisionFound = true;
+
+                //Hay que comprobrar si se empuja a la caja en direccion a la pared.
+                TgcBoundingAxisAlignBox.Face collisionFace = null;
+                var faces = box.BoundingBox.computeFaces();
+                var i = 0;
+
+                foreach (var face in faces)
+                {
+                    if (!TgcCollisionUtils.testPlaneAABB(face.Plane, pared.BoundingBox))
+                    {
+                        collisionFace = face;
+                        i++; //Debuguear cuantas caras no colisionadas encuentra
+                    }
+                    }
+
+                var vectorNormalPlanoColisionado = TgcCollisionUtils.getPlaneNormal(TGCPlane.Normalize(collisionFace.Plane));
+                Console.WriteLine(vectorNormalPlanoColisionado);
+
+                Console.WriteLine(TGCVector3.Normalize(movementVector));
+
+                //Compruebo si el vector movimiento y el vector normal al plano colisionado son paralelos
+                if (calculo.VectoresParalelos(vectorNormalPlanoColisionado, movementVector))
+                {
+                    //Si son paralelos, los movimientos son en la misma direccion, entonces no deberian moverse.
+                    collisionFound = true;
+                }
+               
+            Console.WriteLine(i);
+            }
+            return collisionFound;
+        }
+
+        
+
+        public bool colisionOrientada(TGCVector3 movimientoRealCaja, TgcMesh pared)
+        {
+            TgcCollisionUtils.intersectSegmentAABB(movimientoRealCaja, box.Position, pared.BoundingBox, out TGCVector3 resultante);
+            Console.WriteLine("Mov. Caja" + movimientoRealCaja);
+            Console.WriteLine("Resultante" + resultante);
+            return true;
         }
 
         public void RotarMesh()
@@ -314,6 +363,8 @@ namespace TGC.Group.Model
 
 
             directionArrow.Render();
+
+
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
