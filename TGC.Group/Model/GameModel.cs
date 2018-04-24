@@ -33,7 +33,7 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        private bool interactionBoundary = false;
+        private bool interaccionConCaja = false;
        
 
         private Directorio directorio;
@@ -57,7 +57,8 @@ namespace TGC.Group.Model
         //private TgcBoundingAxisAlignBox personajeBox;
         private TgcBoundingSphere esferaPersonaje;
         private TGCVector3 scaleBoundingVector;
-        private SphereCollisionManager collisionManager;
+        private SphereCollisionManager ColisionadorPersonaje;
+        
         private TgcArrow directionArrow;
         private TgcMesh box;
         private bool BoundingBox = false;
@@ -68,7 +69,7 @@ namespace TGC.Group.Model
        
         public override void Init()
         {
-
+            
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
@@ -121,8 +122,8 @@ namespace TGC.Group.Model
             directionArrow.Thickness = 1;
             directionArrow.HeadSize = new TGCVector2(10, 20);
 
-            collisionManager = new SphereCollisionManager();
-            collisionManager.GravityEnabled = true;
+            ColisionadorPersonaje = new SphereCollisionManager();
+            ColisionadorPersonaje.GravityEnabled = true;
          
             
 
@@ -174,7 +175,7 @@ namespace TGC.Group.Model
 
             RotarMesh();
 
-            if (!interactionBoundary) // Para que no se pueda saltar cuando agarras algun objeto
+            if (!interaccionConCaja) // Para que no se pueda saltar cuando agarras algun objeto
             {
                 if (Input.keyUp(Key.Space) && jumping < coeficienteSalto)
                 {
@@ -209,40 +210,47 @@ namespace TGC.Group.Model
 
             movementVector = new TGCVector3(movX, movY, movZ);
 
-            collisionManager.GravityEnabled = true;
-            collisionManager.GravityForce = new TGCVector3(0, -10, 0);
-            collisionManager.SlideFactor = 1.3f;
+            ColisionadorPersonaje.GravityEnabled = true;
+            ColisionadorPersonaje.GravityForce = new TGCVector3(0, -10, 0);
+            ColisionadorPersonaje.SlideFactor = 1.3f;
 
-            //Si se aprieta R y hay colision pongo el flag en true, tambien sirve para el salto
-            if (Input.keyDown(Key.R) && TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, box.BoundingBox)) interactionBoundary = true;
-            //Si se suelta la R cambio el flag
-            if (Input.keyUp(Key.R)) interactionBoundary = false;
+            moverMundo(movementVector);
+            
 
-            var realMovement = collisionManager.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
-            if (interactionBoundary)
-              {
-                  box.Move(movementVector);
-                  personaje.Move(realMovement);
-              } else  { 
-                  //Mover personaje con detección de colisiones, sliding y gravedad
-                  
-                  personaje.Move(realMovement);
-              }
-
-                //Ejecuta la animacion del personaje
-
+            //Ejecuta la animacion del personaje
             personaje.playAnimation(animacion, true);
             //Hacer que la camara siga al personaje en su nueva posicion
             camaraInterna.Target = personaje.Position;
-
-
+            
             //Actualizar valores de la linea de movimiento
-           directionArrow.PStart = esferaPersonaje.Center;
+            directionArrow.PStart = esferaPersonaje.Center;
             directionArrow.PEnd = esferaPersonaje.Center + TGCVector3.Multiply(movementVector, 50);
             directionArrow.updateValues();
 
-           
             PostUpdate();
+        }
+
+        public void moverMundo(TGCVector3 movementVector)
+        {
+            
+            //Si se aprieta R y hay colision pongo el flag en true, tambien sirve para el salto
+            if (Input.keyDown(Key.R) && TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, box.BoundingBox)) interaccionConCaja = true;
+            //Si se suelta la R cambio el flag
+            if (Input.keyUp(Key.R)) interaccionConCaja = false;
+            
+           //Mover personaje con detección de colisiones, sliding y gravedad
+            var realMovement = ColisionadorPersonaje.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
+            
+            if (interaccionConCaja && !colisionObjetos())
+            {
+                box.Move(movementVector);
+            }
+               personaje.Move(realMovement);
+        }
+
+        public bool colisionObjetos()
+        {
+            return escenario.Paredes().Exists(x => TgcCollisionUtils.testAABBAABB(box.BoundingBox, x.BoundingBox));
         }
 
         public void RotarMesh()

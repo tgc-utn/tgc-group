@@ -33,8 +33,6 @@ namespace TGC.Group.Model
 
         public Directorio(string mediaDir)
         {
-
-            
             EscenaSelva = mediaDir + "MeshCreator\\Scenes\\CrashBandicoot-TgcScene.xml";
             EscenaArena = mediaDir + "MeshCreator\\Scenes\\Arena\\Arena-TgcScene.xml";
             EscenaMontania = mediaDir + "MeshCreator\\Scenes\\Mountains\\Mountains-TgcScene.xml";
@@ -44,7 +42,6 @@ namespace TGC.Group.Model
             RobotCaminando = RobotDirectorio + "Caminando-TgcSkeletalAnim.xml";
             RobotParado = RobotDirectorio + "Parado-TgcSkeletalAnim.xml";
             RobotTextura = RobotDirectorio + "Textures\\uvwGreen.jpg";
-            
         }
 
     }

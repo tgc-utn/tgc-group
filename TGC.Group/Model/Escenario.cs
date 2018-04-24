@@ -37,6 +37,8 @@ namespace TGC.Group.Model
            return Paredes().Concat(Rocas()).Concat(Pisos()).Concat(Cajas()).ToList();
         }
 
+        
+
        
 
        
