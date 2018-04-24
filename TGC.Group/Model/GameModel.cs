@@ -13,7 +13,7 @@ using TGC.Core.Collision;
 using System;
 using System.Collections.Generic;
 using TGC.Examples.Collision.SphereCollision;
-
+using TGC.Group.Obstaculos;
 
 
 namespace TGC.Group.Model
@@ -43,7 +43,7 @@ namespace TGC.Group.Model
         private Calculos calculo = new Calculos();
 
         private TGCVector3 velocidad = TGCVector3.Empty;
-        private TGCVector3 aceleracion = new TGCVector3(0, 0, 0);
+        private TGCVector3 aceleracion = new TGCVector3(0, -100, 0);
         private float Ypiso = 25f;
         private float anguloMovido;
         private bool onGround = true;
@@ -51,9 +51,6 @@ namespace TGC.Group.Model
         //Define direccion del mesh del personaje dependiendo el movimiento
         private Personaje dirPers = new Personaje();
         private Escenario escenario;
-
-        private TGCBox Box { get; set; }
-        private TgcMesh piso { get; set; }
 
         private readonly List<TgcMesh> objectsBehind = new List<TgcMesh>();
         private readonly List<TgcMesh> objectsInFront = new List<TgcMesh>();
@@ -66,6 +63,12 @@ namespace TGC.Group.Model
         private float jumping;
         private bool jump = false;
         private bool moving;
+
+
+        //Hago 3 cajas para probar el sliding
+        private TGCBox piso1;
+        private PisoInercia piso2;
+        private TGCBox piso3;
 
         public void RotateMesh(Key input)
         {
@@ -101,7 +104,7 @@ namespace TGC.Group.Model
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
             //Posicion inicial
-            personaje.Position = new TGCVector3(0, Ypiso + 10, 0);
+            personaje.Position = new TGCVector3(0, Ypiso + 50, 0);
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = true;
             //Rotar al robot en el Init para que mire hacia el otro lado
@@ -113,16 +116,47 @@ namespace TGC.Group.Model
             });
             esferaPersonaje = new TgcBoundingSphere(personaje.BoundingBox.calculateBoxCenter(), personaje.BoundingBox.calculateBoxRadius());
 
-            objetosColisionables.Clear();
-            foreach(var objetoColisionable in escenario.MeshesColisionables())
-            {
-                objetosColisionables.Add(objetoColisionable.BoundingBox);
-            }
 
+            piso1 = TGCBox.fromSize(new TGCVector3(500, 50, 500),Color.Red);
+            piso2 = PisoInercia.fromSize(new TGCVector3(500, 50, 500));
+            piso3 = TGCBox.fromSize(new TGCVector3(500, 50, 500),Color.Green);
+            piso2.AceleracionFrenada = 1f;
+
+            //Tuve que poner los autoTransform porque no funcionan los boundingbox de estas cajas por ahora
+            piso1.AutoTransform = true;
+            piso1.Position = new TGCVector3(0, -25, 0);
+            //piso1.Transform = TGCMatrix.Translation(0, -25, 0);// 
+            //piso1.BoundingBox.scaleTranslate(piso1.Position,new TGCVector3(1,1,1));
+            //piso1.updateValues();
+
+            piso2.AutoTransform = true;
+            piso2.Position = new TGCVector3(500, -25, 0);
+
+            //piso2.Transform = TGCMatrix.Translation(500, -25, 0);  //
+            //piso2.BoundingBox.scaleTranslate(piso1.Position,new TGCVector3(1,1,1));
+            //piso2.updateValues();
+
+            piso3.AutoTransform = true;
+            piso3.Position = new TGCVector3(1000, -25, 0);
+            //piso3.Transform = TGCMatrix.Translation(1000, -25, 0); //.Position = new TGCVector3(1700, -25, -100);
+            //piso3.BoundingBox.move(TGCVector3.Empty - piso3.Position);
+            //piso3.updateValues();
+
+            objetosColisionables.Clear();
+            //foreach(var objetoColisionable in escenario.MeshesColisionables())
+            //{
+            //    objetosColisionables.Add(objetoColisionable.BoundingBox);
+            //}
+
+            objetosColisionables.Add(piso1.BoundingBox);
+            objetosColisionables.Add(piso2.BoundingBox);
+            objetosColisionables.Add(piso3.BoundingBox);
+
+
+        
             collisionManager = new SphereCollisionManager();
             collisionManager.GravityEnabled = true;
-         
-            
+
 
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
@@ -189,8 +223,8 @@ namespace TGC.Group.Model
             if (Input.keyDown(Key.Space) && onGround)
             {
                 onGround = false;
-                velocidad.Y += 200f;
-                aceleracion.Y = -100f;
+                velocidad.Y = 200f;
+                //aceleracion.Y = -100f;
             }
 
             velocidad = velocidad + ElapsedTime * aceleracion;
@@ -200,12 +234,10 @@ namespace TGC.Group.Model
 
             //Vector de movimiento
             var movementVector = TGCVector3.Empty;
-
-
-            //Y esta en 0f porque el salto no logre hacerlo funcionar
+            
 
             float movX = 0;
-            float movY = (personaje.Position.Y >= 0 ? velocidad.Y * ElapsedTime : 0f);
+            float movY =  velocidad.Y * ElapsedTime;
             float movZ = 0;
             if (moving)
             {
@@ -218,18 +250,44 @@ namespace TGC.Group.Model
 
             movementVector = new TGCVector3(movX, movY, movZ);
 
-            
-            //Mover personaje con detección de colisiones, sliding y gravedad
-            var realMovement = collisionManager.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
-            personaje.Move(movementVector); // PONGO MOVEMENT VECTOR PARA QUE PRUEBES EL MOVIMIENTO, SI PONES REAL MOVEMENT QUEDA TRABADO PORQUE LA ESFERA COLISIONA CON TODO
+            var SlideVector = TGCVector3.Empty;
 
-            if(personaje.Position.Y < 0)
+            if (piso2.aCollisionFound(personaje))
             {
-                aceleracion = TGCVector3.Empty;
-                personaje.Position = new TGCVector3(personaje.Position.X,0,personaje.Position.Z);
+                var VectorSlideActual = piso2.VectorEntrada;
+                if (VectorSlideActual == TGCVector3.Empty)
+                {
+                    piso2.VectorEntrada = movementVector;
+                }
+                else
+                {
+                    SlideVector = VectorSlideActual;
+                }
+            }
+            else
+            {
+                piso2.VectorEntrada = TGCVector3.Empty;
+            }
+
+            //Mover personaje con detección de colisiones, sliding y gravedad
+            var realMovement = collisionManager.moveCharacter(esferaPersonaje, movementVector + SlideVector, objetosColisionables);
+
+            if(collisionManager.onGround)
+            {
                 velocidad = TGCVector3.Empty;
                 onGround = true;
             }
+
+            personaje.Move(realMovement); // PONGO MOVEMENT VECTOR PARA QUE PRUEBES EL MOVIMIENTO, SI PONES REAL MOVEMENT QUEDA TRABADO PORQUE LA ESFERA COLISIONA CON TODO
+
+            //if(personaje.Position.Y < 0)
+            //{
+            //    aceleracion = TGCVector3.Empty;
+            //    personaje.Position = new TGCVector3(personaje.Position.X,0,personaje.Position.Z);
+            //    velocidad = TGCVector3.Empty;
+            //    onGround = true;
+            //}
+
             //Ejecuta la animacion del personaje
             personaje.playAnimation(animacion, true);
 
@@ -268,25 +326,37 @@ namespace TGC.Group.Model
 
 
             DrawText.drawText("Posicion Actual: " + personaje.Position, 0, 30, Color.GhostWhite);
+            DrawText.drawText("Vector Velocidad Actual: " + velocidad, 0, 100, Color.GhostWhite);
+            DrawText.drawText("Vector Aceleración Actual: " + aceleracion, 0, 150, Color.GhostWhite);
+            DrawText.drawText("Colison con inercia: " + (piso2.aCollisionFound(personaje) ?  "Si":"No"), 0, 190, Color.GhostWhite);
 
-            escenario.RenderAll();
 
-            foreach (var mesh in objectsInFront)
-            {
-                mesh.Render();
-                if (BoundingBox)
-                {
-                    mesh.BoundingBox.Render();
-                }
-            }
-            foreach (var mesh in objectsBehind)
-            {
-                mesh.BoundingBox.Render();
-            }
+
+            //escenario.RenderAll();
+
+            //foreach (var mesh in objectsInFront)
+            //{
+            //    mesh.Render();
+            //    if (BoundingBox)
+            //    {
+            //        mesh.BoundingBox.Render();
+            //    }
+            //}
+            //foreach (var mesh in objectsBehind)
+            //{
+            //    mesh.BoundingBox.Render();
+            //}
+
+            piso1.Render();
+            piso2.Render();
+            piso3.Render();
 
             if (BoundingBox)
             {
                 esferaPersonaje.Render();
+                piso1.BoundingBox.Render();
+                piso2.BoundingBox.Render();
+                piso3.BoundingBox.Render();
             }
 
 

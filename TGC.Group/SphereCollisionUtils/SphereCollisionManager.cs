@@ -20,6 +20,8 @@ namespace TGC.Examples.Collision.SphereCollision
 
         private readonly List<TgcBoundingAxisAlignBox> objetosCandidatos = new List<TgcBoundingAxisAlignBox>();
 
+        public bool onGround { get; set; }
+
         public SphereCollisionManager()
         {
             GravityEnabled = true;
@@ -65,7 +67,27 @@ namespace TGC.Examples.Collision.SphereCollision
                 collideWithWorld(characterSphere, GravityForce, obstaculos);
             }
 
-            return characterSphere.Center - originalSphereCenter;
+            if (characterSphere.Center == originalSphereCenter)
+            {
+                movementVector = new TGCVector3(movementVector.X, 0f, movementVector.Z);
+                var newOriginalSphereCenter = characterSphere.Center;
+
+                //Realizar movimiento
+                collideWithWorld(characterSphere, movementVector, obstaculos);
+
+                //Aplicar gravedad
+                if (GravityEnabled)
+                {
+                    collideWithWorld(characterSphere, GravityForce, obstaculos);
+                }
+                onGround = true;
+                return characterSphere.Center -    originalSphereCenter;
+            }
+            else
+            {
+                onGround = false;
+                return characterSphere.Center - originalSphereCenter;
+            }
         }
 
         /// <summary>
