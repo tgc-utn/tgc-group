@@ -25,10 +25,10 @@ namespace TGC.Group.Model
         protected float velocidadMaximaDeSalto = 60f;
         protected float velocidadMaximaDeAvance = 300f;
         private float elapsedTime;
-        private float deltaTiempoAvance;
-        private float deltaTiempoSalto;
-        protected float aceleracionAvance = 0.5f;
-        protected float aceleracionRetroceso = 0.3f;
+        private Timer deltaTiempoAvance;
+        private Timer deltaTiempoSalto;
+        protected float aceleracionAvance = 0.3f;
+        protected float aceleracionRetroceso;
         private float aceleracionGravedad = 0.5f;
 
         public Vehiculo(string rutaAMesh)
@@ -38,8 +38,9 @@ namespace TGC.Group.Model
             this.velocidadActual = 0f;
             this.velocidadActualDeSalto = 60f;
             this.elapsedTime = 0f;
-            this.deltaTiempoAvance = 0f;
-            this.deltaTiempoSalto = 0f;
+            this.deltaTiempoAvance = new Timer();
+            this.deltaTiempoSalto = new Timer();
+            this.aceleracionRetroceso = this.aceleracionAvance * 0.8f;
         }
 
         private void crearMesh(string rutaAMesh)
@@ -53,7 +54,7 @@ namespace TGC.Group.Model
 
         public void avanzar()
         {
-            this.avanzarTiempo();
+            this.deltaTiempoAvance.acumularTiempo(this.elapsedTime);
             this.velocidadActual = this.velocidadFisica();
             TGCVector3 cuenta = this.vectorAdelante * this.velocidadActual * this.elapsedTime;
             mesh.Move(cuenta);      
@@ -67,18 +68,17 @@ namespace TGC.Group.Model
 
         private float velocidadFisica()
         {
-            return System.Math.Min(this.velocidadMaximaDeAvance, this.velocidadActual + this.aceleracionAvance * this.deltaTiempoAvance);
+            return System.Math.Min(this.velocidadMaximaDeAvance, this.velocidadActual + this.aceleracionAvance * this.deltaTiempoAvance.tiempoTranscurrido());
         }
 
         private float velocidadFisicaRetroceso()
         {
-            return System.Math.Max(-this.velocidadMaximaDeAvance, this.velocidadActual + (-this.aceleracionRetroceso) * this.deltaTiempoAvance);
+            return System.Math.Max(-this.velocidadMaximaDeAvance, this.velocidadActual + (-this.aceleracionRetroceso) * this.deltaTiempoAvance.tiempoTranscurrido());
         }
 
         public void retroceder()
         {
-            this.avanzarTiempo();
-            //lo mismo que en el anterior nada más que cambio el sentido del vector adelante
+            this.deltaTiempoAvance.acumularTiempo(this.elapsedTime);
             this.velocidadActual = this.velocidadFisicaRetroceso();
             mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
         }
@@ -86,14 +86,14 @@ namespace TGC.Group.Model
         public void actualizarVelocidad()
         {
             float constanteDesaceleracion = 0.5f;
-            this.resetearDeltaTiempo();
+            this.deltaTiempoAvance.resetear();
             if (this.velocidadActual > 0)
             {
                 this.velocidadActual -= constanteDesaceleracion;
                 if(this.velocidadActual < 0)
                 {
                     this.velocidadActual = 0;
-                    this.resetearDeltaTiempo();
+                    this.deltaTiempoAvance.resetear();
                 }
                 mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
             }
@@ -103,15 +103,10 @@ namespace TGC.Group.Model
                 if (this.velocidadActual > 0)
                 {
                     this.velocidadActual = 0;
-                    this.resetearDeltaTiempo();
+                    this.deltaTiempoAvance.resetear();
                 }
                 mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
             }
-        }
-
-        private void  resetearDeltaTiempo()
-        {
-            this.deltaTiempoAvance = 0;
         }
 
         public void doblarALaDerecha(CamaraEnTerceraPersona camara)
@@ -156,7 +151,7 @@ namespace TGC.Group.Model
         {
             if(!this.estaEnPlenoSalto())
             {
-                this.avanzarTiempoSalto();
+                this.deltaTiempoSalto.acumularTiempo(this.elapsedTime);
                 TGCVector3 nuevaPosicion = new TGCVector3(0, 1, 0);
                 mesh.Move(nuevaPosicion);
                 
@@ -165,17 +160,12 @@ namespace TGC.Group.Model
 
         public float velocidadFisicaDeSalto()
         {
-            return this.velocidadActualDeSalto + (-this.aceleracionGravedad) * this.deltaTiempoSalto;
-        }
-
-        private void resetearDeltaTiempoSalto()
-        {
-            this.deltaTiempoSalto = 0f;
+            return this.velocidadActualDeSalto + (-this.aceleracionGravedad) * this.deltaTiempoSalto.tiempoTranscurrido();
         }
 
         public void actualizarSalto()
         {
-            if(this.deltaTiempoSalto != 0)
+            if(this.deltaTiempoSalto.tiempoTranscurrido() != 0)
             {
                 this.velocidadActualDeSalto = this.velocidadFisicaDeSalto();
                 float desplazamientoEnY = this.velocidadActualDeSalto * elapsedTime;
@@ -183,7 +173,7 @@ namespace TGC.Group.Model
                 TGCVector3 nuevoDesplazamiento = new TGCVector3(0, desplazamientoEnY, 0);
                 if (nuevoDesplazamiento.Y == 0f)
                 {
-                    this.resetearDeltaTiempoSalto();
+                    this.deltaTiempoSalto.resetear();
                     this.velocidadActualDeSalto = this.velocidadMaximaDeSalto;
                 }
                 mesh.Move(nuevoDesplazamiento);
@@ -191,26 +181,16 @@ namespace TGC.Group.Model
 
         }
 
-        private void avanzarTiempo()
-        {
-            this.deltaTiempoAvance += this.elapsedTime;
-        }
-
-        private void avanzarTiempoSalto()
-        {
-            this.deltaTiempoSalto += this.elapsedTime;
-        }
-
         public void setElapsedTime(float time)
         {
             this.elapsedTime = time;
-            if(this.deltaTiempoAvance != 0)
+            if(this.deltaTiempoAvance.tiempoTranscurrido() != 0)
             {
-                this.avanzarTiempo();
+                this.deltaTiempoAvance.acumularTiempo(this.elapsedTime);
             }
-            if (this.deltaTiempoSalto != 0)
+            if (this.deltaTiempoSalto.tiempoTranscurrido() != 0)
             {
-                this.avanzarTiempoSalto();
+                this.deltaTiempoSalto.acumularTiempo(this.elapsedTime);
             }
 
         }

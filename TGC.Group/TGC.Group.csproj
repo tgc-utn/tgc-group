@@ -90,6 +90,7 @@
     <Compile Include="Model\CamaraEnTerceraPersona.cs" />
     <Compile Include="Model\OperacionesConVectores.cs" />
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Model\Timer.cs" />
     <Compile Include="Model\Vehiculos\VehiculoPesado.cs" />
     <Compile Include="Model\Vehiculos\VehiculoLiviano.cs" />
     <Compile Include="Model\Vehiculos\Vehiculo.cs" />
