@@ -37,7 +37,8 @@ namespace TGC.Group.Model
        
 
         private Directorio directorio;
-
+        /*private TGCVector3 vectorNormalPlanoColisionado;
+        private TGCVector3 vectorNormalPlanoColisionado;*/
         private TgcSkeletalMesh personaje;
         private TgcThirdPersonCamera camaraInterna;
         private Calculos calculo = new Calculos();
@@ -244,8 +245,8 @@ namespace TGC.Group.Model
            //Mover personaje con detección de colisiones, sliding y gravedad
             var movimientoRealPersonaje = ColisionadorPersonaje.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
             
-            if (interaccionConCaja && !colisionObjetos(movementVector))box.Move(movementVector);
-             
+            if (interaccionConCaja && !colisionObjetos(movementVector))box.Move(movimientoRealPersonaje);
+            if (colisionObjetos(movementVector)) box.Move(-movimientoRealPersonaje);
             personaje.Move(movimientoRealPersonaje);
         }
 
@@ -282,12 +283,20 @@ namespace TGC.Group.Model
 
                 Console.WriteLine(TGCVector3.Normalize(movementVector));
 
+
+                var vectorResultante = TGCVector3.Cross(vectorNormalPlanoColisionado, movementVector);
+
+                //No me importa el eje Y.
+                vectorResultante.Y = 0;
                 //Compruebo si el vector movimiento y el vector normal al plano colisionado son paralelos
-                if (calculo.VectoresParalelos(vectorNormalPlanoColisionado, movementVector))
+                Console.WriteLine(vectorResultante);
+                if (vectorResultante != TGCVector3.Empty)
                 {
                     //Si son paralelos, los movimientos son en la misma direccion, entonces no deberian moverse.
-                    collisionFound = true;
+                    collisionFound = false;
+                    Console.WriteLine("No Colision");
                 }
+                
                
             Console.WriteLine(i);
             }
