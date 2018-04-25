@@ -34,15 +34,25 @@ namespace TGC.Group.Model
 
         public List<TgcMesh> MeshesColisionables()
         {
-           return Paredes().Concat(Rocas()).Concat(Pisos()).Concat(Cajas()).ToList();
+            List<TgcMesh> meshesColisionables = new List<TgcMesh>();
+            meshesColisionables.AddRange(Paredes());
+            meshesColisionables.AddRange(Rocas());
+            meshesColisionables.AddRange(Pisos());
+            meshesColisionables.AddRange(Cajas());
+
+           return meshesColisionables;
         }
 
+        public List<TgcBoundingAxisAlignBox> MeshesColisionablesBB()
+        {
+            return MeshesColisionables().Select(mesh => mesh.BoundingBox).ToList();
+        }
+
+        public List<TgcMesh> ObjetosColisionables()
+        {
+            return Paredes().Concat(Rocas()).Concat(Cajas()).ToList();
+        }
         
-
-       
-
-       
-
         public void RenderizarBoundingBoxes()
         {
             MeshesColisionables().ForEach(mesh => mesh.BoundingBox.Render());
@@ -54,5 +64,16 @@ namespace TGC.Group.Model
         
         public TgcBoundingAxisAlignBox BoundingBox() => scene.BoundingBox;
 
+        public List<TgcBoundingAxisAlignBox> MeshesColisionablesBBSin(TgcMesh box)
+        {
+            List<TgcMesh> obstaculos = MeshesColisionables();
+            var indice = -1;
+            indice = obstaculos.FindIndex(mesh => mesh.Name == box.Name);
+
+            if (indice != -1) obstaculos.RemoveAt(indice);
+            return obstaculos.ConvertAll(mesh => mesh.BoundingBox);
+        }
+
+       
     }
 }

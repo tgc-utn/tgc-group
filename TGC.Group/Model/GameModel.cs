@@ -54,17 +54,16 @@ namespace TGC.Group.Model
         
 
         
-        private List<TgcBoundingAxisAlignBox> objetosColisionables = new List<TgcBoundingAxisAlignBox>();
-        //private TgcBoundingAxisAlignBox personajeBox;
         private TgcBoundingSphere esferaPersonaje;
         private TGCVector3 scaleBoundingVector;
-        private SphereCollisionManager ColisionadorPersonaje;
-        
+        private SphereCollisionManager ColisionadorEsferico;
         private TgcArrow directionArrow;
-        private TgcMesh box;
-        
+        private TGCVector3 movimientoRealPersonaje;
+        private TGCVector3 movimientoRelativoPersonaje;
+        private TGCVector3 movimientoRealCaja;
+        private TgcBoundingSphere esferaCaja;
 
-        private bool BoundingBox = false;
+        private bool boundingBoxActivate = false;
 
         private float jumping;
         private bool moving;
@@ -81,7 +80,6 @@ namespace TGC.Group.Model
 
             //Cagar escenario especifico para el juego.
             escenario = new Escenario(directorio.EscenaSelva);
-            box = escenario.Cajas()[0];
 
             //Cargar personaje con animaciones
             var skeletalLoader = new TgcSkeletalLoader();
@@ -112,11 +110,6 @@ namespace TGC.Group.Model
             scaleBoundingVector = new TGCVector3(1.5f, 1f, 1.2f);
 
 
-            objetosColisionables.Clear();
-            foreach(var objetoColisionable in escenario.MeshesColisionables())
-            {
-                objetosColisionables.Add(objetoColisionable.BoundingBox);
-            }
 
             //Crear linea para mostrar la direccion del movimiento del personaje
             directionArrow = new TgcArrow();
@@ -125,8 +118,8 @@ namespace TGC.Group.Model
             directionArrow.Thickness = 1;
             directionArrow.HeadSize = new TGCVector2(10, 20);
 
-            ColisionadorPersonaje = new SphereCollisionManager();
-            ColisionadorPersonaje.GravityEnabled = true;
+            ColisionadorEsferico = new SphereCollisionManager();
+            ColisionadorEsferico.GravityEnabled = true;
          
             
 
@@ -173,7 +166,7 @@ namespace TGC.Group.Model
 
             if (Input.keyPressed(Key.F))
             {
-                BoundingBox = !BoundingBox;
+                boundingBoxActivate = !boundingBoxActivate;
             }
 
             RotarMesh();
@@ -209,18 +202,16 @@ namespace TGC.Group.Model
             }
             else animacion = "Parado";
 
-
-
             movementVector = new TGCVector3(movX, movY, movZ);
 
-            ColisionadorPersonaje.GravityEnabled = true;
-            ColisionadorPersonaje.GravityForce = new TGCVector3(0, -10, 0);
-            ColisionadorPersonaje.SlideFactor = 1.3f;
+            movimientoRelativoPersonaje = movementVector;
+
+            ColisionadorEsferico.GravityEnabled = true;
+            ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
+            ColisionadorEsferico.SlideFactor = 1.3f;
 
             moverMundo(movementVector);
             
-            
-
             //Ejecuta la animacion del personaje
             personaje.playAnimation(animacion, true);
             //Hacer que la camara siga al personaje en su nueva posicion
@@ -232,85 +223,52 @@ namespace TGC.Group.Model
             directionArrow.updateValues();
 
             PostUpdate();
+
+            
         }
 
         public void moverMundo(TGCVector3 movementVector)
         {
             
+            //Mover personaje con detección de colisiones, sliding y gravedad
+            movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movementVector, escenario.MeshesColisionablesBB());
+            
+            
             //Si se aprieta R y hay colision pongo el flag en true, tambien sirve para el salto
-            if (Input.keyDown(Key.R) && TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, box.BoundingBox)) interaccionConCaja = true;
-            //Si se suelta la R cambio el flag
-            if (Input.keyUp(Key.R)) interaccionConCaja = false;
-            
-           //Mover personaje con detección de colisiones, sliding y gravedad
-            var movimientoRealPersonaje = ColisionadorPersonaje.moveCharacter(esferaPersonaje, movementVector, objetosColisionables);
-            
-            if (interaccionConCaja && !colisionObjetos(movementVector))box.Move(movimientoRealPersonaje);
-            if (colisionObjetos(movementVector)) box.Move(-movimientoRealPersonaje);
-            personaje.Move(movimientoRealPersonaje);
-        }
-
-        //La colision no esta orientada. La caja queda pegada a la pared una vez colisionada
-        public bool colisionObjetos(TGCVector3 movementVector)
-        {
-            return escenario.Paredes().Exists(pared =>colisionOrientadaObjeto(pared,movementVector));
-        }
-
-        public bool colisionOrientadaObjeto(TgcMesh pared,TGCVector3 movementVector)
-        {
-            bool collisionFound = false;
-            //Solo si existe colision entre la caja y la pared.
-            if (TgcCollisionUtils.testAABBAABB(box.BoundingBox, pared.BoundingBox))
+            if (Input.keyDown(Key.R))
             {
-                collisionFound = true;
-
-                //Hay que comprobrar si se empuja a la caja en direccion a la pared.
-                TgcBoundingAxisAlignBox.Face collisionFace = null;
-                var faces = box.BoundingBox.computeFaces();
-                var i = 0;
-
-                foreach (var face in faces)
+                TgcMesh box = obtenerColisionCajaPersonaje();
+                if (box != null)
                 {
-                    if (!TgcCollisionUtils.testPlaneAABB(face.Plane, pared.BoundingBox))
-                    {
-                        collisionFace = face;
-                        i++; //Debuguear cuantas caras no colisionadas encuentra
-                    }
-                    }
+                    interaccionConCaja = true;
 
-                var vectorNormalPlanoColisionado = TgcCollisionUtils.getPlaneNormal(TGCPlane.Normalize(collisionFace.Plane));
-                Console.WriteLine(vectorNormalPlanoColisionado);
+                    esferaCaja = new TgcBoundingSphere(box.BoundingBox.calculateBoxCenter() , box.BoundingBox.calculateBoxRadius());
 
-                Console.WriteLine(TGCVector3.Normalize(movementVector));
+                   
 
-
-                var vectorResultante = TGCVector3.Cross(vectorNormalPlanoColisionado, movementVector);
-
-                //No me importa el eje Y.
-                vectorResultante.Y = 0;
-                //Compruebo si el vector movimiento y el vector normal al plano colisionado son paralelos
-                Console.WriteLine(vectorResultante);
-                if (vectorResultante != TGCVector3.Empty)
-                {
-                    //Si son paralelos, los movimientos son en la misma direccion, entonces no deberian moverse.
-                    collisionFound = false;
-                    Console.WriteLine("No Colision");
+                    movimientoRealCaja = ColisionadorEsferico.moveCharacter(esferaCaja, movementVector,escenario.MeshesColisionablesBBSin(box));
+                   // movimientoRealCaja.Y = 0;
+                    box.Move(movimientoRealCaja);
+                    //if (!testColisionCajasObjetos(box)) box.Move(movimientoRealCaja);
+                    //else box.Move(-movimiento);
                 }
-                
-               
-            Console.WriteLine(i);
             }
-            return collisionFound;
+            else interaccionConCaja = false;
+
+            personaje.Move(movimientoRealPersonaje);
+
         }
 
-        
-
-        public bool colisionOrientada(TGCVector3 movimientoRealCaja, TgcMesh pared)
+        public TgcMesh obtenerColisionCajaPersonaje()
         {
-            TgcCollisionUtils.intersectSegmentAABB(movimientoRealCaja, box.Position, pared.BoundingBox, out TGCVector3 resultante);
-            Console.WriteLine("Mov. Caja" + movimientoRealCaja);
-            Console.WriteLine("Resultante" + resultante);
-            return true;
+            return escenario.Cajas().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.BoundingBox));
+        }
+
+      
+        public bool testColisionCajasObjetos(TgcMesh box)
+        {
+           // return escenario.Paredes().Exists(pared =>colisionConCajaOrientada(box,pared,movementVector));
+            return escenario.ObjetosColisionables().Exists(objeto => objeto != box && TgcCollisionUtils.testAABBAABB(box.BoundingBox, objeto.BoundingBox));
         }
 
         public void RotarMesh()
@@ -357,21 +315,27 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            DrawText.drawText("Posicion Actual: " + personaje.Position + "\n Posicion Caja: " + box.Position, 0, 30, Color.GhostWhite);
+            DrawText.drawText("Posicion Actual: " + personaje.Position + "\n" 
+                            + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
+                            + "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
+                            + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
+                            + "Interaccion Con Caja: " + interaccionConCaja , 0, 30, Color.GhostWhite);
 
             escenario.RenderAll();
             personaje.animateAndRender(ElapsedTime);
 
-            if (BoundingBox)
+            if (boundingBoxActivate)
             {
             
                 personaje.BoundingBox.Render();
                 esferaPersonaje.Render();
                 escenario.RenderizarBoundingBoxes();
+                directionArrow.Render();
+                if(esferaCaja != null) esferaCaja.Render();
+
             }
 
 
-            directionArrow.Render();
 
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
