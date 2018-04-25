@@ -71,7 +71,7 @@ namespace TGC.Group.Model
             var d3dDevice = D3DDevice.Instance.Device;
 
             //Objeto que conoce todos los path de MediaDir
-            directorio = new Directorio(MediaDir);
+            directorio = new Directorio("..\\..\\Media\\");
 
             //Cagar escenario especifico para el juego.
             escenario = new Escenario(directorio.EscenaSelva);
