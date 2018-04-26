@@ -24,13 +24,14 @@ namespace TGC.Group.Model
             scene = loader.loadSceneFromFile(pathEscenario);
         }
 
-        public List<TgcMesh> Paredes()=> scene.Meshes.FindAll(x => x.Layer == "PAREDES");
-
-        public List<TgcMesh> Rocas()=> scene.Meshes.FindAll(x => x.Layer == "ROCAS");
-        
-        public List<TgcMesh> Pisos() => scene.Meshes.FindAll(x => x.Layer == "PISOS");
-
-        public List<TgcMesh> Cajas() => scene.Meshes.FindAll(x => x.Layer == "CAJAS");
+        public List<TgcMesh> encontrarMeshes(string clave) => scene.Meshes.FindAll(x => x.Layer == clave);
+        public List<TgcMesh> Paredes() => encontrarMeshes("PAREDES");
+        public List<TgcMesh> Rocas() => encontrarMeshes("ROCAS");
+        public List<TgcMesh> Pisos() => encontrarMeshes("PISOS");
+        public List<TgcMesh> Cajas() => encontrarMeshes("CAJAS");
+        public List<TgcMesh> Sarcofagos() => encontrarMeshes("SARCOFAGOS");
+        public List<TgcMesh> Pilares() => encontrarMeshes("PILARES");
+                         
 
         public List<TgcMesh> MeshesColisionables()
         {
@@ -39,7 +40,8 @@ namespace TGC.Group.Model
             meshesColisionables.AddRange(Rocas());
             meshesColisionables.AddRange(Pisos());
             meshesColisionables.AddRange(Cajas());
-
+            meshesColisionables.AddRange(Sarcofagos());
+            meshesColisionables.AddRange(Pilares());
            return meshesColisionables;
         }
 

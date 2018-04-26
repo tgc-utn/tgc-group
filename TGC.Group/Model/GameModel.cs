@@ -240,17 +240,15 @@ namespace TGC.Group.Model
                 TgcMesh box = obtenerColisionCajaPersonaje();
                 if (box != null)
                 {
-                    interaccionConCaja = true;
+                   interaccionConCaja = true;
 
-                    esferaCaja = new TgcBoundingSphere(box.BoundingBox.calculateBoxCenter() , box.BoundingBox.calculateBoxRadius());
-
-                   
-
-                    movimientoRealCaja = ColisionadorEsferico.moveCharacter(esferaCaja, movementVector,escenario.MeshesColisionablesBBSin(box));
-                   // movimientoRealCaja.Y = 0;
-                    box.Move(movimientoRealCaja);
-                    //if (!testColisionCajasObjetos(box)) box.Move(movimientoRealCaja);
-                    //else box.Move(-movimiento);
+                   TGCVector3 centroEsfera = box.BoundingBox.calculateBoxCenter() + new TGCVector3(0f,20f,0f);
+                   float radioEsfera = box.BoundingBox.calculateBoxRadius() * 0.7f;
+                    
+                   esferaCaja = new TgcBoundingSphere(centroEsfera,radioEsfera);
+                   movimientoRealCaja = ColisionadorEsferico.moveCharacter(esferaCaja, movementVector,escenario.MeshesColisionablesBBSin(box));
+                   box.Move(movimientoRealCaja);
+                    
                 }
             }
             else interaccionConCaja = false;
@@ -319,7 +317,7 @@ namespace TGC.Group.Model
                             + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
                             + "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
                             + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
-                            + "Interaccion Con Caja: " + interaccionConCaja , 0, 30, Color.GhostWhite);
+                            + "Interaccion Con Caja: " + interaccionConCaja + "\n", 0, 30, Color.GhostWhite);
 
             escenario.RenderAll();
             personaje.animateAndRender(ElapsedTime);
@@ -331,7 +329,11 @@ namespace TGC.Group.Model
                 esferaPersonaje.Render();
                 escenario.RenderizarBoundingBoxes();
                 directionArrow.Render();
-                if(esferaCaja != null) esferaCaja.Render();
+                if (esferaCaja != null)
+                {
+                    esferaCaja.Render();
+                    
+                }
 
             }
 
