@@ -107,9 +107,9 @@ namespace TGC.Group.Model
             });
 
 
-            esferaPersonaje = new TgcBoundingSphere(personaje.BoundingBox.calculateBoxCenter() - new TGCVector3(5f,50f,0f), personaje.BoundingBox.calculateBoxRadius()*0.4f);
+            esferaPersonaje = new TgcBoundingSphere(personaje.BoundingBox.calculateBoxCenter() - new TGCVector3(10f,50f,0f), personaje.BoundingBox.calculateBoxRadius()*0.4f);
             scaleBoundingVector = new TGCVector3(1.5f, 1f, 1.2f);
-
+            
 
 
             //Crear linea para mostrar la direccion del movimiento del personaje
@@ -151,8 +151,6 @@ namespace TGC.Group.Model
         {
             PreUpdate();
             personaje.BoundingBox.scaleTranslate(personaje.Position, scaleBoundingVector);
-            //personaje.BoundingBox.transform(TGCMatrix.Scaling(new TGCVector3(100f, 2f, 2f)));
-
             //obtener velocidades de Modifiers
             var velocidadCaminar = 300f;
             var coeficienteSalto = 30f;
@@ -175,7 +173,7 @@ namespace TGC.Group.Model
             RotarMesh();
 
             if (Input.keyDown(Key.R)) interaccion = true;
-            else interaccion = false;
+            if(Input.keyUp(Key.R)) interaccion = false;
 
             if (!interaccion) // Para que no se pueda saltar cuando agarras algun objeto
             {
@@ -233,7 +231,7 @@ namespace TGC.Group.Model
             
         }
 
-        public void moverMundo(TGCVector3 movementVector/*, TgcMesh objeto*/)
+        public void moverMundo(TGCVector3 movementVector)
         {
 
             var box = obtenerColisionCajaPersonaje();
