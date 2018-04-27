@@ -12,6 +12,8 @@ using System.Drawing;
 using Microsoft.DirectX.DirectInput;
 using System.Timers;
 using System.Diagnostics;
+using TGC.Group.Model;
+using TGC.Group.Model.Vehiculos.Estados;
 
 namespace TGC.Group.Model
 {
@@ -19,7 +21,7 @@ namespace TGC.Group.Model
     {
         private float velocidadActual;
         private float velocidadActualDeSalto;
-        private TgcMesh mesh;
+        public TgcMesh mesh;
         private TGCVector3 vectorAdelante;
         protected float velocidadRotacion = 1f;
         protected float velocidadMaximaDeSalto = 60f;
@@ -30,9 +32,13 @@ namespace TGC.Group.Model
         protected float aceleracionAvance = 0.3f;
         protected float aceleracionRetroceso;
         private float aceleracionGravedad = 0.5f;
+        private EstadoVehiculo estado;
+        protected float constanteRozamiento = 0.2f;
+        protected float constanteFrenado = 1f;
 
         public Vehiculo(string rutaAMesh)
         {
+            this.estado = new Stopped(this);
             this.vectorAdelante = new TGCVector3(0, 0, 1);
             this.crearMesh(rutaAMesh);
             this.velocidadActual = 0f;
@@ -41,6 +47,11 @@ namespace TGC.Group.Model
             this.deltaTiempoAvance = new Timer();
             this.deltaTiempoSalto = new Timer();
             this.aceleracionRetroceso = this.aceleracionAvance * 0.8f;
+        }
+
+        public EstadoVehiculo getEstado()
+        {
+            return estado;
         }
 
         private void crearMesh(string rutaAMesh)
@@ -66,14 +77,24 @@ namespace TGC.Group.Model
             return this.velocidadActualDeSalto;
         }
 
-        private float velocidadFisica()
+        public float velocidadFisica()
         {
             return System.Math.Min(this.velocidadMaximaDeAvance, this.velocidadActual + this.aceleracionAvance * this.deltaTiempoAvance.tiempoTranscurrido());
         }
 
-        private float velocidadFisicaRetroceso()
+        public float velocidadFisicaRetroceso()
         {
             return System.Math.Max(-this.velocidadMaximaDeAvance, this.velocidadActual + (-this.aceleracionRetroceso) * this.deltaTiempoAvance.tiempoTranscurrido());
+        }
+
+        public TGCVector3 getVectorAdelante()
+        {
+            return this.vectorAdelante;
+        }
+
+        public void move(TGCVector3 vector)
+        {
+            mesh.Move(vector);
         }
 
         public void retroceder()
@@ -158,16 +179,11 @@ namespace TGC.Group.Model
             }
         }
 
-        public float velocidadFisicaDeSalto()
-        {
-            return this.velocidadActualDeSalto + (-this.aceleracionGravedad) * this.deltaTiempoSalto.tiempoTranscurrido();
-        }
-
         public void actualizarSalto()
         {
             if(this.deltaTiempoSalto.tiempoTranscurrido() != 0)
             {
-                this.velocidadActualDeSalto = this.velocidadFisicaDeSalto();
+                //this.velocidadActualDeSalto = this.velocidadFisicaDeSalto();
                 float desplazamientoEnY = this.velocidadActualDeSalto * elapsedTime;
                 desplazamientoEnY = (mesh.Position.Y + desplazamientoEnY < 0)? -mesh.Position.Y : desplazamientoEnY;
                 TGCVector3 nuevoDesplazamiento = new TGCVector3(0, desplazamientoEnY, 0);
@@ -210,5 +226,54 @@ namespace TGC.Group.Model
             mesh.Dispose();
         }
 
+        public Timer getDeltaTiempoAvance()
+        {
+            return this.deltaTiempoAvance;
+        }
+
+        public float getElapsedTime()
+        {
+            return this.elapsedTime;
+        }
+
+        public void setVelocidadActual(float nuevaVelocidad)
+        {
+            this.velocidadActual = nuevaVelocidad;
+        }
+
+        public void setEstado(EstadoVehiculo estado)
+        {
+            this.estado = estado;
+        }
+
+        public void setVelocidadActualDeSalto(float velocidad)
+        {
+            this.velocidadActualDeSalto = velocidad;
+        }
+
+        public float getAceleracionGravedad()
+        {
+            return this.aceleracionGravedad;
+        }
+
+        public Timer getDeltaTiempoSalto()
+        {
+            return this.deltaTiempoSalto;
+        }
+
+        public float getVelocidadMaximaDeSalto()
+        {
+            return this.velocidadMaximaDeSalto;
+        }
+
+        public float getConstanteRozamiento()
+        {
+            return this.constanteRozamiento;
+        }
+
+        public float getConstanteFrenado()
+        {
+            return this.constanteFrenado;
+        }
     }
 }

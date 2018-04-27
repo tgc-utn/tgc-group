@@ -13,19 +13,9 @@ using TGC.Core.Text;
 
 namespace TGC.Group.Model
 {
-    /// <summary>
-    ///     Ejemplo para implementar el TP.
-    ///     Inicialmente puede ser renombrado o copiado para hacer más ejemplos chicos, en el caso de copiar para que se
-    ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
-    ///     line 97.
-    /// </summary>
     public class GameModel : TgcExample
     {
-        /// <summary>
-        ///     Constructor del juego.
-        /// </summary>
-        /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
-        /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
+
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
@@ -44,7 +34,7 @@ namespace TGC.Group.Model
             
             //en caso de querer cargar una escena
             TgcSceneLoader loader = new TgcSceneLoader();
-            scene = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Scenes\\CiudadBerreta\\CiudadBerreta-TgcScene.xml");
+            scene = loader.loadSceneFromFile(MediaDir + "Texturas\\pisonuevo-TgcScene.xml");
 
             //creo el vehiculo liviano
             //si quiero crear un vehiculo pesado (camion) hago esto
@@ -110,39 +100,39 @@ namespace TGC.Group.Model
             {
                 //hago avanzar al auto hacia adelante. Le paso el Elapsed Time que se utiliza para
                 //multiplicarlo a la velocidad del auto y no depender del hardware del computador
-                auto.avanzar();
+                auto.getEstado().advance();
 
             }
 
             //lo mismo que para avanzar pero para retroceder
             if (Input.keyDown(Key.S))
             {
-                auto.retroceder();
+                auto.getEstado().back();
             }
 
             //si el usuario teclea D
             if (Input.keyDown(Key.D))
             {
-                auto.doblarALaDerecha(camaraInterna);
+                auto.getEstado().right(camaraInterna);
                 
             }else if (Input.keyDown(Key.A))
             {
-                auto.doblarALaIzquierda(camaraInterna);
+                auto.getEstado().left(camaraInterna);
             }
 
             //Si apreta espacio, salta
             if (Input.keyDown(Key.Space))
             {
-                auto.saltar();
+                auto.getEstado().jump();
             }
 
             if (!Input.keyDown(Key.W) && !Input.keyDown(Key.S))
             {
-                auto.actualizarVelocidad();
+                auto.getEstado().speedUpdate();
             }
 
             //esto es algo turbio que tengo que hacer, por que sino es imposible modelar el salto
-            auto.actualizarSalto();
+            auto.getEstado().jumpUpdate();
 
 
             //Hacer que la camara siga al personaje en su nueva posicion
