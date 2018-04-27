@@ -62,7 +62,7 @@ namespace TGC.Group.Model
             TgcScene scene = loader.loadSceneFromFile(rutaAMesh);
             this.mesh = scene.Meshes[0];
             mesh.RotateY(FastMath.PI);
-            mesh.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
+            mesh.Scale = new TGCVector3(0.05f, 0.05f, 0.05f);
         }
 
         public void setVectorAdelante(TGCVector3 vector)

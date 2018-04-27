@@ -78,5 +78,15 @@ namespace TGC.Group.Model.Vehiculos.Estados
                 }
             }
         }
+
+        public override void right(CamaraEnTerceraPersona camara)
+        {
+            //TODO mover ruedas;
+        }
+
+        public override void left(CamaraEnTerceraPersona camara)
+        {
+            //TODO mover ruedas;
+        }
     }
 }

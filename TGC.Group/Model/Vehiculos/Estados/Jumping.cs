@@ -65,5 +65,16 @@ namespace TGC.Group.Model.Vehiculos.Estados
             auto.mesh.Move(nuevoDesplazamiento);
             auto.mesh.Move(auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
         }
+
+        public override void left(CamaraEnTerceraPersona camara)
+        {
+            //TODO mover ruedas solamente;
+        }
+
+        public override void right(CamaraEnTerceraPersona camara)
+        {
+            //TODO mover ruedas solamente;
+        }
+
     }
 }

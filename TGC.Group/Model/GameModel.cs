@@ -25,7 +25,7 @@ namespace TGC.Group.Model
 
         private VehiculoLiviano auto;
         private CamaraEnTerceraPersona camaraInterna;
-        private TGCVector3 camaraDesplazamiento = new TGCVector3(0,5,30);
+        private TGCVector3 camaraDesplazamiento = new TGCVector3(0,5,40);
         private TGCBox cubo;
         private TgcScene scene;
         private TgcText2D textoVelocidadVehiculo, textoAlturaVehiculo;
@@ -35,7 +35,7 @@ namespace TGC.Group.Model
             
             //en caso de querer cargar una escena
             TgcSceneLoader loader = new TgcSceneLoader();
-            scene = loader.loadSceneFromFile(MediaDir + "meshCreator\\meshes\\Ruedas\\crucenormal-TgcScene.xml");
+            scene = loader.loadSceneFromFile(MediaDir + "meshCreator\\Scenes\\Ciudad\\Ciudad-TgcScene.xml");
 
             //creo el vehiculo liviano
             //si quiero crear un vehiculo pesado (camion) hago esto
@@ -51,7 +51,7 @@ namespace TGC.Group.Model
             //que te permite configurar la posicion, el lookat, etc. Lo que hacemos al heredar, es reescribir algunos
             //metodos y setear valores default para que la camara quede mirando al auto en 3era persona
 
-            camaraInterna = new CamaraEnTerceraPersona(auto.posicion() + camaraDesplazamiento, 10, -70);
+            camaraInterna = new CamaraEnTerceraPersona(auto.posicion() + camaraDesplazamiento, 7.5f, -55);
             Camara = camaraInterna;
 
         }
@@ -146,7 +146,7 @@ namespace TGC.Group.Model
 
 
             //Hacer que la camara siga al personaje en su nueva posicion
-            camaraInterna.Target = auto.posicion() + camaraDesplazamiento;  
+            camaraInterna.Target = auto.posicion() + auto.getVectorAdelante() * 30 ;  
 
             PostUpdate();
         }
