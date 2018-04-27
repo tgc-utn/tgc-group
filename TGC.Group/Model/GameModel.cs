@@ -63,6 +63,8 @@ namespace TGC.Group.Model
         private TGCVector3 movimientoRelativoPersonaje = TGCVector3.Empty;
         private TGCVector3 movimientoRealCaja = TGCVector3.Empty;
         private TgcBoundingSphere esferaCaja;
+       
+
 
         private bool boundingBoxActivate = false;
 
@@ -230,35 +232,53 @@ namespace TGC.Group.Model
 
             
         }
-
+        TgcMesh objetoEscenario;
+        private bool choqueEscenario = false;
         public void moverMundo(TGCVector3 movementVector)
         {
 
             var box = obtenerColisionCajaPersonaje();
             if (box != null && box != objeto) objeto = box;
             //Mover personaje con detección de colisiones, sliding y gravedad
+            objetoEscenario = colisionEscenario();
+
             movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movementVector, escenario.MeshesColisionablesBB());
 
             if (objeto != null)
             {
             
-                TGCVector3 centroEsfera = objeto.BoundingBox.calculateBoxCenter() + new TGCVector3(0f, 20f, 0f);
-                float radioEsfera = objeto.BoundingBox.calculateBoxRadius() * 0.7f;
-
-                esferaCaja = new TgcBoundingSphere(centroEsfera, radioEsfera);
+                esferaCaja = new TgcBoundingSphere(objeto.BoundingBox.calculateBoxCenter() + new TGCVector3(0f, 20f, 0f), objeto.BoundingBox.calculateBoxRadius() * 0.7f);
+                
                 movimientoRealCaja = ColisionadorEsferico.moveCharacter(esferaCaja, movementVector, escenario.MeshesColisionablesBBSin(objeto));
-                if (interaccion && testColisionObjetoPersonaje(objeto)) objeto.Move(movimientoRealCaja);
+
+
+                if (objetoEscenario == null)
+                {
+                    if (interaccion && testColisionObjetoPersonaje(objeto)) objeto.Move(movimientoRealCaja);
+                    choqueEscenario = true;
+                }
+               else if(choqueEscenario)
+                {
+                    objeto.Move(-movimientoRealCaja);
+                    choqueEscenario = false;
+                }
+
+
                 if (!interaccion && movimientoRealCaja.Y < 0) objeto.Move(movimientoRealCaja);
+
             }
-
-                   
+            // if (choqueEscenario) objeto.Move(-movimientoRealCaja);
             personaje.Move(movimientoRealPersonaje);
-
+            
         }
-
+        
+        public TgcMesh colisionEscenario()
+        {
+            return escenario.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, mesh.BoundingBox));
+        } 
         public TgcMesh obtenerColisionCajaPersonaje()
         {
-            return escenario.Cajas().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.BoundingBox));
+            return escenario.Cajas().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.BoundingBox) && caja != objeto);
         }
 
         public bool testColisionObjetoPersonaje(TgcMesh objetoColisionable)
@@ -320,7 +340,8 @@ namespace TGC.Group.Model
                             + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
                             + "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
                             + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
-                            + "Interaccion Con Caja: " + interaccionConCaja + "\n", 0, 30, Color.GhostWhite);
+                            + "Interaccion Con Caja: " + interaccionConCaja + "\n"
+                            + "Objeto Escenario " + objetoEscenario, 0, 30, Color.GhostWhite);
 
             escenario.RenderAll();
             personaje.animateAndRender(ElapsedTime);
