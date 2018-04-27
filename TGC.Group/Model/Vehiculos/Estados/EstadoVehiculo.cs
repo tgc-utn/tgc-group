@@ -57,7 +57,7 @@ namespace TGC.Group.Model.Vehiculos.Estados
             return auto.getVelocidadActualDeSalto() + (-auto.getAceleracionGravedad()) * auto.getDeltaTiempoSalto().tiempoTranscurrido();
         }
 
-        public void right(CamaraEnTerceraPersona camara)
+        virtual public void right(CamaraEnTerceraPersona camara)
         {
             if (auto.getVelocidadActual() == 0) return;
             float rotacionReal = auto.getVelocidadDeRotacion() * auto.getElapsedTime();
@@ -71,7 +71,7 @@ namespace TGC.Group.Model.Vehiculos.Estados
         }
 
         //lo mismo que arriba
-        public void left(CamaraEnTerceraPersona camara)
+        virtual public void left(CamaraEnTerceraPersona camara)
         {
             if (auto.getVelocidadActual() == 0) return;
             float rotacionReal = auto.getVelocidadDeRotacion() * auto.getElapsedTime();

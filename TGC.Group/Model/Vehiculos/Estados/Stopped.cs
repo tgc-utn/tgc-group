@@ -22,11 +22,21 @@ namespace TGC.Group.Model.Vehiculos.Estados
             auto.setEstado(new Forward(this.auto));
         }
 
-        public override void back()
+        override public void back()
         {
             base.back();
             move();
             auto.setEstado(new Backward(this.auto));
+        }
+
+        override public void left(CamaraEnTerceraPersona camara)
+        {
+            return;
+        }
+
+        override public void right(CamaraEnTerceraPersona camara)
+        {
+            return;
         }
 
     }

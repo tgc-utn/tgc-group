@@ -14,6 +14,7 @@ using System.Timers;
 using System.Diagnostics;
 using TGC.Group.Model;
 using TGC.Group.Model.Vehiculos.Estados;
+using TGC.Group.Model.Vehiculos;
 
 namespace TGC.Group.Model
 {
@@ -35,6 +36,7 @@ namespace TGC.Group.Model
         private EstadoVehiculo estado;
         protected float constanteRozamiento = 0.2f;
         protected float constanteFrenado = 1f;
+        protected List<Rueda> ruedas = new List<Rueda>();
 
         public Vehiculo(string rutaAMesh)
         {

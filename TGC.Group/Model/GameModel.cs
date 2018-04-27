@@ -25,6 +25,7 @@ namespace TGC.Group.Model
 
         private VehiculoLiviano auto;
         private CamaraEnTerceraPersona camaraInterna;
+        private TGCVector3 camaraDesplazamiento = new TGCVector3(0,5,30);
         private TGCBox cubo;
         private TgcScene scene;
         private TgcText2D textoVelocidadVehiculo, textoAlturaVehiculo;
@@ -34,7 +35,7 @@ namespace TGC.Group.Model
             
             //en caso de querer cargar una escena
             TgcSceneLoader loader = new TgcSceneLoader();
-            scene = loader.loadSceneFromFile(MediaDir + "Texturas\\pisonuevo-TgcScene.xml");
+            scene = loader.loadSceneFromFile(MediaDir + "meshCreator\\meshes\\Ruedas\\crucenormal-TgcScene.xml");
 
             //creo el vehiculo liviano
             //si quiero crear un vehiculo pesado (camion) hago esto
@@ -49,7 +50,8 @@ namespace TGC.Group.Model
             //creo la camara en tercera persona (la clase CamaraEnTerceraPersona hereda de la clase real del framework
             //que te permite configurar la posicion, el lookat, etc. Lo que hacemos al heredar, es reescribir algunos
             //metodos y setear valores default para que la camara quede mirando al auto en 3era persona
-            camaraInterna = new CamaraEnTerceraPersona(auto.posicion(), 15, -70);
+
+            camaraInterna = new CamaraEnTerceraPersona(auto.posicion() + camaraDesplazamiento, 10, -70);
             Camara = camaraInterna;
 
         }
@@ -57,7 +59,15 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
-
+           
+            if (Input.keyDown(Key.NumPad4))
+            {
+                camaraInterna.rotateY(-0.05f);
+            }
+            if (Input.keyDown(Key.NumPad6))
+            {
+                camaraInterna.rotateY(0.05f);
+            }
             if (Input.keyDown(Key.RightArrow))
             {
                 camaraInterna.OffsetHeight += 0.3f;
@@ -136,7 +146,7 @@ namespace TGC.Group.Model
 
 
             //Hacer que la camara siga al personaje en su nueva posicion
-            camaraInterna.Target = auto.posicion();  
+            camaraInterna.Target = auto.posicion() + camaraDesplazamiento;  
 
             PostUpdate();
         }
