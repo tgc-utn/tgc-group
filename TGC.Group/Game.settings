@@ -6,19 +6,16 @@
       <Value Profile="(Default)">Alumnos</Value>
     </Setting>
     <Setting Name="Name" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Grupo 99</Value>
-    </Setting>
-    <Setting Name="Description" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Crush Bandicoot</Value>
+      <Value Profile="(Default)">Barrilete Cosmico</Value>
     </Setting>
     <Setting Name="ShadersDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)">..\..\Shaders\</Value>
     </Setting>
     <Setting Name="MediaDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Media\</Value>
+      <Value Profile="(Default)">..\..\Media\</Value>
     </Setting>
-    <Setting Name="TexturaCaja" Type="System.String" Scope="User">
-      <Value Profile="(Default)">cajaMadera4.jpg</Value>
+    <Setting Name="Description" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Crash Bandicoot</Value>
     </Setting>
   </Settings>
 </SettingsFile>
