@@ -59,8 +59,8 @@ namespace TGC.Group.Model
         private SphereCollisionManager ColisionadorEsferico;
         private TgcArrow directionArrow;
         private TGCVector3 movimientoRealPersonaje;
-        private TGCVector3 movimientoRelativoPersonaje;
-        private TGCVector3 movimientoRealCaja;
+        private TGCVector3 movimientoRelativoPersonaje = TGCVector3.Empty;
+        private TGCVector3 movimientoRealCaja = TGCVector3.Empty;
         private TgcBoundingSphere esferaCaja;
 
         private bool boundingBoxActivate = false;
@@ -229,17 +229,16 @@ namespace TGC.Group.Model
 
         public void moverMundo(TGCVector3 movementVector)
         {
-            
+
+            TgcMesh box = null;
             //Mover personaje con detección de colisiones, sliding y gravedad
             movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movementVector, escenario.MeshesColisionablesBB());
-            
-            
+
             //Si se aprieta R y hay colision pongo el flag en true, tambien sirve para el salto
-            if (Input.keyDown(Key.R))
-            {
-                TgcMesh box = obtenerColisionCajaPersonaje();
-                if (box != null)
-                {
+            if (Input.keyDown(Key.R)) box = obtenerColisionCajaPersonaje();
+
+            if (box != null)
+             {
                    interaccionConCaja = true;
 
                    TGCVector3 centroEsfera = box.BoundingBox.calculateBoxCenter() + new TGCVector3(0f,20f,0f);
@@ -247,12 +246,13 @@ namespace TGC.Group.Model
                     
                    esferaCaja = new TgcBoundingSphere(centroEsfera,radioEsfera);
                    movimientoRealCaja = ColisionadorEsferico.moveCharacter(esferaCaja, movementVector,escenario.MeshesColisionablesBBSin(box));
-                   box.Move(movimientoRealCaja);
-                    
+
+                  box.Move(movimientoRealCaja);
                 }
-            }
+            
             else interaccionConCaja = false;
 
+                   
             personaje.Move(movimientoRealPersonaje);
 
         }
