@@ -30,16 +30,6 @@ namespace TGC.Group.Model.Vehiculos.Estados
             return;
         }
 
-        virtual public void left(CamaraEnTerceraPersona camara)
-        {
-            return;
-        }
-
-        virtual public void right(CamaraEnTerceraPersona camara)
-        {
-            return;
-        }
-
         virtual public void jump()
         {
             auto.getDeltaTiempoSalto().acumularTiempo(auto.getElapsedTime());
@@ -59,12 +49,39 @@ namespace TGC.Group.Model.Vehiculos.Estados
 
         protected void move()
         {
-            auto.move(auto.getVectorAdelante() * auto.getVelocidadActual() * auto.getElapsedTime());
+            auto.mesh.Move(auto.getVectorAdelante() * auto.getVelocidadActual() * auto.getElapsedTime());
         }
 
         protected float velocidadFisicaDeSalto()
         {
             return auto.getVelocidadActualDeSalto() + (-auto.getAceleracionGravedad()) * auto.getDeltaTiempoSalto().tiempoTranscurrido();
+        }
+
+        public void right(CamaraEnTerceraPersona camara)
+        {
+            if (auto.getVelocidadActual() == 0) return;
+            float rotacionReal = auto.getVelocidadDeRotacion() * auto.getElapsedTime();
+            rotacionReal = (auto.getVelocidadActual() > 0) ? rotacionReal : -rotacionReal;
+            auto.mesh.RotateY(rotacionReal);
+            TGCMatrix matrizDeRotacion = new TGCMatrix();
+            matrizDeRotacion.RotateY(rotacionReal);
+            auto.vectorAdelante.TransformCoordinate(matrizDeRotacion);
+            camara.rotateY(rotacionReal);
+
+        }
+
+        //lo mismo que arriba
+        public void left(CamaraEnTerceraPersona camara)
+        {
+            if (auto.getVelocidadActual() == 0) return;
+            float rotacionReal = auto.getVelocidadDeRotacion() * auto.getElapsedTime();
+            rotacionReal = (auto.getVelocidadActual() < 0) ? rotacionReal : -rotacionReal;
+            auto.mesh.RotateY(rotacionReal);
+            TGCMatrix matrizDeRotacion = new TGCMatrix();
+            matrizDeRotacion.RotateY(rotacionReal);
+            auto.vectorAdelante.TransformCoordinate(matrizDeRotacion);
+            camara.rotateY(rotacionReal);
+
         }
     }
 }

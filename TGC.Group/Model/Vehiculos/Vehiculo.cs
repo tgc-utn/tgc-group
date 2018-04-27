@@ -22,7 +22,7 @@ namespace TGC.Group.Model
         private float velocidadActual;
         private float velocidadActualDeSalto;
         public TgcMesh mesh;
-        private TGCVector3 vectorAdelante;
+        public TGCVector3 vectorAdelante;
         protected float velocidadRotacion = 1f;
         protected float velocidadMaximaDeSalto = 60f;
         protected float velocidadMaximaDeAvance = 300f;
@@ -63,12 +63,14 @@ namespace TGC.Group.Model
             mesh.Scale = new TGCVector3(0.1f, 0.1f, 0.1f);
         }
 
-        public void avanzar()
+        public void setVectorAdelante(TGCVector3 vector)
         {
-            this.deltaTiempoAvance.acumularTiempo(this.elapsedTime);
-            this.velocidadActual = this.velocidadFisica();
-            TGCVector3 cuenta = this.vectorAdelante * this.velocidadActual * this.elapsedTime;
-            mesh.Move(cuenta);      
+            this.vectorAdelante = vector;
+        }
+
+        public float getVelocidadDeRotacion()
+        {
+            return this.velocidadRotacion;
         }
 
         //sirve para imprimirlo por pantalla
@@ -92,109 +94,10 @@ namespace TGC.Group.Model
             return this.vectorAdelante;
         }
 
-        public void move(TGCVector3 vector)
-        {
-            mesh.Move(vector);
-        }
-
-        public void retroceder()
-        {
-            this.deltaTiempoAvance.acumularTiempo(this.elapsedTime);
-            this.velocidadActual = this.velocidadFisicaRetroceso();
-            mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
-        }
-
-        public void actualizarVelocidad()
-        {
-            float constanteDesaceleracion = 0.5f;
-            this.deltaTiempoAvance.resetear();
-            if (this.velocidadActual > 0)
-            {
-                this.velocidadActual -= constanteDesaceleracion;
-                if(this.velocidadActual < 0)
-                {
-                    this.velocidadActual = 0;
-                    this.deltaTiempoAvance.resetear();
-                }
-                mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
-            }
-            else if(this.velocidadActual < 0)
-            {  
-                this.velocidadActual += constanteDesaceleracion;
-                if (this.velocidadActual > 0)
-                {
-                    this.velocidadActual = 0;
-                    this.deltaTiempoAvance.resetear();
-                }
-                mesh.Move(this.vectorAdelante * this.velocidadActual * this.elapsedTime);
-            }
-        }
-
-        public void doblarALaDerecha(CamaraEnTerceraPersona camara)
-        {
-            if (this.velocidadActual == 0) return;
-            float rotacionReal = this.velocidadRotacion * this.elapsedTime;
-            rotacionReal = (this.velocidadActual > 0) ? rotacionReal : -rotacionReal;
-            this.mesh.RotateY(rotacionReal);
-            TGCMatrix matrizDeRotacion = new TGCMatrix();
-            matrizDeRotacion.RotateY(rotacionReal);
-            vectorAdelante.TransformCoordinate(matrizDeRotacion);
-            camara.rotateY(rotacionReal);
-
-        }
-
-        //lo mismo que arriba
-        public void doblarALaIzquierda(CamaraEnTerceraPersona camara)
-        {
-            if (this.velocidadActual == 0) return;
-            float rotacionReal = -this.velocidadRotacion * this.elapsedTime;
-            rotacionReal = (this.velocidadActual < 0) ? -rotacionReal : rotacionReal;
-            this.mesh.RotateY(rotacionReal);
-            TGCMatrix matrizDeRotacion = new TGCMatrix();
-            matrizDeRotacion.RotateY(rotacionReal);
-            vectorAdelante.TransformCoordinate(matrizDeRotacion);
-            camara.rotateY(rotacionReal);
-
-        }
-
         //devuelve la posicion del auto en el mapa, sirve para la camara
         public TGCVector3 posicion()
         {
             return mesh.Position;
-        }
-
-        private bool estaEnPlenoSalto()
-        {
-            return mesh.Position.Y != 0;
-        }
-
-        public void saltar()
-        {
-            if(!this.estaEnPlenoSalto())
-            {
-                this.deltaTiempoSalto.acumularTiempo(this.elapsedTime);
-                TGCVector3 nuevaPosicion = new TGCVector3(0, 1, 0);
-                mesh.Move(nuevaPosicion);
-                
-            }
-        }
-
-        public void actualizarSalto()
-        {
-            if(this.deltaTiempoSalto.tiempoTranscurrido() != 0)
-            {
-                //this.velocidadActualDeSalto = this.velocidadFisicaDeSalto();
-                float desplazamientoEnY = this.velocidadActualDeSalto * elapsedTime;
-                desplazamientoEnY = (mesh.Position.Y + desplazamientoEnY < 0)? -mesh.Position.Y : desplazamientoEnY;
-                TGCVector3 nuevoDesplazamiento = new TGCVector3(0, desplazamientoEnY, 0);
-                if (nuevoDesplazamiento.Y == 0f)
-                {
-                    this.deltaTiempoSalto.resetear();
-                    this.velocidadActualDeSalto = this.velocidadMaximaDeSalto;
-                }
-                mesh.Move(nuevoDesplazamiento);
-            }
-
         }
 
         public void setElapsedTime(float time)
