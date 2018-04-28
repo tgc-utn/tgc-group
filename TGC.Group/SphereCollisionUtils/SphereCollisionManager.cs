@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Collision;
 using TGC.Core.Mathematica;
+using System;
 
 namespace TGC.Examples.Collision.SphereCollision
 {
@@ -19,8 +20,6 @@ namespace TGC.Examples.Collision.SphereCollision
         private const float EPSILON = 0.05f;
 
         private readonly List<TgcBoundingAxisAlignBox> objetosCandidatos = new List<TgcBoundingAxisAlignBox>();
-
-        public bool onGround { get; set; }
 
         public SphereCollisionManager()
         {
@@ -67,27 +66,7 @@ namespace TGC.Examples.Collision.SphereCollision
                 collideWithWorld(characterSphere, GravityForce, obstaculos);
             }
 
-            if (characterSphere.Center == originalSphereCenter)
-            {
-                movementVector = new TGCVector3(movementVector.X, 0f, movementVector.Z);
-                var newOriginalSphereCenter = characterSphere.Center;
-
-                //Realizar movimiento
-                collideWithWorld(characterSphere, movementVector, obstaculos);
-
-                //Aplicar gravedad
-                if (GravityEnabled)
-                {
-                    collideWithWorld(characterSphere, GravityForce, obstaculos);
-                }
-                onGround = true;
-                return characterSphere.Center -    originalSphereCenter;
-            }
-            else
-            {
-                onGround = false;
-                return characterSphere.Center - originalSphereCenter;
-            }
+            return characterSphere.Center - originalSphereCenter;
         }
 
         /// <summary>

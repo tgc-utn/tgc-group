@@ -74,7 +74,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Obstaculos\PisoInercia.cs" />
+    <Compile Include="Model\PisoInercia.cs" />
     <Compile Include="SphereCollisionUtils\BoundingBoxCollider.cs" />
     <Compile Include="SphereCollisionUtils\Collider.cs" />
     <Compile Include="SphereCollisionUtils\SphereCollisionManager.cs" />

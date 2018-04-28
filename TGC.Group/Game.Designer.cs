@@ -37,25 +37,13 @@ namespace TGC.Group {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Grupo 99")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Barrilete Cosmico")]
         public string Name {
             get {
                 return ((string)(this["Name"]));
             }
             set {
                 this["Name"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Crush Bandicoot")]
-        public string Description {
-            get {
-                return ((string)(this["Description"]));
-            }
-            set {
-                this["Description"] = value;
             }
         }
         
@@ -73,7 +61,7 @@ namespace TGC.Group {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Media\\")]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\Media\\")]
         public string MediaDirectory {
             get {
                 return ((string)(this["MediaDirectory"]));
@@ -85,13 +73,13 @@ namespace TGC.Group {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("cajaMadera4.jpg")]
-        public string TexturaCaja {
+        [global::System.Configuration.DefaultSettingValueAttribute("Crash Bandicoot")]
+        public string Description {
             get {
-                return ((string)(this["TexturaCaja"]));
+                return ((string)(this["Description"]));
             }
             set {
-                this["TexturaCaja"] = value;
+                this["Description"] = value;
             }
         }
     }
