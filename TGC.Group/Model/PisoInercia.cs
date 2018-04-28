@@ -15,22 +15,22 @@ using TGC.Core.Collision;
 using TGC.Examples.Collision.SphereCollision;
 
 
-namespace TGC.Group.Obstaculos
+namespace TGC.Group.Model
 {
 
     public class PisoInercia
     {
         private TGCVector3 _vectorEntrada;
         public float AceleracionFrenada { get; set; }
-        public TGCBox RenderBox { get; }//Por ahora uso un TGCBox ya que son mas faciles de manejar que las mesh
-        private TGCBox SlidingBox;
+        public TgcMesh RenderMesh { get; }
+        private TgcBoundingAxisAlignBox SlidingBox { get; set; }
 
         private bool seMovioBB = false;
         public TgcBoundingAxisAlignBox BoundingBox
         {
             get
             {
-                return RenderBox.BoundingBox;
+                return RenderMesh.BoundingBox;
             }
         }
         public TgcBoundingAxisAlignBox SlidingBoundingBox
@@ -39,22 +39,24 @@ namespace TGC.Group.Obstaculos
             {
                 if (!seMovioBB)
                 {
-                    SlidingBox = RenderBox.clone();
-                    SlidingBox.BoundingBox.move(new TGCVector3(0, 20, 0));
+                    var SlidingMesh = RenderMesh.clone("Clon");
+
+                    SlidingMesh.BoundingBox.move(new TGCVector3(0, 20, 0));
+                    SlidingBox = SlidingMesh.BoundingBox.clone();
                     seMovioBB = true;
                 }
-                return SlidingBox.BoundingBox;
+                return SlidingBox;
             }
         }
         public TGCVector3 Position
         {
             get
             {
-                return RenderBox.Position;
+                return RenderMesh.Position;
             }
             set
             {
-                RenderBox.Position = value;
+                RenderMesh.Position = value;
             }
         }
 
@@ -63,7 +65,7 @@ namespace TGC.Group.Obstaculos
             get
             {
                 _vectorEntrada = _vectorEntrada * AceleracionFrenada;
-                //if (_vectorEntrada.X < AceleracionFrenada || _vectorEntrada.Z < AceleracionFrenada)
+                //if (Math.Abs(_vectorEntrada.X )< 0.00000001 || Math.Abs(_vectorEntrada.Z) < 0.00000001)
                 //{
                 //    return TGCVector3.Empty;
                 //}
@@ -79,11 +81,11 @@ namespace TGC.Group.Obstaculos
         {
             get
             {
-                return RenderBox.AutoTransform;
+                return RenderMesh.AutoTransform;
             }
             set
             {
-                RenderBox.AutoTransform = value;
+                RenderMesh.AutoTransform = value;
             }
         }
 
@@ -91,32 +93,38 @@ namespace TGC.Group.Obstaculos
         {
             get
             {
-                return RenderBox.Transform;
+                return RenderMesh.Transform;
             }
             set
             {
-                RenderBox.Transform = value;
+                RenderMesh.Transform = value;
             }
         }
-        public PisoInercia(TGCBox box)
+        public PisoInercia(TgcMesh mesh)
         {
-            this.RenderBox = box;
+            this.RenderMesh = mesh;
         }
 
-        public static PisoInercia fromSize(TGCVector3 size)
+        public PisoInercia(TgcMesh mesh, float aceleracion)
         {
-            return new PisoInercia(TGCBox.fromSize(size));
-        }    
+            this.RenderMesh = mesh;
+            this.AceleracionFrenada = aceleracion;
+        }
+
+        //public static PisoInercia fromSize(TGCVector3 size)
+        //{
+        //    return new PisoInercia(TGCBox.fromSize(size));
+        //}    
 
         public void Render()
         {
-            RenderBox.Render();
+            RenderMesh.Render();
         }
 
-        public void updateValues()
-        {
-            RenderBox.updateValues();
-        }
+        //public void updateValues()
+        //{
+        //    RenderMesh.updateValues();
+        //}
 
         public bool aCollisionFound(TgcSkeletalMesh personaje)
         {

@@ -24,21 +24,42 @@ namespace TGC.Group.Model
             scene = loader.loadSceneFromFile(pathEscenario);
         }
 
-        public List<TgcMesh> Paredes()=> scene.Meshes.FindAll(x => x.Layer == "PAREDES");
+        public List<TgcMesh> encontrarMeshes(string clave) => scene.Meshes.FindAll(x => x.Layer == clave);
+        public List<TgcMesh> Paredes() => encontrarMeshes("PAREDES");
+        public List<TgcMesh> Rocas() => encontrarMeshes("ROCAS");
+        public List<TgcMesh> Pisos() => encontrarMeshes("PISOS");
+        public List<TgcMesh> Cajas() => encontrarMeshes("CAJAS");
+        public List<TgcMesh> Sarcofagos() => encontrarMeshes("SARCOFAGOS");
+        public List<TgcMesh> Pilares() => encontrarMeshes("PILARES");
+        public List<TgcMesh> Resbalosos() => encontrarMeshes("RESBALOSO");
 
-        public List<TgcMesh> Rocas()=> scene.Meshes.FindAll(x => x.Layer == "ROCAS");
-        
-       public List<TgcMesh> Pisos() => scene.Meshes.FindAll(x => x.Layer == "PISOS");
-        
+
         public List<TgcMesh> MeshesColisionables()
         {
-           return Paredes().Concat(Rocas()).Concat(Pisos()).ToList();
+            List<TgcMesh> meshesColisionables = new List<TgcMesh>();
+            meshesColisionables.AddRange(Paredes());
+            meshesColisionables.AddRange(Rocas());
+            meshesColisionables.AddRange(Pisos());
+            meshesColisionables.AddRange(Cajas());
+            meshesColisionables.AddRange(Sarcofagos());
+            meshesColisionables.AddRange(Pilares());
+            meshesColisionables.AddRange(Resbalosos());
+            return meshesColisionables;
         }
 
+        public List<TgcBoundingAxisAlignBox> MeshesColisionablesBB()
+        {
+            return MeshesColisionables().Select(mesh => mesh.BoundingBox).ToList();
+        }
+
+        public List<TgcMesh> ObjetosColisionables()
+        {
+            return Paredes().Concat(Rocas()).Concat(Cajas()).ToList();
+        }
+        
         public void RenderizarBoundingBoxes()
         {
-            this.Paredes().ForEach(x => x.BoundingBox.Render());
-            this.Rocas().ForEach(x => x.BoundingBox.Render());
+            MeshesColisionables().ForEach(mesh => mesh.BoundingBox.Render());
         }
 
         public void RenderAll() => scene.RenderAll();
@@ -47,5 +68,16 @@ namespace TGC.Group.Model
         
         public TgcBoundingAxisAlignBox BoundingBox() => scene.BoundingBox;
 
+        public List<TgcBoundingAxisAlignBox> MeshesColisionablesBBSin(TgcMesh box)
+        {
+            List<TgcMesh> obstaculos = MeshesColisionables();
+            var indice = -1;
+            indice = obstaculos.FindIndex(mesh => mesh.Name == box.Name);
+
+            if (indice != -1) obstaculos.RemoveAt(indice);
+            return obstaculos.ConvertAll(mesh => mesh.BoundingBox);
+        }
+
+       
     }
 }
