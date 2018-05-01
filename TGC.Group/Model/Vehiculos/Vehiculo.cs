@@ -50,8 +50,8 @@ namespace TGC.Group.Model
             TgcSceneLoader loader = new TgcSceneLoader();
             TgcScene scene = loader.loadSceneFromFile(rutaAMesh);
             this.mesh = scene.Meshes[0];
-            mesh.RotateY(FastMath.PI);
-            mesh.Scale = new TGCVector3(0.05f, 0.05f, 0.05f);
+            this.mesh.RotateY(FastMath.PI);
+            this.mesh.Scale = new TGCVector3(0.05f, 0.05f, 0.05f);
         }
 
         public void setVectorAdelante(TGCVector3 vector)
@@ -112,12 +112,12 @@ namespace TGC.Group.Model
 
         public void Render()
         {
-            mesh.Render();
+            this.mesh.Render();
         }
 
         public void dispose()
         {
-            mesh.Dispose();
+            this.mesh.Dispose();
         }
 
         public Timer getDeltaTiempoAvance()
