@@ -1,18 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
-using TGC.Core.Example;
-using TGC.Core.Input;
-using TGC.Core.Text;
-using System.Drawing;
-using Microsoft.DirectX.DirectInput;
-using System.Timers;
-using System.Diagnostics;
-using TGC.Group.Model;
 using TGC.Group.Model.Vehiculos.Estados;
 using TGC.Group.Model.Vehiculos;
 
