@@ -35,7 +35,8 @@ namespace TGC.Group.Model
             
             //en caso de querer cargar una escena
             TgcSceneLoader loader = new TgcSceneLoader();
-            this.scene = loader.loadSceneFromFile(MediaDir + "meshCreator\\Scenes\\Ciudad\\Ciudad-TgcScene.xml");
+
+            this.scene = loader.loadSceneFromFile(MediaDir + "Texturas\\Habitacion\\escenaFinal-TgcScene.xml");
 
             //creo el vehiculo liviano
             //si quiero crear un vehiculo pesado (camion) hago esto
