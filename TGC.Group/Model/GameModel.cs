@@ -37,6 +37,10 @@ namespace TGC.Group.Model
             TgcSceneLoader loader = new TgcSceneLoader();
 
             this.scene = loader.loadSceneFromFile(MediaDir + "Texturas\\Habitacion\\escenaFinal-TgcScene.xml");
+            foreach (var mesh in this.scene.Meshes)
+            {
+                mesh.Scale = new TGCVector3(12f, 12f, 12f);
+            }
 
             //creo el vehiculo liviano
             //si quiero crear un vehiculo pesado (camion) hago esto
