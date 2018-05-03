@@ -29,18 +29,21 @@ namespace TGC.Group.Model
         private TGCBox cubo;
         private TgcScene scene;
         private TgcText2D textoVelocidadVehiculo, textoAlturaVehiculo;
+        private TgcMesh jabon;
 
         public override void Init()
         {
-            
+
             //en caso de querer cargar una escena
             TgcSceneLoader loader = new TgcSceneLoader();
-
             this.scene = loader.loadSceneFromFile(MediaDir + "Texturas\\Habitacion\\escenaFinal-TgcScene.xml");
             foreach (var mesh in this.scene.Meshes)
             {
                 mesh.Scale = new TGCVector3(12f, 12f, 12f);
             }
+
+            this.jabon = new TgcSceneLoader().loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Bathroom\\Jabon\\Jabon-TgcScene.xml").Meshes[0];
+
 
             //creo el vehiculo liviano
             //si quiero crear un vehiculo pesado (camion) hago esto
@@ -173,7 +176,7 @@ namespace TGC.Group.Model
                             * TGCMatrix.RotationYawPitchRoll(cubo.Rotation.Y, cubo.Rotation.X, cubo.Rotation.Z)
                             * TGCMatrix.Translation(cubo.Position);
             this.cubo.Render();
-
+            this.jabon.Render();
             this.PostRender();
         }
 
