@@ -25,13 +25,13 @@ namespace TGC.Group.Model
         private EstadoVehiculo estado;
         protected float constanteRozamiento = 0.2f;
         protected float constanteFrenado = 1f;
-        protected List<Rueda> ruedas = new List<Rueda>();
+        protected Ruedas ruedas;
 
-        public Vehiculo(string rutaAMesh)
+        public Vehiculo(string mediaDir)
         {
             this.estado = new Stopped(this);
             this.vectorAdelante = new TGCVector3(0, 0, 1);
-            this.crearMesh(rutaAMesh);
+            this.crearMesh(mediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml");
             this.velocidadActual = 0f;
             this.velocidadActualDeSalto = 60f;
             this.elapsedTime = 0f;
@@ -113,6 +113,7 @@ namespace TGC.Group.Model
         public void Render()
         {
             this.mesh.Render();
+            this.ruedas.Render();
         }
 
         public void dispose()

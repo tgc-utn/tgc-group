@@ -23,7 +23,7 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        private VehiculoLiviano auto;
+        private Camioneta auto;
         private CamaraEnTerceraPersona camaraInterna;
         private TGCVector3 camaraDesplazamiento = new TGCVector3(0,5,40);
         private TGCBox cubo;
@@ -50,7 +50,7 @@ namespace TGC.Group.Model
             // VehiculoPesado camion = new VehiculoPesado(rutaAMesh);
             // se hace esta distinción de vehiculo liviano y pesado por que cada uno tiene diferentes velocidades,
             // peso, salto, etc.
-            this.auto = new VehiculoLiviano(MediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml");
+            this.auto = new Camioneta(MediaDir);
 
             //creo un cubo para tomarlo de referencia (para ver como se mueve el auto)
             this.cubo = TGCBox.fromSize(new TGCVector3(-50, 10, -20), new TGCVector3(15, 15, 15), Color.Black);
@@ -176,7 +176,7 @@ namespace TGC.Group.Model
                             * TGCMatrix.RotationYawPitchRoll(cubo.Rotation.Y, cubo.Rotation.X, cubo.Rotation.Z)
                             * TGCMatrix.Translation(cubo.Position);
             this.cubo.Render();
-            this.jabon.Render();
+            //this.jabon.Render();
             this.PostRender();
         }
 
