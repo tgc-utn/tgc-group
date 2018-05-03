@@ -62,8 +62,9 @@ namespace TGC.Group.Model.Vehiculos.Estados
             }
             float desplazamientoEnY = auto.getVelocidadActualDeSalto() * auto.getElapsedTime();
             TGCVector3 nuevoDesplazamiento = new TGCVector3(0, desplazamientoEnY, 0);
-            auto.mesh.Move(nuevoDesplazamiento);
-            auto.mesh.Move(auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
+            //auto.mesh.Move(nuevoDesplazamiento);
+            //auto.mesh.Move(auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
+            this.move(nuevoDesplazamiento + auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
         }
 
         public override void left(CamaraEnTerceraPersona camara)

@@ -58,8 +58,9 @@ namespace TGC.Group.Model.Vehiculos.Estados
             float desplazamientoEnY = auto.getVelocidadActualDeSalto() * auto.getElapsedTime();
             desplazamientoEnY = (auto.mesh.Position.Y + desplazamientoEnY < 0) ? -auto.mesh.Position.Y : desplazamientoEnY;
             TGCVector3 nuevoDesplazamiento = new TGCVector3(0, desplazamientoEnY, 0);
-            auto.mesh.Move(nuevoDesplazamiento);
-            auto.mesh.Move(auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
+            //this.move(nuevoDesplazamiento);
+            //this.move(auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
+            this.move(nuevoDesplazamiento + auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
             if(auto.mesh.Position.Y == 0)
             {
                 auto.getDeltaTiempoSalto().resetear();

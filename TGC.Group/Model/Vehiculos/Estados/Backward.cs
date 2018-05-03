@@ -16,7 +16,7 @@ namespace TGC.Group.Model.Vehiculos.Estados
         public override void back()
         {
             base.back();
-            move();
+            move(auto.getVectorAdelante() * auto.getVelocidadActual() * auto.getElapsedTime());
         }
 
         public override void advance()
@@ -40,7 +40,7 @@ namespace TGC.Group.Model.Vehiculos.Estados
                 auto.setEstado(new Stopped(this.auto));
                 return;
             }
-            auto.mesh.Move(auto.getVectorAdelante() * auto.getVelocidadActual() * auto.getElapsedTime());
+            this.move(auto.getVectorAdelante() * auto.getVelocidadActual() * auto.getElapsedTime());
         }
     }
 }

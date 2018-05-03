@@ -33,6 +33,16 @@ namespace TGC.Group.Model.Vehiculos
             }
         }
 
+        public void Move(TGCVector3 desplazamiento)
+        {
+            this.delanteraIzquierda.Move(desplazamiento);
+            this.delanteraDerecha.Move(desplazamiento);
+            foreach (TgcMesh rueda in this.ruedasTraseras)
+            {
+                rueda.Move(desplazamiento);
+            }
+        }
+
         public void Render()
         {
             this.delanteraIzquierda.Render();
@@ -43,24 +53,14 @@ namespace TGC.Group.Model.Vehiculos
             }
         }
 
-        public void Left()
+        public void rotate(TGCVector3 eje, float rotacion)
         {
-
-        }
-
-        public void Right()
-        {
-
-        }
-
-        public void Forward()
-        {
-
-        }
-
-        public void Backward()
-        {
-
+            this.delanteraIzquierda.Transform.RotateAxis(eje, rotacion);
+            this.delanteraDerecha.Transform.RotateAxis(eje, rotacion);
+            foreach (TgcMesh rueda in this.ruedasTraseras)
+            {
+                rueda.Transform.RotateAxis(eje, rotacion);
+            }
         }
 
     }

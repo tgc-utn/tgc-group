@@ -18,14 +18,14 @@ namespace TGC.Group.Model.Vehiculos.Estados
         override public void advance()
         {
             base.advance();
-            move();
+            this.move(auto.getVectorAdelante() * auto.getVelocidadActual() * auto.getElapsedTime());
             auto.setEstado(new Forward(this.auto));
         }
 
         override public void back()
         {
             base.back();
-            move();
+            this.move(auto.getVectorAdelante() * auto.getVelocidadActual() * auto.getElapsedTime());
             auto.setEstado(new Backward(this.auto));
         }
 

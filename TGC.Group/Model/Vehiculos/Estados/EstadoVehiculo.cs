@@ -47,9 +47,9 @@ namespace TGC.Group.Model.Vehiculos.Estados
             return;
         }
 
-        protected void move()
+        protected void move(TGCVector3 desplazamiento)
         {
-            auto.mesh.Move(auto.getVectorAdelante() * auto.getVelocidadActual() * auto.getElapsedTime());
+            this.auto.Move(desplazamiento);
         }
 
         protected float velocidadFisicaDeSalto()
@@ -67,6 +67,7 @@ namespace TGC.Group.Model.Vehiculos.Estados
             matrizDeRotacion.RotateY(rotacionReal);
             auto.vectorAdelante.TransformCoordinate(matrizDeRotacion);
             camara.rotateY(rotacionReal);
+            this.auto.GetRuedas().rotate(this.auto.posicion(), rotacionReal);
 
         }
 
@@ -81,6 +82,7 @@ namespace TGC.Group.Model.Vehiculos.Estados
             matrizDeRotacion.RotateY(rotacionReal);
             auto.vectorAdelante.TransformCoordinate(matrizDeRotacion);
             camara.rotateY(rotacionReal);
+            this.auto.GetRuedas().rotate(this.auto.posicion() ,rotacionReal);
         }
     }
 }

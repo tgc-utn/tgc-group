@@ -170,5 +170,16 @@ namespace TGC.Group.Model
         {
             return this.constanteFrenado;
         }
+
+        public void Move(TGCVector3 desplazamiento)
+        {
+            this.mesh.Move(desplazamiento);
+            this.ruedas.Move(desplazamiento);
+        }
+
+        public Ruedas GetRuedas()
+        {
+            return this.ruedas;
+        }
     }
 }
