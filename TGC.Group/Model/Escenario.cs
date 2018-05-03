@@ -31,7 +31,7 @@ namespace TGC.Group.Model
         public List<TgcMesh> Cajas() => encontrarMeshes("CAJAS");
         public List<TgcMesh> Sarcofagos() => encontrarMeshes("SARCOFAGOS");
         public List<TgcMesh> Pilares() => encontrarMeshes("PILARES");
-                         
+        public List<TgcMesh> Resbalosos() => encontrarMeshes("RESBALOSO");
 
         public List<TgcMesh> MeshesColisionables()
         {
@@ -42,7 +42,8 @@ namespace TGC.Group.Model
             meshesColisionables.AddRange(Cajas());
             meshesColisionables.AddRange(Sarcofagos());
             meshesColisionables.AddRange(Pilares());
-           return meshesColisionables;
+            meshesColisionables.AddRange(Resbalosos());
+            return meshesColisionables;
         }
 
         public List<TgcBoundingAxisAlignBox> MeshesColisionablesBB()

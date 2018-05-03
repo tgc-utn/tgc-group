@@ -69,10 +69,20 @@ namespace TGC.Group.Model
         private float jumping;
         private bool moving;
 
-       
+        private PisoInercia pisoResb = null; //Es null cuando no esta pisando ningun piso resbaloso
+
+        private bool paused = false;
+        private bool perdiste = false;
+
         public override void Init()
         {
-            
+            perdiste = false;
+            paused = false;
+            pisoResb = null;
+            dirPers = new Personaje();
+            velocidad = TGCVector3.Empty;
+            aceleracion = TGCVector3.Empty;
+
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
@@ -124,6 +134,11 @@ namespace TGC.Group.Model
          
             
 
+            //piso2 = new PisoInercia(escenario.Resbalosos()[0]);
+            //piso2.AceleracionFrenada = 0.99f;
+
+            //piso2.AutoTransform = true;
+            //piso2.Position = new TGCVector3(500, -25, 0);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
@@ -146,7 +161,7 @@ namespace TGC.Group.Model
         ///     ante ellas.
         /// </summary>
         /// 
-        
+
         public override void Update()
         {
             PreUpdate();
@@ -167,72 +182,140 @@ namespace TGC.Group.Model
                 ElapsedTime = ElapsedTime / 10;
             };
 
+            if (perdiste && Input.keyPressed(Key.Y))
+            {
+                Init();
+            }
+
+            if (Input.keyPressed(Key.P))
+            {
+                paused = !paused;
+            }
+
             if (Input.keyPressed(Key.F))
             {
                 boundingBoxActivate = !boundingBoxActivate;
             }
 
-            RotarMesh();
-
-            if (Input.keyDown(Key.R)) interaccion = true;
-            else interaccion = false;
-
-            if (!interaccion) // Para que no se pueda saltar cuando agarras algun objeto
+            if (personaje.Position.Y < -700)
             {
-                if (Input.keyUp(Key.Space) && jumping < coeficienteSalto)
-                {
-                    jumping = coeficienteSalto;
-                }
-                if (Input.keyUp(Key.Space) || jumping > 0)
-                {
-                    jumping -= coeficienteSalto * ElapsedTime;
-                    saltoRealizado = jumping;
-                }
+                perdiste = true;
             }
 
-
-            //Vector de movimiento
-            var movementVector = TGCVector3.Empty;
-
-            float movX = 0;
-            float movY = saltoRealizado;
-            float movZ = 0;
-
-            if (moving)
+            if (!paused && !perdiste)
             {
-                animacion = "Caminando";
-                moveForward = -velocidadCaminar;
-                movX = FastMath.Sin(personaje.Rotation.Y) * moveForward * ElapsedTime;
-                movZ = FastMath.Cos(personaje.Rotation.Y) * moveForward * ElapsedTime;
+                RotarMesh();
+
+                if (Input.keyDown(Key.R)) interaccion = true;
+                else interaccion = false;
+
+                if (!interaccion) // Para que no se pueda saltar cuando agarras algun objeto
+                {
+                    if (Input.keyUp(Key.Space) && jumping < coeficienteSalto)
+                    {
+                        jumping = coeficienteSalto;
+                    }
+                    if (Input.keyUp(Key.Space) || jumping > 0)
+                    {
+                        jumping -= coeficienteSalto * ElapsedTime;
+                        saltoRealizado = jumping;
+                    }
+                }
+
+                //Vector de movimiento
+                var movementVector = TGCVector3.Empty;
+
+                float movX = 0;
+                float movY = saltoRealizado;
+                float movZ = 0;
+
+                if (moving)
+                {
+                    animacion = "Caminando";
+                    moveForward = -velocidadCaminar;
+                    movX = FastMath.Sin(personaje.Rotation.Y) * moveForward * ElapsedTime;
+                    movZ = FastMath.Cos(personaje.Rotation.Y) * moveForward * ElapsedTime;
+                }
+                else animacion = "Parado";
+
+                movementVector = new TGCVector3(movX, movY, movZ);
+
+
+                var SlideVector = TGCVector3.Empty;
+
+                foreach (TgcMesh mesh in escenario.Resbalosos())
+                {
+                    if (pisoResb == null)
+                    {
+                        pisoResb = new PisoInercia(mesh, 0.999f);
+                    }
+
+                    if (pisoResb.aCollisionFound(personaje))
+                    {
+                        var VectorSlideActual = pisoResb.VectorEntrada;
+                        if (VectorSlideActual == TGCVector3.Empty)
+                        {
+                            pisoResb.VectorEntrada = movementVector;
+                        }
+                        else
+                        {
+                            SlideVector = VectorSlideActual;
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        pisoResb = null;
+                        //pisoResb.VectorEntrada = TGCVector3.Empty;
+                    }
+                }
+                movimientoRelativoPersonaje = movementVector;
+
+                ColisionadorEsferico.GravityEnabled = true;
+                ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
+                ColisionadorEsferico.SlideFactor = 1.3f;
+
+
+                moverMundo(movementVector + SlideVector);
+
+                //if (movementVector.X == 0 && movementVector.Z == 0)
+                //{
+                //    piso2.VectorEntrada = TGCVector3.Empty;
+                //}
+
+                //Ejecuta la animacion del personaje
+                personaje.playAnimation(animacion, true);
+                //Hacer que la camara siga al personaje en su nueva posicion
+                camaraInterna.Target = personaje.Position;
+
+                //Actualizar valores de la linea de movimiento
+                directionArrow.PStart = esferaPersonaje.Center;
+                directionArrow.PEnd = esferaPersonaje.Center + TGCVector3.Multiply(movementVector, 50);
+                directionArrow.updateValues();
+                movimientoRelativoPersonaje = movementVector;
+
+                ColisionadorEsferico.GravityEnabled = true;
+                ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
+                ColisionadorEsferico.SlideFactor = 1.3f;
+
+
+                moverMundo(movementVector);
+
+                //Ejecuta la animacion del personaje
+                personaje.playAnimation(animacion, true);
+                //Hacer que la camara siga al personaje en su nueva posicion
+                camaraInterna.Target = personaje.Position;
+
+                //Actualizar valores de la linea de movimiento
+                directionArrow.PStart = esferaPersonaje.Center;
+                directionArrow.PEnd = esferaPersonaje.Center + TGCVector3.Multiply(movementVector, 50);
+                directionArrow.updateValues();
+
+                PostUpdate();
+
+
             }
-            else animacion = "Parado";
-
-            movementVector = new TGCVector3(movX, movY, movZ);
-
-            movimientoRelativoPersonaje = movementVector;
-
-            ColisionadorEsferico.GravityEnabled = true;
-            ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
-            ColisionadorEsferico.SlideFactor = 1.3f;
-
-            
-            moverMundo(movementVector);
-            
-            //Ejecuta la animacion del personaje
-            personaje.playAnimation(animacion, true);
-            //Hacer que la camara siga al personaje en su nueva posicion
-            camaraInterna.Target = personaje.Position;
-            
-            //Actualizar valores de la linea de movimiento
-            directionArrow.PStart = esferaPersonaje.Center;
-            directionArrow.PEnd = esferaPersonaje.Center + TGCVector3.Multiply(movementVector, 50);
-            directionArrow.updateValues();
-
-            PostUpdate();
-
-            
         }
-
         public void moverMundo(TGCVector3 movementVector/*, TgcMesh objeto*/)
         {
 
@@ -305,45 +388,53 @@ namespace TGC.Group.Model
             personaje.RotateY(dirPers.RotationAngle(i1,i2));
         }
 
-       
-
-
-        /// <summary>
-        ///     Se llama cada vez que hay que refrescar la pantalla.
-        ///     Escribir aquí todo el código referido al renderizado.
-        ///     Borrar todo lo que no haga falta.
-        /// </summary>
         public override void Render()
         {
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            DrawText.drawText("Posicion Actual: " + personaje.Position + "\n" 
-                            + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
-                            + "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
-                            + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
-                            + "Interaccion Con Caja: " + interaccionConCaja + "\n", 0, 30, Color.GhostWhite);
-
-            escenario.RenderAll();
-            personaje.animateAndRender(ElapsedTime);
-
-            if (boundingBoxActivate)
+            if (!perdiste)
             {
-            
-                personaje.BoundingBox.Render();
-                esferaPersonaje.Render();
-                escenario.RenderizarBoundingBoxes();
-                directionArrow.Render();
-                if (esferaCaja != null)
+                DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
+                                + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
+                                + "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
+                                + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
+                                + "Interaccion Con Caja: " + interaccionConCaja + "\n", 0, 30, Color.GhostWhite);
+
+
+                DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
+
+                escenario.RenderAll();
+                if (!paused)
                 {
-                    esferaCaja.Render();
-                    
+                    personaje.animateAndRender(ElapsedTime);
+                }
+                else
+                {
+                    personaje.Render();
                 }
 
+                if (boundingBoxActivate)
+                {
+
+                    personaje.BoundingBox.Render();
+                    esferaPersonaje.Render();
+                    escenario.RenderizarBoundingBoxes();
+                    directionArrow.Render();
+                    if (esferaCaja != null)
+                    {
+                        esferaCaja.Render();
+
+                    }
+
+                }
+
+
             }
-
-
-
+            else
+            {
+                DrawText.drawText("Perdiste" + "\n" + "¿Reiniciar? (Y)", 500, 500, Color.Red);
+            }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
