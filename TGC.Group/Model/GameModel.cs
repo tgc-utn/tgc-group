@@ -52,7 +52,7 @@ namespace TGC.Group.Model
         //Define direccion del mesh del personaje dependiendo el movimiento
         private Personaje dirPers = new Personaje();
         private Escenario escenario;
-        private TgcMesh objeto;
+        private TgcMesh objetoMovibleG;
 
 
         private TgcBoundingSphere esferaPersonaje;
@@ -63,6 +63,8 @@ namespace TGC.Group.Model
         private TGCVector3 movimientoRelativoPersonaje = TGCVector3.Empty;
         private TGCVector3 movimientoRealCaja = TGCVector3.Empty;
         private TgcBoundingSphere esferaCaja;
+       
+
 
         private bool boundingBoxActivate = false;
 
@@ -117,9 +119,9 @@ namespace TGC.Group.Model
             });
 
 
-            esferaPersonaje = new TgcBoundingSphere(personaje.BoundingBox.calculateBoxCenter() - new TGCVector3(5f,50f,0f), personaje.BoundingBox.calculateBoxRadius()*0.4f);
+            esferaPersonaje = new TgcBoundingSphere(personaje.BoundingBox.calculateBoxCenter() - new TGCVector3(10f,50f,0f), personaje.BoundingBox.calculateBoxRadius()*0.4f);
             scaleBoundingVector = new TGCVector3(1.5f, 1f, 1.2f);
-
+            
 
 
             //Crear linea para mostrar la direccion del movimiento del personaje
@@ -166,8 +168,6 @@ namespace TGC.Group.Model
         {
             PreUpdate();
             personaje.BoundingBox.scaleTranslate(personaje.Position, scaleBoundingVector);
-            //personaje.BoundingBox.transform(TGCMatrix.Scaling(new TGCVector3(100f, 2f, 2f)));
-
             //obtener velocidades de Modifiers
             var velocidadCaminar = 300f;
             var coeficienteSalto = 30f;
@@ -316,34 +316,44 @@ namespace TGC.Group.Model
 
             }
         }
+        TgcMesh objetoEscenario;
         public void moverMundo(TGCVector3 movementVector/*, TgcMesh objeto*/)
         {
 
-            var box = obtenerColisionCajaPersonaje();
-            if (box != null && box != objeto) objeto = box;
+             var box = obtenerColisionCajaPersonaje();
+             if (box != null && box != objetoEscenario) objetoEscenario = box;
             //Mover personaje con detección de colisiones, sliding y gravedad
+            if (objetoEscenario != null) generarMovimiento(objetoEscenario, movementVector);
+
             movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movementVector, escenario.MeshesColisionablesBB());
-
-            if (objeto != null)
-            {
-            
-                TGCVector3 centroEsfera = objeto.BoundingBox.calculateBoxCenter() + new TGCVector3(0f, 20f, 0f);
-                float radioEsfera = objeto.BoundingBox.calculateBoxRadius() * 0.7f;
-
-                esferaCaja = new TgcBoundingSphere(centroEsfera, radioEsfera);
-                movimientoRealCaja = ColisionadorEsferico.moveCharacter(esferaCaja, movementVector, escenario.MeshesColisionablesBBSin(objeto));
-                if (interaccion && testColisionObjetoPersonaje(objeto)) objeto.Move(movimientoRealCaja);
-                if (!interaccion && movimientoRealCaja.Y < 0) objeto.Move(movimientoRealCaja);
-            }
-
-                   
             personaje.Move(movimientoRealPersonaje);
+            
+        }
+      
+        public void generarMovimiento(TgcMesh objetoMovible, TGCVector3 movementV)
+        {
+            if (objetoMovibleG == null || objetoMovibleG != objetoMovible) objetoMovibleG = objetoMovible;
+
+            esferaCaja = new TgcBoundingSphere(objetoMovible.BoundingBox.calculateBoxCenter() + new TGCVector3(0f, 15f, 0f), objetoMovible.BoundingBox.calculateBoxRadius() * 0.65f);
+            movimientoRealCaja = ColisionadorEsferico.moveCharacter(esferaCaja, movementV, escenario.MeshesColisionablesBBSin(objetoMovible));
+
+
+            if (interaccion && testColisionObjetoPersonaje(objetoMovible))
+            {
+                if (!colisionEscenario()) objetoMovible.Move(movimientoRealCaja);
+                else objetoMovible.Move(-movimientoRealCaja);
+
+            }
+            else if (movimientoRealCaja.Y < 0) objetoMovible.Move(movimientoRealCaja);
 
         }
-
+        public bool colisionEscenario()
+        {
+            return escenario.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, mesh.BoundingBox)) != null;
+        } 
         public TgcMesh obtenerColisionCajaPersonaje()
         {
-            return escenario.Cajas().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.BoundingBox));
+            return escenario.Cajas().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.BoundingBox) && caja != objetoMovibleG);
         }
 
         public bool testColisionObjetoPersonaje(TgcMesh objetoColisionable)
@@ -400,7 +410,6 @@ namespace TGC.Group.Model
                                 + "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
                                 + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
                                 + "Interaccion Con Caja: " + interaccionConCaja + "\n", 0, 30, Color.GhostWhite);
-
 
                 DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
 
