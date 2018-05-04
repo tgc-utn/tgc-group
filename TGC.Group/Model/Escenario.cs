@@ -31,7 +31,7 @@ namespace TGC.Group.Model
         public List<TgcMesh> Cajas() => encontrarMeshes("CAJAS");
         public List<TgcMesh> Sarcofagos() => encontrarMeshes("SARCOFAGOS");
         public List<TgcMesh> Pilares() => encontrarMeshes("PILARES");
-        public List<TgcMesh> Resbalosos() => encontrarMeshes("RESBALOSO");
+        public List<TgcMesh> Resbalosos() => encontrarMeshes("RESBALOSOS");
 
         public List<TgcMesh> MeshesColisionables()
         {
