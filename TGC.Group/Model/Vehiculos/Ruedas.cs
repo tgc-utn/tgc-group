@@ -55,11 +55,11 @@ namespace TGC.Group.Model.Vehiculos
 
         public void rotate(TGCVector3 eje, float rotacion)
         {
-            this.delanteraIzquierda.Transform.RotateAxis(eje, rotacion);
-            this.delanteraDerecha.Transform.RotateAxis(eje, rotacion);
+            this.delanteraIzquierda.Transform = TGCMatrix.RotationY(rotacion);
+            this.delanteraDerecha.Transform = TGCMatrix.RotationY(rotacion);
             foreach (TgcMesh rueda in this.ruedasTraseras)
             {
-                rueda.Transform.RotateAxis(eje, rotacion);
+                //rueda.Transform.RotateAxis(eje, rotacion);
             }
         }
 
