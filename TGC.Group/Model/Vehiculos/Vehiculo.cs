@@ -9,31 +9,32 @@ namespace TGC.Group.Model
 {
     abstract class Vehiculo
     {
-        private float velocidadActual;
-        private float velocidadActualDeSalto;
         public TgcMesh mesh;
-        public TGCVector3 vectorAdelante;
-        protected float velocidadRotacion = 1f;
-        protected float velocidadMaximaDeSalto = 60f;
-        protected float velocidadMaximaDeAvance = 300f;
-        private float elapsedTime;
         private Timer deltaTiempoAvance;
         private Timer deltaTiempoSalto;
+        public TGCVector3 vectorAdelante;
+        private TGCMatrix transformacion;
+        protected Ruedas ruedas;
+        private EstadoVehiculo estado;
+        private float velocidadActual;
+        private float velocidadActualDeSalto;
+        protected float velocidadRotacion = 1f;
+        protected float velocidadInicialDeSalto = 60f;
+        protected float velocidadMaximaDeAvance = 300f;
         protected float aceleracionAvance = 0.3f;
         protected float aceleracionRetroceso;
         private float aceleracionGravedad = 0.5f;
-        private EstadoVehiculo estado;
-        protected float constanteRozamiento = 0.2f;
+        private float elapsedTime;
+        protected float constanteDeRozamiento = 0.2f;
         protected float constanteFrenado = 1f;
-        protected Ruedas ruedas;
 
-        public Vehiculo(string mediaDir)
+        public Vehiculo(string mediaDir, TGCVector3 posicionInicial)
         {
             this.estado = new Stopped(this);
             this.vectorAdelante = new TGCVector3(0, 0, 1);
-            this.crearMesh(mediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml");
+            this.crearMesh(mediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml", posicionInicial);
             this.velocidadActual = 0f;
-            this.velocidadActualDeSalto = 60f;
+            this.velocidadActualDeSalto = this.velocidadInicialDeSalto;
             this.elapsedTime = 0f;
             this.deltaTiempoAvance = new Timer();
             this.deltaTiempoSalto = new Timer();
@@ -45,13 +46,14 @@ namespace TGC.Group.Model
             return estado;
         }
 
-        private void crearMesh(string rutaAMesh)
+        private void crearMesh(string rutaAMesh, TGCVector3 posicionInicial)
         {
             TgcSceneLoader loader = new TgcSceneLoader();
             TgcScene scene = loader.loadSceneFromFile(rutaAMesh);
             this.mesh = scene.Meshes[0];
             this.mesh.RotateY(FastMath.PI);
             this.mesh.Scale = new TGCVector3(0.05f, 0.05f, 0.05f);
+            this.mesh.Position = posicionInicial;
         }
 
         public void setVectorAdelante(TGCVector3 vector)
@@ -158,12 +160,12 @@ namespace TGC.Group.Model
 
         public float getVelocidadMaximaDeSalto()
         {
-            return this.velocidadMaximaDeSalto;
+            return this.velocidadInicialDeSalto;
         }
 
         public float getConstanteRozamiento()
         {
-            return this.constanteRozamiento;
+            return this.constanteDeRozamiento;
         }
 
         public float getConstanteFrenado()

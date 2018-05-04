@@ -98,7 +98,6 @@
     <Compile Include="Model\Vehiculos\Estados\Stopped.cs" />
     <Compile Include="Model\Vehiculos\Estados\EstadoVehiculo.cs" />
     <Compile Include="Model\Vehiculos\Ruedas.cs" />
-    <Compile Include="Model\Vehiculos\VehiculoPesado.cs" />
     <Compile Include="Model\Vehiculos\Camioneta.cs" />
     <Compile Include="Model\Vehiculos\Vehiculo.cs" />
     <Compile Include="Program.cs" />
