@@ -15,13 +15,12 @@ namespace TGC.Group.Model {
         TgcBoundingAxisAlignBox superior;
 
         TGCBox box;
-        TGCVector3 vel;
 
         public Caja(string mediaDir, TGCVector3 pos) {
             // TODO: tengo que hacer dispose de esta textura? la hago global?
             var texture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "caja.jpg");
             // TODO: pasar tamaño por parámetro
-            box = TGCBox.fromSize(new TGCVector3(50, 50, 50),  texture);
+            box = TGCBox.fromSize(new TGCVector3(100, 100, 100),  texture);
 
             var minInferior = box.BoundingBox.PMin;
             var maxInferior = box.BoundingBox.PMax;
@@ -41,6 +40,7 @@ namespace TGC.Group.Model {
 
             centro = box.BoundingBox;
 
+            // debug
             centro.setRenderColor(Color.Yellow);
             superior.setRenderColor(Color.Red);
             inferior.setRenderColor(Color.Green);
@@ -69,7 +69,7 @@ namespace TGC.Group.Model {
             // que ya se mueve cuando hago move
             superior.move(movement);
             inferior.move(movement);
-            box.Transform = TGCMatrix.Translation(box.BoundingBox.calculateBoxCenter());
+            box.Transform = TGCMatrix.Translation(box.Position);
         }
 
         public TgcBoundingAxisAlignBox getSuperior() {

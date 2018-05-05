@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Collision;
@@ -16,8 +15,8 @@ namespace TGC.Group.Model {
         }
 
         private Personaje personaje;
-        private TGCVector3 cameraOffset;
         private Nivel nivel;
+        private TGCVector3 cameraOffset;
         // lo saque de un ejemplo, no se si vale?
         private SphereCollisionManager collisionManager;
         // podria ser una variable local, la saque aca para debuggear
@@ -35,7 +34,6 @@ namespace TGC.Group.Model {
             collisionManager.GravityEnabled = true;
             collisionManager.GravityForce = new TGCVector3(0, -1, 0);
             collisionManager.SlideFactor = 1f;
-
         }
 
         public override void Update() {
@@ -47,16 +45,13 @@ namespace TGC.Group.Model {
             // reviso si debo empujar alguna caja
             foreach (var caja in nivel.getCajas()) {
                 if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), caja.getCentro())) {
-                    // hago una sphere de tamaño similar al box
-                    // se que siempre voy a estar checkeando contra paredes o contra el piso
-                    // son siempre contra el borde del radio
-                    // además, como las cajas son siempre cubos, un bounding sphere
-                    // es exáctamente lo mismo que un aabb. si las cajas fueran paralelepípedos, tendríamos problemas.
                     var boundingSphereSimilar = new TgcBoundingSphere(caja.getCentro().Position, caja.getCentro().calculateBoxRadius());
 
                     // saco la dirección del movimiento restando las dos posiciones
-                    var cajaMovementDeseado = TGCVector3.Normalize(personaje.getPosition() - caja.getCentro().Position) * 5;
+                    var cajaMovementDeseado = TGCVector3.Normalize(personaje.getBoundingSphere().Center - caja.getCentro().calculateBoxCenter()) * -5;
                     cajaMovementDeseado.Y = 0;
+
+                    // no se porque devuelve siempre TGCVector3.empty
                     cajaMovement = collisionManager.moveCharacter(
                         boundingSphereSimilar,
                         cajaMovementDeseado,
@@ -65,9 +60,10 @@ namespace TGC.Group.Model {
 
                     Console.WriteLine(cajaMovementDeseado);
                     Console.WriteLine("-----");
-                    Console.WriteLine(caja.getCentro().calculateBoxRadius());
+                    Console.WriteLine(cajaMovement);
 
-                    caja.move(cajaMovementDeseado);
+                    caja.move(cajaMovement); // <--- debería ser así
+                    // caja.move(cajaMovementDeseado); //TEMPORAL
                     empujando = true;
                 } else {
                     empujando = false;
@@ -78,7 +74,7 @@ namespace TGC.Group.Model {
             // y las colisiones que puedan ocurrir
             movement = collisionManager.moveCharacter(
                 personaje.getBoundingSphere(),
-                personaje.getMovement(),
+                personaje.getVelocity(),
                 nivel.getBoundingBoxes()
             );
 
@@ -103,7 +99,7 @@ namespace TGC.Group.Model {
             // datos de debug
             var p1 = personaje.getPosition();
             var p2 = personaje.getBoundingSphere().Position;
-            var rm = personaje.getMovement();
+            var rm = personaje.getVelocity();
             DrawText.drawText(string.Format("vel: ({0}, {1}, {2})", movement.X, movement.Y, movement.Z), 0, 10, Color.White);
             DrawText.drawText(string.Format("mesh: ({0}, {1}, {2})", p1.X, p1.Y, p1.Z), 0, 20, Color.White);
             DrawText.drawText(string.Format("bsphere: ({0}, {1}, {2})", p2.X, p2.Y, p2.Z), 0, 30, Color.White);

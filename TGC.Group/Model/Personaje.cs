@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.DirectX.DirectInput;
+﻿using Microsoft.DirectX.DirectInput;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
@@ -7,20 +6,20 @@ using TGC.Core.SkeletalAnimation;
 
 namespace TGC.Group.Model {
     class Personaje {
-        private TGCVector3 vel;
         private TgcBoundingSphere boundingSphere;
         private TgcBoundingSphere pies;
 
+        // animaciones
         private TgcSkeletalMesh mesh;
         private float meshAngle;
         private float meshAngleAnterior;
         private bool moving = false;
+
+        // movimiento
+        private TGCVector3 vel;
         private const float WALK_SPEED = 5f;
         private const float JUMP_SPEED = 30f;
-
         private bool patinando = false;
-
-        private TGCVector3 piesOffset;
 
         public Personaje(string MediaDir) {
             vel = TGCVector3.Empty;
@@ -50,12 +49,7 @@ namespace TGC.Group.Model {
             var posicionPies = mesh.BoundingBox.calculateBoxCenter();
             posicionPies.Y = mesh.BoundingBox.PMin.Y;
 
-            pies = new TgcBoundingSphere(
-                posicionPies,
-                10
-            );
-
-            piesOffset = posicionPies - boundingSphere.Position;
+            pies = new TgcBoundingSphere(posicionPies, 10);
         }
 
         public void update(float deltaTime, TgcD3dInput Input) {
@@ -66,9 +60,14 @@ namespace TGC.Group.Model {
         public void render(float deltaTime) {
             mesh.UpdateMeshTransform();
             mesh.animateAndRender(deltaTime);
+
+            // para debug
             boundingSphere.Render();
             pies.Render();
+
+            // seria un post-update
             resetUpdateVariables();
+            if (vel.Length() == 0) moving = false;
         }
 
         public void dispose() {
@@ -121,12 +120,17 @@ namespace TGC.Group.Model {
                 mesh.playAnimation("Parado", true);
             }
 
+            // no puedo setear un angulo absoluto
+            // entonces le resto el angulo anterior
+            // y le sumo el nuevo angulo
             mesh.RotateY(-meshAngleAnterior * FastMath.PI / 2);
             mesh.RotateY(meshAngle * FastMath.PI / 2);
             meshAngleAnterior = meshAngle;
         }
         
         public void move(TGCVector3 movement) {
+            // TODO: limite de velocidad
+            // if (TGCVector3.Length(movement) > 30) movement = TGCVector3.Normalize(movement) * 30;
             mesh.Move(movement);
             pies.moveCenter(movement);
             vel = movement;
@@ -152,7 +156,7 @@ namespace TGC.Group.Model {
             return pies;
         }
 
-        public TGCVector3 getMovement() {
+        public TGCVector3 getVelocity() {
             return vel;
         }
 
