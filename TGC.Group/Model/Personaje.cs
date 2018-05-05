@@ -12,6 +12,8 @@ namespace TGC.Group.Model {
         private TgcBoundingSphere pies;
 
         private TgcSkeletalMesh mesh;
+        private float meshAngle;
+        private float meshAngleAnterior;
         private bool moving = false;
         private const float WALK_SPEED = 5f;
         private const float JUMP_SPEED = 30f;
@@ -37,6 +39,8 @@ namespace TGC.Group.Model {
             mesh.playAnimation("Parado", true);
             mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
             mesh.Position = new TGCVector3(0, 1000, 0);
+            meshAngle = 0;
+            meshAngleAnterior = 0;
 
             boundingSphere = new TgcBoundingSphere(
                 mesh.BoundingBox.calculateBoxCenter(),
@@ -75,21 +79,25 @@ namespace TGC.Group.Model {
             if (Input.keyDown(Key.W) || Input.keyDown(Key.UpArrow)) {
                 vel.Z = -WALK_SPEED;
                 moving = true;
+                meshAngle = 0;
             }
 
             if (Input.keyDown(Key.S) || Input.keyDown(Key.DownArrow)) {
                 vel.Z = WALK_SPEED;
                 moving = true;
+                meshAngle = 2;
             }
 
             if (Input.keyDown(Key.D) || Input.keyDown(Key.RightArrow)) {
                 vel.X = -WALK_SPEED;
                 moving = true;
+                meshAngle = 1;
             }
 
             if (Input.keyDown(Key.A) || Input.keyDown(Key.LeftArrow)) {
                 vel.X = WALK_SPEED;
                 moving = true;
+                meshAngle = 3;
             }
 
             // TODO: logica de salto
@@ -112,6 +120,10 @@ namespace TGC.Group.Model {
             } else {
                 mesh.playAnimation("Parado", true);
             }
+
+            mesh.RotateY(-meshAngleAnterior * FastMath.PI / 2);
+            mesh.RotateY(meshAngle * FastMath.PI / 2);
+            meshAngleAnterior = meshAngle;
         }
         
         public void move(TGCVector3 movement) {
