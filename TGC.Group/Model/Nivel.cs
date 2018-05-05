@@ -27,7 +27,7 @@ namespace TGC.Group.Model {
             piso = new TgcPlane(new TGCVector3(-500, 0, -1500), new TGCVector3(1000, 0, 1000), TgcPlane.Orientations.XZplane, hieloTexture);
             pisosResbaladizos.Add(piso);
 
-            cajas.Add(new Caja(mediaDir));
+            cajas.Add(new Caja(mediaDir, new TGCVector3(-250, 50, -250)));
         }
 
         public void render() {
@@ -62,7 +62,8 @@ namespace TGC.Group.Model {
             var list = new List<TgcBoundingAxisAlignBox>();
             list.AddRange(pisosNormales.Select(piso => piso.BoundingBox).ToArray());
             list.AddRange(pisosResbaladizos.Select(piso => piso.BoundingBox).ToArray());
-            list.AddRange(cajas.Select(caja => caja.getSuperior()).ToArray());
+            // list.AddRange(cajas.Select(caja => caja.getSuperior()).ToArray());
+            // list.AddRange(cajas.Select(caja => caja.getCentro()).ToArray());
 
             return list;
         }

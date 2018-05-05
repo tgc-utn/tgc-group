@@ -6,6 +6,9 @@ using TGC.Core.Mathematica;
 using TGC.Core.Textures;
 
 namespace TGC.Group.Model {
+    // TODO: deberian patinar tambien las cajas?
+    // si se patinan, entonces deberiamos refactorizar esta clase y la clase personaje
+    // en una sola clase "entidad fisica" o algo asi
     class Caja {
         TgcBoundingAxisAlignBox inferior;
         TgcBoundingAxisAlignBox centro;
@@ -14,11 +17,11 @@ namespace TGC.Group.Model {
         TGCBox box;
         TGCVector3 vel;
 
-        public Caja(string mediaDir) {
+        public Caja(string mediaDir, TGCVector3 pos) {
             // TODO: tengo que hacer dispose de esta textura? la hago global?
             var texture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "caja.jpg");
-            box = TGCBox.fromSize(new TGCVector3(100, 100, 100),  texture);
-            move(new TGCVector3(-250, 50, -250));
+            // TODO: pasar tamaño por parámetro
+            box = TGCBox.fromSize(new TGCVector3(50, 50, 50),  texture);
 
             var minInferior = box.BoundingBox.PMin;
             var maxInferior = box.BoundingBox.PMax;
@@ -38,9 +41,11 @@ namespace TGC.Group.Model {
 
             centro = box.BoundingBox;
 
-            superior.setRenderColor(Color.Red);
             centro.setRenderColor(Color.Yellow);
+            superior.setRenderColor(Color.Red);
             inferior.setRenderColor(Color.Green);
+
+            move(pos);
         }
 
         public void render() {
@@ -59,8 +64,12 @@ namespace TGC.Group.Model {
         }
 
         public void move(TGCVector3 movement) {
-            box.Transform = TGCMatrix.Translation(movement);
             box.Move(movement);
+            // no muevo centro porque es una referencia al bounding box de la caja,
+            // que ya se mueve cuando hago move
+            superior.move(movement);
+            inferior.move(movement);
+            box.Transform = TGCMatrix.Translation(box.BoundingBox.calculateBoxCenter());
         }
 
         public TgcBoundingAxisAlignBox getSuperior() {
