@@ -1,4 +1,5 @@
 using System.Drawing;
+using TGC.Core.Collision;
 using TGC.Core.Example;
 using TGC.Core.Mathematica;
 using TGC.Examples.Collision.SphereCollision;
@@ -16,6 +17,7 @@ namespace TGC.Group.Model {
         private Nivel nivel;
         // lo saque de un ejemplo, no se si vale?
         private SphereCollisionManager collisionManager;
+        // podria ser una variable local, la saque aca para debuggear
         private TGCVector3 movement;
 
 
@@ -26,16 +28,15 @@ namespace TGC.Group.Model {
 
             collisionManager = new SphereCollisionManager();
             collisionManager.GravityEnabled = true;
-        }
+            collisionManager.GravityForce = new TGCVector3(0, -1, 0);
+            collisionManager.SlideFactor = 1f;
 
+        }
 
         public override void Update() {
             PreUpdate();
 
             personaje.update(ElapsedTime, Input);
-
-            collisionManager.GravityForce = new TGCVector3(0, -1, 0);
-            collisionManager.SlideFactor = 1f;
 
             movement = collisionManager.moveCharacter(
                 personaje.getBoundingSphere(),
@@ -44,6 +45,12 @@ namespace TGC.Group.Model {
             );
 
             personaje.move(movement);
+
+            foreach (var box in nivel.getBoundingBoxes()) {
+                if (TgcCollisionUtils.testSphereAABB(personaje.getPies(), box)) {
+                    personaje.setPatinando(nivel.esPisoResbaladizo(box));
+                }
+            }
 
             Camara.SetCamera(personaje.getPosition() + cameraOffset, personaje.getPosition());
             PostUpdate();
@@ -58,7 +65,7 @@ namespace TGC.Group.Model {
             var p2 = personaje.getBoundingSphere().Position;
             DrawText.drawText(string.Format("vel: ({0}, {1}, {2})", movement.X, movement.Y, movement.Z), 0, 10, Color.White);
             DrawText.drawText(string.Format("mesh: ({0}, {1}, {2})", p1.X, p1.Y, p1.Z), 0, 20, Color.White);
-            DrawText.drawText(string.Format("vel: ({0}, {1}, {2})", p2.X, p2.Y, p2.Z), 0, 30, Color.White);
+            DrawText.drawText(string.Format("bsphere: ({0}, {1}, {2})", p2.X, p2.Y, p2.Z), 0, 30, Color.White);
 
             nivel.render();
             personaje.render(ElapsedTime);

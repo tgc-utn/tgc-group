@@ -9,10 +9,16 @@ namespace TGC.Group.Model {
     class Personaje {
         private TGCVector3 vel;
         private TgcBoundingSphere boundingSphere;
+        private TgcBoundingSphere pies;
+
         private TgcSkeletalMesh mesh;
         private bool moving = false;
         private const float WALK_SPEED = 5f;
         private const float JUMP_SPEED = 30f;
+
+        private bool patinando = false;
+
+        private TGCVector3 piesOffset;
 
         public Personaje(string MediaDir) {
             vel = TGCVector3.Empty;
@@ -37,6 +43,15 @@ namespace TGC.Group.Model {
                 mesh.BoundingBox.calculateBoxRadius()
             );
 
+            var posicionPies = mesh.BoundingBox.calculateBoxCenter();
+            posicionPies.Y = mesh.BoundingBox.PMin.Y;
+
+            pies = new TgcBoundingSphere(
+                posicionPies,
+                10
+            );
+
+            piesOffset = posicionPies - boundingSphere.Position;
         }
 
         public void update(float deltaTime, TgcD3dInput Input) {
@@ -48,6 +63,7 @@ namespace TGC.Group.Model {
             mesh.UpdateMeshTransform();
             mesh.animateAndRender(deltaTime);
             boundingSphere.Render();
+            pies.Render();
             resetUpdateVariables();
         }
 
@@ -98,29 +114,38 @@ namespace TGC.Group.Model {
             }
         }
         
-        public TGCVector3 getMovement() {
-            return vel;
-        }
-
         public void move(TGCVector3 movement) {
             mesh.Move(movement);
+            pies.moveCenter(movement);
             vel = movement;
         }
 
         private void resetUpdateVariables() {
-            vel.X = 0;
-            vel.Z = 0;
-            moving = false;
+            if (! patinando) {
+                vel.X = 0;
+                vel.Z = 0;
+                moving = false;
+            }
         }
 
         public TGCVector3 getPosition() {
             return mesh.Position;
         }
 
-        internal TgcBoundingSphere getBoundingSphere() {
+        public TgcBoundingSphere getBoundingSphere() {
             return boundingSphere;
         }
 
+        public TgcBoundingSphere getPies() {
+            return pies;
+        }
 
+        public TGCVector3 getMovement() {
+            return vel;
+        }
+
+        public void setPatinando(bool b) {
+            patinando = b;
+        }
     }
 }

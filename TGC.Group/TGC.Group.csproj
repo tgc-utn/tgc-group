@@ -239,7 +239,6 @@
     <Content Include="Media\BasicHuman\Textures\WomanJeans_body.jpg" />
     <Content Include="Media\BasicHuman\Textures\WomanJeans_head.jpg" />
     <Content Include="Media\BasicHuman\WomanJeans-TgcSkeletalMesh.xml" />
-    <Content Include="Media\cajaMadera4.jpg" />
     <Content Include="Media\Ciudad\Ciudad-TgcScene.xml" />
     <Content Include="Media\Ciudad\preview.jpg" />
     <Content Include="Media\Ciudad\Textures\Door Rusty.jpg" />
@@ -256,6 +255,7 @@
     <Content Include="Media\Ciudad\Textures\Traffic Light.jpg" />
     <Content Include="Media\Ciudad\Textures\White Wall.JPG" />
     <Content Include="Media\Ciudad\Textures\Yellow Painted.jpg" />
+    <Content Include="Media\hielo.jpg" />
     <Content Include="Media\Jungla\Agua-TgcScene.xml" />
     <Content Include="Media\Jungla\Jungla -TgcScene.xml" />
     <Content Include="Media\Jungla\Plattform-TgcScene.xml" />
@@ -283,6 +283,7 @@
     <Content Include="Media\Jungla\Textures\SassiWall1.jpg" />
     <Content Include="Media\Jungla\Textures\WoodTexture.jpg" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
+    <Content Include="Media\piso.jpg" />
     <Content Include="Media\Robot\Arrojar-TgcSkeletalAnim.xml" />
     <Content Include="Media\Robot\Caminando-TgcSkeletalAnim.xml" />
     <Content Include="Media\Robot\Correr-TgcSkeletalAnim.xml" />
