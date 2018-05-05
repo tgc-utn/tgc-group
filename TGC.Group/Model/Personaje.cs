@@ -1,4 +1,6 @@
-﻿using Microsoft.DirectX.DirectInput;
+﻿using System;
+using Microsoft.DirectX.DirectInput;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SkeletalAnimation;
@@ -6,9 +8,11 @@ using TGC.Core.SkeletalAnimation;
 namespace TGC.Group.Model {
     class Personaje {
         private TGCVector3 vel;
+        private TgcBoundingSphere boundingSphere;
         private TgcSkeletalMesh mesh;
         private bool moving = false;
         private const float WALK_SPEED = 5f;
+        private const float JUMP_SPEED = 30f;
 
         public Personaje(string MediaDir) {
             vel = TGCVector3.Empty;
@@ -26,10 +30,32 @@ namespace TGC.Group.Model {
             mesh.buildSkletonMesh();
             mesh.playAnimation("Parado", true);
             mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
-            mesh.Position = new TGCVector3(300, -85, 0);
+            mesh.Position = new TGCVector3(0, 1000, 0);
+
+            boundingSphere = new TgcBoundingSphere(
+                mesh.BoundingBox.calculateBoxCenter(),
+                mesh.BoundingBox.calculateBoxRadius()
+            );
+
         }
 
         public void update(float deltaTime, TgcD3dInput Input) {
+            checkInputs(Input);
+            updateAnimations();
+        }
+
+        public void render(float deltaTime) {
+            mesh.UpdateMeshTransform();
+            mesh.animateAndRender(deltaTime);
+            boundingSphere.Render();
+            resetUpdateVariables();
+        }
+
+        public void dispose() {
+            mesh.Dispose();
+        }
+
+        private void checkInputs(TgcD3dInput Input) {
             if (Input.keyDown(Key.W) || Input.keyDown(Key.UpArrow)) {
                 vel.Z = -WALK_SPEED;
                 moving = true;
@@ -50,6 +76,11 @@ namespace TGC.Group.Model {
                 moving = true;
             }
 
+            // TODO: logica de salto
+            if (Input.keyDown(Key.Space)) {
+                vel.Y = JUMP_SPEED;
+            }
+
             if (Input.keyDown(Key.LeftShift)) {
                 vel.X = vel.X * 2;
                 vel.Z = vel.Z * 2;
@@ -57,33 +88,37 @@ namespace TGC.Group.Model {
                 vel.X = vel.X / 2;
                 vel.Z = vel.Z / 2;
             }
+        }
 
+        private void updateAnimations() {
             if (moving) {
                 mesh.playAnimation("Caminando", true);
             } else {
                 mesh.playAnimation("Parado", true);
             }
+        }
+        
+        public TGCVector3 getMovement() {
+            return vel;
+        }
 
-            //Aplicar movimiento hacia adelante o atras segun la orientacion actual del Mesh
-            var lastPos = mesh.Position;
+        public void move(TGCVector3 movement) {
+            mesh.Move(movement);
+            vel = movement;
+        }
 
-            mesh.Move(vel);
+        private void resetUpdateVariables() {
             vel.X = 0;
             vel.Z = 0;
             moving = false;
         }
 
-        public void render(float deltaTime) {
-            mesh.UpdateMeshTransform();
-            mesh.animateAndRender(deltaTime);
-        }
-
-        public void dispose() {
-            mesh.Dispose();
-        }
-
         public TGCVector3 getPosition() {
             return mesh.Position;
+        }
+
+        internal TgcBoundingSphere getBoundingSphere() {
+            return boundingSphere;
         }
 
 
