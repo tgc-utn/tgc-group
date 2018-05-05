@@ -91,6 +91,14 @@ namespace TGC.Group.Model {
                 moving = true;
             }
 
+            if (Input.keyDown(Key.LeftShift)) {
+                velocidadPersonaje.X = velocidadPersonaje.X * 2;
+                velocidadPersonaje.Z = velocidadPersonaje.Z * 2;
+            } else if (Input.keyDown(Key.LeftAlt)) {
+                velocidadPersonaje.X = velocidadPersonaje.X / 2;
+                velocidadPersonaje.Z = velocidadPersonaje.Z / 2;
+            }
+
             if (moving) {
                 personaje.playAnimation("Caminando", true);
             } else {
