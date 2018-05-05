@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Drawing;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.Collision;
 using TGC.Core.Example;
 using TGC.Core.Mathematica;

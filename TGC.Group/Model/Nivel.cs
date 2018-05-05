@@ -11,10 +11,12 @@ namespace TGC.Group.Model {
         TgcPlane piso;
         List<TgcPlane> pisosNormales;
         List<TgcPlane> pisosResbaladizos;
+        List<Caja> cajas;
 
         public Nivel(string mediaDir) {
             pisosNormales = new List<TgcPlane>();
             pisosResbaladizos = new List<TgcPlane>();
+            cajas = new List<Caja>();
 
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "piso.jpg");
             var hieloTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "hielo.jpg");
@@ -24,6 +26,8 @@ namespace TGC.Group.Model {
 
             piso = new TgcPlane(new TGCVector3(-500, 0, -1500), new TGCVector3(1000, 0, 1000), TgcPlane.Orientations.XZplane, hieloTexture);
             pisosResbaladizos.Add(piso);
+
+            cajas.Add(new Caja(mediaDir));
         }
 
         public void render() {
@@ -33,6 +37,10 @@ namespace TGC.Group.Model {
 
             foreach (var hielo in pisosResbaladizos) {
                 hielo.Render();
+            }
+
+            foreach (var caja in cajas) {
+                caja.render();
             }
         }
 
@@ -44,15 +52,23 @@ namespace TGC.Group.Model {
             foreach (var hielo in pisosResbaladizos) {
                 hielo.Dispose();
             }
+
+            foreach (var caja in cajas) {
+                caja.dispose();
+            }
         }
 
         public List<TgcBoundingAxisAlignBox> getBoundingBoxes() {
             var list = new List<TgcBoundingAxisAlignBox>();
             list.AddRange(pisosNormales.Select(piso => piso.BoundingBox).ToArray());
             list.AddRange(pisosResbaladizos.Select(piso => piso.BoundingBox).ToArray());
-            // agregar otros boxes
+            list.AddRange(cajas.Select(caja => caja.getSuperior()).ToArray());
 
             return list;
+        }
+
+        public List<Caja> getCajas() {
+            return cajas;
         }
 
         public bool esPisoResbaladizo(TgcBoundingAxisAlignBox piso) {

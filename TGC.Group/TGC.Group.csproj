@@ -85,6 +85,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\Caja.cs" />
     <Compile Include="Model\Collision\SphereCollisionManager.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\Nivel.cs" />
@@ -239,6 +240,7 @@
     <Content Include="Media\BasicHuman\Textures\WomanJeans_body.jpg" />
     <Content Include="Media\BasicHuman\Textures\WomanJeans_head.jpg" />
     <Content Include="Media\BasicHuman\WomanJeans-TgcSkeletalMesh.xml" />
+    <Content Include="Media\caja.jpg" />
     <Content Include="Media\Ciudad\Ciudad-TgcScene.xml" />
     <Content Include="Media\Ciudad\preview.jpg" />
     <Content Include="Media\Ciudad\Textures\Door Rusty.jpg" />
