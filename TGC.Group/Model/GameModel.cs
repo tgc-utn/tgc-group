@@ -78,20 +78,20 @@ namespace TGC.Group.Model
             }
             if (Input.keyDown(Key.RightArrow))
             {
-                this.camaraInterna.OffsetHeight += 0.3f;
+                this.camaraInterna.OffsetHeight += 0.05f;
             }
             if (Input.keyDown(Key.LeftArrow))
             {
-                this.camaraInterna.OffsetHeight -= 0.3f;
+                this.camaraInterna.OffsetHeight -= 0.05f;
             }
 
             if (Input.keyDown(Key.UpArrow))
             {
-                this.camaraInterna.OffsetForward += 0.3f;
+                this.camaraInterna.OffsetForward += 0.05f;
             }
             if (Input.keyDown(Key.DownArrow))
             {
-                this.camaraInterna.OffsetForward -= 0.3f;
+                this.camaraInterna.OffsetForward -= 0.05f;
             }
 
             this.textoVelocidadVehiculo = new TgcText2D();

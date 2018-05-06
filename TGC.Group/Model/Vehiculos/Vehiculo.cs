@@ -13,7 +13,7 @@ namespace TGC.Group.Model
         private Timer deltaTiempoAvance;
         private Timer deltaTiempoSalto;
         public TGCVector3 vectorAdelante;
-        private TGCMatrix transformacion = new TGCMatrix();
+        public TGCMatrix transformacion = new TGCMatrix();
         protected Ruedas ruedas;
         private EstadoVehiculo estado;
         private float velocidadActual;
@@ -181,6 +181,7 @@ namespace TGC.Group.Model
             transformacion = transformacion * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
             this.ruedas.Move(desplazamiento);
         }
+
 
         public Ruedas GetRuedas()
         {

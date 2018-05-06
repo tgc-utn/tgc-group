@@ -62,9 +62,8 @@ namespace TGC.Group.Model.Vehiculos.Estados
             if (auto.getVelocidadActual() == 0) return;
             float rotacionReal = auto.getVelocidadDeRotacion() * auto.getElapsedTime();
             rotacionReal = (auto.getVelocidadActual() > 0) ? rotacionReal : -rotacionReal;
-            auto.mesh.RotateY(rotacionReal);
-            TGCMatrix matrizDeRotacion = new TGCMatrix();
-            matrizDeRotacion.RotateY(rotacionReal);
+            TGCMatrix matrizDeRotacion = TGCMatrix.RotationY(rotacionReal);
+            auto.transformacion = matrizDeRotacion * auto.transformacion;
             auto.vectorAdelante.TransformCoordinate(matrizDeRotacion);
             camara.rotateY(rotacionReal);
             this.auto.GetRuedas().rotate(this.auto.posicion(), rotacionReal);
@@ -77,9 +76,8 @@ namespace TGC.Group.Model.Vehiculos.Estados
             if (auto.getVelocidadActual() == 0) return;
             float rotacionReal = auto.getVelocidadDeRotacion() * auto.getElapsedTime();
             rotacionReal = (auto.getVelocidadActual() < 0) ? rotacionReal : -rotacionReal;
-            auto.mesh.RotateY(rotacionReal);
-            TGCMatrix matrizDeRotacion = new TGCMatrix();
-            matrizDeRotacion.RotateY(rotacionReal);
+            TGCMatrix matrizDeRotacion = TGCMatrix.RotationY(rotacionReal);
+            auto.transformacion = matrizDeRotacion * auto.transformacion;
             auto.vectorAdelante.TransformCoordinate(matrizDeRotacion);
             camara.rotateY(rotacionReal);
             this.auto.GetRuedas().rotate(this.auto.posicion() ,rotacionReal);
