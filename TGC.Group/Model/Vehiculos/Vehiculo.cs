@@ -92,7 +92,7 @@ namespace TGC.Group.Model
         //devuelve la posicion del auto en el mapa, sirve para la camara
         public TGCVector3 posicion()
         {
-            return new TGCVector3(transformacion.M11, transformacion.M22, transformacion.M33);
+            return this.posicion;
         }
 
         public void setElapsedTime(float time)
