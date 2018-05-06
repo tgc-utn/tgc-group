@@ -5,12 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Core.Geometry;
 
 namespace TGC.Group.Model.Vehiculos
 {
     class Rueda
     {
-        public TGCMatrix transformacion;
+        //public TGCMatrix transformacion;
         public TgcMesh mesh;
         public TGCVector3 trasladoInicial;
         public TGCMatrix escala = TGCMatrix.Scaling(0.05f, 0.05f, 0.05f);
@@ -41,9 +42,14 @@ namespace TGC.Group.Model.Vehiculos
             //transformacion = transformacion * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
         }
 
-        public void Rotate(TGCVector3 axis, float rotacion)
+        public void RotateY(float rotacion)
         {
             this.rotacion = TGCMatrix.RotationY(rotacion) * this.rotacion;
+        }
+
+        public void RotateAxis(TGCVector3 eje, float rotacion)
+        {
+            this.rotacion = TGCMatrix.RotationX(rotacion*0.0001f) * this.rotacion;
         }
     }
 }

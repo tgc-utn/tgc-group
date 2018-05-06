@@ -15,6 +15,8 @@ namespace TGC.Group.Model
         public TGCVector3 vectorAdelante;
         public TGCMatrix transformacion;
         protected List<Rueda> ruedas = new List<Rueda>();
+        protected Rueda delanteraIzquierda;
+        protected Rueda delanteraDerecha;
         private EstadoVehiculo estado;
         private float velocidadActual;
         private float velocidadActualDeSalto;
@@ -117,6 +119,8 @@ namespace TGC.Group.Model
         public void Render()
         {
             this.mesh.Render();
+            delanteraIzquierda.Render();
+            delanteraDerecha.Render();
             foreach (var rueda in this.ruedas)
             {
                 rueda.Render();
@@ -182,9 +186,10 @@ namespace TGC.Group.Model
         {
 
             transformacion = transformacion * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
+
             foreach (var rueda in this.ruedas)
             {
-                rueda.Move(desplazamiento);
+                rueda.RotateAxis(this.vectorAdelante, this.getVelocidadActual());
             };
         }
 
@@ -198,6 +203,8 @@ namespace TGC.Group.Model
         public void Transform()
         {
             this.mesh.Transform = this.transformacion;
+            delanteraIzquierda.Transform(TGCVector3.transform(posicion(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)));
+            delanteraDerecha.Transform(TGCVector3.transform(posicion(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)));
             foreach (var rueda in this.ruedas)
             {
                 rueda.Transform(TGCVector3.transform(posicion(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0,1,0)));
@@ -207,11 +214,18 @@ namespace TGC.Group.Model
         public void Rotate(float rotacion)
         {
             transformacion = TGCMatrix.RotationY(rotacion) * transformacion;
+            RotarDelanteras(rotacion);
             foreach (var rueda in ruedas)
             {
-                rueda.Rotate(this.vectorAdelante, rotacion);
+                rueda.RotateY(rotacion);
             }
 
+        }
+
+        public void RotarDelanteras(float rotacion)
+        {
+            delanteraIzquierda.RotateY(rotacion);
+            delanteraDerecha.RotateY(rotacion);
         }
     }
 }

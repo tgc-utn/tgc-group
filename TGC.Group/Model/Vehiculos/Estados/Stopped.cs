@@ -31,12 +31,14 @@ namespace TGC.Group.Model.Vehiculos.Estados
 
         override public void left(CamaraEnTerceraPersona camara)
         {
-            return;
+            float rotacionReal = -auto.getVelocidadDeRotacion() * auto.getElapsedTime();
+            auto.RotarDelanteras(rotacionReal);
         }
 
         override public void right(CamaraEnTerceraPersona camara)
         {
-            return;
+            float rotacionReal = auto.getVelocidadDeRotacion() * auto.getElapsedTime();
+            auto.RotarDelanteras(rotacionReal);
         }
 
     }
