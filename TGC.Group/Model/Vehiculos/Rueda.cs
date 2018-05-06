@@ -14,6 +14,8 @@ namespace TGC.Group.Model.Vehiculos
         public TgcMesh mesh;
         public TGCVector3 trasladoInicial;
         public TGCMatrix escala = TGCMatrix.Scaling(0.05f, 0.05f, 0.05f);
+        public TGCMatrix traslado;
+        public TGCMatrix rotacion = TGCMatrix.RotationY(0);
 
         public Rueda(TgcMesh mesh,TGCVector3 traslado)
         {
@@ -25,7 +27,8 @@ namespace TGC.Group.Model.Vehiculos
         public void Transform(TGCVector3 posicion, TGCVector3 adelante, TGCVector3 costado)
         {
             var posicionFinal = posicion + adelante * trasladoInicial.X + costado * trasladoInicial.Z;
-            mesh.Transform = escala * TGCMatrix.Translation(posicionFinal);
+            this.traslado = TGCMatrix.Translation(posicionFinal);
+            mesh.Transform = escala * rotacion * traslado;
         }
 
         public void Render()
@@ -40,7 +43,7 @@ namespace TGC.Group.Model.Vehiculos
 
         public void Rotate(TGCVector3 axis, float rotacion)
         {
-            //transformacion = TGCMatrix.RotationY(rotacion) * transformacion;
+            this.rotacion = TGCMatrix.RotationY(rotacion) * this.rotacion;
         }
     }
 }
