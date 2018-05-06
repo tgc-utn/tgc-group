@@ -26,14 +26,16 @@ namespace TGC.Group.Model {
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "piso.jpg");
             var hieloTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "hielo.jpg");
 
-            var piso = new TgcPlane(new TGCVector3(-500, 0, -500), new TGCVector3(1000, 0, 1000), TgcPlane.Orientations.XZplane, pisoTexture);
+            var piso = new TgcPlane(new TGCVector3(-500, 0, -500), new TGCVector3(2500, 0, 2500), TgcPlane.Orientations.XZplane, pisoTexture);
             pisosNormales.Add(piso);
 
-            piso = new TgcPlane(new TGCVector3(-500, 0, -1500), new TGCVector3(1000, 0, 1000), TgcPlane.Orientations.XZplane, hieloTexture);
+            piso = new TgcPlane(new TGCVector3(-500, 0, -2500), new TGCVector3(2500, 0, 2000), TgcPlane.Orientations.XZplane, hieloTexture);
             pisosResbaladizos.Add(piso);
 
-            cajas.Add(new Caja(mediaDir, new TGCVector3(-250, 500, -250)));
-            cajas.Add(new Caja(mediaDir, new TGCVector3(250, 500, 250)));
+            cajas.Add(new Caja(mediaDir, new TGCVector3(-250, 40, -1000))); //coordenada Y = 40 para que tengan 40 hasta
+            cajas.Add(new Caja(mediaDir, new TGCVector3(250, 40, 250)));   //el piso y 40 hasta el techo
+            cajas.Add(new Caja(mediaDir, new TGCVector3(1250, 40, 1200)));
+            cajas.Add(new Caja(mediaDir, new TGCVector3(700, 40, 0)));
         }
 
         public void render() {

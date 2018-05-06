@@ -8,27 +8,27 @@ using TGC.Core.Textures;
 namespace TGC.Group.Model {
     // TODO: deberian patinar tambien las cajas?
     // si se patinan, entonces deberiamos refactorizar esta clase y la clase personaje
-    // en una sola clase "entidad fisica" o algo asi
+    // en una sola clase "entidad fisica" o algo asi    
+
     class Caja {
-        TgcBoundingAxisAlignBox inferior;
-        TgcBoundingAxisAlignBox centro;
+        TgcBoundingAxisAlignBox cuerpo;
         TgcBoundingAxisAlignBox superior;
+
+
+        TGCVector3 tamanio = new TGCVector3(80, 80, 80);
 
         TGCBox box;
 
         public Caja(string mediaDir, TGCVector3 pos) {
             // TODO: tengo que hacer dispose de esta textura? la hago global?
             var texture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "caja.jpg");
-            // TODO: pasar tamaño por parámetro
-            box = TGCBox.fromSize(new TGCVector3(100, 100, 100),  texture);
+            box = TGCBox.fromSize(tamanio,  texture);
 
             var minInferior = box.BoundingBox.PMin;
             var maxInferior = box.BoundingBox.PMax;
             var posInferior = box.BoundingBox.calculateBoxCenter();
             maxInferior.Y = minInferior.Y;
             posInferior.Y = minInferior.Y;
-
-            inferior = new TgcBoundingAxisAlignBox(minInferior, maxInferior, posInferior, TGCVector3.One);
 
             var minSuperior = box.BoundingBox.PMin;
             var maxSuperior = box.BoundingBox.PMax;
@@ -38,12 +38,11 @@ namespace TGC.Group.Model {
 
             superior = new TgcBoundingAxisAlignBox(minSuperior, maxSuperior, posSuperior, TGCVector3.One);
 
-            centro = box.BoundingBox;
+            cuerpo = box.BoundingBox;
 
             // debug
-            centro.setRenderColor(Color.Yellow);
+            cuerpo.setRenderColor(Color.Yellow);
             superior.setRenderColor(Color.Red);
-            inferior.setRenderColor(Color.Green);
 
             move(pos);
         }
@@ -54,9 +53,8 @@ namespace TGC.Group.Model {
             // para debuggear
             // renderizo en este orden asi superior e inferior, que tienen 1px de altura
             // puedan tapar a centro.
-            centro.Render();
+            cuerpo.Render();
             superior.Render();
-            inferior.Render();
         }
 
         public void dispose() {
@@ -68,7 +66,6 @@ namespace TGC.Group.Model {
             // no muevo centro porque es una referencia al bounding box de la caja,
             // que ya se mueve cuando hago move
             superior.move(movement);
-            inferior.move(movement);
             box.Transform = TGCMatrix.Translation(box.Position);
         }
 
@@ -76,12 +73,9 @@ namespace TGC.Group.Model {
             return superior;
         }
 
-        public TgcBoundingAxisAlignBox getCentro() {
-            return centro;
+        public TgcBoundingAxisAlignBox getCuerpo() {
+            return cuerpo;
         }
-        
-        public TgcBoundingAxisAlignBox getInferior() {
-            return inferior;
-        }
+
     }
 }

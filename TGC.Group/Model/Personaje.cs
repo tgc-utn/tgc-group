@@ -17,8 +17,8 @@ namespace TGC.Group.Model {
 
         // movimiento
         private TGCVector3 vel;
-        private const float WALK_SPEED = 5f;
-        private const float JUMP_SPEED = 30f;
+        private const float WALK_SPEED = 1f;
+        private const float JUMP_SPEED = 5f;
         private bool patinando = false;
 
         public Personaje(string MediaDir) {
@@ -37,7 +37,7 @@ namespace TGC.Group.Model {
             mesh.buildSkletonMesh();
             mesh.playAnimation("Parado", true);
             mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
-            mesh.Position = new TGCVector3(0, 1000, 0);
+            mesh.Position = new TGCVector3(0, 7.5f, 0);
             meshAngle = 0;
             meshAngleAnterior = 0;
 
@@ -98,15 +98,17 @@ namespace TGC.Group.Model {
                 moving = true;
                 meshAngle = 3;
             }
-
-            // TODO: logica de salto
+            
+            // TODO: logica de salto => mejorar, hacer que cada salto sea igual
             if (Input.keyDown(Key.Space)) {
-                vel.Y = JUMP_SPEED;
+                if (mesh.Position.Y < 600f ) {
+                    vel.Y = JUMP_SPEED;
+                }
             }
 
-            if (Input.keyDown(Key.LeftShift)) {
-                vel.X = vel.X * 2;
-                vel.Z = vel.Z * 2;
+            if (Input.keyDown(Key.LeftShift)) { // La dejamos? Termina haciendo quilombo
+                vel.X = vel.X * 1.5f;
+                vel.Z = vel.Z * 1.5f;
             } else if (Input.keyDown(Key.LeftAlt)) {
                 vel.X = vel.X / 2;
                 vel.Z = vel.Z / 2;
@@ -130,7 +132,7 @@ namespace TGC.Group.Model {
         
         public void move(TGCVector3 movement) {
             // TODO: limite de velocidad
-            // if (TGCVector3.Length(movement) > 30) movement = TGCVector3.Normalize(movement) * 30;
+            //if (TGCVector3.Length(movement) > 30){movement = TGCVector3.Normalize(movement) * 30;}
             mesh.Move(movement);
             pies.moveCenter(movement);
             vel = movement;
