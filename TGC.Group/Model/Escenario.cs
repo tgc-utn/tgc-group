@@ -55,6 +55,15 @@ namespace TGC.Group.Model
         {
             return Paredes().Concat(Rocas()).Concat(Cajas()).ToList();
         }
+
+        public List<TgcMesh> ObstaculosColisionablesConCamara()
+        {
+            List<TgcMesh> obstaculos = new List<TgcMesh>();
+            obstaculos.AddRange(Paredes());
+            obstaculos.AddRange(Rocas());
+
+            return obstaculos;
+        }
         
         public void RenderizarBoundingBoxes()
         {

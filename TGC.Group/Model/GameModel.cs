@@ -76,6 +76,9 @@ namespace TGC.Group.Model
         private bool paused = false;
         private bool perdiste = false;
 
+        private float offsetHeight = 400;
+        private float offsetForward = -800;
+
         public override void Init()
         {
             perdiste = false;
@@ -148,8 +151,7 @@ namespace TGC.Group.Model
             //Posición de la camara.
 
             camaraInterna = new TgcThirdPersonCamera(personaje.Position, 500, -900);
-            //Quiero que la camara mire hacia el origen (0,0,0).
-            var lookAt = TGCVector3.Empty;
+           
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara = camaraInterna;
            
@@ -157,12 +159,6 @@ namespace TGC.Group.Model
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
         }
 
-        /// <summary>
-        ///     Se llama en cada frame.
-        ///     Se debe escribir toda la lógica de computo del modelo, así como también verificar entradas del usuario y reacciones
-        ///     ante ellas.
-        /// </summary>
-        /// 
 
         public override void Update()
         {
@@ -283,10 +279,7 @@ namespace TGC.Group.Model
                 //    piso2.VectorEntrada = TGCVector3.Empty;
                 //}
 
-                //Ejecuta la animacion del personaje
-                personaje.playAnimation(animacion, true);
-                //Hacer que la camara siga al personaje en su nueva posicion
-                camaraInterna.Target = personaje.Position;
+               
 
                 //Actualizar valores de la linea de movimiento
                 directionArrow.PStart = esferaPersonaje.Center;
@@ -303,13 +296,14 @@ namespace TGC.Group.Model
 
                 //Ejecuta la animacion del personaje
                 personaje.playAnimation(animacion, true);
-                //Hacer que la camara siga al personaje en su nueva posicion
-                camaraInterna.Target = personaje.Position;
+                
 
                 //Actualizar valores de la linea de movimiento
                 directionArrow.PStart = esferaPersonaje.Center;
                 directionArrow.PEnd = esferaPersonaje.Center + TGCVector3.Multiply(movementVector, 50);
                 directionArrow.updateValues();
+
+                ajustarCamara();
 
                 PostUpdate();
 
@@ -397,6 +391,56 @@ namespace TGC.Group.Model
             moving = true;
             personaje.RotateY(dirPers.RotationAngle(i1,i2));
         }
+
+        public void ajustarCamara()
+        {
+            //Actualizar valores de camara segun modifiers
+            
+            camaraInterna.TargetDisplacement = new TGCVector3(0, 50, 0);
+            camaraInterna.OffsetHeight = offsetHeight;
+            camaraInterna.OffsetForward = offsetForward;
+
+            //Pedirle a la camara cual va a ser su proxima posicion
+            TGCVector3 position;
+            TGCVector3 target;
+            camaraInterna.CalculatePositionTarget(out position, out target);
+
+            //Detectar colisiones entre el segmento de recta camara-personaje y todos los objetos del escenario
+            TGCVector3 q;
+            var minDistSq = FastMath.Pow2(camaraInterna.OffsetForward);
+            foreach (var obstaculo in escenario.ObstaculosColisionablesConCamara())
+            {
+                //Hay colision del segmento camara-personaje y el objeto
+                if (TgcCollisionUtils.intersectSegmentAABB(target, position, obstaculo.BoundingBox, out q))
+                {
+                    //Si hay colision, guardar la que tenga menor distancia
+                    var distSq = TGCVector3.Subtract(q, target).LengthSq();
+                    //Hay dos casos singulares, puede que tengamos mas de una colision hay que quedarse con el menor offset.
+                    //Si no dividimos la distancia por 2 se acerca mucho al target.
+
+                    minDistSq = FastMath.Min(distSq / 2, minDistSq);
+                }
+            }
+            //Acercar la camara hasta la minima distancia de colision encontrada (pero ponemos un umbral maximo de cercania)
+
+            var newOffsetForward = -FastMath.Sqrt(minDistSq);
+
+            if (FastMath.Abs(newOffsetForward) < 10)
+            {
+                newOffsetForward = 10;
+            }
+
+            camaraInterna.OffsetForward = newOffsetForward;
+
+            //Asignar la ViewMatrix haciendo un LookAt desde la posicion final anterior al centro de la camara
+
+            camaraInterna.CalculatePositionTarget(out position, out target);
+            camaraInterna.SetCamera(position, target);
+
+            //Hacer que la camara siga al personaje en su nueva posicion
+            camaraInterna.Target = personaje.Position;
+        }
+
 
         public override void Render()
         {
