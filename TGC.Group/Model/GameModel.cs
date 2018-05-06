@@ -154,7 +154,7 @@ namespace TGC.Group.Model
 
 
             //Hacer que la camara siga al personaje en su nueva posicion
-            this.camaraInterna.Target = auto.posicion() + auto.getVectorAdelante() * 30 ;
+            this.camaraInterna.Target = (TGCVector3.transform(auto.posicion(), auto.transformacion)) + auto.getVectorAdelante() * 30 ;
 
             this.PostUpdate();
         }
