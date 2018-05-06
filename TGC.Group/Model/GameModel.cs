@@ -151,8 +151,7 @@ namespace TGC.Group.Model
             //Posición de la camara.
 
             camaraInterna = new TgcThirdPersonCamera(personaje.Position, 500, -900);
-            //Quiero que la camara mire hacia el origen (0,0,0).
-            var lookAt = TGCVector3.Empty;
+           
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara = camaraInterna;
            
@@ -160,12 +159,6 @@ namespace TGC.Group.Model
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
         }
 
-        /// <summary>
-        ///     Se llama en cada frame.
-        ///     Se debe escribir toda la lógica de computo del modelo, así como también verificar entradas del usuario y reacciones
-        ///     ante ellas.
-        /// </summary>
-        /// 
 
         public override void Update()
         {
@@ -286,10 +279,7 @@ namespace TGC.Group.Model
                 //    piso2.VectorEntrada = TGCVector3.Empty;
                 //}
 
-                //Ejecuta la animacion del personaje
-                personaje.playAnimation(animacion, true);
-                //Hacer que la camara siga al personaje en su nueva posicion
-                camaraInterna.Target = personaje.Position;
+               
 
                 //Actualizar valores de la linea de movimiento
                 directionArrow.PStart = esferaPersonaje.Center;
@@ -306,8 +296,7 @@ namespace TGC.Group.Model
 
                 //Ejecuta la animacion del personaje
                 personaje.playAnimation(animacion, true);
-                //Hacer que la camara siga al personaje en su nueva posicion
-                camaraInterna.Target = personaje.Position;
+                
 
                 //Actualizar valores de la linea de movimiento
                 directionArrow.PStart = esferaPersonaje.Center;
@@ -406,8 +395,8 @@ namespace TGC.Group.Model
         public void ajustarCamara()
         {
             //Actualizar valores de camara segun modifiers
-            var displacement = new TGCVector2(0, 50);
-            camaraInterna.TargetDisplacement = new TGCVector3(displacement.X, displacement.Y, 0);
+            
+            camaraInterna.TargetDisplacement = new TGCVector3(0, 50, 0);
             camaraInterna.OffsetHeight = offsetHeight;
             camaraInterna.OffsetForward = offsetForward;
 
@@ -447,6 +436,9 @@ namespace TGC.Group.Model
 
             camaraInterna.CalculatePositionTarget(out position, out target);
             camaraInterna.SetCamera(position, target);
+
+            //Hacer que la camara siga al personaje en su nueva posicion
+            camaraInterna.Target = personaje.Position;
         }
 
 
