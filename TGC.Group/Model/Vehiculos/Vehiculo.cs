@@ -200,7 +200,7 @@ namespace TGC.Group.Model
             this.mesh.Transform = this.transformacion;
             foreach (var rueda in this.ruedas)
             {
-                rueda.Transform();
+                rueda.Transform(TGCVector3.transform(posicion(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0,1,0)));
             }
         }
 
