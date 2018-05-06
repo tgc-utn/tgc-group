@@ -1,0 +1,13 @@
+<roomsEditor-Map>
+  <mapSettings width="1000" height="1000" scaleX="3" scaleY="3" scaleZ="3" />
+  <rooms count="1">
+    <room name="Room-1" x="20" y="70" width="500" length="240" height="100" floorLevel="0">
+      <wall name="Roof" textureName="techo.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="Floor" textureName="16_wood flooring square texture-seamless.jpg" autoAdjustUv="True" uTile="1" vTile="1" />
+      <wall name="East" textureName="pared2.jpg" autoAdjustUv="False" uTile="1" vTile="1" />
+      <wall name="West" textureName="pared.jpg" autoAdjustUv="False" uTile="1" vTile="1" />
+      <wall name="North" textureName="pared.jpg" autoAdjustUv="True" uTile="1,5" vTile="1" />
+      <wall name="South" textureName="pared.jpg" autoAdjustUv="False" uTile="1,5" vTile="1" />
+    </room>
+  </rooms>
+</roomsEditor-Map>
