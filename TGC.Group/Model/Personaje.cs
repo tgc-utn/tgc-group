@@ -17,7 +17,9 @@ namespace TGC.Group.Model {
 
         // movimiento
         private TGCVector3 vel;
-        private const float WALK_SPEED = 2f;
+        private const float WALK_SPEED = 5f;
+        private const float MULT_CORRER = 1.5f;
+        private const float MULT_CAMINAR = 0.5f;
         private bool patinando = false;
 
         // saltos
@@ -103,18 +105,21 @@ namespace TGC.Group.Model {
                 meshAngle = 3;
             }
             
-            // TODO: logica de salto => mejorar, hacer que cada salto sea igual
             if (Input.keyPressed(Key.Space) && saltosRestantes > 0) {
                 vel.Y = JUMP_SPEED;
                 saltosRestantes--;
             }
 
-            if (Input.keyDown(Key.LeftShift)) { // La dejamos? Termina haciendo quilombo
-                vel.X = vel.X * 1.5f;
-                vel.Z = vel.Z * 1.5f;
+            // HACK: no puede correr mientras patina
+            // si pudiera correr mientras patina se hace quilombo con el sliding
+            // y le queda una velocidad constante, que podría ser un feature mas que
+            // un bug pero no se
+            if (Input.keyDown(Key.LeftShift) && !patinando) {
+                vel.X = vel.X * MULT_CORRER;
+                vel.Z = vel.Z * MULT_CORRER;
             } else if (Input.keyDown(Key.LeftAlt)) {
-                vel.X = vel.X / 2;
-                vel.Z = vel.Z / 2;
+                vel.X = vel.X * MULT_CAMINAR;
+                vel.Z = vel.Z * MULT_CAMINAR;
             }
         }
 
@@ -134,10 +139,18 @@ namespace TGC.Group.Model {
         }
         
         public void move(TGCVector3 movement) {
-            // TODO: limite de velocidad
-            //if (TGCVector3.Length(movement) > 30){movement = TGCVector3.Normalize(movement) * 30;}
+            // deshago el movimiento del manager
+            boundingSphere.moveCenter(-movement);
+            // limite de velocidad
+            if (movement.X > WALK_SPEED * MULT_CORRER) movement.X = WALK_SPEED * 1.5f;
+            if (movement.Z > WALK_SPEED * MULT_CORRER) movement.Z = WALK_SPEED * 1.5f;
+            if (movement.X < WALK_SPEED * MULT_CORRER * -1) movement.X = WALK_SPEED * 1.5f * -1;
+            if (movement.Z < WALK_SPEED * MULT_CORRER * -1) movement.Z = WALK_SPEED * 1.5f * -1;
+
             mesh.Move(movement);
             pies.moveCenter(movement);
+            boundingSphere.moveCenter(movement);
+
             vel = movement;
         }
 
