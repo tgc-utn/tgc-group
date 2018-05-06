@@ -11,18 +11,19 @@ namespace TGC.Group.Model {
     // en una sola clase "entidad fisica" o algo asi    
 
     class Caja {
-        TgcBoundingAxisAlignBox cuerpo;
-        TgcBoundingAxisAlignBox superior;
+        private TgcBoundingAxisAlignBox cuerpo;
+        private TgcBoundingAxisAlignBox superior;
 
+        private TGCBox box;
+        private TGCVector3 vel;
 
-        TGCVector3 tamanio = new TGCVector3(80, 80, 80);
+        public Caja(string mediaDir, TGCVector3 pos) :
+            this(mediaDir, pos, new TGCVector3(80, 80, 80)) { }
 
-        TGCBox box;
-
-        public Caja(string mediaDir, TGCVector3 pos) {
+        public Caja(string mediaDir, TGCVector3 pos, TGCVector3 size) {
             // TODO: tengo que hacer dispose de esta textura? la hago global?
             var texture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "caja.jpg");
-            box = TGCBox.fromSize(tamanio,  texture);
+            box = TGCBox.fromSize(size, texture);
 
             var minInferior = box.BoundingBox.PMin;
             var maxInferior = box.BoundingBox.PMax;
@@ -45,6 +46,7 @@ namespace TGC.Group.Model {
             superior.setRenderColor(Color.Red);
 
             move(pos);
+            vel = TGCVector3.Empty;
         }
 
         public void render() {
@@ -69,6 +71,12 @@ namespace TGC.Group.Model {
             box.Transform = TGCMatrix.Translation(box.Position);
         }
 
+        public void applyGravity() {
+            box.Move(vel);
+            superior.move(vel);
+            box.Transform = TGCMatrix.Translation(box.Position);
+        }
+
         public TgcBoundingAxisAlignBox getSuperior() {
             return superior;
         }
@@ -77,5 +85,12 @@ namespace TGC.Group.Model {
             return cuerpo;
         }
 
+        public void addVel(TGCVector3 moreVel) {
+            vel += moreVel;
+        }
+
+        public void resetVel() {
+            vel = TGCVector3.Empty;
+        }
     }
 }

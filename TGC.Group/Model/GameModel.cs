@@ -1,6 +1,5 @@
 using System;
 using System.Drawing;
-using TGC.Core.BoundingVolumes;
 using TGC.Core.Collision;
 using TGC.Core.Example;
 using TGC.Core.Mathematica;
@@ -21,9 +20,8 @@ namespace TGC.Group.Model {
         private SphereCollisionManager collisionManager;
         // podria ser una variable local, la saque aca para debuggear
         private TGCVector3 movement;
-        private TGCVector3 cajaMovement;
-        private bool empujando;
 
+        private TGCVector3 VEC_GRAVEDAD = new TGCVector3(0, -0.4f, 0);
 
         public override void Init() {
             cameraOffset = new TGCVector3(0, 200, 400);
@@ -32,7 +30,7 @@ namespace TGC.Group.Model {
 
             collisionManager = new SphereCollisionManager();
             collisionManager.GravityEnabled = true;
-            collisionManager.GravityForce = new TGCVector3(0, -0.4f, 0);
+            collisionManager.GravityForce = VEC_GRAVEDAD;
             collisionManager.SlideFactor = 10f;
         }
 
@@ -41,38 +39,10 @@ namespace TGC.Group.Model {
 
             // calculo nueva velocidad
             personaje.update(ElapsedTime, Input);
-            
-            // reviso si debo empujar alguna caja
-            foreach (var caja in nivel.getCajas()) {
-                if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), caja.getCuerpo())) {
 
-                    // obtengo dirección para mover la caja
-                    var distanciaPersonajeCaja = caja.getCuerpo().calculateBoxCenter() - personaje.getBoundingSphere().Center;
-                    var cajaMovementDeseado = TGCVector3.Empty;
+            checkearEmpujeCajas();
+            aplicarGravedadCajas();
 
-                    if (FastMath.Abs(distanciaPersonajeCaja.X) > FastMath.Abs(distanciaPersonajeCaja.Z)) {
-                        if (distanciaPersonajeCaja.X > 0) {
-                            cajaMovementDeseado = new TGCVector3(5, 0, 0);
-                        } else {
-                            cajaMovementDeseado = new TGCVector3(-5, 0, 0);
-                        }
-                    } else {
-                        if (distanciaPersonajeCaja.Z > 0) {
-                            cajaMovementDeseado = new TGCVector3(0, 0, 5);
-                        } else {
-                            cajaMovementDeseado = new TGCVector3(0, 0, -5);
-                        }
-                    }
-
-                    caja.move(cajaMovementDeseado); //TEMPORAL
-                    empujando = true;
-                } else {
-                    empujando = false;
-                }
-            }
-
-            // obtengo movimiento real en base a la velocidad que tengo del personaje 
-            // y las colisiones que puedan ocurrir
             movement = collisionManager.moveCharacter(
                 personaje.getBoundingSphere(),
                 personaje.getVelocity(),
@@ -105,7 +75,6 @@ namespace TGC.Group.Model {
             DrawText.drawText(string.Format("vel: ({0}, {1}, {2})", movement.X, movement.Y, movement.Z), 0, 10, Color.White);
             DrawText.drawText(string.Format("mesh: ({0}, {1}, {2})", p1.X, p1.Y, p1.Z), 0, 20, Color.White);
             DrawText.drawText(string.Format("bsphere: ({0}, {1}, {2})", p2.X, p2.Y, p2.Z), 0, 30, Color.White);
-            DrawText.drawText(string.Format("empujando: ({0})", empujando), 0, 40, Color.White);
 
             nivel.render();
             personaje.render(ElapsedTime);
@@ -117,6 +86,52 @@ namespace TGC.Group.Model {
         public override void Dispose() {
             personaje.dispose();
             nivel.dispose();
+        }
+
+        private void checkearEmpujeCajas() {
+            foreach (var caja in nivel.getCajas()) {
+                if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), caja.getCuerpo())) {
+
+                    // obtengo dirección para mover la caja
+                    var distanciaPersonajeCaja = caja.getCuerpo().calculateBoxCenter() - personaje.getBoundingSphere().Center;
+                    var cajaMovementDeseado = TGCVector3.Empty;
+
+                    if (FastMath.Abs(distanciaPersonajeCaja.X) > FastMath.Abs(distanciaPersonajeCaja.Z)) {
+                        if (distanciaPersonajeCaja.X > 0) {
+                            cajaMovementDeseado = new TGCVector3(5, 0, 0);
+                        } else {
+                            cajaMovementDeseado = new TGCVector3(-5, 0, 0);
+                        }
+                    } else {
+                        if (distanciaPersonajeCaja.Z > 0) {
+                            cajaMovementDeseado = new TGCVector3(0, 0, 5);
+                        } else {
+                            cajaMovementDeseado = new TGCVector3(0, 0, -5);
+                        }
+                    }
+
+                    caja.move(cajaMovementDeseado); //TEMP
+                }
+            }
+        }
+
+        private void aplicarGravedadCajas() {
+            foreach (var caja in nivel.getCajas()) {
+                var apoyada = false;
+                foreach (var piso in nivel.getPisos()) {
+                    if (TgcCollisionUtils.testAABBAABB(caja.getCuerpo(), piso)) {
+                        apoyada = true;
+                    }
+                }
+
+                if (!apoyada) {
+                    caja.addVel(VEC_GRAVEDAD);
+                } else {
+                    caja.resetVel();
+                }
+
+                caja.applyGravity();
+            }
         }
     }
 }

@@ -79,6 +79,14 @@ namespace TGC.Group.Model {
             return list;
         }
 
+        public List<TgcBoundingAxisAlignBox> getPisos() {
+            var list = new List<TgcBoundingAxisAlignBox>();
+            list.AddRange(pisosNormales.Select(piso => piso.BoundingBox).ToArray());
+            list.AddRange(pisosResbaladizos.Select(piso => piso.BoundingBox).ToArray());
+
+            return list;
+        }
+
         public List<Caja> getCajas() {
             return cajas;
         }
