@@ -70,11 +70,11 @@ namespace TGC.Group.Model
            
             if (Input.keyDown(Key.NumPad4))
             {
-                this.camaraInterna.rotateY(-0.05f);
+                this.camaraInterna.rotateY(-0.005f);
             }
             if (Input.keyDown(Key.NumPad6))
             {
-                this.camaraInterna.rotateY(0.05f);
+                this.camaraInterna.rotateY(0.005f);
             }
             if (Input.keyDown(Key.RightArrow))
             {
