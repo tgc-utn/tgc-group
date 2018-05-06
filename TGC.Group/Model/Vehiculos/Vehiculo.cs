@@ -13,7 +13,7 @@ namespace TGC.Group.Model
         private Timer deltaTiempoAvance;
         private Timer deltaTiempoSalto;
         public TGCVector3 vectorAdelante;
-        private TGCMatrix transformacion;
+        private TGCMatrix transformacion = new TGCMatrix();
         protected Ruedas ruedas;
         private EstadoVehiculo estado;
         private float velocidadActual;
@@ -51,9 +51,11 @@ namespace TGC.Group.Model
             TgcSceneLoader loader = new TgcSceneLoader();
             TgcScene scene = loader.loadSceneFromFile(rutaAMesh);
             this.mesh = scene.Meshes[0];
-            this.mesh.RotateY(FastMath.PI);
-            this.mesh.Scale = new TGCVector3(0.05f, 0.05f, 0.05f);
-            this.mesh.Position = posicionInicial;
+            var rotacion = TGCMatrix.RotationY(FastMath.PI);
+            var escala = TGCMatrix.Scaling(0.05f, 0.05f, 0.05f);
+            var traslado = TGCMatrix.Translation(posicionInicial.X, posicionInicial.Y, posicionInicial.Z);
+
+            this.transformacion = escala * rotacion * traslado;
         }
 
         public void setVectorAdelante(TGCVector3 vector)
@@ -175,13 +177,20 @@ namespace TGC.Group.Model
 
         public void Move(TGCVector3 desplazamiento)
         {
-            this.mesh.Move(desplazamiento);
+
+            transformacion = transformacion * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
             this.ruedas.Move(desplazamiento);
         }
 
         public Ruedas GetRuedas()
         {
             return this.ruedas;
+
+        }
+
+        public void Transform()
+        {
+            this.mesh.Transform = this.transformacion;
         }
     }
 }
