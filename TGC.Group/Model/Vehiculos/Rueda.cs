@@ -49,7 +49,7 @@ namespace TGC.Group.Model.Vehiculos
 
         public void RotateAxis(TGCVector3 eje, float rotacion)
         {
-            this.rotacion = TGCMatrix.RotationX(rotacion*0.0001f) * this.rotacion;
+            //this.rotacion = TGCMatrix.RotationX(rotacion*0.0001f) * this.rotacion;
         }
     }
 }
