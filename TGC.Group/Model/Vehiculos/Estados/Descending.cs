@@ -56,12 +56,12 @@ namespace TGC.Group.Model.Vehiculos.Estados
         {
             auto.setVelocidadActualDeSalto(this.velocidadFisicaDeSalto());
             float desplazamientoEnY = auto.getVelocidadActualDeSalto() * auto.getElapsedTime();
-            desplazamientoEnY = (auto.mesh.Position.Y + desplazamientoEnY < 0) ? -auto.mesh.Position.Y : desplazamientoEnY;
+            desplazamientoEnY = (TGCVector3.transform(auto.posicion(), auto.transformacion).Y + desplazamientoEnY < 0) ? -TGCVector3.transform(auto.posicion(), auto.transformacion).Y : desplazamientoEnY;
             TGCVector3 nuevoDesplazamiento = new TGCVector3(0, desplazamientoEnY, 0);
             //this.move(nuevoDesplazamiento);
             //this.move(auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
             this.move(nuevoDesplazamiento + auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
-            if(auto.mesh.Position.Y == 0)
+            if(TGCVector3.transform(auto.posicion(), auto.transformacion).Y == 0)
             {
                 auto.getDeltaTiempoSalto().resetear();
                 auto.setVelocidadActualDeSalto(auto.getVelocidadMaximaDeSalto());

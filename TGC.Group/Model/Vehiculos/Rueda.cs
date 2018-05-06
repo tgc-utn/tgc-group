@@ -37,9 +37,9 @@ namespace TGC.Group.Model.Vehiculos
             transformacion = transformacion * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
         }
 
-        public void Rotate(TGCMatrix matrizRotacion)
+        public void Rotate(TGCVector3 axis, float rotacion)
         {
-            transformacion = matrizRotacion * transformacion;
+            transformacion = transformacion * TGCMatrix.RotationY(rotacion);
         }
     }
 }

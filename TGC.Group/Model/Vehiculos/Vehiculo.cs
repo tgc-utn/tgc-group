@@ -204,12 +204,12 @@ namespace TGC.Group.Model
             }
         }
 
-        public void Rotate(TGCMatrix rotation)
+        public void Rotate(float rotacion)
         {
-            transformacion = rotation * transformacion;
+            transformacion = TGCMatrix.RotationY(rotacion) * transformacion;
             foreach (var rueda in ruedas)
             {
-                rueda.Rotate(rotation);
+                rueda.Rotate(this.vectorAdelante, rotacion);
             }
 
         }
