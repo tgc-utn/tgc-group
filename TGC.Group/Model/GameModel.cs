@@ -32,7 +32,7 @@ namespace TGC.Group.Model {
 
             collisionManager = new SphereCollisionManager();
             collisionManager.GravityEnabled = true;
-            collisionManager.GravityForce = new TGCVector3(0, -0.4f, 0);
+            collisionManager.GravityForce = new TGCVector3(0, -0.3f, 0);
             collisionManager.SlideFactor = 1f;
         }
 
@@ -84,6 +84,7 @@ namespace TGC.Group.Model {
             // checkeo si estoy sobre hielo
             foreach (var box in nivel.getBoundingBoxes()) {
                 if (TgcCollisionUtils.testSphereAABB(personaje.getPies(), box)) {
+                    personaje.aterrizar();
                     personaje.setPatinando(nivel.esPisoResbaladizo(box));
                 }
             }

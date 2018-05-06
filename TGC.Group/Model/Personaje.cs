@@ -17,9 +17,13 @@ namespace TGC.Group.Model {
 
         // movimiento
         private TGCVector3 vel;
-        private const float WALK_SPEED = 1f;
-        private const float JUMP_SPEED = 5f;
+        private const float WALK_SPEED = 2f;
         private bool patinando = false;
+
+        // saltos
+        private int saltosRestantes = 0;
+        private const int SALTOS_TOTALES = 2;
+        private const float JUMP_SPEED = 10f;
 
         public Personaje(string MediaDir) {
             vel = TGCVector3.Empty;
@@ -100,10 +104,9 @@ namespace TGC.Group.Model {
             }
             
             // TODO: logica de salto => mejorar, hacer que cada salto sea igual
-            if (Input.keyDown(Key.Space)) {
-                if (mesh.Position.Y < 600f ) {
-                    vel.Y = JUMP_SPEED;
-                }
+            if (Input.keyPressed(Key.Space) && saltosRestantes > 0) {
+                vel.Y = JUMP_SPEED;
+                saltosRestantes--;
             }
 
             if (Input.keyDown(Key.LeftShift)) { // La dejamos? Termina haciendo quilombo
@@ -144,6 +147,10 @@ namespace TGC.Group.Model {
                 vel.Z = 0;
                 moving = false;
             }
+        }
+
+        public void aterrizar() {
+            saltosRestantes = SALTOS_TOTALES;
         }
 
         public TGCVector3 getPosition() {
