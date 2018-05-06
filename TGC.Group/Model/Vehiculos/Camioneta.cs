@@ -12,19 +12,18 @@ namespace TGC.Group.Model.Vehiculos
     {
         public Camioneta(string mediaDir, TGCVector3 posicionInicial) : base(mediaDir, posicionInicial)
         {
+            //creo los meshes de las ruedas y luego agrego cada object Rueda(mesh,posicion) a la lista de ruedas;
             TgcSceneLoader loader = new TgcSceneLoader();
             TgcMesh ruedaIzquierda = loader.loadSceneFromFile(mediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Rueda\\Rueda-TgcScene.xml").Meshes[0];
             TgcMesh ruedaDerecha = ruedaIzquierda.clone("ruedaDerecha");
             TgcMesh ruedaTraseraIzquierda = ruedaIzquierda.clone("ruedaTraseraIzquierda");
             TgcMesh ruedaTraseraDerecha = ruedaIzquierda.clone("ruedaTraseraDerecha");
-            ruedaIzquierda.Move(new TGCVector3(1.7f,0f,3.15f) + posicionInicial);
-            ruedaDerecha.Move(new TGCVector3(-1.7f, 0f, 3.15f) + posicionInicial);
-            ruedaTraseraIzquierda.Move(new TGCVector3(1.7f, 0, -2.75f) + posicionInicial);
-            ruedaTraseraDerecha.Move(new TGCVector3(-1.7f, 0, -2.75f) + posicionInicial);
-            List<TgcMesh> ruedas = new List<TgcMesh>();
-            ruedas.Add(ruedaTraseraIzquierda);
-            ruedas.Add(ruedaTraseraDerecha);
-            this.ruedas = new Ruedas(ruedaIzquierda, ruedaDerecha, ruedas);
+            ruedas.Add(new Rueda(ruedaIzquierda, new TGCVector3(1.7f, 0f, 3.15f) + posicionInicial));
+            ruedas.Add(new Rueda(ruedaDerecha, new TGCVector3(-1.7f, 0f, 3.15f) + posicionInicial));
+            ruedas.Add(new Rueda(ruedaTraseraIzquierda, new TGCVector3(1.7f, 0, -2.75f) + posicionInicial));
+            ruedas.Add(new Rueda(ruedaTraseraDerecha, new TGCVector3(-1.7f, 0, -2.75f) + posicionInicial));
         }
+
+
     }
 }

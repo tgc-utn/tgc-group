@@ -13,8 +13,8 @@ namespace TGC.Group.Model
         private Timer deltaTiempoAvance;
         private Timer deltaTiempoSalto;
         public TGCVector3 vectorAdelante;
-        public TGCMatrix transformacion = new TGCMatrix();
-        protected Ruedas ruedas;
+        public TGCMatrix transformacion;
+        protected List<Rueda> ruedas = new List<Rueda>();
         private EstadoVehiculo estado;
         private float velocidadActual;
         private float velocidadActualDeSalto;
@@ -92,7 +92,7 @@ namespace TGC.Group.Model
         //devuelve la posicion del auto en el mapa, sirve para la camara
         public TGCVector3 posicion()
         {
-            return mesh.Position;
+            return new TGCVector3(transformacion.M11, transformacion.M22, transformacion.M33);
         }
 
         public void setElapsedTime(float time)
@@ -117,7 +117,10 @@ namespace TGC.Group.Model
         public void Render()
         {
             this.mesh.Render();
-            this.ruedas.Render();
+            foreach (var rueda in this.ruedas)
+            {
+                rueda.Render();
+            }
         }
 
         public void dispose()
@@ -179,11 +182,14 @@ namespace TGC.Group.Model
         {
 
             transformacion = transformacion * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
-            this.ruedas.Move(desplazamiento);
+            foreach (var rueda in this.ruedas)
+            {
+                rueda.Move(desplazamiento);
+            };
         }
 
 
-        public Ruedas GetRuedas()
+        public List<Rueda> GetRuedas()
         {
             return this.ruedas;
 
@@ -192,6 +198,20 @@ namespace TGC.Group.Model
         public void Transform()
         {
             this.mesh.Transform = this.transformacion;
+            foreach (var rueda in this.ruedas)
+            {
+                rueda.Transform();
+            }
+        }
+
+        public void Rotate(TGCMatrix rotation)
+        {
+            transformacion = rotation * transformacion;
+            foreach (var rueda in ruedas)
+            {
+                rueda.Rotate(rotation);
+            }
+
         }
     }
 }
