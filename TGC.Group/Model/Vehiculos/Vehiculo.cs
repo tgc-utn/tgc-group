@@ -178,7 +178,7 @@ namespace TGC.Group.Model
         public void Move(TGCVector3 desplazamiento)
         {
 
-            transformacion.Translate(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
+            transformacion = transformacion * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
             this.ruedas.Move(desplazamiento);
         }
 
