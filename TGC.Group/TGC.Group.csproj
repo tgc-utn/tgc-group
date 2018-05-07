@@ -306,6 +306,7 @@
     <Content Include="Media\Robot\Robot-TgcSkeletalMesh.xml" />
     <Content Include="Media\Robot\Textures\uvw.jpg" />
     <Content Include="Media\Robot\Textures\uvwGreen.jpg" />
+    <Content Include="Media\tronco.jpg" />
     <Content Include="obj\Debug\TGC.Group.csproj.FileListAbsolute.txt" />
     <Content Include="obj\Debug\TGC.Group.exe" />
     <Content Include="obj\Debug\TGC.Group.pdb" />
