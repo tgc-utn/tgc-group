@@ -14,8 +14,8 @@ namespace TGC.Group.Model {
             box.Transform = TGCMatrix.Translation(box.Position);
         }
 
-        public void update() {
-            box.RotateY(vel);
+        public void update(float deltaTime) {
+            box.RotateY(vel * deltaTime);
             box.Transform = TGCMatrix.RotationY(box.Rotation.Y) * TGCMatrix.Translation(box.Position);
         }
 

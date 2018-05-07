@@ -57,13 +57,6 @@ namespace TGC.Group.Model {
             piso = new TgcPlane(new TGCVector3(-500, 0, -3000), new TGCVector3(2500, 0, 2500), TgcPlane.Orientations.XZplane, hieloTexture);
             pisosResbaladizos.Add(piso); // piso de hielo
 
-            /*
-            cajas.Add(new Caja(mediaDir, new TGCVector3(-250, 40, -1000))); //coordenada Y = 40 para que tengan 40 hasta
-            cajas.Add(new Caja(mediaDir, new TGCVector3(250, 40, 250)));   //el piso y 40 hasta el techo
-            cajas.Add(new Caja(mediaDir, new TGCVector3(1250, 40, 1200)));
-            cajas.Add(new Caja(mediaDir, new TGCVector3(700, 40, 0)));
-            */
-
             // paredes de la jungla
             pEstaticas.Add(new Plataforma(new TGCVector3(-500, 150, 600), new TGCVector3(100, 300, 2800), paredJunglaTexture)); //laterales jungla derecha
             pEstaticas.Add(new Plataforma(new TGCVector3(500, 150, 600), new TGCVector3(100, 300, 2800), paredJunglaTexture));
@@ -114,20 +107,20 @@ namespace TGC.Group.Model {
             pEstaticas.Add(new Plataforma(new TGCVector3(3000, -100, 1400), new TGCVector3(2, 200, 1200), precipicioTexture)); // izquierda
             pEstaticas.Add(new Plataforma(new TGCVector3(2500, -100, 2000), new TGCVector3(1000, 200, 2), precipicioTexture)); // frontal
 
-            pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(300, 120, 300), new TGCVector3(200, 50, 200), cajaTexture, new TGCVector3(-300, 100, -300), new TGCVector3(0.5f, 0, 0.5f)));
+            pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(0, -50, 5000), new TGCVector3(200, 50, 200), cajaTexture, new TGCVector3(-200, -50, 5000), new TGCVector3(2f, 0, 0)));
             // tronco que se desplaza en el precipicio, en X; TODO: Revisar movimiento en conjunto con tgcito
-            pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(2075, -60, 1400), new TGCVector3(150, 50, 80), maderaTexture, new TGCVector3(2925, -60, 1400), new TGCVector3(0.2f, 0, 0)));
+            pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(2075, -60, 1400), new TGCVector3(150, 50, 80), maderaTexture, new TGCVector3(2925, -60, 1400), new TGCVector3(2f, 0, 0)));
 
-            pRotantes.Add(new PlataformaRotante(new TGCVector3(0, 100, 300), new TGCVector3(200, 50, 200), cajaTexture, FastMath.QUARTER_PI/4));
+            pRotantes.Add(new PlataformaRotante(new TGCVector3(0, 100, 300), new TGCVector3(200, 50, 200), cajaTexture, FastMath.PI * 100));
         }
 
-        public void update() {
+        public void update(float deltaTime) {
             foreach (var p in pDesplazan) {
-                p.update();
+                p.update(deltaTime);
             }
 
             foreach (var p in pRotantes) {
-                p.update();
+                p.update(deltaTime);
             }
         }
 

@@ -19,7 +19,7 @@ namespace TGC.Group.Model {
 
         // movimiento
         private TGCVector3 vel;
-        private const float WALK_SPEED = 1f;
+        private const float WALK_SPEED = 500f;
         private const float MULT_CORRER = 1.5f;
         private const float MULT_CAMINAR = 0.5f;
         private bool patinando = false;
@@ -27,7 +27,7 @@ namespace TGC.Group.Model {
         // saltos
         private int saltosRestantes = 0;
         private const int SALTOS_TOTALES = 2;
-        private const float JUMP_SPEED = 10f;
+        private const float JUMP_SPEED = 1000f;
 
         public Personaje(string MediaDir) {
             vel = TGCVector3.Empty;
@@ -61,7 +61,7 @@ namespace TGC.Group.Model {
         }
 
         public void update(float deltaTime, TgcD3dInput Input) {
-            checkInputs(Input);
+            checkInputs(Input, deltaTime);
             updateAnimations();
         }
 
@@ -82,33 +82,35 @@ namespace TGC.Group.Model {
             mesh.Dispose();
         }
 
-        private void checkInputs(TgcD3dInput Input) {
+        private void checkInputs(TgcD3dInput Input, float deltaTime) {
+            float FRAME_WALK_SPEED = WALK_SPEED * deltaTime;
+            float FRAME_JUMP_SPEED = JUMP_SPEED * deltaTime;
             if (Input.keyDown(Key.W) || Input.keyDown(Key.UpArrow)) {
-                vel.Z = -WALK_SPEED;
+                vel.Z = -FRAME_WALK_SPEED;
                 moving = true;
                 meshAngle = 0;
             }
 
             if (Input.keyDown(Key.S) || Input.keyDown(Key.DownArrow)) {
-                vel.Z = WALK_SPEED;
+                vel.Z = FRAME_WALK_SPEED;
                 moving = true;
                 meshAngle = 2;
             }
 
             if (Input.keyDown(Key.D) || Input.keyDown(Key.RightArrow)) {
-                vel.X = -WALK_SPEED;
+                vel.X = -FRAME_WALK_SPEED;
                 moving = true;
                 meshAngle = 1;
             }
 
             if (Input.keyDown(Key.A) || Input.keyDown(Key.LeftArrow)) {
-                vel.X = WALK_SPEED;
+                vel.X = FRAME_WALK_SPEED;
                 moving = true;
                 meshAngle = 3;
             }
             
             if (Input.keyPressed(Key.Space) && saltosRestantes > 0) {
-                vel.Y = JUMP_SPEED;
+                vel.Y = FRAME_JUMP_SPEED;
                 saltosRestantes--;
             }
 
@@ -123,6 +125,7 @@ namespace TGC.Group.Model {
                 vel.X = vel.X * MULT_CAMINAR;
                 vel.Z = vel.Z * MULT_CAMINAR;
             }
+
         }
 
         private void updateAnimations() {
@@ -196,8 +199,7 @@ namespace TGC.Group.Model {
             meshAngle = angle;
         }
 
-        public void volverAlOrigen()
-        {
+        public void volverAlOrigen() {
             mesh.Position = POS_ORIGEN;
         }
     }

@@ -7,6 +7,7 @@ namespace TGC.Group.Model {
         private TGCVector3 posInicial;
         private TGCVector3 posFinal;
         private TGCVector3 vel;
+        private TGCVector3 realVel;
 
         public PlataformaDesplazante(TGCVector3 pos, TGCVector3 size, 
             TgcTexture textura, TGCVector3 posFinal, TGCVector3 vel) : base(pos, size, textura) {
@@ -15,8 +16,9 @@ namespace TGC.Group.Model {
             this.vel = vel;
         }
 
-        public void update() {
+        public void update(float deltaTime) {
             move(vel);
+            realVel = vel * deltaTime;
 
             if (posInicial.X < posFinal.X) {
                 if (posInicial.Z < posFinal.Z) {
@@ -56,6 +58,11 @@ namespace TGC.Group.Model {
 
         public TGCVector3 getVelocity() {
             return vel;
+        }
+
+        new public void render() {
+            box.Render();
+            box.BoundingBox.Render();
         }
 
     }

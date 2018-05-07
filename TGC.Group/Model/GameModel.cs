@@ -38,7 +38,7 @@ namespace TGC.Group.Model {
             PreUpdate();
 
             // muevo plataformas
-            nivel.update();
+            nivel.update(ElapsedTime);
 
             // calculo nueva velocidad
             personaje.update(ElapsedTime, Input);
@@ -47,13 +47,14 @@ namespace TGC.Group.Model {
             aplicarGravedadCajas();
 
             // checkeo sobre que estoy parado
+            // TODO: hacer funcion aparte
             foreach (var box in nivel.getPisos()) {
                 if (TgcCollisionUtils.testSphereAABB(personaje.getPies(), box)) {
                     if (nivel.esPisoDesplazante(box)) {
                         personaje.addVelocity(nivel.getPlataformaDesplazante(box).getVelocity());
                     } else if (nivel.esPisoRotante(box)) {
                         var plataformaRotante = nivel.getPlataformaRotante(box);
-                        personaje.addVelocity(plataformaRotante.getVelAsVector(personaje.getPosition()));
+                        personaje.addVelocity(plataformaRotante.getVelAsVector(personaje.getPosition()) * ElapsedTime);
                         personaje.setRotation(plataformaRotante.getAngle());
                     }
                     personaje.aterrizar();
