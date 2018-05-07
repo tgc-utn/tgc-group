@@ -28,7 +28,7 @@ namespace TGC.Group.Model
         private TGCVector3 camaraDesplazamiento = new TGCVector3(0,5,40);
         private TGCBox cubo;
         private TgcScene scene;
-        private TgcText2D textoVelocidadVehiculo, textoAlturaVehiculo, textoPosicionVehiculo, textoVectorAdelante, textoVectorCostado;
+        private TgcText2D textoVelocidadVehiculo, textoOffsetH, textoOffsetF, textoPosicionVehiculo, textoVectorAdelante, textoVectorCostado;
         private TgcMesh jabon;
         private TgcMesh ropero;
 
@@ -111,6 +111,14 @@ namespace TGC.Group.Model
             dialogo = string.Format(dialogo, auto.getVectorCostado().X, auto.getVectorCostado().Y, auto.getVectorCostado().Z);
             textoVectorCostado = Textos.newText(dialogo, 120, 55);
 
+            dialogo = "OffsetHeight = {0}";
+            dialogo = string.Format(dialogo, this.camaraInterna.OffsetHeight);
+            textoOffsetH = Textos.newText(dialogo, 120, 70);
+
+            dialogo = "OffsetForward = {0}";
+            dialogo = string.Format(dialogo, this.camaraInterna.OffsetForward);
+            textoOffsetF = Textos.newText(dialogo, 120, 85);
+
             this.auto.setElapsedTime(ElapsedTime);
 
             //si el usuario teclea la W y ademas no tecla la D o la A
@@ -170,6 +178,8 @@ namespace TGC.Group.Model
             this.textoPosicionVehiculo.render();
             this.textoVectorAdelante.render();
             this.textoVectorCostado.render();
+            this.textoOffsetF.render();
+            this.textoOffsetH.render();
             
             this.scene.RenderAll();
             
