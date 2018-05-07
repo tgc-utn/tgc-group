@@ -200,15 +200,11 @@ namespace TGC.Group.Model
 
         }
 
-        public void Transform()
+        virtual public void Transform()
         {
             this.mesh.Transform = this.transformacion;
             delanteraIzquierda.Transform(TGCVector3.transform(posicion(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)) + new TGCVector3(0, 0.5f, 0));
             delanteraDerecha.Transform(TGCVector3.transform(posicion(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)) + new TGCVector3(0, -0.5f, 0));
-            foreach (var rueda in this.ruedas)
-            {
-                rueda.Transform(TGCVector3.transform(posicion(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0,1,0)) + new TGCVector3(0,0.5f,0));
-            }
         }
 
         public void Rotate(float rotacion)
