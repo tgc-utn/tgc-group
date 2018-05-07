@@ -54,7 +54,7 @@ namespace TGC.Group.Model
             TgcScene scene = loader.loadSceneFromFile(rutaAMesh);
             this.mesh = scene.Meshes[0];
             var rotacion = TGCMatrix.RotationY(FastMath.PI);
-            var escala = TGCMatrix.Scaling(0.05f, 0.05f, 0.05f);
+            var escala = TGCMatrix.Scaling(0.005f, 0.005f, 0.005f);
             var traslado = TGCMatrix.Translation(posicionInicial.X, posicionInicial.Y, posicionInicial.Z);
 
             this.transformacion = escala * rotacion * traslado;
