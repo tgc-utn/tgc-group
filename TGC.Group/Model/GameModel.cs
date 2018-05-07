@@ -58,7 +58,7 @@ namespace TGC.Group.Model
             //que te permite configurar la posicion, el lookat, etc. Lo que hacemos al heredar, es reescribir algunos
             //metodos y setear valores default para que la camara quede mirando al auto en 3era persona
 
-            this.camaraInterna = new CamaraEnTerceraPersona(auto.posicion() + camaraDesplazamiento, 7.5f, -55);
+            this.camaraInterna = new CamaraEnTerceraPersona(auto.posicion() + camaraDesplazamiento, 0.8f, -33);
             this.Camara = camaraInterna;
 
         }
