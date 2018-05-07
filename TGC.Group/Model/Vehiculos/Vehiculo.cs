@@ -211,18 +211,17 @@ namespace TGC.Group.Model
         public void Rotate(float rotacion)
         {
             transformacion = TGCMatrix.RotationY(rotacion) * transformacion;
-            RotarDelanteras(rotacion);
             foreach (var rueda in ruedas)
             {
-                rueda.RotateY(rotacion);
+                rueda.RotateAxis(TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)), rotacion);
             }
 
         }
 
         public void RotarDelanteras(float rotacion)
         {
-            delanteraIzquierda.RotateY(rotacion);
-            delanteraDerecha.RotateY(rotacion);
+            delanteraIzquierda.RotateAxis(TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)), rotacion);
+            delanteraDerecha.RotateAxis(TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)), rotacion);
         }
     }
 }
