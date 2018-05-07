@@ -10,12 +10,12 @@ namespace TGC.Group.Model {
     class Nivel {
         List<TgcPlane> pisosNormales;
         List<TgcPlane> pisosResbaladizos;
-        List<TgcPlane> pisosMuerte;
+        List<TgcPlane> pMuerte;
         List<Caja> cajas;
         List<Plataforma> pEstaticas;
         List<PlataformaDesplazante> pDesplazan;
         List<PlataformaRotante> pRotantes;
-        // List<Bloque> pAscensor;
+        List<PlataformaAscensor> pAscensor;
 
         public Nivel(string mediaDir) {
             pisosNormales = new List<TgcPlane>();
@@ -24,8 +24,9 @@ namespace TGC.Group.Model {
             pEstaticas = new List<Plataforma>();
             pDesplazan = new List<PlataformaDesplazante>();
             pRotantes = new List<PlataformaRotante>();
-            pisosMuerte = new List<TgcPlane>();
-            // si colisiona con el death plane lo mandamos al origen
+            pAscensor = new List<PlataformaAscensor>();
+
+            pMuerte = new List<TgcPlane>();
 
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "pisoJungla.jpg");
             var hieloTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "hielo.jpg");
@@ -69,9 +70,9 @@ namespace TGC.Group.Model {
 
             // precipicios del desierto
             piso = new TgcPlane(new TGCVector3(-150, -380, 3300), new TGCVector3(500, 0, 200), TgcPlane.Orientations.XZplane, precipicioTexture);
-            pisosMuerte.Add(piso); // precipicio ancho
+            pMuerte.Add(piso); // precipicio ancho
             piso = new TgcPlane(new TGCVector3(-400, -380, 4100), new TGCVector3(250, 0, 800), TgcPlane.Orientations.XZplane, precipicioTexture);
-            pisosMuerte.Add(piso); // precipicio largo
+            pMuerte.Add(piso); // precipicio largo
             pEstaticas.Add(new Plataforma(new TGCVector3(100, -280, 3300), new TGCVector3(500, 200, 2), precipicioTexture)); // paredes precipicio ancho
             pEstaticas.Add(new Plataforma(new TGCVector3(350, -280, 3400), new TGCVector3(2, 200, 200), precipicioTexture));
             pEstaticas.Add(new Plataforma(new TGCVector3(-150, -280, 3400), new TGCVector3(2, 200, 200), precipicioTexture));
@@ -100,17 +101,17 @@ namespace TGC.Group.Model {
 
             // precipicio del tronco
             piso = new TgcPlane(new TGCVector3(2000, -200, 800), new TGCVector3(1000, 0, 1200), TgcPlane.Orientations.XZplane, precipicioTexture);
-            pisosMuerte.Add(piso); //TODO: Configurar el deathplane, deberia ir ahi?
+            pMuerte.Add(piso); //TODO: Configurar el deathplane, deberia ir ahi?
             pEstaticas.Add(new Plataforma(new TGCVector3(2500, -100, 800), new TGCVector3(1000, 200, 2), precipicioTexture)); // fondo
             pEstaticas.Add(new Plataforma(new TGCVector3(2000, -100, 1400), new TGCVector3(2, 200, 1200), precipicioTexture)); // derecha
             pEstaticas.Add(new Plataforma(new TGCVector3(3000, -100, 1400), new TGCVector3(2, 200, 1200), precipicioTexture)); // izquierda
             pEstaticas.Add(new Plataforma(new TGCVector3(2500, -100, 2000), new TGCVector3(1000, 200, 2), precipicioTexture)); // frontal
 
             pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(0, -50, 5000), new TGCVector3(200, 50, 200), cajaTexture, new TGCVector3(-200, -50, 5000), new TGCVector3(2f, 0, 0)));
-            // tronco que se desplaza en el precipicio, en X; TODO: Revisar movimiento en conjunto con tgcito
             pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(2075, -60, 1400), new TGCVector3(150, 50, 80), maderaTexture, new TGCVector3(2925, -60, 1400), new TGCVector3(2f, 0, 0)));
 
             pRotantes.Add(new PlataformaRotante(new TGCVector3(0, 100, 300), new TGCVector3(200, 50, 200), cajaTexture, FastMath.PI * 100));
+            pAscensor.Add(new PlataformaAscensor(new TGCVector3(0, -50, 5000), new TGCVector3(200, 50, 200), cajaTexture, 200, 1));
         }
 
         public void update(float deltaTime) {
@@ -119,6 +120,10 @@ namespace TGC.Group.Model {
             }
 
             foreach (var p in pRotantes) {
+                p.update(deltaTime);
+            }
+
+            foreach (var p in pAscensor) {
                 p.update(deltaTime);
             }
         }
@@ -132,7 +137,7 @@ namespace TGC.Group.Model {
                 hielo.Render();
             }
 
-            foreach (var deathplane in pisosMuerte)
+            foreach (var deathplane in pMuerte)
             {
                 deathplane.Render();
             }
@@ -152,6 +157,10 @@ namespace TGC.Group.Model {
             foreach (var p in pRotantes) {
                 p.render();
             }
+
+            foreach (var p in pAscensor) {
+                p.render();
+            }
         }
 
         public void dispose() {
@@ -163,7 +172,7 @@ namespace TGC.Group.Model {
                 hielo.Dispose();
             }
 
-            foreach (var deathplane in pisosMuerte)
+            foreach (var deathplane in pMuerte)
             {
                 deathplane.Dispose();
             }
@@ -183,6 +192,10 @@ namespace TGC.Group.Model {
             foreach (var p in pRotantes) {
                 p.dispose();
             }
+
+            foreach (var p in pAscensor) {
+                p.dispose();
+            }
         }
 
         public List<TgcBoundingAxisAlignBox> getBoundingBoxes() {
@@ -200,6 +213,7 @@ namespace TGC.Group.Model {
             list.AddRange(pEstaticas.Select(caja => caja.getAABB()).ToArray());
             list.AddRange(pDesplazan.Select(caja => caja.getAABB()).ToArray());
             list.AddRange(pRotantes.Select(caja => caja.getAABB()).ToArray());
+            list.AddRange(pAscensor.Select(caja => caja.getAABB()).ToArray());
 
             return list;
         }
@@ -220,6 +234,10 @@ namespace TGC.Group.Model {
             return pRotantes.Select(p => p.getAABB()).Contains(piso);
         }
 
+        public bool esPisoAscensor(TgcBoundingAxisAlignBox piso) {
+            return pAscensor.Select(p => p.getAABB()).Contains(piso);
+        }
+
         public PlataformaDesplazante getPlataformaDesplazante(TgcBoundingAxisAlignBox piso) {
             return pDesplazan.Find(p => p.getAABB() == piso);
         }
@@ -228,8 +246,12 @@ namespace TGC.Group.Model {
             return pRotantes.Find(p => p.getAABB() == piso);
         }
 
+        public PlataformaAscensor getPlataformaAscensor(TgcBoundingAxisAlignBox piso) {
+            return pAscensor.Find(p => p.getAABB() == piso);
+        }
+
         public List<TgcBoundingAxisAlignBox> getDeathPlanes() {
-            return pisosMuerte.Select(p => p.BoundingBox).ToList();
+            return pMuerte.Select(p => p.BoundingBox).ToList();
         }
     }
 }

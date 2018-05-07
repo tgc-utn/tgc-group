@@ -91,6 +91,7 @@
     <Compile Include="Model\Personaje.cs" />
     <Compile Include="Model\Collision\SphereCollisionManager.cs" />
     <Compile Include="Model\Plataforma.cs" />
+    <Compile Include="Model\PlataformaAscensor.cs" />
     <Compile Include="Model\PlataformaDesplazante.cs" />
     <Compile Include="Model\PlataformaRotante.cs" />
     <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />

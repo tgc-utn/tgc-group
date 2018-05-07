@@ -38,9 +38,6 @@ namespace TGC.Group.Model {
         public override void Update() {
             PreUpdate();
 
-            // muevo plataformas
-            nivel.update(ElapsedTime);
-
             // calculo nueva velocidad
             personaje.update(ElapsedTime, Input);
 
@@ -57,11 +54,18 @@ namespace TGC.Group.Model {
                         var plataformaRotante = nivel.getPlataformaRotante(box);
                         personaje.addVelocity(plataformaRotante.getVelAsVector(personaje.getPosition()) * ElapsedTime);
                         personaje.setRotation(plataformaRotante.getAngle());
+                    } else if (nivel.esPisoAscensor(box)) {
+                        personaje.addVelocity(nivel.getPlataformaAscensor(box).getVel());
                     }
+
                     personaje.aterrizar();
                     personaje.setPatinando(nivel.esPisoResbaladizo(box));
                 }
             }
+
+            // muevo plataformas
+            nivel.update(ElapsedTime);
+
 
             // manejo de muerte
             // todo: poner en otra funcion
