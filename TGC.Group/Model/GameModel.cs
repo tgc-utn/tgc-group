@@ -1,3 +1,4 @@
+using Microsoft.DirectX.DirectInput;
 using System;
 using System.Drawing;
 using TGC.Core.Collision;
@@ -61,6 +62,19 @@ namespace TGC.Group.Model {
                     personaje.setPatinando(nivel.esPisoResbaladizo(box));
                 }
             }
+
+            // manejo de muerte
+            // todo: poner en otra funcion
+            foreach (var box in nivel.getDeathPlanes()) {
+                if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), box)) {
+                    personaje.volverAlOrigen();
+                }
+            }
+
+            if (personaje.getPosition().Y < -1500) personaje.volverAlOrigen();
+
+            // tecla de reset
+            if (Input.keyPressed(Key.F9)) personaje.volverAlOrigen();
 
             movement = collisionManager.moveCharacter(
                 personaje.getBoundingSphere(),

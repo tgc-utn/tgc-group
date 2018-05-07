@@ -201,6 +201,13 @@ namespace TGC.Group.Model {
 
         public void volverAlOrigen() {
             mesh.Position = POS_ORIGEN;
+            boundingSphere.setValues(mesh.BoundingBox.calculateBoxCenter(), mesh.BoundingBox.calculateBoxRadius());
+
+            var posicionPies = mesh.BoundingBox.calculateBoxCenter();
+            posicionPies.Y = mesh.BoundingBox.PMin.Y;
+            pies.setValues(posicionPies, 10);
+
+            vel = TGCVector3.Empty;
         }
     }
 }

@@ -16,7 +16,6 @@ namespace TGC.Group.Model {
         List<PlataformaDesplazante> pDesplazan;
         List<PlataformaRotante> pRotantes;
         // List<Bloque> pAscensor;
-        TgcPlane deathPlane;
 
         public Nivel(string mediaDir) {
             pisosNormales = new List<TgcPlane>();
@@ -227,6 +226,10 @@ namespace TGC.Group.Model {
 
         public PlataformaRotante getPlataformaRotante(TgcBoundingAxisAlignBox piso) {
             return pRotantes.Find(p => p.getAABB() == piso);
+        }
+
+        public List<TgcBoundingAxisAlignBox> getDeathPlanes() {
+            return pisosMuerte.Select(p => p.BoundingBox).ToList();
         }
     }
 }
