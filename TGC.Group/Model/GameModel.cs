@@ -10,6 +10,7 @@ using TGC.Core.Textures;
 using TGC.Group.Model;
 using TGC.Group.Model.Vehiculos;
 using TGC.Core.Text;
+using System.Collections.Generic;
 
 namespace TGC.Group.Model
 {
@@ -30,7 +31,13 @@ namespace TGC.Group.Model
         private TgcScene scene;
         private TgcText2D textoVelocidadVehiculo, textoOffsetH, textoOffsetF, textoPosicionVehiculo, textoVectorAdelante, textoVectorCostado;
         private TgcMesh jabon;
+        private TgcMesh cama;
+        private TgcMesh mesaDeLuz;
         private TgcMesh ropero;
+        private TgcMesh armario;
+        private TgcMesh escritorio;
+
+        private List<TgcMesh> losMeshes = new List<TgcMesh>();
 
         public override void Init()
         {
@@ -40,10 +47,15 @@ namespace TGC.Group.Model
             this.scene = loader.loadSceneFromFile(MediaDir + "Texturas\\Habitacion\\escenaFinal-TgcScene.xml");
 
             this.jabon = new TgcSceneLoader().loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Bathroom\\Jabon\\Jabon-TgcScene.xml").Meshes[0];
-            this.ropero = new TgcSceneLoader().loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Habitacion\\Placard\\Placard-TgcScene.xml").Meshes[0];
-            ropero.Move(new TGCVector3(212.34f, 0, -127.89f));
-            ropero.RotateY(FastMath.PI_HALF);
+            this.cama = new TgcSceneLoader().loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Habitacion\\Cama\\Cama-TgcScene.xml").Meshes[0];
+            cama.Move(new TGCVector3(-36f, 0, -124f));
+            cama.RotateY(FastMath.PI);
+            losMeshes.Add(cama);
 
+            this.mesaDeLuz = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\MesaDeLuz\\MesaDeLuz-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, FastMath.PI, 0), new TGCVector3(22f, 0, -158f));
+            this.ropero = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Placard\\Placard-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, -FastMath.PI_HALF, 0), new TGCVector3(-205f ,0, -122f));
+            this.armario = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Armario\\Armario-TgcScene.xml", new TGCVector3(1,1,1), new TGCVector3(0,-FastMath.PI_HALF,0), new TGCVector3(-30f,0,110f));
+            //this.escritorio = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Escritorio\\Escritorio-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, 0, 0), new TGCVector3());
             //creo el vehiculo liviano
             //si quiero crear un vehiculo pesado (camion) hago esto
             // VehiculoPesado camion = new VehiculoPesado(rutaAMesh);
@@ -174,7 +186,6 @@ namespace TGC.Group.Model
 
             this.textoVelocidadVehiculo.render();
 
-            this.ropero.Render();
             this.textoPosicionVehiculo.render();
             this.textoVectorAdelante.render();
             this.textoVectorCostado.render();
@@ -192,6 +203,11 @@ namespace TGC.Group.Model
                             * TGCMatrix.Translation(cubo.Position);
             this.cubo.Render();
             //this.jabon.Render();
+            foreach (var mesh in losMeshes)
+            {
+                mesh.Render();
+            }
+
             this.PostRender();
         }
 
@@ -203,6 +219,18 @@ namespace TGC.Group.Model
             this.cubo.Dispose();
             //Dispose Scene
             this.scene.DisposeAll();
+        }
+
+        private TgcMesh dameMesh(string ruta, TGCVector3 escala, TGCVector3 rotacion, TGCVector3 traslado)
+        {
+            var mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + ruta).Meshes[0];
+            mesh.Scale = escala;
+            mesh.RotateX(rotacion.X);
+            mesh.RotateY(rotacion.Y);
+            mesh.RotateZ(rotacion.Z);
+            mesh.Move(traslado);
+            losMeshes.Add(mesh);
+            return mesh;
         }
     }
 }
