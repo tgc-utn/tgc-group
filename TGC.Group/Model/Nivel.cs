@@ -13,8 +13,8 @@ namespace TGC.Group.Model {
         List<Caja> cajas;
         List<Plataforma> pEstaticas;
         List<PlataformaDesplazante> pDesplazan;
-        // List<Bloque> rotanEjeY;
-        // List<Bloque> desplazanXZ;
+        List<PlataformaRotante> pRotantes;
+        // List<Bloque> pAscensor;
         TgcPlane deathPlane;
 
         public Nivel(string mediaDir) {
@@ -23,6 +23,7 @@ namespace TGC.Group.Model {
             cajas = new List<Caja>();
             pEstaticas = new List<Plataforma>();
             pDesplazan = new List<PlataformaDesplazante>();
+            pRotantes = new List<PlataformaRotante>();
 
             deathPlane = new TgcPlane(/*0, -2000, 0*/);
             // si colisiona con el death plane lo mandamos al origen
@@ -48,11 +49,16 @@ namespace TGC.Group.Model {
             pEstaticas.Add(new Plataforma(new TGCVector3(500, 0, 500), new TGCVector3(100, 500, 3000), pisoTexture));
 
             pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(300, 100, 300), new TGCVector3(200, 50, 200), cajaTexture, new TGCVector3(-300, 100, -300), new TGCVector3(1, 0, 1)));
-        }
 
+            pRotantes.Add(new PlataformaRotante(new TGCVector3(0, 100, 300), new TGCVector3(200, 50, 200), cajaTexture, FastMath.PI_HALF));
+        }
 
         public void update() {
             foreach (var p in pDesplazan) {
+                p.update();
+            }
+
+            foreach (var p in pRotantes) {
                 p.update();
             }
         }
@@ -77,6 +83,10 @@ namespace TGC.Group.Model {
             foreach (var p in pDesplazan) {
                 p.render();
             }
+
+            foreach (var p in pRotantes) {
+                p.render();
+            }
         }
 
         public void dispose() {
@@ -99,6 +109,10 @@ namespace TGC.Group.Model {
             foreach (var p in pDesplazan) {
                 p.dispose();
             }
+
+            foreach (var p in pRotantes) {
+                p.dispose();
+            }
         }
 
         public List<TgcBoundingAxisAlignBox> getBoundingBoxes() {
@@ -115,7 +129,7 @@ namespace TGC.Group.Model {
             list.AddRange(pisosResbaladizos.Select(piso => piso.BoundingBox).ToArray());
             list.AddRange(pEstaticas.Select(caja => caja.getAABB()).ToArray());
             list.AddRange(pDesplazan.Select(caja => caja.getAABB()).ToArray());
-            // list.AddRange(rotanEjeY.Select(caja => caja.getCentro()).ToArray());
+            list.AddRange(pRotantes.Select(caja => caja.getAABB()).ToArray());
 
             return list;
         }
@@ -132,13 +146,16 @@ namespace TGC.Group.Model {
             return pDesplazan.Select(p => p.getAABB()).Contains(piso);
         }
 
+        public bool esPisoRotante(TgcBoundingAxisAlignBox piso) {
+            return pRotantes.Select(p => p.getAABB()).Contains(piso);
+        }
+
         public PlataformaDesplazante getPlataformaDesplazante(TgcBoundingAxisAlignBox piso) {
             return pDesplazan.Find(p => p.getAABB() == piso);
         }
 
-        public bool esPisoRotable(TgcBoundingAxisAlignBox piso) {
-            // return rotanEjeY.Select(p => p.BoundingBox).Contains(piso);
-            return false;
+        public PlataformaRotante getPlataformaRotante(TgcBoundingAxisAlignBox piso) {
+            return pRotantes.Find(p => p.getAABB() == piso);
         }
     }
 }

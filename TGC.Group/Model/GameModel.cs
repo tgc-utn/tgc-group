@@ -51,7 +51,10 @@ namespace TGC.Group.Model {
                 if (TgcCollisionUtils.testSphereAABB(personaje.getPies(), box)) {
                     if (nivel.esPisoDesplazante(box)) {
                         personaje.addVelocity(nivel.getPlataformaDesplazante(box).getVelocity());
-                        Console.WriteLine(nivel.getPlataformaDesplazante(box).getVelocity());
+                    } else if (nivel.esPisoRotante(box)) {
+                        var plataformaRotante = nivel.getPlataformaRotante(box);
+                        personaje.addVelocity(plataformaRotante.getVelAsVector(personaje.getPosition()));
+                        personaje.setRotation(plataformaRotante.getAngle());
                     }
                     personaje.aterrizar();
                     personaje.setPatinando(nivel.esPisoResbaladizo(box));

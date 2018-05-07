@@ -189,5 +189,9 @@ namespace TGC.Group.Model {
         public void addVelocity(TGCVector3 velAdded) {
             vel += velAdded;
         }
+
+        public void setRotation(float angle) {
+            meshAngle = angle;
+        }
     }
 }
