@@ -21,7 +21,7 @@ namespace TGC.Group.Model {
         // podria ser una variable local, la saque aca para debuggear
         private TGCVector3 movement;
 
-        private TGCVector3 VEC_GRAVEDAD = new TGCVector3(0, -0.4f, 0);
+        private TGCVector3 VEC_GRAVEDAD = new TGCVector3(0, -0.25f, 0);
 
         public override void Init() {
             cameraOffset = new TGCVector3(0, 200, 400);

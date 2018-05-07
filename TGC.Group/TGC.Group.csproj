@@ -216,6 +216,7 @@
     <Content Include="bin\Debug\TGC.Core.xml" />
     <Content Include="bin\Debug\TGC.Group.exe" />
     <Content Include="bin\Debug\TGC.Group.pdb" />
+    <Content Include="Media\arena.jpg" />
     <Content Include="Media\BasicHuman\Animations\CrouchWalk-TgcSkeletalAnim.xml" />
     <Content Include="Media\BasicHuman\Animations\FlyingKick-TgcSkeletalAnim.xml" />
     <Content Include="Media\BasicHuman\Animations\HighKick-TgcSkeletalAnim.xml" />
@@ -288,7 +289,11 @@
     <Content Include="Media\Jungla\Textures\SassiWall1.jpg" />
     <Content Include="Media\Jungla\Textures\WoodTexture.jpg" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
+    <Content Include="Media\paredJungla.jpg" />
+    <Content Include="Media\piedra.png" />
     <Content Include="Media\piso.jpg" />
+    <Content Include="Media\pisoJungla.jpg" />
+    <Content Include="Media\precipicio.jpg" />
     <Content Include="Media\Robot\Arrojar-TgcSkeletalAnim.xml" />
     <Content Include="Media\Robot\Caminando-TgcSkeletalAnim.xml" />
     <Content Include="Media\Robot\Correr-TgcSkeletalAnim.xml" />

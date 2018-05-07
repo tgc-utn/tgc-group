@@ -28,15 +28,21 @@ namespace TGC.Group.Model {
             deathPlane = new TgcPlane(/*0, -2000, 0*/);
             // si colisiona con el death plane lo mandamos al origen
 
-            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "piso.jpg");
+            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "pisoJungla.jpg");
             var hieloTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "hielo.jpg");
             var cajaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "caja.jpg");
+            var paredJunglaTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "paredJungla.jpg");
+            var desiertoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "arena.jpg");
+            var piedraTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "piedra.png");
 
             var piso = new TgcPlane(new TGCVector3(-500, 0, -500), new TGCVector3(2500, 0, 2500), TgcPlane.Orientations.XZplane, pisoTexture);
-            pisosNormales.Add(piso);
+            pisosNormales.Add(piso); //piso de la jungla
+
+            piso = new TgcPlane(new TGCVector3(-500, -180, 2600), new TGCVector3(1000, 0, 3500), TgcPlane.Orientations.XZplane, desiertoTexture);
+            pisosNormales.Add(piso); // piso del desierto
 
             piso = new TgcPlane(new TGCVector3(-500, 0, -2500), new TGCVector3(2500, 0, 2000), TgcPlane.Orientations.XZplane, hieloTexture);
-            pisosResbaladizos.Add(piso);
+            pisosResbaladizos.Add(piso); // piso de hielo
 
             /*
             cajas.Add(new Caja(mediaDir, new TGCVector3(-250, 40, -1000))); //coordenada Y = 40 para que tengan 40 hasta
@@ -45,12 +51,30 @@ namespace TGC.Group.Model {
             cajas.Add(new Caja(mediaDir, new TGCVector3(700, 40, 0)));
             */
 
-            pEstaticas.Add(new Plataforma(new TGCVector3(-500, 0, 500), new TGCVector3(100, 500, 3000), pisoTexture));
-            pEstaticas.Add(new Plataforma(new TGCVector3(500, 0, 500), new TGCVector3(100, 500, 3000), pisoTexture));
+            // paredes de la jungla
+            pEstaticas.Add(new Plataforma(new TGCVector3(-500, 150, 500), new TGCVector3(100, 300, 3000), paredJunglaTexture));
+            pEstaticas.Add(new Plataforma(new TGCVector3(500, 150, 500), new TGCVector3(100, 300, 3000), paredJunglaTexture));
+            
+            //paredes del desierto
+            pEstaticas.Add(new Plataforma(new TGCVector3(500, -150, 4350), new TGCVector3(100, 60, 3500), desiertoTexture));
+            pEstaticas.Add(new Plataforma(new TGCVector3(-500, -150, 4350), new TGCVector3(100, 60, 3500), desiertoTexture));
+            pEstaticas.Add(new Plataforma(new TGCVector3(0, -165, 6090), new TGCVector3(900, 70, 20), desiertoTexture));
 
-            pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(300, 100, 300), new TGCVector3(200, 50, 200), cajaTexture, new TGCVector3(-300, 100, -300), new TGCVector3(1, 0, 1)));
+            //escalinatas de piedra, separan jungla de desierto
+            var tamanioEscalinata = new TGCVector3(900, 60, 200);
+            pEstaticas.Add(new Plataforma(new TGCVector3(0, -150, 2500), tamanioEscalinata, piedraTexture));  // escalinata inferior
+            pEstaticas.Add(new Plataforma(new TGCVector3(0, -90, 2300), tamanioEscalinata, piedraTexture));   // escalinata del medio
+            pEstaticas.Add(new Plataforma(new TGCVector3(0, -30, 2100), tamanioEscalinata, piedraTexture));   // escalinata superior
+            pEstaticas.Add(new Plataforma(new TGCVector3(500, -140, 2500), new TGCVector3(100, 80, 200), piedraTexture));  // contornos inferior
+            pEstaticas.Add(new Plataforma(new TGCVector3(-500, -140, 2500), new TGCVector3(100, 80, 200), piedraTexture));
+            pEstaticas.Add(new Plataforma(new TGCVector3(500, -115, 2300), new TGCVector3(100, 130, 200), piedraTexture));  // contornos del medio
+            pEstaticas.Add(new Plataforma(new TGCVector3(-500, -115, 2300), new TGCVector3(100, 130, 200), piedraTexture));
+            pEstaticas.Add(new Plataforma(new TGCVector3(500, -80, 2100), new TGCVector3(100, 200, 200), piedraTexture));  // contornos superior
+            pEstaticas.Add(new Plataforma(new TGCVector3(-500, -80, 2100), new TGCVector3(100, 200, 200), piedraTexture));
 
-            pRotantes.Add(new PlataformaRotante(new TGCVector3(0, 100, 300), new TGCVector3(200, 50, 200), cajaTexture, FastMath.PI_HALF));
+            pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(300, 120, 300), new TGCVector3(200, 50, 200), cajaTexture, new TGCVector3(-300, 100, -300), new TGCVector3(0.5f, 0, 0.5f)));
+
+            pRotantes.Add(new PlataformaRotante(new TGCVector3(0, 100, 300), new TGCVector3(200, 50, 200), cajaTexture, FastMath.QUARTER_PI/4));
         }
 
         public void update() {

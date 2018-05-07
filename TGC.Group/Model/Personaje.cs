@@ -17,7 +17,7 @@ namespace TGC.Group.Model {
 
         // movimiento
         private TGCVector3 vel;
-        private const float WALK_SPEED = 5f;
+        private const float WALK_SPEED = 2f;
         private const float MULT_CORRER = 1.5f;
         private const float MULT_CAMINAR = 0.5f;
         private bool patinando = false;
