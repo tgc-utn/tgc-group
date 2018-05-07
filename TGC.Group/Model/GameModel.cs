@@ -165,15 +165,12 @@ namespace TGC.Group.Model
             this.PreRender();
 
             this.textoVelocidadVehiculo.render();
-<<<<<<< HEAD
-            this.textoAlturaVehiculo.render();
+
             this.ropero.Render();
-=======
             this.textoPosicionVehiculo.render();
             this.textoVectorAdelante.render();
             this.textoVectorCostado.render();
-
->>>>>>> c10cf3e6c0311eb1b60f9567e049e096d1652c44
+            
             this.scene.RenderAll();
             
             this.auto.Transform();
