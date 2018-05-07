@@ -22,8 +22,8 @@ namespace TGC.Group.Model
         private float velocidadActual;
         private float velocidadActualDeSalto;
         protected float velocidadRotacion = 1f;
-        protected float velocidadInicialDeSalto = 60f;
-        protected float velocidadMaximaDeAvance = 300f;
+        protected float velocidadInicialDeSalto = 6f;
+        protected float velocidadMaximaDeAvance = 30f;
         protected float aceleracionAvance = 0.3f;
         protected float aceleracionRetroceso;
         private float aceleracionGravedad = 0.5f;
