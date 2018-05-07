@@ -17,6 +17,7 @@ namespace TGC.Group.Model
         protected List<Rueda> ruedas = new List<Rueda>();
         protected Rueda delanteraIzquierda;
         protected Rueda delanteraDerecha;
+        protected TGCVector3 vectorDireccion;
         private EstadoVehiculo estado;
         private float velocidadActual;
         private float velocidadActualDeSalto;
@@ -41,6 +42,7 @@ namespace TGC.Group.Model
             this.deltaTiempoAvance = new Timer();
             this.deltaTiempoSalto = new Timer();
             this.aceleracionRetroceso = this.aceleracionAvance * 0.8f;
+            this.vectorDireccion = this.vectorAdelante;
         }
 
         public EstadoVehiculo getEstado()
@@ -194,6 +196,16 @@ namespace TGC.Group.Model
             };
         }
 
+        public TGCVector3 getPosicion()
+        {
+            return TGCVector3.transform(new TGCVector3(0, 0, 0), this.transformacion);
+        }
+
+        public TGCVector3 getVectorCostado()
+        {
+            return TGCVector3.Cross(this.vectorAdelante, new TGCVector3(0, 1, 0));
+        }
+
 
         public List<Rueda> GetRuedas()
         {
@@ -213,7 +225,7 @@ namespace TGC.Group.Model
             transformacion = TGCMatrix.RotationY(rotacion) * transformacion;
             foreach (var rueda in ruedas)
             {
-                rueda.RotateAxis(TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)), rotacion);
+                rueda.RotateY(rotacion);
             }
 
         }

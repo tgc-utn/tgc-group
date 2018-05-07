@@ -28,7 +28,7 @@ namespace TGC.Group.Model
         private TGCVector3 camaraDesplazamiento = new TGCVector3(0,5,40);
         private TGCBox cubo;
         private TgcScene scene;
-        private TgcText2D textoVelocidadVehiculo, textoAlturaVehiculo;
+        private TgcText2D textoVelocidadVehiculo, textoAlturaVehiculo, textoPosicionVehiculo, textoVectorAdelante, textoVectorCostado;
         private TgcMesh jabon;
 
         public override void Init()
@@ -94,22 +94,23 @@ namespace TGC.Group.Model
                 this.camaraInterna.OffsetForward -= 0.05f;
             }
 
-            this.textoVelocidadVehiculo = new TgcText2D();
-            string dialogo = "Velocidad = {0}km";
-            this.textoVelocidadVehiculo.Text = string.Format(dialogo, auto.getVelocidadActual());
-            //text3.Align = TgcText2D.TextAlign.RIGHT;
-            this.textoVelocidadVehiculo.Position = new Point(55, 15);
-            this.textoVelocidadVehiculo.Size = new Size(0, 0);
-            this.textoVelocidadVehiculo.Color = Color.Gold;
+            string dialogo;
 
-            this.textoAlturaVehiculo = new TgcText2D();
-            string dialogo2 = "Velocidad salto = {0}";
-            this.textoAlturaVehiculo.Text = string.Format(dialogo2, auto.getVelocidadActualDeSalto());
-            //text3.Align = TgcText2D.TextAlign.RIGHT;
-            this.textoAlturaVehiculo.Position = new Point(55, 25);
-            this.textoAlturaVehiculo.Size = new Size(0, 0);
-            this.textoAlturaVehiculo.Color = Color.Gold;
+            dialogo = "Velocidad = {0}km";
+            dialogo = string.Format(dialogo, auto.getVelocidadActual());
+            textoVelocidadVehiculo = Textos.newText(dialogo, 120, 10);
 
+            dialogo = "Posicion = ({0} | {1} | {2})";
+            dialogo = string.Format(dialogo, auto.getPosicion().X, auto.getPosicion().Y, auto.getPosicion().Z);
+            textoPosicionVehiculo = Textos.newText(dialogo, 120, 25);
+
+            dialogo = "VectorAdelante = ({0} | {1} | {2})";
+            dialogo = string.Format(dialogo, auto.getVectorAdelante().X, auto.getVectorAdelante().Y, auto.getVectorAdelante().Z);
+            textoVectorAdelante = Textos.newText(dialogo, 120, 40);
+
+            dialogo = "VectorCostado = ({0} | {1} | {2})";
+            dialogo = string.Format(dialogo, auto.getVectorCostado().X, auto.getVectorCostado().Y, auto.getVectorCostado().Z);
+            textoVectorCostado = Textos.newText(dialogo, 120, 55);
 
             this.auto.setElapsedTime(ElapsedTime);
 
@@ -165,7 +166,9 @@ namespace TGC.Group.Model
             this.PreRender();
 
             this.textoVelocidadVehiculo.render();
-            this.textoAlturaVehiculo.render();
+            this.textoPosicionVehiculo.render();
+            this.textoVectorAdelante.render();
+            this.textoVectorCostado.render();
 
             this.scene.RenderAll();
             
@@ -185,15 +188,10 @@ namespace TGC.Group.Model
         {
             //Dispose del auto.
             this.auto.dispose();
-
             //Dispose del cubo
             this.cubo.Dispose();
             //Dispose Scene
             this.scene.DisposeAll();
-            //Dispose TextoVelocidadVehiculo
-            this.textoAlturaVehiculo.Dispose();
-            //Dispose TextoAlturaVehiculo
-            this.textoAlturaVehiculo.Dispose();
         }
     }
 }
