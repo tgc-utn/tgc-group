@@ -10,6 +10,7 @@ namespace TGC.Group.Model {
     class Nivel {
         List<TgcPlane> pisosNormales;
         List<TgcPlane> pisosResbaladizos;
+        List<TgcPlane> pisosMuerte;
         List<Caja> cajas;
         List<Plataforma> pEstaticas;
         List<PlataformaDesplazante> pDesplazan;
@@ -24,8 +25,7 @@ namespace TGC.Group.Model {
             pEstaticas = new List<Plataforma>();
             pDesplazan = new List<PlataformaDesplazante>();
             pRotantes = new List<PlataformaRotante>();
-
-            deathPlane = new TgcPlane(/*0, -2000, 0*/);
+            pisosMuerte = new List<TgcPlane>();
             // si colisiona con el death plane lo mandamos al origen
 
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "pisoJungla.jpg");
@@ -40,8 +40,19 @@ namespace TGC.Group.Model {
             var piso = new TgcPlane(new TGCVector3(-500, 0, -500), new TGCVector3(2500, 0, 2500), TgcPlane.Orientations.XZplane, pisoTexture);
             pisosNormales.Add(piso); //piso de la jungla
 
-            piso = new TgcPlane(new TGCVector3(-500, -180, 2600), new TGCVector3(1000, 0, 3500), TgcPlane.Orientations.XZplane, desiertoTexture);
-            pisosNormales.Add(piso); // piso del desierto
+            // pisos del desierto
+            piso = new TgcPlane(new TGCVector3(-500, -180, 2600), new TGCVector3(1000, 0, 700), TgcPlane.Orientations.XZplane, desiertoTexture);
+            pisosNormales.Add(piso); 
+            piso = new TgcPlane(new TGCVector3(-500, -180, 3300), new TGCVector3(350, 0, 800), TgcPlane.Orientations.XZplane, desiertoTexture);
+            pisosNormales.Add(piso);
+            piso = new TgcPlane(new TGCVector3(350, -180, 3300), new TGCVector3(150, 0, 2800), TgcPlane.Orientations.XZplane, desiertoTexture);
+            pisosNormales.Add(piso);
+            piso = new TgcPlane(new TGCVector3(-150, -180, 3500), new TGCVector3(500, 0, 2600), TgcPlane.Orientations.XZplane, desiertoTexture);
+            pisosNormales.Add(piso);
+            piso = new TgcPlane(new TGCVector3(-500, -180, 4100), new TGCVector3(100, 0, 2000), TgcPlane.Orientations.XZplane, desiertoTexture);
+            pisosNormales.Add(piso);
+            piso = new TgcPlane(new TGCVector3(-400, -180, 4900), new TGCVector3(250, 0, 1200), TgcPlane.Orientations.XZplane, desiertoTexture);
+            pisosNormales.Add(piso);
 
             piso = new TgcPlane(new TGCVector3(-500, 0, -3000), new TGCVector3(2500, 0, 2500), TgcPlane.Orientations.XZplane, hieloTexture);
             pisosResbaladizos.Add(piso); // piso de hielo
@@ -59,12 +70,26 @@ namespace TGC.Group.Model {
             pEstaticas.Add(new Plataforma(new TGCVector3(1975, 150, 0), new TGCVector3(50, 300, 1600), paredJunglaTexture)); // borde izquierdo jungla derecha
             pEstaticas.Add(new Plataforma(new TGCVector3(1250, 30, 1990), new TGCVector3(1500, 60, 20), paredJunglaTexture)); // fondo jungla izquierda
 
-            //paredes del desierto; el desierto está a un nivel inferior que la jungla y los glaciares
+            // paredes del desierto; el desierto está a un nivel inferior que la jungla y los glaciares
             pEstaticas.Add(new Plataforma(new TGCVector3(500, -150, 4350), new TGCVector3(100, 60, 3500), desiertoTexture));
             pEstaticas.Add(new Plataforma(new TGCVector3(-500, -150, 4350), new TGCVector3(100, 60, 3500), desiertoTexture));
             pEstaticas.Add(new Plataforma(new TGCVector3(0, -165, 6090), new TGCVector3(900, 70, 20), desiertoTexture));
 
-            //escalinatas de piedra, separan jungla de desierto
+            // precipicios del desierto
+            piso = new TgcPlane(new TGCVector3(-150, -380, 3300), new TGCVector3(500, 0, 200), TgcPlane.Orientations.XZplane, precipicioTexture);
+            pisosMuerte.Add(piso); // precipicio ancho
+            piso = new TgcPlane(new TGCVector3(-400, -380, 4100), new TGCVector3(250, 0, 800), TgcPlane.Orientations.XZplane, precipicioTexture);
+            pisosMuerte.Add(piso); // precipicio largo
+            pEstaticas.Add(new Plataforma(new TGCVector3(100, -280, 3300), new TGCVector3(500, 200, 2), precipicioTexture)); // paredes precipicio ancho
+            pEstaticas.Add(new Plataforma(new TGCVector3(350, -280, 3400), new TGCVector3(2, 200, 200), precipicioTexture));
+            pEstaticas.Add(new Plataforma(new TGCVector3(-150, -280, 3400), new TGCVector3(2, 200, 200), precipicioTexture));
+            pEstaticas.Add(new Plataforma(new TGCVector3(100, -280, 3500), new TGCVector3(500, 200, 2), precipicioTexture));
+            pEstaticas.Add(new Plataforma(new TGCVector3(-275, -280, 4100), new TGCVector3(250, 200, 2), precipicioTexture)); // paredes precipicio largo
+            pEstaticas.Add(new Plataforma(new TGCVector3(-150, -280, 4500), new TGCVector3(2, 200, 800), precipicioTexture));
+            pEstaticas.Add(new Plataforma(new TGCVector3(-400, -280, 4500), new TGCVector3(2, 200, 800), precipicioTexture));
+            pEstaticas.Add(new Plataforma(new TGCVector3(-275, -280, 4900), new TGCVector3(250, 200, 2), precipicioTexture));
+
+            // escalinatas de piedra, separan jungla de desierto
             var tamanioEscalinata = new TGCVector3(900, 60, 200);
             pEstaticas.Add(new Plataforma(new TGCVector3(0, -150, 2500), tamanioEscalinata, piedraTexture));  // escalinata inferior
             pEstaticas.Add(new Plataforma(new TGCVector3(0, -90, 2300), tamanioEscalinata, piedraTexture));   // escalinata del medio
@@ -83,14 +108,14 @@ namespace TGC.Group.Model {
 
             // precipicio del tronco
             piso = new TgcPlane(new TGCVector3(2000, -200, 800), new TGCVector3(1000, 0, 1200), TgcPlane.Orientations.XZplane, precipicioTexture);
-            pisosNormales.Add(piso); //TODO: Configurar el deathplane, deberia ir ahi?
+            pisosMuerte.Add(piso); //TODO: Configurar el deathplane, deberia ir ahi?
             pEstaticas.Add(new Plataforma(new TGCVector3(2500, -100, 800), new TGCVector3(1000, 200, 2), precipicioTexture)); // fondo
             pEstaticas.Add(new Plataforma(new TGCVector3(2000, -100, 1400), new TGCVector3(2, 200, 1200), precipicioTexture)); // derecha
             pEstaticas.Add(new Plataforma(new TGCVector3(3000, -100, 1400), new TGCVector3(2, 200, 1200), precipicioTexture)); // izquierda
             pEstaticas.Add(new Plataforma(new TGCVector3(2500, -100, 2000), new TGCVector3(1000, 200, 2), precipicioTexture)); // frontal
 
             pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(300, 120, 300), new TGCVector3(200, 50, 200), cajaTexture, new TGCVector3(-300, 100, -300), new TGCVector3(0.5f, 0, 0.5f)));
-            // tronco que se desplaza en el precipicio; TODO: Revisar movimiento en conjunto con tgcito
+            // tronco que se desplaza en el precipicio, en X; TODO: Revisar movimiento en conjunto con tgcito
             pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(2075, -60, 1400), new TGCVector3(150, 50, 80), maderaTexture, new TGCVector3(2925, -60, 1400), new TGCVector3(0.2f, 0, 0)));
 
             pRotantes.Add(new PlataformaRotante(new TGCVector3(0, 100, 300), new TGCVector3(200, 50, 200), cajaTexture, FastMath.QUARTER_PI/4));
@@ -113,6 +138,11 @@ namespace TGC.Group.Model {
 
             foreach (var hielo in pisosResbaladizos) {
                 hielo.Render();
+            }
+
+            foreach (var deathplane in pisosMuerte)
+            {
+                deathplane.Render();
             }
 
             foreach (var caja in cajas) {
@@ -139,6 +169,11 @@ namespace TGC.Group.Model {
 
             foreach (var hielo in pisosResbaladizos) {
                 hielo.Dispose();
+            }
+
+            foreach (var deathplane in pisosMuerte)
+            {
+                deathplane.Dispose();
             }
 
             foreach (var caja in cajas) {

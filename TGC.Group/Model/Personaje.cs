@@ -9,6 +9,8 @@ namespace TGC.Group.Model {
         private TgcBoundingSphere boundingSphere;
         private TgcBoundingSphere pies;
 
+        private TGCVector3 POS_ORIGEN = new TGCVector3(0, -170, 5800);
+
         // animaciones
         private TgcSkeletalMesh mesh;
         private float meshAngle;
@@ -17,7 +19,7 @@ namespace TGC.Group.Model {
 
         // movimiento
         private TGCVector3 vel;
-        private const float WALK_SPEED = 2f;
+        private const float WALK_SPEED = 1f;
         private const float MULT_CORRER = 1.5f;
         private const float MULT_CAMINAR = 0.5f;
         private bool patinando = false;
@@ -43,7 +45,7 @@ namespace TGC.Group.Model {
             mesh.buildSkletonMesh();
             mesh.playAnimation("Parado", true);
             mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
-            mesh.Position = new TGCVector3(0, 7.5f, 0);
+            mesh.Position = POS_ORIGEN;
             meshAngle = 0;
             meshAngleAnterior = 0;
 
@@ -192,6 +194,11 @@ namespace TGC.Group.Model {
 
         public void setRotation(float angle) {
             meshAngle = angle;
+        }
+
+        public void volverAlOrigen()
+        {
+            mesh.Position = POS_ORIGEN;
         }
     }
 }
