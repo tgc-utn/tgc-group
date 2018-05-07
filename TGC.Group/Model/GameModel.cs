@@ -11,6 +11,7 @@ using TGC.Group.Model;
 using TGC.Group.Model.Vehiculos;
 using TGC.Core.Text;
 using System.Collections.Generic;
+using TGC.Core.Collision;
 
 namespace TGC.Group.Model
 {
@@ -46,12 +47,12 @@ namespace TGC.Group.Model
             //en caso de querer cargar una escena
             TgcSceneLoader loader = new TgcSceneLoader();
             this.scene = loader.loadSceneFromFile(MediaDir + "Texturas\\Habitacion\\escenaFinal-TgcScene.xml");
-
-            this.jabon = new TgcSceneLoader().loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Bathroom\\Jabon\\Jabon-TgcScene.xml").Meshes[0];
-            this.cama = new TgcSceneLoader().loadSceneFromFile(MediaDir + "MeshCreator\\Meshes\\Habitacion\\Cama\\Cama-TgcScene.xml").Meshes[0];
-            cama.Move(new TGCVector3(-36f, 0, -124f));
-            cama.RotateY(FastMath.PI);
-            losMeshes.Add(cama);
+            foreach (var mesh in scene.Meshes)
+            {
+                losMeshes.Add(mesh);
+            }
+            this.jabon = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\Jabon\\Jabon-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, 0, 0), new TGCVector3(100f, 0f, 10f));
+            this.cama = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Cama\\Cama-TgcScene.xml", new TGCVector3(1,1,1), new TGCVector3(0, FastMath.PI, 0), new TGCVector3(-36f, 0, -124f));
 
             this.mesaDeLuz = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\MesaDeLuz\\MesaDeLuz-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, FastMath.PI, 0), new TGCVector3(22f, 0, -158f));
             this.ropero = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Placard\\Placard-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, -FastMath.PI_HALF, 0), new TGCVector3(-205f ,0, -122f));
@@ -66,7 +67,7 @@ namespace TGC.Group.Model
             this.auto = new Camioneta(MediaDir, new TGCVector3(0f, 0f, 0f));
             this.auto.mesh.AutoTransform = false;
             //creo un cubo para tomarlo de referencia (para ver como se mueve el auto)
-            this.cubo = TGCBox.fromSize(new TGCVector3(-50, 10, -20), new TGCVector3(15, 15, 15), Color.Black);
+            this.cubo = TGCBox.fromSize(new TGCVector3(-50, 0, -20), new TGCVector3(10, 10, 10), Color.Black);
 
             //creo la camara en tercera persona (la clase CamaraEnTerceraPersona hereda de la clase real del framework
             //que te permite configurar la posicion, el lookat, etc. Lo que hacemos al heredar, es reescribir algunos
@@ -135,6 +136,8 @@ namespace TGC.Group.Model
 
             this.auto.setElapsedTime(ElapsedTime);
 
+            TGCMatrix lastPosition = auto.transformacion;
+
             //si el usuario teclea la W y ademas no tecla la D o la A
             if (Input.keyDown(Key.W))
             {
@@ -175,8 +178,57 @@ namespace TGC.Group.Model
             this.auto.getEstado().jumpUpdate();
 
 
-            //Hacer que la camara siga al personaje en su nueva posicion
+            //Hacer que la camara siga al auto.mesh en su nueva posicion
             this.camaraInterna.Target = (TGCVector3.transform(auto.posicion(), auto.transformacion)) + auto.getVectorAdelante() * 30 ;
+
+            bool collide = false;
+            TgcMesh collider = null;
+            foreach (var mesh in losMeshes)
+            {
+                if (TgcCollisionUtils.testAABBAABB(auto.mesh.BoundingBox, mesh.BoundingBox))
+                {
+                    collide = true;
+                    collider = mesh;
+                }
+            }
+            /*
+            if (collide)
+            {
+                    var movementRay = lastPosition - TGCMatrix.Translation(auto.getPosicion());
+                    var rs = TGCVector3.Empty;
+                    if (((auto.mesh.BoundingBox.PMax.X > collider.BoundingBox.PMax.X && movementRay.X > 0) ||
+                        (auto.mesh.BoundingBox.PMin.X < collider.BoundingBox.PMin.X && movementRay.X < 0)) &&
+                        ((auto.mesh.BoundingBox.PMax.Z > collider.BoundingBox.PMax.Z && movementRay.Z > 0) ||
+                        (auto.mesh.BoundingBox.PMin.Z < collider.BoundingBox.PMin.Z && movementRay.Z < 0)))
+                    {
+                        if (auto.mesh.Position.X > collider.BoundingBox.PMin.X && auto.mesh.Position.X < collider.BoundingBox.PMax.X)
+                        {
+                            rs = new TGCVector3(movementRay.X, movementRay.Y, 0);
+                        }
+                        if (auto.mesh.Position.Z > collider.BoundingBox.PMin.Z && auto.mesh.Position.Z < collider.BoundingBox.PMax.Z)
+                        {
+                            rs = new TGCVector3(0, movementRay.Y, movementRay.Z);
+                        }
+
+                    }
+                    else
+                    {
+                        if ((auto.mesh.BoundingBox.PMax.X > collider.BoundingBox.PMax.X && movementRay.X > 0) ||
+                            (auto.mesh.BoundingBox.PMin.X < collider.BoundingBox.PMin.X && movementRay.X < 0))
+                        {
+                            rs = new TGCVector3(0, movementRay.Y, movementRay.Z);
+                        }
+                        if ((auto.mesh.BoundingBox.PMax.Z > collider.BoundingBox.PMax.Z && movementRay.Z > 0) ||
+                            (auto.mesh.BoundingBox.PMin.Z < collider.BoundingBox.PMin.Z && movementRay.Z < 0))
+                        {
+                            rs = new TGCVector3(movementRay.X, movementRay.Y, 0);
+                        }
+                    }
+                    auto.mesh.Position = lastPos - rs;
+            }*/
+
+
+
 
             this.PostUpdate();
         }
@@ -195,16 +247,24 @@ namespace TGC.Group.Model
             this.textoOffsetH.render();
             
             this.scene.RenderAll();
+            foreach (var mesh in losMeshes)
+            {
+                mesh.BoundingBox.Render();
+            }
             
             this.auto.Transform();
             this.auto.Render();
+            this.auto.mesh.BoundingBox.Render();
+            this.jabon.Render();
+            this.jabon.BoundingBox.Render();
 
             this.cubo.Transform =
                 TGCMatrix.Scaling(cubo.Scale)
                             * TGCMatrix.RotationYawPitchRoll(cubo.Rotation.Y, cubo.Rotation.X, cubo.Rotation.Z)
                             * TGCMatrix.Translation(cubo.Position);
+
+            this.cubo.BoundingBox.Render();
             this.cubo.Render();
-            //this.jabon.Render();
             foreach (var mesh in losMeshes)
             {
                 mesh.Render();

@@ -9,6 +9,7 @@ namespace TGC.Group.Model
 {
     abstract class Vehiculo
     {
+        
         public TgcMesh mesh;
         private Timer deltaTiempoAvance;
         private Timer deltaTiempoSalto;
@@ -216,6 +217,7 @@ namespace TGC.Group.Model
         virtual public void Transform()
         {
             this.mesh.Transform = this.transformacion;
+            this.mesh.BoundingBox.transform(transformacion);
             delanteraIzquierda.Transform(TGCVector3.transform(posicion(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)) + new TGCVector3(0, 0.5f, 0));
             delanteraDerecha.Transform(TGCVector3.transform(posicion(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)) + new TGCVector3(0, -0.5f, 0));
         }
