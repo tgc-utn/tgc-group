@@ -186,7 +186,8 @@ namespace TGC.Group.Model
         {
 
             transformacion = transformacion * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
-
+            delanteraIzquierda.RotateAxis(this.vectorAdelante, this.getVelocidadActual());
+            delanteraDerecha.RotateAxis(this.vectorAdelante, this.getVelocidadActual());
             foreach (var rueda in this.ruedas)
             {
                 rueda.RotateAxis(this.vectorAdelante, this.getVelocidadActual());

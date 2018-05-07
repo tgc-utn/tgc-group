@@ -14,7 +14,7 @@ namespace TGC.Group.Model.Vehiculos
         //public TGCMatrix transformacion;
         public TgcMesh mesh;
         public TGCVector3 trasladoInicial;
-        public TGCMatrix escala = TGCMatrix.Scaling(0.05f, 0.05f, 0.05f);
+        public TGCMatrix escala = TGCMatrix.Scaling(0.045f, 0.045f, 0.045f);
         public TGCMatrix traslado;
         public TGCMatrix rotacion = TGCMatrix.RotationY(0);
 
