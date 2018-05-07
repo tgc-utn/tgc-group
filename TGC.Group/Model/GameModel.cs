@@ -37,11 +37,26 @@ namespace TGC.Group.Model {
         public override void Update() {
             PreUpdate();
 
+            // muevo plataformas
+            nivel.update();
+
             // calculo nueva velocidad
             personaje.update(ElapsedTime, Input);
 
             checkearEmpujeCajas();
             aplicarGravedadCajas();
+
+            // checkeo sobre que estoy parado
+            foreach (var box in nivel.getPisos()) {
+                if (TgcCollisionUtils.testSphereAABB(personaje.getPies(), box)) {
+                    if (nivel.esPisoDesplazante(box)) {
+                        personaje.addVelocity(nivel.getPlataformaDesplazante(box).getVelocity());
+                        Console.WriteLine(nivel.getPlataformaDesplazante(box).getVelocity());
+                    }
+                    personaje.aterrizar();
+                    personaje.setPatinando(nivel.esPisoResbaladizo(box));
+                }
+            }
 
             movement = collisionManager.moveCharacter(
                 personaje.getBoundingSphere(),
@@ -52,13 +67,6 @@ namespace TGC.Group.Model {
             // muevo al personaje
             personaje.move(movement);
 
-            // checkeo si estoy sobre hielo
-            foreach (var box in nivel.getBoundingBoxes()) {
-                if (TgcCollisionUtils.testSphereAABB(personaje.getPies(), box)) {
-                    personaje.aterrizar();
-                    personaje.setPatinando(nivel.esPisoResbaladizo(box));
-                }
-            }
 
             Camara.SetCamera(personaje.getPosition() + cameraOffset, personaje.getPosition());
             PostUpdate();

@@ -185,5 +185,9 @@ namespace TGC.Group.Model {
         public void setPatinando(bool b) {
             patinando = b;
         }
+
+        public void addVelocity(TGCVector3 velAdded) {
+            vel += velAdded;
+        }
     }
 }
