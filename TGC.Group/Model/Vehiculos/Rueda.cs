@@ -51,5 +51,10 @@ namespace TGC.Group.Model.Vehiculos
         {
             this.rotacion = TGCMatrix.RotationX(rotacion*0.0001f) * this.rotacion;
         }
+
+        public void RotacionSobreSiMisma(float velocidad)
+        {
+            this.rotacion = TGCMatrix.RotationX(velocidad * 0.0001f) * this.rotacion;
+        }
     }
 }
