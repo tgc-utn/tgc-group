@@ -36,7 +36,7 @@ namespace TGC.Group.Model
         private TgcMesh ropero;
         private TgcMesh armario;
         private TgcMesh escritorio;
-        private TgcMesh silla;
+        private TgcMesh sillaEscritorio;
 
         private List<TgcMesh> losMeshes = new List<TgcMesh>();
 
@@ -57,7 +57,7 @@ namespace TGC.Group.Model
             this.ropero = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Placard\\Placard-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, -FastMath.PI_HALF, 0), new TGCVector3(-205f ,0, -122f));
             this.armario = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Armario\\Armario-TgcScene.xml", new TGCVector3(1,1,1), new TGCVector3(0,-FastMath.PI_HALF,0), new TGCVector3(-30f,0,110f));
             this.escritorio = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Escritorio\\Escritorio-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, 0, 0), new TGCVector3(183f,0f,-107f));
-
+            this.sillaEscritorio = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\SillaEscritorio\\SillaEscritorio-TgcScene.xml", new TGCVector3(0.5f, 0.3f, 0.5f),new TGCVector3(0,0,0), new TGCVector3(151f, -1f, -101f));
             //creo el vehiculo liviano
             //si quiero crear un vehiculo pesado (camion) hago esto
             // VehiculoPesado camion = new VehiculoPesado(rutaAMesh);
