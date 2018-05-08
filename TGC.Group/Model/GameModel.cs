@@ -166,7 +166,7 @@ namespace TGC.Group.Model
 
             //TODO: Redificar estos valores.
             //Obtenemos los valores default
-            var velocidadCaminar = 300f;
+            var velocidadCaminar = 600f;
             var coeficienteSalto = 30f;
             float saltoRealizado = 0;
             var moveForward = 0f;
