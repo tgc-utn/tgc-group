@@ -61,7 +61,7 @@ namespace TGC.Group.Model.Vehiculos.Estados
             //this.move(nuevoDesplazamiento);
             //this.move(auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
             this.move(nuevoDesplazamiento + auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
-            if(TGCVector3.transform(auto.posicion(), auto.transformacion).Y != 0)
+            if(TGCVector3.transform(auto.posicion(), auto.transformacion).Y == 0)
             {
                 auto.getDeltaTiempoSalto().resetear();
                 auto.setVelocidadActualDeSalto(auto.getVelocidadMaximaDeSalto());

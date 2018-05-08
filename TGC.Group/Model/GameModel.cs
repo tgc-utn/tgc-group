@@ -34,7 +34,7 @@ namespace TGC.Group.Model
         private TgcMesh cama, mesaDeLuz, ropero, armario, escritorio, sillaEscritorio, dispenser, mesaCocina, heladera, tacho, sillaCocina1, sillaCocina2, sillaCocina3, muebleCocina;
         private TgcMesh libroCocina1,libroCocina2,libroCocina3;
         private TgcMesh cajaCocina;
-        private TgcMesh mesadaCocina1, mesadaCocina2, cocina;
+        private TgcMesh mesadaCocina1;
         private TgcMesh bathtub, inodoro, cepillo, esponja, jabon, toalla, banqueta, espejo;
         private List<TgcMesh> objetosEscenario = new List<TgcMesh>();
 
@@ -49,7 +49,7 @@ namespace TGC.Group.Model
                 objetosEscenario.Add(mesh);
             }
 
-            this.jabon = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\Jabon\\Jabon-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, 0, 0), new TGCVector3(100f, 0f, 10f));
+            this.jabon = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\Jabon\\Jabon-TgcScene.xml", new TGCVector3(0.7f, 0.7f, 0.7f), new TGCVector3(0, 0, 0), new TGCVector3(-75f, 0f, 265f));
             this.cama = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Cama\\Cama-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, FastMath.PI, 0), new TGCVector3(-36f, 0, -124f));
             this.mesaDeLuz = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\MesaDeLuz\\MesaDeLuz-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, FastMath.PI, 0), new TGCVector3(22f, 0, -158f));
             this.ropero = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Placard\\Placard-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, -FastMath.PI_HALF, 0), new TGCVector3(-205f, 0, -122f));
@@ -72,10 +72,11 @@ namespace TGC.Group.Model
 
             this.bathtub = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\Bathtub\\Bathtub-TgcScene.xml", new TGCVector3(1.5f, 1.8f, 1.5f), new TGCVector3(0, 0, 0), new TGCVector3(-164f, 0f, 270f));
             this.inodoro = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\InodoroCuadrado\\InodoroCuadrado-TgcScene.xml", new TGCVector3(2f, 3f, 3f), new TGCVector3(0, 0, 0), new TGCVector3(-85, 0f, 175));
-            this.cepillo = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\Cepillo\\Cepillo-TgcScene.xml", new TGCVector3(1.4f, 1.4f, 1.4f), new TGCVector3(0, FastMath.QUARTER_PI, 0), new TGCVector3(-140, 0f, 190f));
+            this.cepillo = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\Cepillo\\Cepillo-TgcScene.xml", new TGCVector3(1.4f, 1.4f, 1.4f), new TGCVector3(0, FastMath.QUARTER_PI, 0), new TGCVector3(-125, 0f, 170f));
             this.esponja = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\Esponja\\Esponja-TgcScene.xml", new TGCVector3(1f, 1f, 1f), new TGCVector3(0, FastMath.QUARTER_PI, 0), new TGCVector3(-165, 0f, 190));
             this.banqueta = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Banqueta\\Banqueta-TgcScene.xml", new TGCVector3(0.4f, 0.35f, 0.4f), new TGCVector3(0, 0, 0), new TGCVector3(-170, 0f, 215));
             this.espejo = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\Espejo\\Espejo-TgcScene.xml", new TGCVector3(1f, 1f, 1f), new TGCVector3(0, 0, 0), new TGCVector3(-90f, 0f, 298f));
+
             //this.toalla = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\Toalla\\Toalla-TgcScene.xml", new TGCVector3(1f, 1f, 1f), new TGCVector3(0, FastMath.QUARTER_PI, 0), new TGCVector3(-90, 0f, 245));
 
             //creo el vehiculo liviano
