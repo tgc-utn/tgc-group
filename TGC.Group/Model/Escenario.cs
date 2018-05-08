@@ -51,6 +51,11 @@ namespace TGC.Group.Model
             return ParedesMesh().Exists(pared => TgcCollisionUtils.testAABBAABB(pared.BoundingBox, mesh.BoundingBox));
         }
 
+        public bool colisionaCon(TgcMesh mesh)
+        {
+            return MeshesColisionablesSin("PLATAFORMA").Exists(x => TgcCollisionUtils.testAABBAABB(x.BoundingBox, mesh.BoundingBox));
+        }
+
         public List<Plataforma> Plataformas()
         {
             List<Plataforma> plataformas = new List<Plataforma>();
@@ -61,6 +66,7 @@ namespace TGC.Group.Model
 
                 if (plataformaMesh.Name == "PlataformaY") plataforma = new PlataformaY(plataformaMesh, this);
                 else if (plataformaMesh.Name == "PlataformaX") plataforma = new PlataformaX(plataformaMesh, this);
+                else if (plataformaMesh.Name == "PlataformaZ") plataforma = new PlataformaZ(plataformaMesh, this);
                 else if (plataformaMesh.Name == "PlataformaRotante") plataforma = new PlataformaRotante(plataformaMesh, this);
                 else plataforma = new Plataforma(plataformaMesh, this);
 
@@ -81,6 +87,7 @@ namespace TGC.Group.Model
             meshesColisionables.AddRange(PilaresMesh());
             meshesColisionables.AddRange(ResbalososMesh());
             meshesColisionables.AddRange(PlataformasMesh());
+            
             return meshesColisionables;
         }
 
@@ -125,6 +132,17 @@ namespace TGC.Group.Model
             return obstaculos.ConvertAll(mesh => mesh.BoundingBox);
         }
 
-       
+        public List<TgcMesh> MeshesColisionablesSin(string layer)
+        {
+            List<TgcMesh> obstaculos = MeshesColisionables();
+
+            obstaculos.RemoveAll(mesh => mesh.Layer == layer);
+            
+            return obstaculos;
+        }
+
+
+
+
     }
 }

@@ -74,6 +74,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\AI\PlataformaZ.cs" />
     <Compile Include="Model\PisoInercia.cs" />
     <Compile Include="Model\AI\Plataforma.cs" />
     <Compile Include="Model\AI\PlataformaRotante.cs" />
