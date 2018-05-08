@@ -75,6 +75,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\PisoInercia.cs" />
+    <Compile Include="Model\AI\Plataforma.cs" />
+    <Compile Include="Model\AI\PlataformaRotante.cs" />
+    <Compile Include="Model\AI\PlataformaX.cs" />
+    <Compile Include="Model\AI\PlataformaY.cs" />
     <Compile Include="SphereCollisionUtils\BoundingBoxCollider.cs" />
     <Compile Include="SphereCollisionUtils\Collider.cs" />
     <Compile Include="SphereCollisionUtils\SphereCollisionManager.cs" />
@@ -100,7 +104,7 @@
     <Compile Include="Model\Calculos.cs" />
     <Compile Include="Model\Directorio.cs" />
     <Compile Include="Model\Escenario.cs" />
-    <Compile Include="Model\Personaje.cs" />
+    <Compile Include="Model\DireccionPersonaje.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

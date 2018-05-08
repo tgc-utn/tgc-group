@@ -9,7 +9,7 @@ using TGC.Group.VectorMovement;
 
 namespace TGC.Group.Model
 {
-    class Personaje
+    class DireccionPersonaje
     {
 
         private Calculos calculo = new Calculos();

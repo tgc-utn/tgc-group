@@ -11,6 +11,7 @@ using TGC.Core.Textures;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.Collision;
 using TGC.Core.BoundingVolumes;
+using TGC.Group.Model.AI;
 
 namespace TGC.Group.Model
 {
@@ -24,27 +25,60 @@ namespace TGC.Group.Model
             scene = loader.loadSceneFromFile(pathEscenario);
         }
 
+        
+
         public List<TgcMesh> encontrarMeshes(string clave) => scene.Meshes.FindAll(x => x.Layer == clave);
-        public List<TgcMesh> Paredes() => encontrarMeshes("PAREDES");
-        public List<TgcMesh> Rocas() => encontrarMeshes("ROCAS");
-        public List<TgcMesh> Pisos() => encontrarMeshes("PISOS");
-        public List<TgcMesh> Cajas() => encontrarMeshes("CAJAS");
-        public List<TgcMesh> Sarcofagos() => encontrarMeshes("SARCOFAGOS");
-        public List<TgcMesh> Pilares() => encontrarMeshes("PILARES");
-        public List<TgcMesh> Resbalosos() => encontrarMeshes("RESBALOSOS");
+        public List<TgcMesh> ParedesMesh() => encontrarMeshes("PAREDES");
+        public List<TgcMesh> RocasMesh() => encontrarMeshes("ROCAS");
+        public List<TgcMesh> PisosMesh() => encontrarMeshes("PISOS");
+        public List<TgcMesh> CajasMesh() => encontrarMeshes("CAJAS");
+        public List<TgcMesh> SarcofagosMesh() => encontrarMeshes("SARCOFAGOS");
+        public List<TgcMesh> PilaresMesh() => encontrarMeshes("PILARES");
+        public List<TgcMesh> PlataformasMesh() => encontrarMeshes("PLATAFORMA");
+        public List<TgcMesh> ResbalososMesh() => encontrarMeshes("RESBALOSOS");
+
+        public bool colisionaConPiso(TgcMesh mesh)
+        {
+            return PisosMesh().Exists(piso => TgcCollisionUtils.testAABBAABB(piso.BoundingBox, mesh.BoundingBox));
+        }
+        public bool colisionaConPared(TgcMesh mesh)
+        {
+            return ParedesMesh().Exists(pared => TgcCollisionUtils.testAABBAABB(pared.BoundingBox, mesh.BoundingBox));
+        }
+
+        public List<Plataforma> Plataformas()
+        {
+            List<Plataforma> plataformas = new List<Plataforma>();
+
+            foreach (TgcMesh plataformaMesh in PlataformasMesh())
+            {
+                Plataforma plataforma;
+
+                if (plataformaMesh.Name == "PlataformaY") plataforma = new PlataformaY(plataformaMesh, this);
+                else if (plataformaMesh.Name == "PlataformaX") plataforma = new PlataformaX(plataformaMesh, this);
+                else if (plataformaMesh.Name == "PlataformaRotante") plataforma = new PlataformaRotante(plataformaMesh, this);
+                else plataforma = new Plataforma(plataformaMesh, this);
+
+                plataformas.Add(plataforma);
+            }
+
+            return plataformas;
+        }
 
         public List<TgcMesh> MeshesColisionables()
         {
             List<TgcMesh> meshesColisionables = new List<TgcMesh>();
-            meshesColisionables.AddRange(Paredes());
-            meshesColisionables.AddRange(Rocas());
-            meshesColisionables.AddRange(Pisos());
-            meshesColisionables.AddRange(Cajas());
-            meshesColisionables.AddRange(Sarcofagos());
-            meshesColisionables.AddRange(Pilares());
-            meshesColisionables.AddRange(Resbalosos());
+            meshesColisionables.AddRange(ParedesMesh());
+            meshesColisionables.AddRange(RocasMesh());
+            meshesColisionables.AddRange(PisosMesh());
+            meshesColisionables.AddRange(CajasMesh());
+            meshesColisionables.AddRange(SarcofagosMesh());
+            meshesColisionables.AddRange(PilaresMesh());
+            meshesColisionables.AddRange(ResbalososMesh());
+            meshesColisionables.AddRange(PlataformasMesh());
             return meshesColisionables;
         }
+
 
         public List<TgcBoundingAxisAlignBox> MeshesColisionablesBB()
         {
@@ -53,14 +87,14 @@ namespace TGC.Group.Model
 
         public List<TgcMesh> ObjetosColisionables()
         {
-            return Paredes().Concat(Rocas()).Concat(Cajas()).ToList();
+            return ParedesMesh().Concat(RocasMesh()).Concat(CajasMesh()).ToList();
         }
 
         public List<TgcMesh> ObstaculosColisionablesConCamara()
         {
             List<TgcMesh> obstaculos = new List<TgcMesh>();
-            obstaculos.AddRange(Paredes());
-            obstaculos.AddRange(Rocas());
+            obstaculos.AddRange(ParedesMesh());
+            obstaculos.AddRange(RocasMesh());
 
             return obstaculos;
         }

@@ -13,7 +13,7 @@ using TGC.Core.Collision;
 using System;
 using System.Collections.Generic;
 using TGC.Examples.Collision.SphereCollision;
-
+using TGC.Group.Model.AI;
 
 
 namespace TGC.Group.Model
@@ -38,19 +38,17 @@ namespace TGC.Group.Model
 
 
         private Directorio directorio;
-        /*private TGCVector3 vectorNormalPlanoColisionado;
-        private TGCVector3 vectorNormalPlanoColisionado;*/
         private TgcSkeletalMesh personaje;
         private TgcThirdPersonCamera camaraInterna;
         private Calculos calculo = new Calculos();
 
         private TGCVector3 velocidad = TGCVector3.Empty;
         private TGCVector3 aceleracion = TGCVector3.Empty;
-        private float Ypiso = 25f;
+        private float Ypiso = 20f;
         
 
         //Define direccion del mesh del personaje dependiendo el movimiento
-        private Personaje dirPers = new Personaje();
+        private DireccionPersonaje direccionPersonaje = new DireccionPersonaje();
         private Escenario escenario;
         private TgcMesh objetoMovibleG;
 
@@ -63,7 +61,9 @@ namespace TGC.Group.Model
         private TGCVector3 movimientoRelativoPersonaje = TGCVector3.Empty;
         private TGCVector3 movimientoRealCaja = TGCVector3.Empty;
         private TgcBoundingSphere esferaCaja;
-       
+        TGCVector3 movimientoPorPlataforma = new TGCVector3(0, 0, 0);
+        private bool colisionPlataforma = false;
+        private List<Plataforma> plataformas;
 
 
         private bool boundingBoxActivate = false;
@@ -84,7 +84,7 @@ namespace TGC.Group.Model
             perdiste = false;
             paused = false;
             pisoResb = null;
-            dirPers = new Personaje();
+            direccionPersonaje = new DireccionPersonaje();
             velocidad = TGCVector3.Empty;
             aceleracion = TGCVector3.Empty;
 
@@ -108,7 +108,7 @@ namespace TGC.Group.Model
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
             //Posicion inicial 2
-            personaje.Position = new TGCVector3(0,Ypiso + 20, -6000);
+            personaje.Position = new TGCVector3(-3630, Ypiso, -7600);
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = true;
             
@@ -136,14 +136,10 @@ namespace TGC.Group.Model
 
             ColisionadorEsferico = new SphereCollisionManager();
             ColisionadorEsferico.GravityEnabled = true;
-         
+
+            plataformas = escenario.Plataformas();
+
             
-
-            //piso2 = new PisoInercia(escenario.Resbalosos()[0]);
-            //piso2.AceleracionFrenada = 0.99f;
-
-            //piso2.AutoTransform = true;
-            //piso2.Position = new TGCVector3(500, -25, 0);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
@@ -200,7 +196,7 @@ namespace TGC.Group.Model
 
             if (!paused && !perdiste)
             {
-                RotarMesh();
+                RotarPersonaje();
 
                 if (Input.keyDown(Key.R)) interaccion = true;
                 else interaccion = false;
@@ -239,7 +235,7 @@ namespace TGC.Group.Model
 
                 var SlideVector = TGCVector3.Empty;
 
-                foreach (TgcMesh mesh in escenario.Resbalosos())
+                foreach (TgcMesh mesh in escenario.ResbalososMesh())
                 {
                     if (pisoResb == null)
                     {
@@ -274,10 +270,7 @@ namespace TGC.Group.Model
 
                 moverMundo(movementVector + SlideVector);
 
-                //if (movementVector.X == 0 && movementVector.Z == 0)
-                //{
-                //    piso2.VectorEntrada = TGCVector3.Empty;
-                //}
+               
 
                
                 //Actualizar valores de la linea de movimiento
@@ -308,8 +301,20 @@ namespace TGC.Group.Model
             if (objetoEscenario != null) generarMovimiento(objetoEscenario, movementVector);
 
             movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movementVector, escenario.MeshesColisionablesBB());
-            personaje.Move(movimientoRealPersonaje);
-            
+
+            foreach (Plataforma plataforma in plataformas) plataforma.Update();
+
+            Plataforma plataformaColisionante = plataformas.Find(plataforma => plataforma.colisionaConPersonaje(esferaPersonaje));
+            if (plataformaColisionante != null) colisionPlataforma = true;
+            else colisionPlataforma = false;
+
+            if (colisionPlataforma) movimientoPorPlataforma = plataformaColisionante.VectorMovimiento();
+            else movimientoPorPlataforma = new TGCVector3(0, 0, 0);
+
+            personaje.Move(movimientoRealPersonaje + movimientoPorPlataforma);
+
+            TGCVector3 movimientoCentroEsfera = movimientoPorPlataforma;
+            esferaPersonaje.moveCenter(movimientoCentroEsfera);
         }
 
       
@@ -341,11 +346,11 @@ namespace TGC.Group.Model
         } 
         public TgcMesh obtenerColisionCajaPersonaje()
         {
-            return escenario.Cajas().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.BoundingBox) && caja != objetoMovibleG);
+            return escenario.CajasMesh().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.BoundingBox) && caja != objetoMovibleG);
         }
         public bool colisionConPilar()
         {
-            return escenario.Pilares().Exists(mesh => TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, mesh.BoundingBox));
+            return escenario.PilaresMesh().Exists(mesh => TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, mesh.BoundingBox));
         }
         
         public bool testColisionObjetoPersonaje(TgcMesh objetoColisionable)
@@ -359,7 +364,7 @@ namespace TGC.Group.Model
             return escenario.ObjetosColisionables().Exists(objeto => objeto != box && TgcCollisionUtils.testAABBAABB(box.BoundingBox, objeto.BoundingBox));
         }
 
-        public void RotarMesh()
+        public void RotarPersonaje()
         {
             //Adelante
             if (Input.keyDown(Key.W)) RotateMesh(Key.W);
@@ -382,12 +387,12 @@ namespace TGC.Group.Model
          public void RotateMesh(Key input)
         {
             moving = true;
-            personaje.RotateY(dirPers.RotationAngle(input));
+            personaje.RotateY(direccionPersonaje.RotationAngle(input));
         }
         public void RotateMesh(Key i1, Key i2)
         {
             moving = true;
-            personaje.RotateY(dirPers.RotationAngle(i1,i2));
+            personaje.RotateY(direccionPersonaje.RotationAngle(i1,i2));
         }
 
         public void ajustarCamara()
@@ -447,11 +452,15 @@ namespace TGC.Group.Model
 
             if (!perdiste)
             {
-                DrawText.drawText(/*"Posicion Actual: " + personaje.Position + "\n"
-                                + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
-                                + "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
-                                + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"*/
-                                "ColisESC: " + colisionEscenario()+ "\n", 0, 30, Color.GhostWhite);
+                
+
+                DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
+                           + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
+                           + "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
+                           + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
+                           + "Interaccion Con Caja: " + interaccionConCaja + "\n"
+                           + "Colision Plataforma: " + colisionPlataforma + "\n"
+                           + "Movimiento por plataforma: " + movimientoPorPlataforma, 0, 30, Color.GhostWhite);
 
                 DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
 
