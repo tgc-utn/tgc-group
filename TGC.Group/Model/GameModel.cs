@@ -268,7 +268,6 @@ namespace TGC.Group.Model
             this.scene.RenderAll();
             foreach (var mesh in objetosEscenario)
             {   
-                mesh.updateBoundingBox();
                 mesh.BoundingBox.Render();
                 mesh.Render();
             }
@@ -312,9 +311,7 @@ namespace TGC.Group.Model
                 TGCMatrix matrixTraslacion = TGCMatrix.Translation(traslado);
                 mesh.AutoTransform = false;
                 mesh.Transform = matrixEscalado * matrixRotacionY * matrixTraslacion;
-                mesh.UpdateMeshTransform();
                 mesh.BoundingBox.transform(matrixEscalado * matrixRotacionY * matrixTraslacion);
-                mesh.updateBoundingBox();
                 /*
                     mesh.Scale = escala;
                     mesh.RotateX(rotacion.X);
