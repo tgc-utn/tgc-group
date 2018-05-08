@@ -110,7 +110,7 @@ namespace TGC.Group.Model
             personaje.playAnimation("Parado", true);
 
             //Posicion inicial
-            personaje.Position = new TGCVector3(-4000, Ypiso, -10600);
+            personaje.Position = new TGCVector3(400, Ypiso, -900);
 
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = true;
@@ -374,7 +374,7 @@ namespace TGC.Group.Model
         public bool testColisionCajasObjetos(TgcMesh box)
         {
            // return escenario.Paredes().Exists(pared =>colisionConCajaOrientada(box,pared,movementVector));
-            return escenario.ObjetosColisionables().Exists(objeto => objeto != box && TgcCollisionUtils.testAABBAABB(box.BoundingBox, objeto.BoundingBox));
+            return escenario.ObjetosColisionablesConCajas().Exists(objeto => objeto != box && TgcCollisionUtils.testAABBAABB(box.BoundingBox, objeto.BoundingBox));
         }
 
         public void RotarPersonaje()

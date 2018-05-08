@@ -97,9 +97,13 @@ namespace TGC.Group.Model
             return MeshesColisionables().Select(mesh => mesh.BoundingBox).ToList();
         }
 
-        public List<TgcMesh> ObjetosColisionables()
+        public List<TgcMesh> ObjetosColisionablesConCajas()
         {
-            return ParedesMesh().Concat(RocasMesh()).Concat(CajasMesh()).ToList();
+            return ParedesMesh().Concat(RocasMesh())
+                                .Concat(CajasMesh())
+                                .Concat(SarcofagosMesh())
+                                .Concat(PilaresMesh())
+                                .ToList();
         }
 
         public List<TgcMesh> ObstaculosColisionablesConCamara()
