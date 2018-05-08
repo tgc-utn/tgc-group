@@ -31,8 +31,7 @@ namespace TGC.Group.Model
         private TGCBox cubo;
         private TgcScene scene;
         private TgcText2D textoVelocidadVehiculo, textoOffsetH, textoOffsetF, textoPosicionVehiculo, textoVectorAdelante, textoVectorCostado;
-        private TgcMesh jabon;
-        private TgcMesh cama, mesaDeLuz, ropero, armario, escritorio, sillaEscritorio, dispenser, mesa, heladera, tacho, sillaCocina, muebleCocina;
+        private TgcMesh jabon, cama, mesaDeLuz, ropero, armario, escritorio, sillaEscritorio, dispenser, mesa, heladera, tacho, sillaCocina, muebleCocina;
 
         private List<TgcMesh> objetosEscenario = new List<TgcMesh>();
 
@@ -49,7 +48,6 @@ namespace TGC.Group.Model
 
             this.jabon = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\Jabon\\Jabon-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, 0, 0), new TGCVector3(100f, 0f, 10f));
             this.cama = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Cama\\Cama-TgcScene.xml", new TGCVector3(1,1,1), new TGCVector3(0, FastMath.PI, 0), new TGCVector3(-36f, 0, -124f));
-
             this.mesaDeLuz = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\MesaDeLuz\\MesaDeLuz-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, FastMath.PI, 0), new TGCVector3(22f, 0, -158f));
             this.ropero = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Placard\\Placard-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, -FastMath.PI_HALF, 0), new TGCVector3(-205f ,0, -122f));
             this.armario = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Armario\\Armario-TgcScene.xml", new TGCVector3(1,1,1), new TGCVector3(0,-FastMath.PI_HALF,0), new TGCVector3(-30f,0,110f));
@@ -61,8 +59,8 @@ namespace TGC.Group.Model
             this.tacho = this.dameMesh("MeshCreator\\Meshes\\Cocina\\Tacho\\Tacho-TgcScene.xml", new TGCVector3(0.6f, 0.6f, 0.6f),new TGCVector3(0,0,0), new TGCVector3(-30f, -1f, 165f));
             this.sillaCocina = this.dameMesh("MeshCreator\\Meshes\\Cocina\\Silla\\silla-TgcScene.xml", new TGCVector3(0.5f, 0.5f, 0.5f),new TGCVector3(0,FastMath.QUARTER_PI,0), new TGCVector3(100f, -1f, 310f));
             this.muebleCocina = this.dameMesh("MeshCreator\\Meshes\\Cocina\\Mueble\\Mueble-TgcScene.xml", new TGCVector3(1f, 1f, 0.5f),new TGCVector3(0,0,0), new TGCVector3(10f, -1f, 360f));
-         
 
+            
             //creo el vehiculo liviano
             //si quiero crear un vehiculo pesado (camion) hago esto
             // VehiculoPesado camion = new VehiculoPesado(rutaAMesh);
@@ -252,15 +250,15 @@ namespace TGC.Group.Model
             
             this.scene.RenderAll();
             foreach (var mesh in objetosEscenario)
-            {
+            {   
+                mesh.updateBoundingBox();
                 mesh.BoundingBox.Render();
+                mesh.Render();
             }
             
             this.auto.Transform();
             this.auto.Render();
             this.auto.mesh.BoundingBox.Render();
-            this.jabon.Render();
-            this.jabon.BoundingBox.Render();
 
             this.cubo.Transform =
                 TGCMatrix.Scaling(cubo.Scale)
@@ -269,10 +267,6 @@ namespace TGC.Group.Model
 
             this.cubo.BoundingBox.Render();
             this.cubo.Render();
-            foreach (var mesh in objetosEscenario)
-            {
-                mesh.Render();
-            }
 
             this.PostRender();
         }
@@ -291,23 +285,18 @@ namespace TGC.Group.Model
         {
             TgcScene tgcScene = new TgcSceneLoader().loadSceneFromFile(MediaDir + ruta);
 
-            foreach(var mesh in tgcScene.Meshes)
+            foreach (var mesh in tgcScene.Meshes)
             {
 
-            mesh.Scale = escala;
-            mesh.RotateX(rotacion.X);
-            mesh.RotateY(rotacion.Y);
-            mesh.RotateZ(rotacion.Z);
-            mesh.Move(traslado);
-            /*
-            losMeshes.Add(mesh);
+                mesh.Scale = escala;
+                mesh.RotateX(rotacion.X);
+                mesh.RotateY(rotacion.Y);
+                mesh.RotateZ(rotacion.Z);
+                mesh.Move(traslado);
+                objetosEscenario.Add(mesh);
             }
-
-            var meshZero = tgcScene.Meshes[0];
-            return meshZero;
-            */
-            objetosEscenario.Add(mesh);
-            return mesh;
+            
+            return tgcScene.Meshes[0];
 
         }
     }
