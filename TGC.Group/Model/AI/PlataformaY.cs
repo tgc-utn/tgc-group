@@ -21,7 +21,7 @@ namespace TGC.Group.Model.AI
             this.plataformaMesh = plataformaMesh;
             this.posicionInicial = plataformaMesh.Position;
             this.escenario = escenario;
-            vectorMovimiento = new TGCVector3(0, -1, 0);
+            vectorMovimiento = new TGCVector3(0, -10, 0);
         }
 
 		public override TGCVector3 VectorMovimiento()

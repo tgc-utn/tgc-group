@@ -20,9 +20,8 @@ namespace TGC.Group.Model
     class Directorio
     {
 
-        public string EscenaSelva {get;set;}
-        public string EscenaArena { get; set; }
-        public string EscenaMontania { get; set; }
+        public string EscenaCrash {get;set;}
+        
 
         public string RobotDirectorio { get; set; }
         public string RobotSkeletalMesh { get; set; }
@@ -33,7 +32,7 @@ namespace TGC.Group.Model
 
         public Directorio(string mediaDir)
         {
-            EscenaSelva = mediaDir + "Escenas\\CrashBandicoot-TgcScene.xml";
+            EscenaCrash = mediaDir + "Escenas\\CrashBandicoot-TgcScene.xml";
 
             RobotDirectorio = mediaDir + "Personaje\\Robot\\";
             RobotSkeletalMesh = RobotDirectorio + "Robot-TgcSkeletalMesh.xml";

@@ -23,7 +23,7 @@ namespace TGC.Group.Model.AI
             this.plataformaMesh = plataformaMesh;
             this.posicionInicial = plataformaMesh.Position;
             this.escenario = escenario;
-            vectorMovimiento = new TGCVector3(-20, 0, 0);
+            vectorMovimiento = new TGCVector3(-10, 0, 0);
         }
 
         public override bool colisionaConPersonaje(TgcBoundingSphere esferaPersonaje)
