@@ -34,7 +34,7 @@ namespace TGC.Group.Model
         private TgcMesh jabon;
         private TgcMesh cama, mesaDeLuz, ropero, armario, escritorio, sillaEscritorio, dispenser, mesa, heladera, tacho, sillaCocina, muebleCocina;
 
-        private List<TgcMesh> losMeshes = new List<TgcMesh>();
+        private List<TgcMesh> objetosEscenario = new List<TgcMesh>();
 
         public override void Init()
         {
@@ -44,7 +44,7 @@ namespace TGC.Group.Model
             this.scene = loader.loadSceneFromFile(MediaDir + "Texturas\\Habitacion\\escenaFinal-TgcScene.xml");
             foreach (var mesh in scene.Meshes)
             {
-                losMeshes.Add(mesh);
+                objetosEscenario.Add(mesh);
             }
 
             this.jabon = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\Jabon\\Jabon-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, 0, 0), new TGCVector3(100f, 0f, 10f));
@@ -66,7 +66,7 @@ namespace TGC.Group.Model
             //creo el vehiculo liviano
             //si quiero crear un vehiculo pesado (camion) hago esto
             // VehiculoPesado camion = new VehiculoPesado(rutaAMesh);
-            // se hace esta distinción de vehiculo liviano y pesado por que cada uno tiene diferentes velocidades,
+            // se hace esta distinciÃ³n de vehiculo liviano y pesado por que cada uno tiene diferentes velocidades,
             // peso, salto, etc.
             this.auto = new Camioneta(MediaDir, new TGCVector3(0f, 0f, 0f));
             this.auto.mesh.AutoTransform = false;
@@ -187,7 +187,7 @@ namespace TGC.Group.Model
 
             bool collide = false;
             TgcMesh collider = null;
-            foreach (var mesh in losMeshes)
+            foreach (var mesh in objetosEscenario)
             {
                 if (TgcCollisionUtils.testAABBAABB(auto.mesh.BoundingBox, mesh.BoundingBox))
                 {
@@ -251,7 +251,7 @@ namespace TGC.Group.Model
             this.textoOffsetH.render();
             
             this.scene.RenderAll();
-            foreach (var mesh in losMeshes)
+            foreach (var mesh in objetosEscenario)
             {
                 mesh.BoundingBox.Render();
             }
@@ -269,7 +269,7 @@ namespace TGC.Group.Model
 
             this.cubo.BoundingBox.Render();
             this.cubo.Render();
-            foreach (var mesh in losMeshes)
+            foreach (var mesh in objetosEscenario)
             {
                 mesh.Render();
             }
@@ -299,11 +299,16 @@ namespace TGC.Group.Model
             mesh.RotateY(rotacion.Y);
             mesh.RotateZ(rotacion.Z);
             mesh.Move(traslado);
+            /*
             losMeshes.Add(mesh);
             }
 
             var meshZero = tgcScene.Meshes[0];
             return meshZero;
+            */
+            objetosEscenario.Add(mesh);
+            return mesh;
+
         }
     }
 }
