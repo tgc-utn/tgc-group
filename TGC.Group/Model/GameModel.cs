@@ -12,6 +12,7 @@ using TGC.Group.Model.Vehiculos;
 using TGC.Core.Text;
 using System.Collections.Generic;
 using TGC.Core.Collision;
+using TGC.Core.Sound;
 
 namespace TGC.Group.Model
 {
@@ -24,6 +25,8 @@ namespace TGC.Group.Model
             Name = Game.Default.Name;
             Description = Game.Default.Description;
         }
+
+        private TgcStaticSound sound;
 
         private Camioneta auto;
         private CamaraEnTerceraPersona camaraInterna;
@@ -98,6 +101,22 @@ namespace TGC.Group.Model
             this.camaraInterna = new CamaraEnTerceraPersona(auto.posicion() + camaraDesplazamiento, 0.8f, -33);
             this.Camara = camaraInterna;
 
+            loadSound(MediaDir + "Sound\\eee.wav");
+
+        }
+
+        private void loadSound(string path)
+        {
+            //Borrar sonido anterior
+            if (sound != null)
+            {
+                sound.dispose();
+                sound = null;
+            }
+
+            //Cargar sonido
+            sound = new TgcStaticSound();
+            sound.loadSound(path, DirectSound.DsDevice);
         }
 
         public override void Update()
@@ -163,6 +182,8 @@ namespace TGC.Group.Model
             //si el usuario teclea la W y ademas no tecla la D o la A
             if (Input.keyDown(Key.W))
             {
+                //primera aproximacion de sonido
+                this.sound.play();
                 //hago avanzar al auto hacia adelante. Le paso el Elapsed Time que se utiliza para
                 //multiplicarlo a la velocidad del auto y no depender del hardware del computador
                 this.auto.getEstado().advance();
@@ -203,15 +224,17 @@ namespace TGC.Group.Model
             //Hacer que la camara siga al auto.mesh en su nueva posicion
             this.camaraInterna.Target = (TGCVector3.transform(auto.posicion(), auto.transformacion)) + auto.getVectorAdelante() * 30 ;
 
-            bool collide = false;
+            //bool collide = false;
             TgcMesh collider = null;
             foreach (var mesh in objetosEscenario)
             {
                 if (TgcCollisionUtils.testAABBAABB(auto.mesh.BoundingBox, mesh.BoundingBox))
                 {
-                    collide = true;
+                    //collide = true;
                     collider = mesh;
+                    this.auto.mesh.BoundingBox.setRenderColor(Color.Red);
                 }
+                else this.auto.mesh.BoundingBox.setRenderColor(Color.Yellow);
             }
             /*
             if (collide)
@@ -250,7 +273,8 @@ namespace TGC.Group.Model
             }*/
 
 
-
+            if (this.auto.getVelocidadActual() == 0)
+                this.sound.stop();
 
             this.PostUpdate();
         }
