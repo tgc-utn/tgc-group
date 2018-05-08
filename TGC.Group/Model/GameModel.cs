@@ -39,6 +39,7 @@ namespace TGC.Group.Model
         private TgcMesh cajaCocina;
         private TgcMesh mesadaCocina1;
         private TgcMesh bathtub, inodoro, cepillo, esponja, jabon, toalla, banqueta, espejo;
+        private TgcMesh cajaZapatillas, sillon, escoba;
         private List<TgcMesh> objetosEscenario = new List<TgcMesh>();
 
         public override void Init()
@@ -82,6 +83,9 @@ namespace TGC.Group.Model
             this.banqueta = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Banqueta\\Banqueta-TgcScene.xml", new TGCVector3(0.4f, 0.35f, 0.4f), new TGCVector3(0, 0, 0), new TGCVector3(-170, 0f, 215));
             this.espejo = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\Espejo\\Espejo-TgcScene.xml", new TGCVector3(1f, 1f, 1f), new TGCVector3(0, 0, 0), new TGCVector3(-90f, 0f, 298f));
 
+            this.cajaZapatillas = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\CajaZapatillas\\CajaZapatillas-TgcScene.xml", new TGCVector3(0.5f, 0.5f, 0.5f), new TGCVector3(0, FastMath.PI_HALF, 0), new TGCVector3(100f, 0f, -147f));
+            this.sillon = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Sillon\\Sillon-TgcScene.xml", new TGCVector3(1f, 1f, 1f), new TGCVector3(1.35f, FastMath.PI, 0), new TGCVector3(0f, 22f, 20f));
+            this.escoba = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Escoba\\Escoba-TgcScene.xml", new TGCVector3(1.3f, 1.3f, 1.3f), new TGCVector3(FastMath.PI_HALF, 0, 0), new TGCVector3(-105f, 1f, -60f));
             //this.toalla = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\Toalla\\Toalla-TgcScene.xml", new TGCVector3(1f, 1f, 1f), new TGCVector3(0, FastMath.QUARTER_PI, 0), new TGCVector3(-90, 0f, 245));
 
             //creo el vehiculo liviano
@@ -335,10 +339,12 @@ namespace TGC.Group.Model
                 TGCMatrix matrixRotacionX = TGCMatrix.RotationX(rotacion.X);
                 TGCMatrix matrixRotacionY = TGCMatrix.RotationY(rotacion.Y);
                 TGCMatrix matrixRotacionZ = TGCMatrix.RotationZ(rotacion.Z);
+                TGCMatrix matrixRotacion = matrixRotacionX * matrixRotacionY * matrixRotacionZ;
                 TGCMatrix matrixTraslacion = TGCMatrix.Translation(traslado);
+                TGCMatrix transformacion = matrixEscalado * matrixRotacion * matrixTraslacion;
                 mesh.AutoTransform = false;
-                mesh.Transform = matrixEscalado * matrixRotacionY * matrixTraslacion;
-                mesh.BoundingBox.transform(matrixEscalado * matrixRotacionY * matrixTraslacion);
+                mesh.Transform = transformacion;
+                mesh.BoundingBox.transform(transformacion);
                 objetosEscenario.Add(mesh);
             }
             
