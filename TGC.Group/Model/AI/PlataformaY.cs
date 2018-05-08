@@ -21,7 +21,7 @@ namespace TGC.Group.Model.AI
             this.plataformaMesh = plataformaMesh;
             this.posicionInicial = plataformaMesh.Position;
             this.escenario = escenario;
-            vectorMovimiento = new TGCVector3(0, -10, 0);
+            vectorMovimiento = new TGCVector3(0, -5, 0);
         }
 
 		public override TGCVector3 VectorMovimiento()
@@ -36,7 +36,7 @@ namespace TGC.Group.Model.AI
             TGCVector3 posicionSiguiente = plataformaMesh.Position + vectorMovimiento;
 
             //Si la plataforma colisiona con el piso, cambiamos el sentido de movimiento.
-            if (escenario.colisionaConPiso(plataformaMesh)) vectorMovimiento.Multiply(-1);
+            if (escenario.colisionaConPiso(plataformaMesh) || escenario.colisionaConLava(plataformaMesh)) vectorMovimiento.Multiply(-1);
 
             //Si la plataforma supera en una cierta cantidad de veces a su altura inicial, cambiamos el sentido de movimiento.
             if (posicionSiguiente.Y >= toleranciaLimiteSuperior * posicionInicial.Y) vectorMovimiento.Multiply(-1);

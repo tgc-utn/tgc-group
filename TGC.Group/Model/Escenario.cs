@@ -36,10 +36,15 @@ namespace TGC.Group.Model
         public List<TgcMesh> PilaresMesh() => encontrarMeshes("PILARES");
         public List<TgcMesh> PlataformasMesh() => encontrarMeshes("PLATAFORMA");
         public List<TgcMesh> ResbalososMesh() => encontrarMeshes("RESBALOSOS");
+        public List<TgcMesh> LavaMesh() => encontrarMeshes("LAVA");
 
         public bool colisionaConPiso(TgcMesh mesh)
         {
             return PisosMesh().Exists(piso => TgcCollisionUtils.testAABBAABB(piso.BoundingBox, mesh.BoundingBox));
+        }
+        public bool colisionaConLava(TgcMesh mesh)
+        {
+            return LavaMesh().Exists(lava => TgcCollisionUtils.testAABBAABB(lava.BoundingBox, mesh.BoundingBox));
         }
         public bool colisionaConPared(TgcMesh mesh)
         {

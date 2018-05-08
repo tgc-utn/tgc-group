@@ -68,7 +68,8 @@ namespace TGC.Group.Model
 
         private bool boundingBoxActivate = false;
 
-        private float jumping;
+        private float saltoActual = 0;
+        private bool jumping;
         private bool moving;
 
         private PisoInercia pisoResbaloso = null; //Es null cuando no esta pisando ningun piso resbaloso
@@ -109,7 +110,7 @@ namespace TGC.Group.Model
             personaje.playAnimation("Parado", true);
 
             //Posicion inicial
-            personaje.Position = new TGCVector3(-3630, Ypiso, -7600);
+            personaje.Position = new TGCVector3(-4000, Ypiso, -10600);
 
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = true;
@@ -210,17 +211,22 @@ namespace TGC.Group.Model
                 if (Input.keyDown(Key.R)) interaccionCaja = true;
                 else interaccionCaja = false;
 
-                if (!interaccionCaja) // Para que no se pueda saltar cuando agarras algun objeto
+                //TODO: No debe saltar cuando ya esta saltando
+                // Para que no se pueda saltar cuando agarras algun objeto
+                if (!interaccionCaja)
                 {
-                    if (Input.keyUp(Key.Space) && jumping < coeficienteSalto)
+                    if (Input.keyUp(Key.Space) && saltoActual < coeficienteSalto)
                     {
-                        jumping = coeficienteSalto;
+                        saltoActual = coeficienteSalto;
+                        //jumping = false;
                     }
-                    if (Input.keyUp(Key.Space) || jumping > 0)
+                    if (Input.keyUp(Key.Space) || saltoActual > 0 )
                     {
-                        jumping -= coeficienteSalto * ElapsedTime;
-                        saltoRealizado = jumping;
+                        saltoActual -= coeficienteSalto * ElapsedTime;
+                        saltoRealizado = saltoActual;
+                       // jumping = true;
                     }
+                   
                 }
 
                 //Vector de movimiento
