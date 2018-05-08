@@ -305,20 +305,13 @@ namespace TGC.Group.Model
             {
                 
                 TGCMatrix matrixEscalado = TGCMatrix.Scaling(escala);
-                //TGCMatrix matrixRotacionX = TGCMatrix.RotationX(rotacion.X);
+                TGCMatrix matrixRotacionX = TGCMatrix.RotationX(rotacion.X);
                 TGCMatrix matrixRotacionY = TGCMatrix.RotationY(rotacion.Y);
-                //TGCMatrix matrixRotacionZ = TGCMatrix.RotationZ(rotacion.Z);
+                TGCMatrix matrixRotacionZ = TGCMatrix.RotationZ(rotacion.Z);
                 TGCMatrix matrixTraslacion = TGCMatrix.Translation(traslado);
                 mesh.AutoTransform = false;
                 mesh.Transform = matrixEscalado * matrixRotacionY * matrixTraslacion;
                 mesh.BoundingBox.transform(matrixEscalado * matrixRotacionY * matrixTraslacion);
-                /*
-                    mesh.Scale = escala;
-                    mesh.RotateX(rotacion.X);
-                    mesh.RotateY(rotacion.Y);
-                    mesh.RotateZ(rotacion.Z);
-                    mesh.Move(traslado);
-                */
                 objetosEscenario.Add(mesh);
             }
             
