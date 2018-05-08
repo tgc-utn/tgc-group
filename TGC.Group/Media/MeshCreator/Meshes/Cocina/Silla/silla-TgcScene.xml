@@ -11,7 +11,7 @@
 				<specular>[229.5,229.5,229.5,255.0]</specular>
 				<opacity>100.0</opacity>
 				<alphaBlendEnable>false</alphaBlendEnable>
-				<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>Roble-rústico.jpg</bitmap>
+				<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>Roble-rustico.jpg</bitmap>
 			</subM>
 			<subM name='Material #3' type='Standardmaterial'>
 				<ambient>[149.94,149.94,149.94,255.0]</ambient>
