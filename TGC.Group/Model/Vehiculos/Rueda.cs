@@ -14,13 +14,14 @@ namespace TGC.Group.Model.Vehiculos
         //public TGCMatrix transformacion;
         public TgcMesh mesh;
         public TGCVector3 trasladoInicial;
-        public TGCMatrix escala = TGCMatrix.Scaling(0.0045f, 0.0045f, 0.0045f);
+        public TGCMatrix escala;
         public TGCMatrix traslado;
         public TGCMatrix rotacion = TGCMatrix.RotationY(0);
 
-        public Rueda(TgcMesh mesh,TGCVector3 traslado)
+        public Rueda(TgcMesh mesh,TGCVector3 traslado, TGCVector3 escalado)
         {
             this.mesh = mesh;
+            this.escala = TGCMatrix.Scaling(escalado);
             mesh.AutoTransform = false;
             trasladoInicial = traslado;
         }

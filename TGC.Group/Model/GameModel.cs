@@ -93,7 +93,7 @@ namespace TGC.Group.Model
             // VehiculoPesado camion = new VehiculoPesado(rutaAMesh);
             // se hace esta distinción de vehiculo liviano y pesado por que cada uno tiene diferentes velocidades,
             // peso, salto, etc.
-            this.auto = new Camioneta(MediaDir, new TGCVector3(0f, 0f, 0f));
+            this.auto = new Camioneta(MediaDir, new TGCVector3(-100f, 0f, 0f));
             this.auto.mesh.AutoTransform = false;
             //creo un cubo para tomarlo de referencia (para ver como se mueve el auto)
             this.cubo = TGCBox.fromSize(new TGCVector3(-50, 0, -20), new TGCVector3(10, 10, 10), Color.Black);
@@ -238,7 +238,10 @@ namespace TGC.Group.Model
                     collider = mesh;
                     this.auto.mesh.BoundingBox.setRenderColor(Color.Red);
                 }
-                else this.auto.mesh.BoundingBox.setRenderColor(Color.Yellow);
+                else
+                {
+                    this.auto.mesh.BoundingBox.setRenderColor(Color.Yellow);
+                }
             }
             /*
             if (collide)

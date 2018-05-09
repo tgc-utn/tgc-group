@@ -31,6 +31,7 @@ namespace TGC.Group.Model
         private float elapsedTime;
         protected float constanteDeRozamiento = 0.2f;
         protected float constanteFrenado = 1f;
+        protected TGCVector3 escaladoInicial = new TGCVector3(0.005f, 0.005f, 0.005f);
 
         public Vehiculo(string mediaDir, TGCVector3 posicionInicial)
         {
@@ -57,7 +58,7 @@ namespace TGC.Group.Model
             TgcScene scene = loader.loadSceneFromFile(rutaAMesh);
             this.mesh = scene.Meshes[0];
             var rotacion = TGCMatrix.RotationY(FastMath.PI);
-            var escala = TGCMatrix.Scaling(0.005f, 0.005f, 0.005f);
+            var escala = TGCMatrix.Scaling(this.escaladoInicial);
             var traslado = TGCMatrix.Translation(posicionInicial.X, posicionInicial.Y, posicionInicial.Z);
 
             this.transformacion = escala * rotacion * traslado;

@@ -18,13 +18,13 @@ namespace TGC.Group.Model.Vehiculos
             TgcMesh ruedaDerecha = ruedaIzquierda.clone("ruedaDerecha");
             TgcMesh ruedaTraseraIzquierda = ruedaIzquierda.clone("ruedaTraseraIzquierda");
             TgcMesh ruedaTraseraDerecha = ruedaIzquierda.clone("ruedaTraseraDerecha");
-            delanteraIzquierda = new Rueda(ruedaIzquierda, new TGCVector3(3.1f, 0, 1.7f));
-            delanteraDerecha = new Rueda(ruedaDerecha, new TGCVector3(3.1f, 0, -1.7f));
+            delanteraIzquierda = new Rueda(ruedaIzquierda, new TGCVector3(0.3f, 0, 0.18f), this.escaladoInicial);
+            delanteraDerecha = new Rueda(ruedaDerecha, new TGCVector3(0.3f, 0, -0.18f), this.escaladoInicial);
             delanteraIzquierda.Transform(TGCVector3.transform(posicion(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)));
             delanteraDerecha.Transform(TGCVector3.transform(posicion(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)));
 
-            ruedas.Add(new Rueda(ruedaTraseraIzquierda, new TGCVector3(-2.7f, 0, 1.55f)));
-            ruedas.Add(new Rueda(ruedaTraseraDerecha, new TGCVector3(-2.7f, 0, -1.7f)));
+            ruedas.Add(new Rueda(ruedaTraseraIzquierda, new TGCVector3(-0.3f, 0, 0.18f), this.escaladoInicial));
+            ruedas.Add(new Rueda(ruedaTraseraDerecha, new TGCVector3(-0.3f, 0, -0.18f), this.escaladoInicial));
 
             foreach (var rueda in ruedas)
             {
