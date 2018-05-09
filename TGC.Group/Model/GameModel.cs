@@ -239,6 +239,7 @@ namespace TGC.Group.Model
                     collider = mesh;
                     this.auto.mesh.BoundingBox.setRenderColor(Color.Red);
                     mesh.BoundingBox.setRenderColor(Color.Red);
+                    this.auto.setVelocidadActual(-this.auto.getVelocidadActual()*4);
                 }
                 else
                 {
