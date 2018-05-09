@@ -110,8 +110,10 @@ namespace TGC.Group.Model {
             pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(0, -50, 5000), new TGCVector3(200, 50, 200), cajaTexture, new TGCVector3(-200, -50, 5000), new TGCVector3(2f, 0, 0)));
             pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(2075, -60, 1400), new TGCVector3(150, 50, 80), maderaTexture, new TGCVector3(2925, -60, 1400), new TGCVector3(2f, 0, 0)));
 
-            pRotantes.Add(new PlataformaRotante(new TGCVector3(0, 100, 300), new TGCVector3(200, 50, 200), cajaTexture, FastMath.PI * 100));
-            pAscensor.Add(new PlataformaAscensor(new TGCVector3(0, -50, 5000), new TGCVector3(200, 50, 200), cajaTexture, 200, 1));
+            pRotantes.Add(new PlataformaRotante(new TGCVector3(0, 50, 300), new TGCVector3(200, 50, 200), cajaTexture, FastMath.PI * 100));
+            pAscensor.Add(new PlataformaAscensor(new TGCVector3(0, -200, 5200), new TGCVector3(200, 50, 200), cajaTexture, 200, 1));
+
+            cajas.Add(new Caja(mediaDir, new TGCVector3(0, 0, 5800)));
         }
 
         public void update(float deltaTime) {
@@ -202,7 +204,7 @@ namespace TGC.Group.Model {
             var list = new List<TgcBoundingAxisAlignBox>();
             list.AddRange(getPisos().ToArray());
             list.AddRange(cajas.Select(caja => caja.getSuperior()).ToArray());
-            list.AddRange(cajas.Select(caja => caja.getCuerpo()).ToArray());
+            // list.AddRange(cajas.Select(caja => caja.getCuerpo()).ToArray());
             return list;
         }
 

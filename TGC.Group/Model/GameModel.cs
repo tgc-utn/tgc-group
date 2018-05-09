@@ -32,7 +32,7 @@ namespace TGC.Group.Model {
             collisionManager = new SphereCollisionManager();
             collisionManager.GravityEnabled = true;
             collisionManager.GravityForce = VEC_GRAVEDAD;
-            collisionManager.SlideFactor = 10f;
+            collisionManager.SlideFactor = 1.3f;
         }
 
         public override void Update() {
@@ -43,6 +43,9 @@ namespace TGC.Group.Model {
 
             checkearEmpujeCajas();
             aplicarGravedadCajas();
+
+            nivel.update(ElapsedTime);
+
 
             // checkeo sobre que estoy parado
             // TODO: hacer funcion aparte
@@ -62,9 +65,6 @@ namespace TGC.Group.Model {
                     personaje.setPatinando(nivel.esPisoResbaladizo(box));
                 }
             }
-
-            // muevo plataformas
-            nivel.update(ElapsedTime);
 
 
             // manejo de muerte
