@@ -230,6 +230,7 @@ namespace TGC.Group.Model
 
             //bool collide = false;
             TgcMesh collider = null;
+            this.auto.mesh.BoundingBox.setRenderColor(Color.Yellow);
             foreach (var mesh in objetosEscenario)
             {
                 if (TgcCollisionUtils.testAABBAABB(auto.mesh.BoundingBox, mesh.BoundingBox))
