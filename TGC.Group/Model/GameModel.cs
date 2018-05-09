@@ -9,6 +9,7 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Group.Model;
 using TGC.Group.Model.Vehiculos;
+using TGC.Group.Model.Vehiculos.Estados;
 using TGC.Core.Text;
 using System.Collections.Generic;
 using TGC.Core.Collision;
@@ -240,6 +241,7 @@ namespace TGC.Group.Model
                     this.auto.mesh.BoundingBox.setRenderColor(Color.Red);
                     mesh.BoundingBox.setRenderColor(Color.Red);
                     this.auto.setVelocidadActual(-this.auto.getVelocidadActual()*4);
+                    this.auto.setEstado(new Backward(this.auto));
                 }
                 else
                 {
