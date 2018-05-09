@@ -237,11 +237,13 @@ namespace TGC.Group.Model
                     //collide = true;
                     collider = mesh;
                     this.auto.mesh.BoundingBox.setRenderColor(Color.Red);
+                    mesh.BoundingBox.setRenderColor(Color.Red);
                 }
                 else
                 {
-                    this.auto.mesh.BoundingBox.setRenderColor(Color.Yellow);
+                    mesh.BoundingBox.setRenderColor(Color.Yellow);
                 }
+
             }
             /*
             if (collide)
