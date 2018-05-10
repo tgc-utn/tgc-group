@@ -89,6 +89,7 @@
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
     <Compile Include="Model\CamaraEnTerceraPersona.cs" />
+    <Compile Include="Model\Objeto.cs" />
     <Compile Include="Model\Textos.cs" />
     <Compile Include="Model\OperacionesConVectores.cs" />
     <Compile Include="Model\GameModel.cs" />

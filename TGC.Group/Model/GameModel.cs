@@ -34,14 +34,14 @@ namespace TGC.Group.Model
         private TGCVector3 camaraDesplazamiento = new TGCVector3(0,5,40);
         private TgcText2D textoVelocidadVehiculo, textoOffsetH, textoOffsetF, textoPosicionVehiculo, textoVectorAdelante, textoVectorCostado;
         //escena
-        private TgcMesh scene;
+        private Objeto scene;
         //habitacion
-        private TgcMesh cajaZapatillas, sillon, escoba, cama, mesaDeLuz, ropero, armario, escritorio, sillaEscritorio;
+        private Objeto cajaZapatillas, sillon, escoba, cama, mesaDeLuz, ropero, armario, escritorio, sillaEscritorio;
         //cocina
-        private TgcMesh mesadaCocina1, cajaCocina, dispenser, mesaCocina, heladera, tacho, sillaCocina1, sillaCocina2, sillaCocina3, muebleCocina, libroCocina1, libroCocina2, libroCocina3;
+        private Objeto mesadaCocina1, cajaCocina, dispenser, mesaCocina, heladera, tacho, sillaCocina1, sillaCocina2, sillaCocina3, muebleCocina, libroCocina1, libroCocina2, libroCocina3;
         //banio
-        private TgcMesh bathtub, inodoro, cepillo, esponja, jabon, banqueta, espejo;
-        private List<TgcMesh> objetosEscenario = new List<TgcMesh>();
+        private Objeto bathtub, inodoro, cepillo, esponja, jabon, banqueta, espejo;
+        private List<Objeto> objetosEscenario = new List<Objeto>();
 
         public override void Init()
         {
@@ -215,20 +215,19 @@ namespace TGC.Group.Model
             //bool collide = false;
             TgcMesh collider = null;
             this.auto.mesh.BoundingBox.setRenderColor(Color.Yellow);
-            foreach (var mesh in objetosEscenario)
+            foreach (Objeto objeto in objetosEscenario)
             {
-                if (TgcCollisionUtils.testAABBAABB(auto.mesh.BoundingBox, mesh.BoundingBox))
+                if ((collider = objeto.TestColision(auto.mesh)) != null)
                 {
-                    //collide = true;
-                    collider = mesh;
                     this.auto.mesh.BoundingBox.setRenderColor(Color.Red);
-                    mesh.BoundingBox.setRenderColor(Color.Red);
-                    this.auto.SetVelocidadActual(-this.auto.GetVelocidadActual()*4);
+                    collider.BoundingBox.setRenderColor(Color.Red);
+                    this.auto.SetVelocidadActual(-this.auto.GetVelocidadActual() * 4);
                     this.auto.SetEstado(new Backward(this.auto));
                 }
+
                 else
                 {
-                    mesh.BoundingBox.setRenderColor(Color.Yellow);
+                    objeto.SetColorBoundingBox(Color.Yellow);
                 }
 
             }
@@ -288,10 +287,10 @@ namespace TGC.Group.Model
             this.textoOffsetF.render();
             this.textoOffsetH.render();
             
-            foreach (var mesh in objetosEscenario)
+            foreach (Objeto objeto in objetosEscenario)
             {   
-                mesh.BoundingBox.Render();
-                mesh.Render();
+                objeto.RenderBoundingBox();
+                objeto.Render();
             }
             
             this.auto.Transform();
@@ -305,29 +304,28 @@ namespace TGC.Group.Model
         {
             //Dispose del auto.
             this.auto.Dispose();
+            foreach (Objeto objeto in objetosEscenario)
+            {
+                objeto.Dispose();
+            }
         }
 
-        private TgcMesh dameMesh(string ruta, TGCVector3 escala, TGCVector3 rotacion, TGCVector3 traslado)
+        private Objeto dameMesh(string ruta, TGCVector3 escala, TGCVector3 rotacion, TGCVector3 traslado)
         {
             TgcScene tgcScene = new TgcSceneLoader().loadSceneFromFile(MediaDir + ruta);
 
-            foreach (var mesh in tgcScene.Meshes)
-            {
-                
-                TGCMatrix matrixEscalado = TGCMatrix.Scaling(escala);
-                TGCMatrix matrixRotacionX = TGCMatrix.RotationX(rotacion.X);
-                TGCMatrix matrixRotacionY = TGCMatrix.RotationY(rotacion.Y);
-                TGCMatrix matrixRotacionZ = TGCMatrix.RotationZ(rotacion.Z);
-                TGCMatrix matrixRotacion = matrixRotacionX * matrixRotacionY * matrixRotacionZ;
-                TGCMatrix matrixTraslacion = TGCMatrix.Translation(traslado);
-                TGCMatrix transformacion = matrixEscalado * matrixRotacion * matrixTraslacion;
-                mesh.AutoTransform = false;
-                mesh.Transform = transformacion;
-                mesh.BoundingBox.transform(transformacion);
-                objetosEscenario.Add(mesh);
-            }
-            
-            return tgcScene.Meshes[0];
+            TGCMatrix matrixEscalado = TGCMatrix.Scaling(escala);
+            TGCMatrix matrixRotacionX = TGCMatrix.RotationX(rotacion.X);
+            TGCMatrix matrixRotacionY = TGCMatrix.RotationY(rotacion.Y);
+            TGCMatrix matrixRotacionZ = TGCMatrix.RotationZ(rotacion.Z);
+            TGCMatrix matrixRotacion = matrixRotacionX * matrixRotacionY * matrixRotacionZ;
+            TGCMatrix matrixTraslacion = TGCMatrix.Translation(traslado);
+            TGCMatrix transformacion = matrixEscalado * matrixRotacion * matrixTraslacion;
+
+            Objeto nuevoObjeto = new Objeto(tgcScene.Meshes, transformacion);
+            objetosEscenario.Add(nuevoObjeto);
+
+            return nuevoObjeto;
 
         }
     }
