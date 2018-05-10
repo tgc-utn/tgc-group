@@ -166,8 +166,6 @@ namespace TGC.Group.Model
 
             this.auto.SetElapsedTime(ElapsedTime);
 
-            TGCMatrix lastPosition = auto.transformacion;
-
             //si el usuario teclea la W y ademas no tecla la D o la A
             if (Input.keyDown(Key.W))
             {
@@ -209,7 +207,7 @@ namespace TGC.Group.Model
 
 
             //Hacer que la camara siga al auto.mesh en su nueva posicion
-            this.camaraInterna.Target = (TGCVector3.transform(auto.GetPosicionCero(), auto.transformacion)) + auto.GetVectorAdelante() * 30 ;
+            this.camaraInterna.Target = (TGCVector3.transform(auto.GetPosicionCero(), auto.GetTransformacion())) + auto.GetVectorAdelante() * 30 ;
 
             //bool collide = false;
             TgcMesh collider = null;

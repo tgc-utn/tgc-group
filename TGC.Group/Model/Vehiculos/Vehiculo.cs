@@ -9,12 +9,12 @@ namespace TGC.Group.Model
 {
     abstract class Vehiculo
     {
-        
+
         public TgcMesh mesh;
         private Timer deltaTiempoAvance;
         private Timer deltaTiempoSalto;
         public TGCVector3 vectorAdelante;
-        public TGCMatrix transformacion;
+        public TGCMatrix traslado, rotado, escalado;
         protected List<Rueda> ruedas = new List<Rueda>();
         protected Rueda delanteraIzquierda;
         protected Rueda delanteraDerecha;
@@ -32,6 +32,8 @@ namespace TGC.Group.Model
         protected float constanteDeRozamiento = 0.2f;
         protected float constanteFrenado = 1f;
         protected TGCVector3 escaladoInicial = new TGCVector3(0.005f, 0.005f, 0.005f);
+        //se guarda el traslado inicial porque se usa como pivote
+        protected TGCMatrix trasladoInicial;
 
         public Vehiculo(string mediaDir, TGCVector3 posicionInicial)
         {
@@ -45,6 +47,8 @@ namespace TGC.Group.Model
             this.deltaTiempoSalto = new Timer();
             this.aceleracionRetroceso = this.aceleracionAvance * 0.8f;
             this.vectorDireccion = this.vectorAdelante;
+
+
         }
 
         public EstadoVehiculo GetEstado()
@@ -57,11 +61,11 @@ namespace TGC.Group.Model
             TgcSceneLoader loader = new TgcSceneLoader();
             TgcScene scene = loader.loadSceneFromFile(rutaAMesh);
             this.mesh = scene.Meshes[0];
-            var rotacion = TGCMatrix.RotationY(FastMath.PI);
-            var escala = TGCMatrix.Scaling(this.escaladoInicial);
-            var traslado = TGCMatrix.Translation(posicionInicial.X, posicionInicial.Y, posicionInicial.Z);
+            this.rotado = TGCMatrix.RotationY(FastMath.PI);
+            this.escalado = TGCMatrix.Scaling(this.escaladoInicial);
+            this.traslado = TGCMatrix.Translation(posicionInicial.X, posicionInicial.Y, posicionInicial.Z);
+            this.trasladoInicial = traslado;
 
-            this.transformacion = escala * rotacion * traslado;
         }
 
         public void SetVectorAdelante(TGCVector3 vector)
@@ -189,7 +193,7 @@ namespace TGC.Group.Model
         public void Move(TGCVector3 desplazamiento)
         {
 
-            transformacion = transformacion * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
+            this.traslado = this.traslado * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
             delanteraIzquierda.RotateAxis(this.vectorAdelante, this.GetVelocidadActual());
             delanteraDerecha.RotateAxis(this.vectorAdelante, this.GetVelocidadActual());
             foreach (var rueda in this.ruedas)
@@ -200,7 +204,7 @@ namespace TGC.Group.Model
 
         public TGCVector3 GetPosicion()
         {
-            return TGCVector3.transform(new TGCVector3(0, 0, 0), this.transformacion);
+            return TGCVector3.transform(new TGCVector3(0, 0, 0), this.rotado * this.traslado);
         }
 
         public TGCVector3 GetVectorCostado()
@@ -217,15 +221,21 @@ namespace TGC.Group.Model
 
         virtual public void Transform()
         {
-            this.mesh.Transform = this.transformacion;
+            var transformacion = GetTransformacion();
+            this.mesh.Transform = transformacion;
             this.mesh.BoundingBox.transform(transformacion);
             delanteraIzquierda.Transform(TGCVector3.transform(GetPosicionCero(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)) + new TGCVector3(0, 0.5f, 0));
             delanteraDerecha.Transform(TGCVector3.transform(GetPosicionCero(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)) + new TGCVector3(0, -0.5f, 0));
         }
 
+        public TGCMatrix GetTransformacion()
+        {
+            return this.escalado * this.rotado * this.traslado;
+        }
+
         public void Rotate(float rotacion)
         {
-            transformacion = TGCMatrix.RotationY(rotacion) * transformacion;
+            this.rotado = TGCMatrix.RotationY(rotacion) * this.rotado;
             foreach (var rueda in ruedas)
             {
                 rueda.RotateY(rotacion);
