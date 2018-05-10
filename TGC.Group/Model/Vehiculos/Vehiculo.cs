@@ -37,7 +37,7 @@ namespace TGC.Group.Model
         {
             this.estado = new Stopped(this);
             this.vectorAdelante = new TGCVector3(0, 0, 1);
-            this.crearMesh(mediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml", posicionInicial);
+            this.CrearMesh(mediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml", posicionInicial);
             this.velocidadActual = 0f;
             this.velocidadActualDeSalto = this.velocidadInicialDeSalto;
             this.elapsedTime = 0f;
@@ -47,12 +47,12 @@ namespace TGC.Group.Model
             this.vectorDireccion = this.vectorAdelante;
         }
 
-        public EstadoVehiculo getEstado()
+        public EstadoVehiculo GetEstado()
         {
             return estado;
         }
 
-        private void crearMesh(string rutaAMesh, TGCVector3 posicionInicial)
+        private void CrearMesh(string rutaAMesh, TGCVector3 posicionInicial)
         {
             TgcSceneLoader loader = new TgcSceneLoader();
             TgcScene scene = loader.loadSceneFromFile(rutaAMesh);
@@ -64,44 +64,44 @@ namespace TGC.Group.Model
             this.transformacion = escala * rotacion * traslado;
         }
 
-        public void setVectorAdelante(TGCVector3 vector)
+        public void SetVectorAdelante(TGCVector3 vector)
         {
             this.vectorAdelante = vector;
         }
 
-        public float getVelocidadDeRotacion()
+        public float GetVelocidadDeRotacion()
         {
             return this.velocidadRotacion;
         }
 
         //sirve para imprimirlo por pantalla
-        public float getVelocidadActualDeSalto()
+        public float GetVelocidadActualDeSalto()
         {
             return this.velocidadActualDeSalto;
         }
 
-        public float velocidadFisica()
+        public float VelocidadFisica()
         {
             return System.Math.Min(this.velocidadMaximaDeAvance, this.velocidadActual + this.aceleracionAvance * this.deltaTiempoAvance.tiempoTranscurrido());
         }
 
-        public float velocidadFisicaRetroceso()
+        public float VelocidadFisicaRetroceso()
         {
             return System.Math.Max(-this.velocidadMaximaDeAvance, this.velocidadActual + (-this.aceleracionRetroceso) * this.deltaTiempoAvance.tiempoTranscurrido());
         }
 
-        public TGCVector3 getVectorAdelante()
+        public TGCVector3 GetVectorAdelante()
         {
             return this.vectorAdelante;
         }
 
         //devuelve la posicion del auto en el mapa, sirve para la camara
-        public TGCVector3 posicion()
+        public TGCVector3 GetPosicionCero()
         {
             return this.mesh.Position;
         }
 
-        public void setElapsedTime(float time)
+        public void SetElapsedTime(float time)
         {
             this.elapsedTime = time;
             if(this.deltaTiempoAvance.tiempoTranscurrido() != 0)
@@ -115,7 +115,7 @@ namespace TGC.Group.Model
 
         }
 
-        public float getVelocidadActual()
+        public float GetVelocidadActual()
         {
             return this.velocidadActual;
         }
@@ -131,57 +131,57 @@ namespace TGC.Group.Model
             }
         }
 
-        public void dispose()
+        public void Dispose()
         {
             this.mesh.Dispose();
         }
 
-        public Timer getDeltaTiempoAvance()
+        public Timer GetDeltaTiempoAvance()
         {
             return this.deltaTiempoAvance;
         }
 
-        public float getElapsedTime()
+        public float GetElapsedTime()
         {
             return this.elapsedTime;
         }
 
-        public void setVelocidadActual(float nuevaVelocidad)
+        public void SetVelocidadActual(float nuevaVelocidad)
         {
             this.velocidadActual = nuevaVelocidad;
         }
 
-        public void setEstado(EstadoVehiculo estado)
+        public void SetEstado(EstadoVehiculo estado)
         {
             this.estado = estado;
         }
 
-        public void setVelocidadActualDeSalto(float velocidad)
+        public void SetVelocidadActualDeSalto(float velocidad)
         {
             this.velocidadActualDeSalto = velocidad;
         }
 
-        public float getAceleracionGravedad()
+        public float GetAceleracionGravedad()
         {
             return this.aceleracionGravedad;
         }
 
-        public Timer getDeltaTiempoSalto()
+        public Timer GetDeltaTiempoSalto()
         {
             return this.deltaTiempoSalto;
         }
 
-        public float getVelocidadMaximaDeSalto()
+        public float GetVelocidadMaximaDeSalto()
         {
             return this.velocidadInicialDeSalto;
         }
 
-        public float getConstanteRozamiento()
+        public float GetConstanteRozamiento()
         {
             return this.constanteDeRozamiento;
         }
 
-        public float getConstanteFrenado()
+        public float GetConstanteFrenado()
         {
             return this.constanteFrenado;
         }
@@ -190,20 +190,20 @@ namespace TGC.Group.Model
         {
 
             transformacion = transformacion * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
-            delanteraIzquierda.RotateAxis(this.vectorAdelante, this.getVelocidadActual());
-            delanteraDerecha.RotateAxis(this.vectorAdelante, this.getVelocidadActual());
+            delanteraIzquierda.RotateAxis(this.vectorAdelante, this.GetVelocidadActual());
+            delanteraDerecha.RotateAxis(this.vectorAdelante, this.GetVelocidadActual());
             foreach (var rueda in this.ruedas)
             {
-                rueda.RotateAxis(this.vectorAdelante, this.getVelocidadActual());
+                rueda.RotateAxis(this.vectorAdelante, this.GetVelocidadActual());
             };
         }
 
-        public TGCVector3 getPosicion()
+        public TGCVector3 GetPosicion()
         {
             return TGCVector3.transform(new TGCVector3(0, 0, 0), this.transformacion);
         }
 
-        public TGCVector3 getVectorCostado()
+        public TGCVector3 GetVectorCostado()
         {
             return TGCVector3.Cross(this.vectorAdelante, new TGCVector3(0, 1, 0));
         }
@@ -219,8 +219,8 @@ namespace TGC.Group.Model
         {
             this.mesh.Transform = this.transformacion;
             this.mesh.BoundingBox.transform(transformacion);
-            delanteraIzquierda.Transform(TGCVector3.transform(posicion(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)) + new TGCVector3(0, 0.5f, 0));
-            delanteraDerecha.Transform(TGCVector3.transform(posicion(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)) + new TGCVector3(0, -0.5f, 0));
+            delanteraIzquierda.Transform(TGCVector3.transform(GetPosicionCero(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)) + new TGCVector3(0, 0.5f, 0));
+            delanteraDerecha.Transform(TGCVector3.transform(GetPosicionCero(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)) + new TGCVector3(0, -0.5f, 0));
         }
 
         public void Rotate(float rotacion)

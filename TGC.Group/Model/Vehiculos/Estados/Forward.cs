@@ -15,34 +15,34 @@ namespace TGC.Group.Model.Vehiculos.Estados
 
         }
 
-        public override void advance()
+        public override void Advance()
         {
-            base.advance();
-            move(auto.getVectorAdelante() * auto.getVelocidadActual() * auto.getElapsedTime());
+            base.Advance();
+            Move(auto.GetVectorAdelante() * auto.GetVelocidadActual() * auto.GetElapsedTime());
         }
 
-        public override void back()
+        public override void Back()
         {
-            brake(auto.getConstanteFrenado());
+            Brake(auto.GetConstanteFrenado());
         }
 
-        public override void speedUpdate()
+        public override void SpeedUpdate()
         {
-            brake(auto.getConstanteRozamiento());
+            Brake(auto.GetConstanteRozamiento());
         }
 
-        private void brake(float constante)
+        private void Brake(float constante)
         {
-            auto.getDeltaTiempoAvance().resetear();
-            auto.setVelocidadActual(auto.getVelocidadActual() - constante);
-            if (auto.getVelocidadActual() < 0)
+            auto.GetDeltaTiempoAvance().resetear();
+            auto.SetVelocidadActual(auto.GetVelocidadActual() - constante);
+            if (auto.GetVelocidadActual() < 0)
             {
-                auto.setVelocidadActual(0);
-                auto.getDeltaTiempoAvance().resetear();
-                auto.setEstado(new Stopped(this.auto));
+                auto.SetVelocidadActual(0);
+                auto.GetDeltaTiempoAvance().resetear();
+                auto.SetEstado(new Stopped(this.auto));
                 return;
             }
-            this.move(auto.getVectorAdelante() * auto.getVelocidadActual() * auto.getElapsedTime());
+            this.Move(auto.GetVectorAdelante() * auto.GetVelocidadActual() * auto.GetElapsedTime());
         }
         
     }

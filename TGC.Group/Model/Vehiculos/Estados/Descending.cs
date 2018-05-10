@@ -16,76 +16,76 @@ namespace TGC.Group.Model.Vehiculos.Estados
             this.initialSpeed = initialSpeed;
         }
 
-        public override void advance()
+        public override void Advance()
         {
-            if (auto.getVelocidadActual() < 0)
+            if (auto.GetVelocidadActual() < 0)
             {
-                auto.setVelocidadActual(auto.getVelocidadActual() + auto.getConstanteFrenado() * 2);
-                if (auto.getVelocidadActual() > 0)
+                auto.SetVelocidadActual(auto.GetVelocidadActual() + auto.GetConstanteFrenado() * 2);
+                if (auto.GetVelocidadActual() > 0)
                 {
-                    auto.setVelocidadActual(0);
-                    auto.getDeltaTiempoAvance().resetear();
+                    auto.SetVelocidadActual(0);
+                    auto.GetDeltaTiempoAvance().resetear();
                 }
                 return;
             }
-            base.advance();
+            base.Advance();
 
         }
 
-        public override void back()
+        public override void Back()
         {
-            if (auto.getVelocidadActual() > 0)
+            if (auto.GetVelocidadActual() > 0)
             {
-                auto.setVelocidadActual(auto.getVelocidadActual() - auto.getConstanteFrenado() * 2);
-                if (auto.getVelocidadActual() < 0)
+                auto.SetVelocidadActual(auto.GetVelocidadActual() - auto.GetConstanteFrenado() * 2);
+                if (auto.GetVelocidadActual() < 0)
                 {
-                    auto.setVelocidadActual(0);
-                    auto.getDeltaTiempoAvance().resetear();
+                    auto.SetVelocidadActual(0);
+                    auto.GetDeltaTiempoAvance().resetear();
                 }
                 return;
             }
-            base.back();
+            base.Back();
         }
 
-        public override void jump()
+        public override void Jump()
         {
             return;
         }
 
-        public override void jumpUpdate()
+        public override void JumpUpdate()
         {
-            auto.setVelocidadActualDeSalto(this.velocidadFisicaDeSalto());
-            float desplazamientoEnY = auto.getVelocidadActualDeSalto() * auto.getElapsedTime();
-            desplazamientoEnY = (TGCVector3.transform(auto.posicion(), auto.transformacion).Y + desplazamientoEnY < 0) ? -TGCVector3.transform(auto.posicion(), auto.transformacion).Y : desplazamientoEnY;
+            auto.SetVelocidadActualDeSalto(this.VelocidadFisicaDeSalto());
+            float desplazamientoEnY = auto.GetVelocidadActualDeSalto() * auto.GetElapsedTime();
+            desplazamientoEnY = (TGCVector3.transform(auto.GetPosicionCero(), auto.transformacion).Y + desplazamientoEnY < 0) ? -TGCVector3.transform(auto.GetPosicionCero(), auto.transformacion).Y : desplazamientoEnY;
             TGCVector3 nuevoDesplazamiento = new TGCVector3(0, desplazamientoEnY, 0);
             //this.move(nuevoDesplazamiento);
             //this.move(auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
-            this.move(nuevoDesplazamiento + auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
-            if(TGCVector3.transform(auto.posicion(), auto.transformacion).Y == 0)
+            this.Move(nuevoDesplazamiento + auto.GetVectorAdelante() * this.initialSpeed * auto.GetElapsedTime());
+            if(TGCVector3.transform(auto.GetPosicionCero(), auto.transformacion).Y == 0)
             {
-                auto.getDeltaTiempoSalto().resetear();
-                auto.setVelocidadActualDeSalto(auto.getVelocidadMaximaDeSalto());
-                if(auto.getVelocidadActual() > 0)
+                auto.GetDeltaTiempoSalto().resetear();
+                auto.SetVelocidadActualDeSalto(auto.GetVelocidadMaximaDeSalto());
+                if(auto.GetVelocidadActual() > 0)
                 {
-                    auto.setEstado(new Forward(this.auto));
+                    auto.SetEstado(new Forward(this.auto));
                 }
-                else if(auto.getVelocidadActual() < 0)
+                else if(auto.GetVelocidadActual() < 0)
                 {
-                    auto.setEstado(new Backward(this.auto));
+                    auto.SetEstado(new Backward(this.auto));
                 }
                 else
                 {
-                    auto.setEstado(new Stopped(this.auto));
+                    auto.SetEstado(new Stopped(this.auto));
                 }
             }
         }
 
-        public override void right(CamaraEnTerceraPersona camara)
+        public override void Right(CamaraEnTerceraPersona camara)
         {
             //TODO mover ruedas;
         }
 
-        public override void left(CamaraEnTerceraPersona camara)
+        public override void Left(CamaraEnTerceraPersona camara)
         {
             //TODO mover ruedas;
         }

@@ -13,66 +13,66 @@ namespace TGC.Group.Model.Vehiculos.Estados
 
         public Jumping(Vehiculo auto) : base(auto)
         {
-            this.initialSpeed = auto.getVelocidadActual();
+            this.initialSpeed = auto.GetVelocidadActual();
         }
 
-        public override void advance()
+        public override void Advance()
         {
-            if(auto.getVelocidadActual() < 0)
+            if(auto.GetVelocidadActual() < 0)
             {
-                auto.setVelocidadActual(auto.getVelocidadActual() + auto.getConstanteFrenado() * 2);
-                if(auto.getVelocidadActual() > 0)
+                auto.SetVelocidadActual(auto.GetVelocidadActual() + auto.GetConstanteFrenado() * 2);
+                if(auto.GetVelocidadActual() > 0)
                 {
-                    auto.setVelocidadActual(0);
-                    auto.getDeltaTiempoAvance().resetear();
+                    auto.SetVelocidadActual(0);
+                    auto.GetDeltaTiempoAvance().resetear();
                 }
                 return;
             }
-            base.advance();
+            base.Advance();
 
         }
 
-        public override void back()
+        public override void Back()
         {
-            if(auto.getVelocidadActual() > 0)
+            if(auto.GetVelocidadActual() > 0)
             {
-                auto.setVelocidadActual(auto.getVelocidadActual() - auto.getConstanteFrenado() *2);
-                if(auto.getVelocidadActual() < 0)
+                auto.SetVelocidadActual(auto.GetVelocidadActual() - auto.GetConstanteFrenado() *2);
+                if(auto.GetVelocidadActual() < 0)
                 {
-                    auto.setVelocidadActual(0);
-                    auto.getDeltaTiempoAvance().resetear();
+                    auto.SetVelocidadActual(0);
+                    auto.GetDeltaTiempoAvance().resetear();
                 }
                 return;
             }
-            base.back();
+            base.Back();
         }
 
-        public override void jump()
+        public override void Jump()
         {
             return;
         }
 
-        public override void jumpUpdate()
+        public override void JumpUpdate()
         {
-            auto.setVelocidadActualDeSalto(this.velocidadFisicaDeSalto());
-            if(auto.getVelocidadActualDeSalto() < 0)
+            auto.SetVelocidadActualDeSalto(this.VelocidadFisicaDeSalto());
+            if(auto.GetVelocidadActualDeSalto() < 0)
             {
-                auto.setEstado(new Descending(this.auto, this.initialSpeed));
+                auto.SetEstado(new Descending(this.auto, this.initialSpeed));
                 return;
             }
-            float desplazamientoEnY = auto.getVelocidadActualDeSalto() * auto.getElapsedTime();
+            float desplazamientoEnY = auto.GetVelocidadActualDeSalto() * auto.GetElapsedTime();
             TGCVector3 nuevoDesplazamiento = new TGCVector3(0, desplazamientoEnY, 0);
             //auto.mesh.Move(nuevoDesplazamiento);
             //auto.mesh.Move(auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
-            this.move(nuevoDesplazamiento + auto.getVectorAdelante() * this.initialSpeed * auto.getElapsedTime());
+            this.Move(nuevoDesplazamiento + auto.GetVectorAdelante() * this.initialSpeed * auto.GetElapsedTime());
         }
 
-        public override void left(CamaraEnTerceraPersona camara)
+        public override void Left(CamaraEnTerceraPersona camara)
         {
             //TODO mover ruedas solamente;
         }
 
-        public override void right(CamaraEnTerceraPersona camara)
+        public override void Right(CamaraEnTerceraPersona camara)
         {
             //TODO mover ruedas solamente;
         }

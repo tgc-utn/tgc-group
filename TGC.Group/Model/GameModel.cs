@@ -103,7 +103,7 @@ namespace TGC.Group.Model
             //que te permite configurar la posicion, el lookat, etc. Lo que hacemos al heredar, es reescribir algunos
             //metodos y setear valores default para que la camara quede mirando al auto en 3era persona
 
-            this.camaraInterna = new CamaraEnTerceraPersona(auto.posicion() + camaraDesplazamiento, 0.8f, -33);
+            this.camaraInterna = new CamaraEnTerceraPersona(auto.GetPosicionCero() + camaraDesplazamiento, 0.8f, -33);
             this.Camara = camaraInterna;
 
             loadSound(MediaDir + "Sound\\eee.wav");
@@ -157,19 +157,19 @@ namespace TGC.Group.Model
             string dialogo;
 
             dialogo = "Velocidad = {0}km";
-            dialogo = string.Format(dialogo, auto.getVelocidadActual());
+            dialogo = string.Format(dialogo, auto.GetVelocidadActual());
             textoVelocidadVehiculo = Textos.newText(dialogo, 120, 10);
 
             dialogo = "Posicion = ({0} | {1} | {2})";
-            dialogo = string.Format(dialogo, auto.getPosicion().X, auto.getPosicion().Y, auto.getPosicion().Z);
+            dialogo = string.Format(dialogo, auto.GetPosicion().X, auto.GetPosicion().Y, auto.GetPosicion().Z);
             textoPosicionVehiculo = Textos.newText(dialogo, 120, 25);
 
             dialogo = "VectorAdelante = ({0} | {1} | {2})";
-            dialogo = string.Format(dialogo, auto.getVectorAdelante().X, auto.getVectorAdelante().Y, auto.getVectorAdelante().Z);
+            dialogo = string.Format(dialogo, auto.GetVectorAdelante().X, auto.GetVectorAdelante().Y, auto.GetVectorAdelante().Z);
             textoVectorAdelante = Textos.newText(dialogo, 120, 40);
 
             dialogo = "VectorCostado = ({0} | {1} | {2})";
-            dialogo = string.Format(dialogo, auto.getVectorCostado().X, auto.getVectorCostado().Y, auto.getVectorCostado().Z);
+            dialogo = string.Format(dialogo, auto.GetVectorCostado().X, auto.GetVectorCostado().Y, auto.GetVectorCostado().Z);
             textoVectorCostado = Textos.newText(dialogo, 120, 55);
 
             dialogo = "OffsetHeight = {0}";
@@ -180,7 +180,7 @@ namespace TGC.Group.Model
             dialogo = string.Format(dialogo, this.camaraInterna.OffsetForward);
             textoOffsetF = Textos.newText(dialogo, 120, 85);
 
-            this.auto.setElapsedTime(ElapsedTime);
+            this.auto.SetElapsedTime(ElapsedTime);
 
             TGCMatrix lastPosition = auto.transformacion;
 
@@ -191,43 +191,43 @@ namespace TGC.Group.Model
                 this.sound.play();
                 //hago avanzar al auto hacia adelante. Le paso el Elapsed Time que se utiliza para
                 //multiplicarlo a la velocidad del auto y no depender del hardware del computador
-                this.auto.getEstado().advance();
+                this.auto.GetEstado().Advance();
 
             }
 
             //lo mismo que para avanzar pero para retroceder
             if (Input.keyDown(Key.S))
             {
-                this.auto.getEstado().back();
+                this.auto.GetEstado().Back();
             }
 
             //si el usuario teclea D
             if (Input.keyDown(Key.D))
             {
-                this.auto.getEstado().right(camaraInterna);
+                this.auto.GetEstado().Right(camaraInterna);
                 
             }else if (Input.keyDown(Key.A))
             {
-                this.auto.getEstado().left(camaraInterna);
+                this.auto.GetEstado().Left(camaraInterna);
             }
 
             //Si apreta espacio, salta
             if (Input.keyDown(Key.Space))
             {
-                this.auto.getEstado().jump();
+                this.auto.GetEstado().Jump();
             }
 
             if (!Input.keyDown(Key.W) && !Input.keyDown(Key.S))
             {
-                this.auto.getEstado().speedUpdate();
+                this.auto.GetEstado().SpeedUpdate();
             }
 
             //esto es algo turbio que tengo que hacer, por que sino es imposible modelar el salto
-            this.auto.getEstado().jumpUpdate();
+            this.auto.GetEstado().JumpUpdate();
 
 
             //Hacer que la camara siga al auto.mesh en su nueva posicion
-            this.camaraInterna.Target = (TGCVector3.transform(auto.posicion(), auto.transformacion)) + auto.getVectorAdelante() * 30 ;
+            this.camaraInterna.Target = (TGCVector3.transform(auto.GetPosicionCero(), auto.transformacion)) + auto.GetVectorAdelante() * 30 ;
 
             //bool collide = false;
             TgcMesh collider = null;
@@ -240,8 +240,8 @@ namespace TGC.Group.Model
                     collider = mesh;
                     this.auto.mesh.BoundingBox.setRenderColor(Color.Red);
                     mesh.BoundingBox.setRenderColor(Color.Red);
-                    this.auto.setVelocidadActual(-this.auto.getVelocidadActual()*4);
-                    this.auto.setEstado(new Backward(this.auto));
+                    this.auto.SetVelocidadActual(-this.auto.GetVelocidadActual()*4);
+                    this.auto.SetEstado(new Backward(this.auto));
                 }
                 else
                 {
@@ -286,7 +286,7 @@ namespace TGC.Group.Model
             }*/
 
 
-            if (this.auto.getVelocidadActual() == 0)
+            if (this.auto.GetVelocidadActual() == 0)
                 this.sound.stop();
 
             this.PostUpdate();
@@ -330,7 +330,7 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             //Dispose del auto.
-            this.auto.dispose();
+            this.auto.Dispose();
             //Dispose del cubo
             this.cubo.Dispose();
             //Dispose Scene

@@ -16,52 +16,52 @@ namespace TGC.Group.Model.Vehiculos.Estados
             this.auto = auto;
         }
 
-        virtual public void advance()
+        virtual public void Advance()
         {
-            auto.getDeltaTiempoAvance().acumularTiempo(auto.getElapsedTime());
-            auto.setVelocidadActual(auto.velocidadFisica());
+            auto.GetDeltaTiempoAvance().acumularTiempo(auto.GetElapsedTime());
+            auto.SetVelocidadActual(auto.VelocidadFisica());
             return;
         }
 
-        virtual public void back()
+        virtual public void Back()
         {
-            auto.getDeltaTiempoAvance().acumularTiempo(auto.getElapsedTime());
-            auto.setVelocidadActual(auto.velocidadFisicaRetroceso());
+            auto.GetDeltaTiempoAvance().acumularTiempo(auto.GetElapsedTime());
+            auto.SetVelocidadActual(auto.VelocidadFisicaRetroceso());
             return;
         }
 
-        virtual public void jump()
+        virtual public void Jump()
         {
-            auto.getDeltaTiempoSalto().acumularTiempo(auto.getElapsedTime());
-            this.auto.setEstado(new Jumping(this.auto));
+            auto.GetDeltaTiempoSalto().acumularTiempo(auto.GetElapsedTime());
+            this.auto.SetEstado(new Jumping(this.auto));
             return;
         }
 
-        virtual public void speedUpdate()
-        {
-            return;
-        }
-
-        virtual public void jumpUpdate()
+        virtual public void SpeedUpdate()
         {
             return;
         }
 
-        protected void move(TGCVector3 desplazamiento)
+        virtual public void JumpUpdate()
+        {
+            return;
+        }
+
+        protected void Move(TGCVector3 desplazamiento)
         {
             this.auto.Move(desplazamiento);
         }
 
-        protected float velocidadFisicaDeSalto()
+        protected float VelocidadFisicaDeSalto()
         {
-            return auto.getVelocidadActualDeSalto() + (-auto.getAceleracionGravedad()) * auto.getDeltaTiempoSalto().tiempoTranscurrido();
+            return auto.GetVelocidadActualDeSalto() + (-auto.GetAceleracionGravedad()) * auto.GetDeltaTiempoSalto().tiempoTranscurrido();
         }
 
-        virtual public void right(CamaraEnTerceraPersona camara)
+        virtual public void Right(CamaraEnTerceraPersona camara)
         {
-            if (auto.getVelocidadActual() == 0) return;
-            float rotacionReal = auto.getVelocidadDeRotacion() * auto.getElapsedTime();
-            rotacionReal = (auto.getVelocidadActual() > 0) ? rotacionReal : -rotacionReal;
+            if (auto.GetVelocidadActual() == 0) return;
+            float rotacionReal = auto.GetVelocidadDeRotacion() * auto.GetElapsedTime();
+            rotacionReal = (auto.GetVelocidadActual() > 0) ? rotacionReal : -rotacionReal;
             TGCMatrix matrizDeRotacion = TGCMatrix.RotationY(rotacionReal);
             auto.Rotate(rotacionReal);
             auto.RotarDelanteras(rotacionReal);
@@ -71,11 +71,11 @@ namespace TGC.Group.Model.Vehiculos.Estados
         }
 
         //lo mismo que arriba
-        virtual public void left(CamaraEnTerceraPersona camara)
+        virtual public void Left(CamaraEnTerceraPersona camara)
         {
-            if (auto.getVelocidadActual() == 0) return;
-            float rotacionReal = auto.getVelocidadDeRotacion() * auto.getElapsedTime();
-            rotacionReal = (auto.getVelocidadActual() < 0) ? rotacionReal : -rotacionReal;
+            if (auto.GetVelocidadActual() == 0) return;
+            float rotacionReal = auto.GetVelocidadDeRotacion() * auto.GetElapsedTime();
+            rotacionReal = (auto.GetVelocidadActual() < 0) ? rotacionReal : -rotacionReal;
             TGCMatrix matrizDeRotacion = TGCMatrix.RotationY(rotacionReal);
             auto.Rotate(rotacionReal);
             auto.RotarDelanteras(rotacionReal);

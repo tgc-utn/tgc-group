@@ -15,29 +15,29 @@ namespace TGC.Group.Model.Vehiculos.Estados
 
         }
 
-        override public void advance()
+        override public void Advance()
         {
-            base.advance();
-            this.move(auto.getVectorAdelante() * auto.getVelocidadActual() * auto.getElapsedTime());
-            auto.setEstado(new Forward(this.auto));
+            base.Advance();
+            this.Move(auto.GetVectorAdelante() * auto.GetVelocidadActual() * auto.GetElapsedTime());
+            auto.SetEstado(new Forward(this.auto));
         }
 
-        override public void back()
+        override public void Back()
         {
-            base.back();
-            this.move(auto.getVectorAdelante() * auto.getVelocidadActual() * auto.getElapsedTime());
-            auto.setEstado(new Backward(this.auto));
+            base.Back();
+            this.Move(auto.GetVectorAdelante() * auto.GetVelocidadActual() * auto.GetElapsedTime());
+            auto.SetEstado(new Backward(this.auto));
         }
 
-        override public void left(CamaraEnTerceraPersona camara)
+        override public void Left(CamaraEnTerceraPersona camara)
         {
-            float rotacionReal = -auto.getVelocidadDeRotacion() * auto.getElapsedTime();
+            float rotacionReal = -auto.GetVelocidadDeRotacion() * auto.GetElapsedTime();
             auto.RotarDelanteras(rotacionReal);
         }
 
-        override public void right(CamaraEnTerceraPersona camara)
+        override public void Right(CamaraEnTerceraPersona camara)
         {
-            float rotacionReal = auto.getVelocidadDeRotacion() * auto.getElapsedTime();
+            float rotacionReal = auto.GetVelocidadDeRotacion() * auto.GetElapsedTime();
             auto.RotarDelanteras(rotacionReal);
         }
 
