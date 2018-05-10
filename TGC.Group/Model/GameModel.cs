@@ -27,7 +27,7 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        private TgcStaticSound sound;
+        private TgcStaticSound aceleracion, salto;
 
         private Camioneta auto;
         private CamaraEnTerceraPersona camaraInterna;
@@ -89,22 +89,23 @@ namespace TGC.Group.Model
             this.camaraInterna = new CamaraEnTerceraPersona(auto.GetPosicionCero() + camaraDesplazamiento, 0.8f, -33);
             this.Camara = camaraInterna;
 
-            loadSound(MediaDir + "Sound\\eee.wav");
+            this.loadSound(MediaDir + "Sound\\eee.wav", ref aceleracion);
+            this.loadSound(MediaDir + "Sound\\Salto3.wav", ref salto);
 
         }
 
-        private void loadSound(string path)
+        private void loadSound(string path, ref TgcStaticSound audio)
         {
             //Borrar sonido anterior
-            if (sound != null)
+            if (audio != null)
             {
-                sound.dispose();
-                sound = null;
+                audio.dispose();
+                audio = null;
             }
 
             //Cargar sonido
-            sound = new TgcStaticSound();
-            sound.loadSound(path, DirectSound.DsDevice);
+            audio = new TgcStaticSound();
+            audio.loadSound(path, DirectSound.DsDevice);
         }
 
         public override void Update()
@@ -170,10 +171,7 @@ namespace TGC.Group.Model
             //si el usuario teclea la W y ademas no tecla la D o la A
             if (Input.keyDown(Key.W))
             {
-                //primera aproximacion de sonido
-                this.sound.play();
-                //hago avanzar al auto hacia adelante. Le paso el Elapsed Time que se utiliza para
-                //multiplicarlo a la velocidad del auto y no depender del hardware del computador
+                this.aceleracion.play();
                 this.auto.GetEstado().Advance();
 
             }
@@ -197,6 +195,7 @@ namespace TGC.Group.Model
             //Si apreta espacio, salta
             if (Input.keyDown(Key.Space))
             {
+                this.salto.play();
                 this.auto.GetEstado().Jump();
             }
 
@@ -269,7 +268,7 @@ namespace TGC.Group.Model
 
 
             if (this.auto.GetVelocidadActual() == 0)
-                this.sound.stop();
+                this.aceleracion.stop();
 
             this.PostUpdate();
         }
