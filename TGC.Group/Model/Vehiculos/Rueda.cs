@@ -38,10 +38,13 @@ namespace TGC.Group.Model.Vehiculos
             //esto es para las de adelante cuando apretas A,D
         }
 
-        //para rotar sobre si misma
+
+        /// <summary>
+        /// Rota la rueda sobre si misma
+        /// </summary>
         public void RotateX(float velocidad)
         {
-            this.rotacion = TGCMatrix.RotationX(velocidad * 0.0001f) * this.rotacion;
+            this.rotacion = TGCMatrix.RotationX(-velocidad * 0.001f) * this.rotacion;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace TGC.Group.Model.Vehiculos
             TgcMesh ruedaDerecha = ruedaIzquierda.clone("ruedaDerecha");
             TgcMesh ruedaTraseraIzquierda = ruedaIzquierda.clone("ruedaTraseraIzquierda");
             TgcMesh ruedaTraseraDerecha = ruedaIzquierda.clone("ruedaTraseraDerecha");
-            delanteraIzquierda = new Rueda(ruedaIzquierda, new TGCVector3(35f, 18f, -60f));
+            delanteraIzquierda = new Rueda(ruedaIzquierda, new TGCVector3(32f, 18f, -63f));
             //delanteraDerecha = new Rueda(ruedaDerecha, new TGCVector3(0.3f, 0, -0.18f));
             //delanteraDerecha.Transform();
 
