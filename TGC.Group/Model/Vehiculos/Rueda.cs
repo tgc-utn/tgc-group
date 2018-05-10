@@ -13,24 +13,19 @@ namespace TGC.Group.Model.Vehiculos
     {
         //public TGCMatrix transformacion;
         public TgcMesh mesh;
-        public TGCVector3 trasladoInicial;
-        public TGCMatrix escala;
-        public TGCMatrix traslado;
-        public TGCMatrix rotacion = TGCMatrix.RotationY(0);
+        public TGCMatrix trasladoInicial;
+        public TGCMatrix rotacion = TGCMatrix.Identity;
 
-        public Rueda(TgcMesh mesh,TGCVector3 traslado, TGCVector3 escalado)
+        public Rueda(TgcMesh mesh,TGCVector3 traslado)
         {
             this.mesh = mesh;
-            this.escala = TGCMatrix.Scaling(escalado);
             mesh.AutoTransform = false;
-            trasladoInicial = traslado;
+            trasladoInicial = TGCMatrix.Translation(traslado);
         }
 
-        public void Transform(TGCVector3 posicion, TGCVector3 adelante, TGCVector3 costado)
+        public void Transform(TGCMatrix matrizAuto)
         {
-            var posicionFinal = posicion + adelante * trasladoInicial.X + costado * trasladoInicial.Z;
-            this.traslado = TGCMatrix.Translation(posicionFinal);
-            mesh.Transform = escala * rotacion * traslado;
+            this.mesh.Transform = rotacion * trasladoInicial * matrizAuto;
         }
 
         public void Render()
@@ -38,22 +33,13 @@ namespace TGC.Group.Model.Vehiculos
             mesh.Render();
         }
 
-        public void Move(TGCVector3 desplazamiento)
-        {
-            //transformacion = transformacion * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
-        }
-
         public void RotateY(float rotacion)
         {
-            this.rotacion = TGCMatrix.RotationY(rotacion) * this.rotacion;
+            //esto es para las de adelante cuando apretas A,D
         }
 
-        public void RotateAxis(TGCVector3 eje, float rotacion)
-        {
-            this.rotacion = TGCMatrix.RotationX(rotacion*0.0001f) * this.rotacion;
-        }
-
-        public void RotacionSobreSiMisma(float velocidad)
+        //para rotar sobre si misma
+        public void RotateX(float velocidad)
         {
             this.rotacion = TGCMatrix.RotationX(velocidad * 0.0001f) * this.rotacion;
         }

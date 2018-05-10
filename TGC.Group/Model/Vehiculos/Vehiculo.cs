@@ -128,7 +128,7 @@ namespace TGC.Group.Model
         {
             this.mesh.Render();
             delanteraIzquierda.Render();
-            delanteraDerecha.Render();
+            //delanteraDerecha.Render();
             foreach (var rueda in this.ruedas)
             {
                 rueda.Render();
@@ -194,12 +194,6 @@ namespace TGC.Group.Model
         {
 
             this.traslado = this.traslado * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
-            delanteraIzquierda.RotateAxis(this.vectorAdelante, this.GetVelocidadActual());
-            delanteraDerecha.RotateAxis(this.vectorAdelante, this.GetVelocidadActual());
-            foreach (var rueda in this.ruedas)
-            {
-                rueda.RotateAxis(this.vectorAdelante, this.GetVelocidadActual());
-            };
         }
 
         public TGCVector3 GetPosicion()
@@ -224,8 +218,8 @@ namespace TGC.Group.Model
             var transformacion = GetTransformacion();
             this.mesh.Transform = transformacion;
             this.mesh.BoundingBox.transform(transformacion);
-            delanteraIzquierda.Transform(TGCVector3.transform(GetPosicionCero(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)) + new TGCVector3(0, 0.5f, 0));
-            delanteraDerecha.Transform(TGCVector3.transform(GetPosicionCero(), transformacion), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)) + new TGCVector3(0, -0.5f, 0));
+            this.delanteraIzquierda.Transform(this.GetTransformacion());
+            
         }
 
         public TGCMatrix GetTransformacion()
@@ -236,17 +230,10 @@ namespace TGC.Group.Model
         public void Rotate(float rotacion)
         {
             this.rotado = TGCMatrix.RotationY(rotacion) * this.rotado;
-            foreach (var rueda in ruedas)
-            {
-                rueda.RotateY(rotacion);
-            }
-
         }
 
         public void RotarDelanteras(float rotacion)
         {
-            delanteraIzquierda.RotateAxis(TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)), rotacion);
-            delanteraDerecha.RotateAxis(TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)), rotacion);
         }
     }
 }
