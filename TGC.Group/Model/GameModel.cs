@@ -32,28 +32,22 @@ namespace TGC.Group.Model
         private Camioneta auto;
         private CamaraEnTerceraPersona camaraInterna;
         private TGCVector3 camaraDesplazamiento = new TGCVector3(0,5,40);
-        private TGCBox cubo;
-        private TgcScene scene;
         private TgcText2D textoVelocidadVehiculo, textoOffsetH, textoOffsetF, textoPosicionVehiculo, textoVectorAdelante, textoVectorCostado;
-        private TgcMesh cama, mesaDeLuz, ropero, armario, escritorio, sillaEscritorio, dispenser, mesaCocina, heladera, tacho, sillaCocina1, sillaCocina2, sillaCocina3, muebleCocina;
-        private TgcMesh libroCocina1,libroCocina2,libroCocina3;
-        private TgcMesh cajaCocina;
-        private TgcMesh mesadaCocina1;
-        private TgcMesh bathtub, inodoro, cepillo, esponja, jabon, toalla, banqueta, espejo;
-        private TgcMesh cajaZapatillas, sillon, escoba;
+        //escena
+        private TgcMesh scene;
+        //habitacion
+        private TgcMesh cajaZapatillas, sillon, escoba, cama, mesaDeLuz, ropero, armario, escritorio, sillaEscritorio;
+        //cocina
+        private TgcMesh mesadaCocina1, cajaCocina, dispenser, mesaCocina, heladera, tacho, sillaCocina1, sillaCocina2, sillaCocina3, muebleCocina, libroCocina1, libroCocina2, libroCocina3;
+        //banio
+        private TgcMesh bathtub, inodoro, cepillo, esponja, jabon, banqueta, espejo;
         private List<TgcMesh> objetosEscenario = new List<TgcMesh>();
 
         public override void Init()
         {
 
-            //en caso de querer cargar una escena
             TgcSceneLoader loader = new TgcSceneLoader();
-            this.scene = loader.loadSceneFromFile(MediaDir + "Texturas\\Habitacion\\escenaFinal-TgcScene.xml");
-            foreach (var mesh in scene.Meshes)
-            {
-                objetosEscenario.Add(mesh);
-            }
-
+            this.scene = this.dameMesh("Texturas\\Habitacion\\escenaFinal-TgcScene.xml", new TGCVector3(1,1,1), new TGCVector3(0,0,0), new TGCVector3(0,0,0));
             //cocina
             this.cama = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Cama\\Cama-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, FastMath.PI, 0), new TGCVector3(-36f, 0, -124f));
             this.mesaDeLuz = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\MesaDeLuz\\MesaDeLuz-TgcScene.xml", new TGCVector3(1, 1, 1), new TGCVector3(0, FastMath.PI, 0), new TGCVector3(22f, 0, -158f));
@@ -89,19 +83,8 @@ namespace TGC.Group.Model
             this.escoba = this.dameMesh("MeshCreator\\Meshes\\Habitacion\\Escoba\\Escoba-TgcScene.xml", new TGCVector3(1.3f, 1.3f, 1.3f), new TGCVector3(FastMath.PI_HALF, 0, 0), new TGCVector3(-105f, 1f, -60f));
             //this.toalla = this.dameMesh("MeshCreator\\Meshes\\Bathroom\\Toalla\\Toalla-TgcScene.xml", new TGCVector3(1f, 1f, 1f), new TGCVector3(0, FastMath.QUARTER_PI, 0), new TGCVector3(-90, 0f, 245));
 
-            //creo el vehiculo liviano
-            //si quiero crear un vehiculo pesado (camion) hago esto
-            // VehiculoPesado camion = new VehiculoPesado(rutaAMesh);
-            // se hace esta distinción de vehiculo liviano y pesado por que cada uno tiene diferentes velocidades,
-            // peso, salto, etc.
             this.auto = new Camioneta(MediaDir, new TGCVector3(-100f, 0f, 0f));
             this.auto.mesh.AutoTransform = false;
-            //creo un cubo para tomarlo de referencia (para ver como se mueve el auto)
-            this.cubo = TGCBox.fromSize(new TGCVector3(-50, 0, -20), new TGCVector3(10, 10, 10), Color.Black);
-
-            //creo la camara en tercera persona (la clase CamaraEnTerceraPersona hereda de la clase real del framework
-            //que te permite configurar la posicion, el lookat, etc. Lo que hacemos al heredar, es reescribir algunos
-            //metodos y setear valores default para que la camara quede mirando al auto en 3era persona
 
             this.camaraInterna = new CamaraEnTerceraPersona(auto.GetPosicionCero() + camaraDesplazamiento, 0.8f, -33);
             this.Camara = camaraInterna;
@@ -305,7 +288,6 @@ namespace TGC.Group.Model
             this.textoOffsetF.render();
             this.textoOffsetH.render();
             
-            this.scene.RenderAll();
             foreach (var mesh in objetosEscenario)
             {   
                 mesh.BoundingBox.Render();
@@ -316,14 +298,6 @@ namespace TGC.Group.Model
             this.auto.Render();
             this.auto.mesh.BoundingBox.Render();
 
-            this.cubo.Transform =
-                TGCMatrix.Scaling(cubo.Scale)
-                            * TGCMatrix.RotationYawPitchRoll(cubo.Rotation.Y, cubo.Rotation.X, cubo.Rotation.Z)
-                            * TGCMatrix.Translation(cubo.Position);
-
-            this.cubo.BoundingBox.Render();
-            this.cubo.Render();
-
             this.PostRender();
         }
 
@@ -331,10 +305,6 @@ namespace TGC.Group.Model
         {
             //Dispose del auto.
             this.auto.Dispose();
-            //Dispose del cubo
-            this.cubo.Dispose();
-            //Dispose Scene
-            this.scene.DisposeAll();
         }
 
         private TgcMesh dameMesh(string ruta, TGCVector3 escala, TGCVector3 rotacion, TGCVector3 traslado)
