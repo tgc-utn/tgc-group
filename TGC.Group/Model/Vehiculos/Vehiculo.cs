@@ -242,5 +242,14 @@ namespace TGC.Group.Model
         {
             this.rotado = TGCMatrix.RotationY(rotacion) * this.rotado;
         }
+        /// <summary>
+        /// Rotar delanteras con A,D
+        /// </summary>
+        public void RotarDelanteras(float rotacion)
+        {
+            delanteraIzquierda.RotateY(rotacion);
+            delanteraDerecha.RotateY(rotacion);
+        }
+
     }
 }

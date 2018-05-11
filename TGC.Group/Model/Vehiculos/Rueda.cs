@@ -14,7 +14,8 @@ namespace TGC.Group.Model.Vehiculos
         //public TGCMatrix transformacion;
         public TgcMesh mesh;
         public TGCMatrix trasladoInicial;
-        public TGCMatrix rotacion = TGCMatrix.Identity;
+        public TGCMatrix rotationX = TGCMatrix.Identity;
+        public TGCMatrix rotationY = TGCMatrix.Identity;
 
         public Rueda(TgcMesh mesh,TGCVector3 traslado)
         {
@@ -25,7 +26,7 @@ namespace TGC.Group.Model.Vehiculos
 
         public void Transform(TGCMatrix matrizAuto)
         {
-            this.mesh.Transform = rotacion * trasladoInicial * matrizAuto;
+            this.mesh.Transform = rotationX * rotationY * trasladoInicial * matrizAuto;
         }
 
         public void Render()
@@ -35,7 +36,7 @@ namespace TGC.Group.Model.Vehiculos
 
         public void RotateY(float rotacion)
         {
-            //esto es para las de adelante cuando apretas A,D
+            this.rotationY = TGCMatrix.RotationY(rotacion) * this.rotationY;
         }
 
 
@@ -44,7 +45,7 @@ namespace TGC.Group.Model.Vehiculos
         /// </summary>
         public void RotateX(float velocidad)
         {
-            this.rotacion = TGCMatrix.RotationX(-velocidad * 0.01f) * this.rotacion;
+            this.rotationX = TGCMatrix.RotationX(-velocidad * 0.01f) * this.rotationX;
         }
     }
 }
