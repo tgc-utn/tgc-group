@@ -74,6 +74,7 @@ namespace TGC.Group.Model
             {
                 this.camaraInterna.rotateY(0.005f);
             }
+
             if (Input.keyDown(Key.RightArrow))
             {
                 this.camaraInterna.OffsetHeight += 0.05f;

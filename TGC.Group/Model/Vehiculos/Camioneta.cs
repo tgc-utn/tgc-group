@@ -18,25 +18,23 @@ namespace TGC.Group.Model.Vehiculos
             TgcMesh ruedaDerecha = ruedaIzquierda.clone("ruedaDerecha");
             TgcMesh ruedaTraseraIzquierda = ruedaIzquierda.clone("ruedaTraseraIzquierda");
             TgcMesh ruedaTraseraDerecha = ruedaIzquierda.clone("ruedaTraseraDerecha");
-            delanteraIzquierda = new Rueda(ruedaIzquierda, new TGCVector3(0.3f, 0, 0.18f), this.escaladoInicial);
-            delanteraDerecha = new Rueda(ruedaDerecha, new TGCVector3(0.3f, 0, -0.18f), this.escaladoInicial);
-            delanteraIzquierda.Transform(TGCVector3.transform(GetPosicionCero(), this.GetTransformacion()), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)));
-            delanteraDerecha.Transform(TGCVector3.transform(GetPosicionCero(), this.GetTransformacion()), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)));
+            delanteraIzquierda = new Rueda(ruedaIzquierda, new TGCVector3(32f, 18f, -63f));
+            //delanteraDerecha = new Rueda(ruedaDerecha, new TGCVector3(0.3f, 0, -0.18f));
+            //delanteraDerecha.Transform();
 
-            ruedas.Add(new Rueda(ruedaTraseraIzquierda, new TGCVector3(-0.3f, 0, 0.18f), this.escaladoInicial));
-            ruedas.Add(new Rueda(ruedaTraseraDerecha, new TGCVector3(-0.3f, 0, -0.18f), this.escaladoInicial));
+            ruedas.Add(new Rueda(ruedaTraseraIzquierda, new TGCVector3(-0.3f, 0, 0.18f)));
+            ruedas.Add(new Rueda(ruedaTraseraDerecha, new TGCVector3(-0.3f, 0, -0.18f)));
 
             foreach (var rueda in ruedas)
             {
-                rueda.Transform(TGCVector3.transform(GetPosicionCero(), this.GetTransformacion()), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)));
+                //rueda.Transform(TGCVector3.transform();
             }
         }
 
         override public void Transform()
         {
             base.Transform();
-            this.ruedas[0].Transform(TGCVector3.transform(GetPosicionCero(), this.GetTransformacion()), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)) + new TGCVector3(0, 0.5f, 0));
-            this.ruedas[1].Transform(TGCVector3.transform(GetPosicionCero(), this.GetTransformacion()), vectorAdelante, TGCVector3.Cross(vectorAdelante, new TGCVector3(0, 1, 0)) + new TGCVector3(0, -0.5f, 0));
+            //poner las de atras
         }
 
 
