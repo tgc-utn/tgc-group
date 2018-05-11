@@ -64,7 +64,6 @@ namespace TGC.Group.Model.Vehiculos.Estados
             rotacionReal = (auto.GetVelocidadActual() > 0) ? rotacionReal : -rotacionReal;
             TGCMatrix matrizDeRotacion = TGCMatrix.RotationY(rotacionReal);
             auto.Rotate(rotacionReal);
-            auto.RotarDelanteras(rotacionReal);
             auto.vectorAdelante.TransformCoordinate(matrizDeRotacion);
             camara.rotateY(rotacionReal);
 
@@ -78,7 +77,6 @@ namespace TGC.Group.Model.Vehiculos.Estados
             rotacionReal = (auto.GetVelocidadActual() < 0) ? rotacionReal : -rotacionReal;
             TGCMatrix matrizDeRotacion = TGCMatrix.RotationY(rotacionReal);
             auto.Rotate(rotacionReal);
-            auto.RotarDelanteras(rotacionReal);
             auto.vectorAdelante.TransformCoordinate(matrizDeRotacion);
             camara.rotateY(rotacionReal);
         }

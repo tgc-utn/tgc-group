@@ -44,7 +44,7 @@ namespace TGC.Group.Model.Vehiculos
         /// </summary>
         public void RotateX(float velocidad)
         {
-            this.rotacion = TGCMatrix.RotationX(-velocidad * 0.001f) * this.rotacion;
+            this.rotacion = TGCMatrix.RotationX(-velocidad * 0.01f) * this.rotacion;
         }
     }
 }

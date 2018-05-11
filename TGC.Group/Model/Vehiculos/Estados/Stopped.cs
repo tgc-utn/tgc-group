@@ -32,13 +32,11 @@ namespace TGC.Group.Model.Vehiculos.Estados
         override public void Left(CamaraEnTerceraPersona camara)
         {
             float rotacionReal = -auto.GetVelocidadDeRotacion() * auto.GetElapsedTime();
-            auto.RotarDelanteras(rotacionReal);
         }
 
         override public void Right(CamaraEnTerceraPersona camara)
         {
             float rotacionReal = auto.GetVelocidadDeRotacion() * auto.GetElapsedTime();
-            auto.RotarDelanteras(rotacionReal);
         }
 
     }

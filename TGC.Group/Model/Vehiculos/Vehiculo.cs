@@ -128,7 +128,7 @@ namespace TGC.Group.Model
         {
             this.mesh.Render();
             delanteraIzquierda.Render();
-            //delanteraDerecha.Render();
+            delanteraDerecha.Render();
             foreach (var rueda in this.ruedas)
             {
                 rueda.Render();
@@ -195,6 +195,7 @@ namespace TGC.Group.Model
 
             this.traslado = this.traslado * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
             this.delanteraIzquierda.RotateX(this.GetVelocidadActual());
+            this.delanteraDerecha.RotateX(this.GetVelocidadActual());
         }
 
         public TGCVector3 GetPosicion()
@@ -220,6 +221,7 @@ namespace TGC.Group.Model
             this.mesh.Transform = transformacion;
             this.mesh.BoundingBox.transform(transformacion);
             this.delanteraIzquierda.Transform(this.GetTransformacion());
+            this.delanteraDerecha.Transform(this.GetTransformacion());
             
         }
 
@@ -231,10 +233,6 @@ namespace TGC.Group.Model
         public void Rotate(float rotacion)
         {
             this.rotado = TGCMatrix.RotationY(rotacion) * this.rotado;
-        }
-
-        public void RotarDelanteras(float rotacion)
-        {
         }
     }
 }
