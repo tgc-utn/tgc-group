@@ -21,17 +21,9 @@ namespace TGC.Group.Model.Vehiculos
             delanteraIzquierda = new Rueda(ruedaIzquierda, new TGCVector3(32f, 18f, -63f));
             delanteraDerecha = new Rueda(ruedaDerecha, new TGCVector3(-32f, 18f, -63f));
 
-            ruedas.Add(new Rueda(ruedaTraseraIzquierda, new TGCVector3(32f, 0, 50f)));
-            ruedas.Add(new Rueda(ruedaTraseraDerecha, new TGCVector3(-32f, 0, 50f)));
+            ruedas.Add(new Rueda(ruedaTraseraIzquierda, new TGCVector3(32f, 18f, 55f)));
+            ruedas.Add(new Rueda(ruedaTraseraDerecha, new TGCVector3(-32f, 18f, 55f)));
 
         }
-
-        override public void Transform()
-        {
-            base.Transform();
-
-        }
-
-
     }
 }
