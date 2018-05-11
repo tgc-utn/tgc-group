@@ -235,7 +235,7 @@ namespace TGC.Group.Model
                        
             this.auto.Transform();
             this.auto.Render();
-            this.auto.mesh.BoundingBox.Render();
+            //this.auto.mesh.BoundingBox.Render();
 
             this.PostRender();
         }

@@ -4,6 +4,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Group.Model.Vehiculos.Estados;
 using TGC.Group.Model.Vehiculos;
+using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Model
 {
@@ -11,6 +12,7 @@ namespace TGC.Group.Model
     {
 
         public TgcMesh mesh;
+        private TgcBoundingOrientedBox obb;
         private Timer deltaTiempoAvance;
         private Timer deltaTiempoSalto;
         public TGCVector3 vectorAdelante;
@@ -124,9 +126,22 @@ namespace TGC.Group.Model
             return this.velocidadActual;
         }
 
+        private void ActualizarBoundingOrientedBox()
+        {
+            this.obb = TgcBoundingOrientedBox.computeFromAABB(this.mesh.BoundingBox);
+            this.obb.setRotation(TGCVector3.transform(new TGCVector3(1, 1, 1), this.rotado));
+        }
+
+        private void RenderBoundingOrientedBox()
+        {
+            this.obb.Render();
+        }
+
         public void Render()
         {
             this.mesh.Render();
+            this.ActualizarBoundingOrientedBox();
+            this.RenderBoundingOrientedBox();
             delanteraIzquierda.Render();
             delanteraDerecha.Render();
             foreach (var rueda in this.ruedas)
