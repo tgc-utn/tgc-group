@@ -194,6 +194,7 @@ namespace TGC.Group.Model
         {
 
             this.traslado = this.traslado * TGCMatrix.Translation(desplazamiento.X, desplazamiento.Y, desplazamiento.Z);
+            this.delanteraIzquierda.RotateX(this.GetVelocidadActual());
         }
 
         public TGCVector3 GetPosicion()
