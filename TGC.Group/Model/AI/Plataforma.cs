@@ -13,7 +13,7 @@ namespace TGC.Group.Model.AI
 {
     class Plataforma 
     {
-        private TgcMesh plataformaMesh;
+        public TgcMesh plataformaMesh;
         private Escenario escenario;
         public TGCVector3 vectorMovimiento = new TGCVector3(0,0,0);
 

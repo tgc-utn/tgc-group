@@ -64,13 +64,14 @@ namespace TGC.Group.Model
             {
                 Plataforma plataforma;
 
-                if (plataformaMesh.Name == "PlataformaY") plataforma = new PlataformaY(plataformaMesh, this);
+                if (plataformaMesh.Name == "PlataformaY")plataforma = new PlataformaY(plataformaMesh, this);
                 else if (plataformaMesh.Name == "PlataformaX") plataforma = new PlataformaX(plataformaMesh, this);
                 else if (plataformaMesh.Name == "PlataformaZ") plataforma = new PlataformaZ(plataformaMesh, this);
                 else if (plataformaMesh.Name == "PlataformaRotante") plataforma = new PlataformaRotante(plataformaMesh, this);
                 else plataforma = new Plataforma(plataformaMesh, this);
 
                 plataformas.Add(plataforma);
+                
             }
 
             return plataformas;

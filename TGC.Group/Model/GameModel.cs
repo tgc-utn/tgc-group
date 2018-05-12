@@ -148,7 +148,9 @@ namespace TGC.Group.Model
            
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara = camaraInterna;
-           
+
+            personaje.BoundingBox.scaleTranslate(personaje.Position, scaleBoundingVector);
+
         }
 
 
@@ -156,7 +158,8 @@ namespace TGC.Group.Model
         {
             PreUpdate();
             tiempoAcumulado += ElapsedTime;
-            personaje.BoundingBox.scaleTranslate(personaje.Position, scaleBoundingVector);
+
+            Frustum.updateMesh(personaje.Position, personaje.Position, 1f, 0f, 100000000000000000f, 1000000000000000000f);
 
             //TODO: Redificar estos valores.
             //Obtenemos los valores default
@@ -316,11 +319,11 @@ namespace TGC.Group.Model
 
 
 
-      public void movimientoDePlataformas()
+        public void movimientoDePlataformas()
         {
             foreach (Plataforma plataforma in plataformas) plataforma.Update(tiempoAcumulado);
         }
-      public void movimientoPorPlataformas()
+        public void movimientoPorPlataformas()
         {
 
             Plataforma plataformaColisionante = plataformas.Find(plataforma => plataforma.colisionaConPersonaje(esferaPersonaje));
@@ -336,7 +339,7 @@ namespace TGC.Group.Model
             if (objetoMovibleG == null || objetoMovibleG != objetoMovible) objetoMovibleG = objetoMovible;
 
             esferaCaja = new TgcBoundingSphere(objetoMovible.BoundingBox.calculateBoxCenter() + new TGCVector3(0f, 15f, 0f), objetoMovible.BoundingBox.calculateBoxRadius() * 0.7f);
-            escenario.MeshesColisionables();
+          //  escenario.MeshesColisionables();
             movimientoRealCaja = ColisionadorEsferico.moveCharacter(esferaCaja, movementV, escenario.MeshesColisionablesBBSin(objetoMovible));
 
             var testCol = testColisionObjetoPersonaje(objetoMovible);
@@ -489,15 +492,15 @@ namespace TGC.Group.Model
                 if (boundingBoxActivate)
                 {
 
-                    personaje.BoundingBox.Render();
-                    esferaPersonaje.Render();
+                    //personaje.BoundingBox.Render();
+                    //esferaPersonaje.Render();
                     escenario.RenderizarBoundingBoxes();
-                    directionArrow.Render();
-                    if (esferaCaja != null)
+                   // directionArrow.Render();
+                    /*if (esferaCaja != null)
                     {
                         esferaCaja.Render();
 
-                    }
+                    }*/
 
                 }
 
