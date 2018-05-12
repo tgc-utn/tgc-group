@@ -20,14 +20,16 @@ namespace TGC.Group.Model.AI
             this.plataformaMesh = plataformaMesh;
             this.escenario = escenario;
             this.plataformaMesh.AutoTransform = false;
+            this.plataformaMesh.AutoUpdateBoundingBox = false;
             this.anguloRotacion = FastMath.ToRad(1f);
+            this.plataformaMesh.Transform = TGCMatrix.RotationY(anguloRotacion);
         }
 
-        public override void Update()
+        public override void Update(float tiempo)
         {
 
-            plataformaMesh.Transform = TGCMatrix.RotationY(anguloRotacion);
             
+            plataformaMesh.BoundingBox.transform(plataformaMesh.Transform);
 
         }
     }

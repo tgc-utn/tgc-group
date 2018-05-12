@@ -18,12 +18,6 @@ using TGC.Group.Model.AI;
 
 namespace TGC.Group.Model
 {
-    /// <summary>
-    ///     Ejemplo para implementar el TP.
-    ///     Inicialmente puede ser renombrado o copiado para hacer más ejemplos chicos, en el caso de copiar para que se
-    ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
-    ///     line 97.
-    /// </summary>
     public class GameModel : TgcExample
     {
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
@@ -69,7 +63,6 @@ namespace TGC.Group.Model
         private bool boundingBoxActivate = false;
 
         private float saltoActual = 0;
-        private bool jumping;
         private bool moving;
 
         private PisoInercia pisoResbaloso = null; //Es null cuando no esta pisando ningun piso resbaloso
@@ -79,6 +72,7 @@ namespace TGC.Group.Model
 
         private float offsetHeight = 400;
         private float offsetForward = -800;
+        private float tiempoAcumulado;
 
         public override void Init()
         {
@@ -161,7 +155,7 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
-
+            tiempoAcumulado += ElapsedTime;
             personaje.BoundingBox.scaleTranslate(personaje.Position, scaleBoundingVector);
 
             //TODO: Redificar estos valores.
@@ -218,13 +212,11 @@ namespace TGC.Group.Model
                     if (Input.keyUp(Key.Space) && saltoActual < coeficienteSalto)
                     {
                         saltoActual = coeficienteSalto;
-                        //jumping = false;
                     }
                     if (Input.keyUp(Key.Space) || saltoActual > 0 )
                     {
                         saltoActual -= coeficienteSalto * ElapsedTime;
                         saltoRealizado = saltoActual;
-                       // jumping = true;
                     }
                    
                 }
@@ -266,7 +258,7 @@ namespace TGC.Group.Model
                         }
                         else
                         {
-                            vectorSlide = VectorSlideActual;
+                           vectorSlide = VectorSlideActual;
                         }
                         break;
                     }
@@ -276,13 +268,12 @@ namespace TGC.Group.Model
                         //pisoResb.VectorEntrada = TGCVector3.Empty;
                     }
                 }
-                //movimientoRelativoPersonaje = movementVector; Variable de log.
 
                 ColisionadorEsferico.GravityEnabled = true;
                 ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
                 ColisionadorEsferico.SlideFactor = 1.3f;
 
-
+                movimientoDePlataformas();
                 moverMundo(movementVector + vectorSlide);
 
                //Actualizar valores de la linea de movimiento
@@ -300,6 +291,7 @@ namespace TGC.Group.Model
                 PostUpdate();
             }
         }
+
         TgcMesh objetoEscenario;
         public void moverMundo(TGCVector3 movementVector)
         {
@@ -313,8 +305,23 @@ namespace TGC.Group.Model
             
             movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movementVector, escenario.MeshesColisionablesBB());
 
-            //MOVIMIENTOS POR PLATAFORMAS
-            foreach (Plataforma plataforma in plataformas) plataforma.Update();
+            movimientoPorPlataformas();
+            personaje.Move(movimientoRealPersonaje + movimientoPorPlataforma);
+
+
+            //Actualizamos la esfera del personaje.
+            TGCVector3 movimientoCentroEsfera = movimientoPorPlataforma;
+            esferaPersonaje.moveCenter(movimientoCentroEsfera);
+        }
+
+
+
+      public void movimientoDePlataformas()
+        {
+            foreach (Plataforma plataforma in plataformas) plataforma.Update(tiempoAcumulado);
+        }
+      public void movimientoPorPlataformas()
+        {
 
             Plataforma plataformaColisionante = plataformas.Find(plataforma => plataforma.colisionaConPersonaje(esferaPersonaje));
             if (plataformaColisionante != null) colisionPlataforma = true;
@@ -322,15 +329,7 @@ namespace TGC.Group.Model
 
             if (colisionPlataforma) movimientoPorPlataforma = plataformaColisionante.VectorMovimiento();
             else movimientoPorPlataforma = new TGCVector3(0, 0, 0);
-
-            personaje.Move(movimientoRealPersonaje + movimientoPorPlataforma);
-
-            //Actualizamos la esfera del personaje.
-            TGCVector3 movimientoCentroEsfera = movimientoPorPlataforma;
-            esferaPersonaje.moveCenter(movimientoCentroEsfera);
         }
-
-      
 
         public void generarMovimiento(TgcMesh objetoMovible, TGCVector3 movementV)
         {

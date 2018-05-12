@@ -35,7 +35,7 @@ namespace TGC.Group.Model.AI
             return vectorMovimiento;
         }
 
-        public virtual void Update()
+        public virtual void Update(float tiempo)
         {
             
         }

@@ -30,7 +30,7 @@ namespace TGC.Group.Model.AI
             else return vectorMovimiento;
         }
 
-        public override void Update()
+        public override void Update(float tiempo)
         {
 
             TGCVector3 posicionSiguiente = plataformaMesh.Position + vectorMovimiento;
