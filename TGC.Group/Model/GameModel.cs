@@ -30,7 +30,7 @@ namespace TGC.Group.Model
         private Camioneta auto;
         private CamaraEnTerceraPersona camaraInterna;
         private TGCVector3 camaraDesplazamiento = new TGCVector3(0,5,40);
-        private TgcText2D textoVelocidadVehiculo, textoOffsetH, textoOffsetF, textoPosicionVehiculo, textoVectorAdelante, textoVectorCostado;
+        private TgcText2D textoVelocidadVehiculo, textoOffsetH, textoOffsetF, textoPosicionVehiculo, textoVectorAdelante;
 
 
         public override void Init()
@@ -43,23 +43,6 @@ namespace TGC.Group.Model
 
             this.camaraInterna = new CamaraEnTerceraPersona(auto.GetPosicionCero() + camaraDesplazamiento, 0.8f, -33);
             this.Camara = camaraInterna;
-
-            //this.loadSound(MediaDir + "Sound\\eee.wav", ref aceleracion);
-            //this.loadSound(MediaDir + "Sound\\Salto3.wav", ref salto);
-        }
-
-        private void loadSound(string path, ref TgcStaticSound audio)
-        {
-            //Borrar sonido anterior
-            if (audio != null)
-            {
-                audio.dispose();
-                audio = null;
-            }
-
-            //Cargar sonido
-            audio = new TgcStaticSound();
-            audio.loadSound(path, DirectSound.DsDevice);
         }
 
         public override void Update()
@@ -107,10 +90,6 @@ namespace TGC.Group.Model
             dialogo = string.Format(dialogo, auto.GetVectorAdelante().X, auto.GetVectorAdelante().Y, auto.GetVectorAdelante().Z);
             textoVectorAdelante = Textos.newText(dialogo, 120, 40);
 
-            dialogo = "VectorCostado = ({0} | {1} | {2})";
-            dialogo = string.Format(dialogo, auto.GetVectorCostado().X, auto.GetVectorCostado().Y, auto.GetVectorCostado().Z);
-            textoVectorCostado = Textos.newText(dialogo, 120, 55);
-
             dialogo = "OffsetHeight = {0}";
             dialogo = string.Format(dialogo, this.camaraInterna.OffsetHeight);
             textoOffsetH = Textos.newText(dialogo, 120, 70);
@@ -121,21 +100,17 @@ namespace TGC.Group.Model
 
             this.auto.SetElapsedTime(ElapsedTime);
 
-            //si el usuario teclea la W y ademas no tecla la D o la A
             if (Input.keyDown(Key.W))
             {
-                //this.aceleracion.play();
                 this.auto.GetEstado().Advance();
 
             }
 
-            //lo mismo que para avanzar pero para retroceder
             if (Input.keyDown(Key.S))
             {
                 this.auto.GetEstado().Back();
             }
 
-            //si el usuario teclea D
             if (Input.keyDown(Key.D))
             {
                 this.auto.GetEstado().Right(camaraInterna);
@@ -145,7 +120,6 @@ namespace TGC.Group.Model
                 this.auto.GetEstado().Left(camaraInterna);
             }
 
-            //Si apreta espacio, salta
             if (Input.keyDown(Key.Space))
             {
                 this.auto.GetEstado().Jump();
@@ -156,14 +130,11 @@ namespace TGC.Group.Model
                 this.auto.GetEstado().SpeedUpdate();
             }
 
-            //esto es algo turbio que tengo que hacer, por que sino es imposible modelar el salto
             this.auto.GetEstado().JumpUpdate();
 
-
-            //Hacer que la camara siga al auto.mesh en su nueva posicion
             this.camaraInterna.Target = (TGCVector3.transform(auto.GetPosicionCero(), auto.GetTransformacion())) + auto.GetVectorAdelante() * 30 ;
 
-            //Calcular colisiones
+            //Comentado para que los sonidos funcionen correctamente
             //this.auto = Escena.getInstance().calculateCollisions(this.auto);
             
             
@@ -219,13 +190,11 @@ namespace TGC.Group.Model
 
             this.textoPosicionVehiculo.render();
             this.textoVectorAdelante.render();
-            this.textoVectorCostado.render();
             this.textoOffsetF.render();
             this.textoOffsetH.render();
                        
             this.auto.Transform();
             this.auto.Render();
-            //this.auto.mesh.BoundingBox.Render();
 
             this.PostRender();
         }
@@ -233,7 +202,6 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             Escena.getInstance().dispose();
-            //Dispose del auto.
             this.auto.Dispose();
            
         }
