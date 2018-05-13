@@ -22,7 +22,7 @@ namespace TGC.Group.Model
         protected Rueda delanteraDerecha;
         protected TGCVector3 vectorDireccion;
         private EstadoVehiculo estado;
-        private float velocidadActual;
+        private float velocidadActual = 0f;
         private float velocidadActualDeSalto;
         protected float velocidadRotacion = 1f;
         protected float velocidadInicialDeSalto = 15f;
@@ -30,7 +30,7 @@ namespace TGC.Group.Model
         protected float aceleracionAvance = 0.3f;
         protected float aceleracionRetroceso;
         private float aceleracionGravedad = 0.5f;
-        private float elapsedTime;
+        private float elapsedTime = 0f;
         protected float constanteDeRozamiento = 0.2f;
         protected float constanteFrenado = 1f;
         protected TGCVector3 escaladoInicial = new TGCVector3(0.005f, 0.005f, 0.005f);
@@ -39,16 +39,14 @@ namespace TGC.Group.Model
 
         public Vehiculo(string mediaDir, TGCVector3 posicionInicial)
         {
-            this.estado = new Stopped(this);
             this.vectorAdelante = new TGCVector3(0, 0, 1);
             this.CrearMesh(mediaDir + "meshCreator\\meshes\\Vehiculos\\Camioneta\\Camioneta-TgcScene.xml", posicionInicial);
-            this.velocidadActual = 0f;
             this.velocidadActualDeSalto = this.velocidadInicialDeSalto;
-            this.elapsedTime = 0f;
             this.deltaTiempoAvance = new Timer();
             this.deltaTiempoSalto = new Timer();
             this.aceleracionRetroceso = this.aceleracionAvance * 0.8f;
             this.vectorDireccion = this.vectorAdelante;
+            this.estado = new Stopped(this);
 
 
         }

@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TGC.Core.Mathematica;
+using TGC.Core.Sound;
 
 namespace TGC.Group.Model.Vehiculos.Estados
 {
     abstract class EstadoVehiculo
     {
         protected Vehiculo auto;
+        protected Tgc3dSound audio;
 
         public EstadoVehiculo(Vehiculo auto)
         {
@@ -33,7 +35,7 @@ namespace TGC.Group.Model.Vehiculos.Estados
         virtual public void Jump()
         {
             auto.GetDeltaTiempoSalto().acumularTiempo(auto.GetElapsedTime());
-            this.auto.SetEstado(new Jumping(this.auto));
+            this.cambiarEstado(new Jumping(this.auto));
             return;
         }
 
@@ -79,6 +81,22 @@ namespace TGC.Group.Model.Vehiculos.Estados
             auto.Rotate(rotacionReal);
             auto.vectorAdelante.TransformCoordinate(matrizDeRotacion);
             camara.rotateY(rotacionReal);
+        }
+
+        protected void liberarRecursos()
+        {
+            if(audio != null)
+            {
+                this.audio.stop();
+                this.audio.dispose();
+            }
+            
+        }
+
+        protected void cambiarEstado(EstadoVehiculo nuevoEstado)
+        {
+            this.liberarRecursos();
+            this.auto.SetEstado(nuevoEstado);
         }
 
     }

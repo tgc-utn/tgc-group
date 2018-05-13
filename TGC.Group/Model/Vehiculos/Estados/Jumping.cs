@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TGC.Core.Mathematica;
+using TGC.Core.Sound;
 
 namespace TGC.Group.Model.Vehiculos.Estados
 {
@@ -14,6 +15,9 @@ namespace TGC.Group.Model.Vehiculos.Estados
         public Jumping(Vehiculo auto) : base(auto)
         {
             this.initialSpeed = auto.GetVelocidadActual();
+            this.audio = new Tgc3dSound(ConceptosGlobales.getInstance().GetMediaDir() + "Sound\\Salto.wav", this.auto.GetPosicion(), ConceptosGlobales.getInstance().GetDispositivoDeAudio());
+            this.audio.MinDistance = 50f;
+            this.audio.play();
         }
 
         public override void Advance()
@@ -57,7 +61,7 @@ namespace TGC.Group.Model.Vehiculos.Estados
             auto.SetVelocidadActualDeSalto(this.VelocidadFisicaDeSalto());
             if(auto.GetVelocidadActualDeSalto() < 0)
             {
-                auto.SetEstado(new Descending(this.auto, this.initialSpeed));
+                this.cambiarEstado(new Descending(this.auto, this.initialSpeed));
                 return;
             }
             float desplazamientoEnY = auto.GetVelocidadActualDeSalto() * auto.GetElapsedTime();

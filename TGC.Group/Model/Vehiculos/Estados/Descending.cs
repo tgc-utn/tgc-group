@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TGC.Core.Mathematica;
+using TGC.Core.Sound;
 
 namespace TGC.Group.Model.Vehiculos.Estados
 {
@@ -14,6 +15,8 @@ namespace TGC.Group.Model.Vehiculos.Estados
         public Descending(Vehiculo auto, float initialSpeed) : base(auto)
         {
             this.initialSpeed = initialSpeed;
+            this.audio = new Tgc3dSound(ConceptosGlobales.getInstance().GetMediaDir() + "Sound\\Caida.wav", this.auto.GetPosicion(), ConceptosGlobales.getInstance().GetDispositivoDeAudio());
+            this.audio.MinDistance = 50f;
         }
 
         public override void Advance()
@@ -65,17 +68,18 @@ namespace TGC.Group.Model.Vehiculos.Estados
             {
                 auto.GetDeltaTiempoSalto().resetear();
                 auto.SetVelocidadActualDeSalto(auto.GetVelocidadMaximaDeSalto());
-                if(auto.GetVelocidadActual() > 0)
+                this.audio.play();
+                if (auto.GetVelocidadActual() > 0)
                 {
-                    auto.SetEstado(new Forward(this.auto));
+                    this.cambiarEstado(new Forward(this.auto));
                 }
                 else if(auto.GetVelocidadActual() < 0)
                 {
-                    auto.SetEstado(new Backward(this.auto));
+                    this.cambiarEstado(new Backward(this.auto));
                 }
                 else
                 {
-                    auto.SetEstado(new Stopped(this.auto));
+                    this.cambiarEstado(new Stopped(this.auto));
                 }
             }
         }

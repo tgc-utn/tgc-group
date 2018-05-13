@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TGC.Core.Sound;
 
 namespace TGC.Group.Model.Vehiculos.Estados
 {
@@ -11,7 +12,9 @@ namespace TGC.Group.Model.Vehiculos.Estados
 
         public Backward(Vehiculo auto) : base(auto)
         {
-
+            this.audio = new Tgc3dSound(ConceptosGlobales.getInstance().GetMediaDir() + "Sound\\Marcha.wav", this.auto.GetPosicion(), ConceptosGlobales.getInstance().GetDispositivoDeAudio());
+            this.audio.MinDistance = 50f;
+            this.audio.play(true);
         }
         public override void Back()
         {
@@ -37,7 +40,7 @@ namespace TGC.Group.Model.Vehiculos.Estados
             {
                 auto.SetVelocidadActual(0);
                 auto.GetDeltaTiempoAvance().resetear();
-                auto.SetEstado(new Stopped(this.auto));
+                this.cambiarEstado(new Stopped(this.auto));
                 return;
             }
             this.Move(auto.GetVectorAdelante() * auto.GetVelocidadActual() * auto.GetElapsedTime());

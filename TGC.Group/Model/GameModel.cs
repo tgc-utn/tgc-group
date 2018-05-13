@@ -27,8 +27,6 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        private TgcStaticSound aceleracion, salto;
-
         private Camioneta auto;
         private CamaraEnTerceraPersona camaraInterna;
         private TGCVector3 camaraDesplazamiento = new TGCVector3(0,5,40);
@@ -37,15 +35,17 @@ namespace TGC.Group.Model
 
         public override void Init()
         {
+            ConceptosGlobales.getInstance().SetMediaDir(this.MediaDir);
+            ConceptosGlobales.getInstance().SetDispositivoDeAudio(this.DirectSound.DsDevice);
             Escena.getInstance().init(this.MediaDir);
-            this.auto = new Camioneta(MediaDir, new TGCVector3(-100f, 0f, 0f));
+            this.auto = new Camioneta(MediaDir, new TGCVector3(-0f, 0f, 0f));
             this.auto.mesh.AutoTransform = false;
 
             this.camaraInterna = new CamaraEnTerceraPersona(auto.GetPosicionCero() + camaraDesplazamiento, 0.8f, -33);
             this.Camara = camaraInterna;
 
-            this.loadSound(MediaDir + "Sound\\eee.wav", ref aceleracion);
-            this.loadSound(MediaDir + "Sound\\Salto3.wav", ref salto);
+            //this.loadSound(MediaDir + "Sound\\eee.wav", ref aceleracion);
+            //this.loadSound(MediaDir + "Sound\\Salto3.wav", ref salto);
         }
 
         private void loadSound(string path, ref TgcStaticSound audio)
@@ -124,7 +124,7 @@ namespace TGC.Group.Model
             //si el usuario teclea la W y ademas no tecla la D o la A
             if (Input.keyDown(Key.W))
             {
-                this.aceleracion.play();
+                //this.aceleracion.play();
                 this.auto.GetEstado().Advance();
 
             }
@@ -148,7 +148,6 @@ namespace TGC.Group.Model
             //Si apreta espacio, salta
             if (Input.keyDown(Key.Space))
             {
-                this.salto.play();
                 this.auto.GetEstado().Jump();
             }
 
@@ -165,7 +164,7 @@ namespace TGC.Group.Model
             this.camaraInterna.Target = (TGCVector3.transform(auto.GetPosicionCero(), auto.GetTransformacion())) + auto.GetVectorAdelante() * 30 ;
 
             //Calcular colisiones
-            this.auto = Escena.getInstance().calculateCollisions(this.auto);
+            //this.auto = Escena.getInstance().calculateCollisions(this.auto);
             
             
             
@@ -205,15 +204,6 @@ namespace TGC.Group.Model
                     }
                     auto.mesh.Position = lastPos - rs;
             }*/
-
-
-
-
-
-
-
-            if (this.auto.GetVelocidadActual() == 0)
-                this.aceleracion.stop();
 
             this.PostUpdate();
         }
