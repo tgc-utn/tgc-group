@@ -65,10 +65,13 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.DirectInput.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DirectX.DirectSound, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="Microsoft.VisualC" />
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
     <Reference Include="TGC.Core, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\TGC.Core.2.3.1\lib\net471\TGC.Core.dll</HintPath>
     </Reference>
@@ -85,7 +88,23 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\CamaraEnTerceraPersona.cs" />
+    <Compile Include="Model\ConceptosGlobales.cs" />
+    <Compile Include="Model\Escena.cs" />
+    <Compile Include="Model\Objeto.cs" />
+    <Compile Include="Model\Textos.cs" />
+    <Compile Include="Model\OperacionesConVectores.cs" />
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Model\Timer.cs" />
+    <Compile Include="Model\Vehiculos\Rueda.cs" />
+    <Compile Include="Model\Vehiculos\Estados\Forward.cs" />
+    <Compile Include="Model\Vehiculos\Estados\Backward.cs" />
+    <Compile Include="Model\Vehiculos\Estados\Descending.cs" />
+    <Compile Include="Model\Vehiculos\Estados\Jumping.cs" />
+    <Compile Include="Model\Vehiculos\Estados\Stopped.cs" />
+    <Compile Include="Model\Vehiculos\Estados\EstadoVehiculo.cs" />
+    <Compile Include="Model\Vehiculos\Camioneta.cs" />
+    <Compile Include="Model\Vehiculos\Vehiculo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
@@ -159,6 +178,7 @@
     <Content Include="Media\cajaMadera4.jpg" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

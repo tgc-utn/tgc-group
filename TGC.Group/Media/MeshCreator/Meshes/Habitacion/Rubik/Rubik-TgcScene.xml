@@ -1,0 +1,73 @@
+<tgcScene>
+	<name>Scene01</name>
+	<texturesExport enabled='true' dir='Textures'/>
+	<lightmapExport enabled='false' dir='LightMaps'/>
+	<sceneBoundingBox min='[-7.45112,0,-7.62181]' max='[7.54888,15,7.37819]'/>
+	<materials count='1'>
+		<m name='Material #35' type='Multimaterial'>
+			<subM name='Material #25' type='Standardmaterial'>
+				<ambient>[149.94,149.94,149.94,255.0]</ambient>
+				<diffuse>[149.94,149.94,149.94,255.0]</diffuse>
+				<specular>[229.5,229.5,229.5,255.0]</specular>
+				<opacity>100.0</opacity>
+				<alphaBlendEnable>false</alphaBlendEnable>
+				<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>1.jpeg</bitmap>
+			</subM>
+			<subM name='Material #26' type='Standardmaterial'>
+				<ambient>[149.94,149.94,149.94,255.0]</ambient>
+				<diffuse>[149.94,149.94,149.94,255.0]</diffuse>
+				<specular>[229.5,229.5,229.5,255.0]</specular>
+				<opacity>100.0</opacity>
+				<alphaBlendEnable>false</alphaBlendEnable>
+				<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>2.jpeg</bitmap>
+			</subM>
+			<subM name='Material #27' type='Standardmaterial'>
+				<ambient>[149.94,149.94,149.94,255.0]</ambient>
+				<diffuse>[149.94,149.94,149.94,255.0]</diffuse>
+				<specular>[229.5,229.5,229.5,255.0]</specular>
+				<opacity>100.0</opacity>
+				<alphaBlendEnable>false</alphaBlendEnable>
+				<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>3.jpeg</bitmap>
+			</subM>
+			<subM name='Material #28' type='Standardmaterial'>
+				<ambient>[149.94,149.94,149.94,255.0]</ambient>
+				<diffuse>[149.94,149.94,149.94,255.0]</diffuse>
+				<specular>[229.5,229.5,229.5,255.0]</specular>
+				<opacity>100.0</opacity>
+				<alphaBlendEnable>false</alphaBlendEnable>
+				<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>4.jpeg</bitmap>
+			</subM>
+			<subM name='Material #29' type='Standardmaterial'>
+				<ambient>[149.94,149.94,149.94,255.0]</ambient>
+				<diffuse>[149.94,149.94,149.94,255.0]</diffuse>
+				<specular>[229.5,229.5,229.5,255.0]</specular>
+				<opacity>100.0</opacity>
+				<alphaBlendEnable>false</alphaBlendEnable>
+				<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>5.jpeg</bitmap>
+			</subM>
+			<subM name='Material #30' type='Standardmaterial'>
+				<ambient>[149.94,149.94,149.94,255.0]</ambient>
+				<diffuse>[149.94,149.94,149.94,255.0]</diffuse>
+				<specular>[229.5,229.5,229.5,255.0]</specular>
+				<opacity>100.0</opacity>
+				<alphaBlendEnable>false</alphaBlendEnable>
+				<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>6.jpeg</bitmap>
+			</subM>
+		</m>
+	</materials>
+	<meshes count='1' >
+		<mesh name='Box001' layer='0' type='Original' matId='0' color='[154.0,215.0,229.0]' visibility='1.0' lightmap=''>
+			<boundingBox min='[-7.45112,0,-7.62181]' max='[7.54888,15,7.37819]'/>
+			<coordinatesIdx count='36'>0 2 3 3 1 0 4 5 7 7 6 4 0 1 5 5 4 0 1 3 7 7 5 1 3 2 6 6 7 3 2 0 4 4 6 2 </coordinatesIdx>
+			<textCoordsIdx count='36'>0 2 3 3 1 0 4 5 7 7 6 4 8 9 11 11 10 8 12 13 15 15 14 12 16 17 19 19 18 16 20 21 23 23 22 20 </textCoordsIdx>
+			<colorsIdx count='36'>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </colorsIdx>
+			<matIds count='12'>5 5 4 4 0 0 3 3 2 2 1 1 </matIds>
+			<vertices count='24'>-7.45112 0.0 -7.62181 7.54888 0.0 -7.62181 -7.45112 0.0 7.37819 7.54888 0.0 7.37819 -7.45112 15.0 -7.62181 7.54888 15.0 -7.62181 -7.45112 15.0 7.37819 7.54888 15.0 7.37819 </vertices>
+			<normals count='108'>0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 </normals>
+			<texCoords count='48'>1.0 1.0 0.0 1.0 1.0 0.0 0.0 0.0 0.0 1.0 1.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 1.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 1.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 1.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 1.0 1.0 0.0 0.0 1.0 0.0 </texCoords>
+			<colors count='3'>255 255 255 </colors>
+			<tangents count='108'>-1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 </tangents>
+			<binormals count='108'>0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 0.0 -1.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 0.0 1.0 0.0 </binormals>
+		</mesh>
+	</meshes>
+</tgcScene>
