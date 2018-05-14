@@ -11,7 +11,7 @@
 				<specular>[229.5,229.5,229.5,255.0]</specular>
 				<opacity>100.0</opacity>
 				<alphaBlendEnable>false</alphaBlendEnable>
-				<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>2.jpeg</bitmap>
+				<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>2cel.jpeg</bitmap>
 			</subM>
 			<subM name='Material #26' type='Standardmaterial'>
 				<ambient>[149.94,149.94,149.94,255.0]</ambient>
@@ -19,7 +19,7 @@
 				<specular>[229.5,229.5,229.5,255.0]</specular>
 				<opacity>100.0</opacity>
 				<alphaBlendEnable>false</alphaBlendEnable>
-				<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>3.jpeg</bitmap>
+				<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>3cel.jpeg</bitmap>
 			</subM>
 			<subM name='Material #36' type='Standardmaterial'>
 				<ambient>[149.94,149.94,149.94,255.0]</ambient>
