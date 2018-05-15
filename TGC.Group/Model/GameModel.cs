@@ -26,16 +26,18 @@ namespace TGC.Group.Model
     /// </summary>
     public class GameModel : TgcExample
     {
-        public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
+        public GameModel(string amediaDir, string shadersDir) : base(amediaDir, shadersDir)
         {
             Category = Game.Default.Category;
             Name = Game.Default.Name;
             Description = Game.Default.Description;
+            mediaDir = amediaDir;
         }
 
         private bool interaccionConCaja = false;
         private bool interaccionCaja = false;
 
+        static string mediaDir;
 
         private Directorio directorio;
         private TgcSkeletalMesh personaje;
@@ -79,6 +81,9 @@ namespace TGC.Group.Model
 
         private float offsetHeight = 400;
         private float offsetForward = -800;
+
+
+        SoundManager soundManager = new SoundManager(mediaDir);
 
         public override void Init()
         {
@@ -242,6 +247,7 @@ namespace TGC.Group.Model
                     moveForward = -velocidadCaminar;
                     movX = FastMath.Sin(personaje.Rotation.Y) * moveForward * ElapsedTime;
                     movZ = FastMath.Cos(personaje.Rotation.Y) * moveForward * ElapsedTime;
+                    soundManager.playSonidoCaminar();
                 }
                 else animacion = "Parado";
 
@@ -502,6 +508,7 @@ namespace TGC.Group.Model
 
                 }
 
+                soundManager.playSonidoFondo();
 
             }
             else
