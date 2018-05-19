@@ -113,7 +113,7 @@ namespace TGC.Group.Model
             personaje.Position = new TGCVector3(400, Ypiso, -900);
 
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
-            personaje.AutoTransform = true;
+            personaje.AutoTransform = false;
             
             
             //Rotar al robot en el Init para que mire hacia el otro lado
@@ -273,7 +273,6 @@ namespace TGC.Group.Model
                     else
                     {
                         pisoResbaloso = null;
-                        //pisoResb.VectorEntrada = TGCVector3.Empty;
                     }
                 }
                 //movimientoRelativoPersonaje = movementVector; Variable de log.
@@ -296,6 +295,10 @@ namespace TGC.Group.Model
 
                 //Reajustamos la camara
                 ajustarCamara();
+
+                //Esto soluciona el Autrotransform = false
+                personaje.UpdateMeshTransform();
+
 
                 PostUpdate();
             }
