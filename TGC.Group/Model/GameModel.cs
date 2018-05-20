@@ -58,6 +58,7 @@ namespace TGC.Group.Model
         TGCVector3 movimientoPorPlataforma = new TGCVector3(0, 0, 0);
         private bool colisionPlataforma = false;
         private List<Plataforma> plataformas;
+        private List<PlataformaRotante> plataformasRotantes;
 
 
         private bool boundingBoxActivate = false;
@@ -104,8 +105,8 @@ namespace TGC.Group.Model
             personaje.playAnimation("Parado", true);
 
             //Posicion inicial
-            personaje.Position = new TGCVector3(400, Ypiso, -900);
-
+            //personaje.Position = new TGCVector3(400, Ypiso, -900);
+            personaje.Position = new TGCVector3(-4133.616f, 1362f, -6640.231f);
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = true;
             
@@ -142,6 +143,7 @@ namespace TGC.Group.Model
 
             //Obtenemos las plataformas segun su tipo de movimiento.
             plataformas = escenario.Plataformas();
+            plataformasRotantes = escenario.PlataformasRotantes();
 
            //Posición de la camara.
             camaraInterna = new TgcThirdPersonCamera(personaje.Position, 500, -900);
@@ -158,8 +160,6 @@ namespace TGC.Group.Model
         {
             PreUpdate();
             tiempoAcumulado += ElapsedTime;
-
-            Frustum.updateMesh(personaje.Position, personaje.Position, 1f, 0f, 100000000000000000f, 1000000000000000000f);
 
             //TODO: Redificar estos valores.
             //Obtenemos los valores default
@@ -460,6 +460,7 @@ namespace TGC.Group.Model
         }
 
 
+
         public override void Render()
         {
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
@@ -480,6 +481,8 @@ namespace TGC.Group.Model
                 DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
 
                 escenario.RenderAll();
+                plataformasRotantes.ForEach(plat => plat.RotateOBB(tiempoAcumulado));
+               
                 if (!paused)
                 {
                     personaje.animateAndRender(ElapsedTime);
@@ -529,4 +532,6 @@ namespace TGC.Group.Model
             
         }
     }
+
+
 }

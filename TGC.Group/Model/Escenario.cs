@@ -64,7 +64,7 @@ namespace TGC.Group.Model
             {
                 Plataforma plataforma;
 
-                if (plataformaMesh.Name == "PlataformaY")plataforma = new PlataformaY(plataformaMesh, this);
+                if (plataformaMesh.Name == "PlataformaY") plataforma = new PlataformaY(plataformaMesh, this);
                 else if (plataformaMesh.Name == "PlataformaX") plataforma = new PlataformaX(plataformaMesh, this);
                 else if (plataformaMesh.Name == "PlataformaZ") plataforma = new PlataformaZ(plataformaMesh, this);
                 else if (plataformaMesh.Name == "PlataformaRotante") plataforma = new PlataformaRotante(plataformaMesh, this);
@@ -74,6 +74,15 @@ namespace TGC.Group.Model
                 
             }
 
+            return plataformas;
+        }
+        public List<PlataformaRotante> PlataformasRotantes()
+        {
+            List<PlataformaRotante> plataformas = new List<PlataformaRotante>();
+            foreach(PlataformaRotante plataforma in Plataformas().FindAll(plat => plat.plataformaMesh.Name == "PlataformaRotante"))
+            {
+                plataformas.Add(plataforma);
+            }
             return plataformas;
         }
 
@@ -115,10 +124,15 @@ namespace TGC.Group.Model
 
             return obstaculos;
         }
-        
+
         public void RenderizarBoundingBoxes()
         {
-            MeshesColisionables().ForEach(mesh => mesh.BoundingBox.Render());
+            MeshesColisionables().ForEach(mesh => BoundingBoxRender(mesh));
+           
+        }
+        private void BoundingBoxRender(TgcMesh mesh)
+        {
+            if (mesh.Name != "PlataformaRotante") mesh.BoundingBox.Render();
         }
 
         public void RenderAll() => scene.RenderAll();
