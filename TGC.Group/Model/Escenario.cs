@@ -104,7 +104,7 @@ namespace TGC.Group.Model
 
         public List<TgcBoundingAxisAlignBox> MeshesColisionablesBB()
         {
-            return MeshesColisionables().Select(mesh => mesh.BoundingBox).ToList();
+            return MeshesColisionables().FindAll(mesh => mesh.Name != "PlataformaRotante").Select(mesh => mesh.BoundingBox).ToList();
         }
 
         public List<TgcMesh> ObjetosColisionablesConCajas()

@@ -7,6 +7,8 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Collision;
 using TGC.Core.BoundingVolumes;
+using TGC.Core.Geometry;
+
 namespace TGC.Group.Model.AI
 {
     class PlataformaRotante : Plataforma
@@ -34,22 +36,14 @@ namespace TGC.Group.Model.AI
             MTraslacionOrigen = TGCMatrix.Translation(new TGCVector3(-initPosBB.X, -initPosBB.Y, -initPosBB.Z));
 
             obb = TgcBoundingOrientedBox.computeFromAABB(this.plataformaMesh.BoundingBox);
-            
             obb.setRenderColor(System.Drawing.Color.Red);
             plataformaMesh.BoundingBox.Dispose();
-            //plataformaMesh.BoundingBox.move(new TGCVector3(0f,-10000f,0f));
         }
 
         public void RotateOBB(float tiempo)
         {
-            
-           // plataformaMesh.BoundingBox.Render();
             obb.setRotation(new TGCVector3(0f, anguloRotacion * tiempo, 0f));
-            //obb.updateValues();
-            obb.Render();
-            
-           // plataformaMesh.BoundingBox.Render();
-            
+            obb.Render();            
         }
         public override void Update(float tiempo)
         {
@@ -62,6 +56,7 @@ namespace TGC.Group.Model.AI
         {
             return TgcCollisionUtils.testSphereOBB(esferaPersonaje, obb);
         }
+
 
     }
 }

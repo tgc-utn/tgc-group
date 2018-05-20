@@ -15,7 +15,6 @@ using System.Collections.Generic;
 using TGC.Examples.Collision.SphereCollision;
 using TGC.Group.Model.AI;
 
-
 namespace TGC.Group.Model
 {
     public class GameModel : TgcExample
@@ -296,6 +295,8 @@ namespace TGC.Group.Model
         }
 
         TgcMesh objetoEscenario;
+        TGCVector3 esferaSecurePos;
+
         public void moverMundo(TGCVector3 movementVector)
         {
 
@@ -305,19 +306,19 @@ namespace TGC.Group.Model
             
             if (objetoEscenario != null) generarMovimiento(objetoEscenario, movementVector);
 
-            
-            movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movementVector, escenario.MeshesColisionablesBB());
+            //var platRot = plataformasRotantes.Find(plat => plat.colisionaConPersonaje(esferaPersonaje));
+//            if (platRot != null) movimientoPorPlataforma = platRot.colisionConRotante(esferaPersonaje, movementVector);
+             movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movementVector, escenario.MeshesColisionablesBB());
 
             movimientoPorPlataformas();
             personaje.Move(movimientoRealPersonaje + movimientoPorPlataforma);
-
+            
 
             //Actualizamos la esfera del personaje.
-            TGCVector3 movimientoCentroEsfera = movimientoPorPlataforma;
-            esferaPersonaje.moveCenter(movimientoCentroEsfera);
+            
+            esferaPersonaje.moveCenter(movimientoPorPlataforma);
+            esferaSecurePos = esferaPersonaje.Position;
         }
-
-
 
         public void movimientoDePlataformas()
         {
@@ -481,7 +482,6 @@ namespace TGC.Group.Model
                 DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
 
                 escenario.RenderAll();
-                plataformasRotantes.ForEach(plat => plat.RotateOBB(tiempoAcumulado));
                
                 if (!paused)
                 {
@@ -495,8 +495,9 @@ namespace TGC.Group.Model
                 if (boundingBoxActivate)
                 {
 
-                    //personaje.BoundingBox.Render();
-                    //esferaPersonaje.Render();
+                    personaje.BoundingBox.Render();
+                    esferaPersonaje.Render();
+                     plataformasRotantes.ForEach(plat => plat.RotateOBB(tiempoAcumulado));
                     escenario.RenderizarBoundingBoxes();
                    // directionArrow.Render();
                     /*if (esferaCaja != null)
