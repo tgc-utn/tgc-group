@@ -1,12 +1,13 @@
-﻿using TGC.Core.Sound;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.DirectX.DirectInput;
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
+using TGC.Core.Sound;
+using TGC.Core.Text;
 
 namespace TGC.Group.Model
 {
-    public class SoundManager
+    public class SoundManager : TgcDirectSound
     {
         public TgcStaticSound sonidoCaminar;
         public TgcStaticSound sonidoFondo;
@@ -15,26 +16,25 @@ namespace TGC.Group.Model
 
         public static SoundManager Instance;
 
+
         public static SoundManager getInstance()
         {
             if (Instance == null)
             {
-                Instance = new SoundManager(mediaDir);
+                Instance = new SoundManager();
             }
             return Instance;
         }
 
-        public SoundManager(string unMediaDir)
+        public SoundManager()
         {
 
 
             sonidoCaminar = new TgcStaticSound();
             sonidoFondo = new TgcStaticSound();
 
-            mediaDir = unMediaDir;
-
-            sonidoFondo.loadSound(mediaDir + "Sound\\Background.wav");
-            sonidoCaminar.loadSound(mediaDir + "Sound\\FootSteps.wav");
+            sonidoFondo.loadSound("Media\\Sound\\Background", DsDevice);
+            sonidoCaminar.loadSound("Media\\Sound\\FootSteps", DsDevice);
 
         }
 

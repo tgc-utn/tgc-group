@@ -83,7 +83,7 @@ namespace TGC.Group.Model
         private float offsetForward = -800;
 
 
-        SoundManager soundManager = new SoundManager(mediaDir);
+        SoundManager soundManager = new SoundManager();
 
         public override void Init()
         {
