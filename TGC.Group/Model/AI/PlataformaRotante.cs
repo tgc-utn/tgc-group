@@ -60,38 +60,55 @@ namespace TGC.Group.Model.AI
             plataformaMesh.Transform = mTraslacionAlOrigen * TGCMatrix.RotationY(anguloRotacion * tiempo) * mTraslacionPosInicial;
         }
 
+
+
+        //Manejo de colision Esfera OBB
+        //TODO: Reificar
         override public bool colisionaConPersonaje(TgcBoundingSphere esferaPersonaje)
         {
             return TgcCollisionUtils.testSphereOBB(esferaPersonaje, OBB);
         }
 
-        private TGCVector3 EPSILON = new TGCVector3(0f, 0.005f, 0f);
+        private TGCVector3 EPSILON = new TGCVector3(0f, 0.0000005f, 0f);
 
         public TGCVector3 colisionConRotante(TgcBoundingSphere esfera, TGCVector3 movementVector)
         {
-            if(TgcCollisionUtils.testSphereOBB(esfera, OBB))//distancia(esfera, this.obb) <= esfera.Radius) --> update
+            
+            if (distanciaEsferaOBB(esfera, OBB) <= esfera.Radius)
             {
-                movementVector += EPSILON;
-                esfera.moveCenter(movementVector);
+                if (movementVector.LengthSq() > EPSILON.Length())
+                {
+                    movementVector += EPSILON;
+                    esfera.moveCenter(movementVector);
+                }
             }
             return movementVector;
         }
-        /***********************************PROXIMAMENTE************************************************/
-        private float distancia(TgcBoundingSphere esfera, TgcBoundingOrientedBox obb)
+        
+        private float distanciaEsferaOBB(TgcBoundingSphere esfera, TgcBoundingOrientedBox obb)
+        {
+            var closest = vMenorDistancia(esfera, obb);
+            float sqDist = TGCVector3.Dot(closest - esfera.Center, closest - esfera.Center);
+            return sqDist;
+
+        }
+
+        private TGCVector3 vMenorDistancia(TgcBoundingSphere esfera, TgcBoundingOrientedBox obb)
         {
             var v = esfera.Center - obb.Center;
-            float sqDist = 0f;
+            var q = esfera.Center;
             foreach(TGCVector3 eje in obb.Orientation)
             {
-                float d = TGCVector3.Dot(v, eje), excess = 0f;
-                if (d < -eje.Length()) excess = d + eje.LengthSq();
-                else if (d > eje.Length()) excess = d - eje.LengthSq();
-                sqDist += FastMath.Pow2(excess);
+                //Distancia al eje de la caja
+                float dist = TGCVector3.Dot(v, eje), excess = 0f;
+
+                if (dist > eje.Length()) dist = eje.Length();
+                else if (dist < -eje.Length()) dist = -eje.Length();
+
+                TGCVector3.Add(q,TGCVector3.Multiply(eje,excess));
 
             }
-
-
-            return sqDist;
+            return q;
         }
 
     }
