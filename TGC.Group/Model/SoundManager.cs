@@ -9,49 +9,47 @@ namespace TGC.Group.Model
 {
     public class SoundManager : TgcDirectSound
     {
-        public TgcStaticSound sonidoCaminar;
-        public TgcStaticSound sonidoFondo;
-
-        static string mediaDir;
-
+        public TgcStaticSound SonidoCaminar;
+        public TgcStaticSound SonidoFondo;
+        public static Directorio Directorio { get; set; }
+        
         public static SoundManager Instance;
-
 
         public static SoundManager getInstance()
         {
             if (Instance == null)
             {
-                Instance = new SoundManager();
+                Instance = new SoundManager(Directorio);
             }
             return Instance;
         }
 
-        public SoundManager()
+        public SoundManager(Directorio directorio)
         {
+            Directorio = directorio;
 
+            SonidoCaminar = new TgcStaticSound();
+            SonidoFondo = new TgcStaticSound();
 
-            sonidoCaminar = new TgcStaticSound();
-            sonidoFondo = new TgcStaticSound();
-
-            sonidoFondo.loadSound("Media\\Sound\\Background.wav", DsDevice);
-            sonidoCaminar.loadSound("Media\\Sound\\FootSteps.wav", DsDevice);
+            SonidoFondo.loadSound(directorio.SonidoFondo, DsDevice);
+            SonidoCaminar.loadSound(directorio.SonidoCaminar, DsDevice);
 
         }
 
         public void playSonidoCaminar()
         {
-            sonidoCaminar.play();
+            SonidoCaminar.play();
         }
 
         public void playSonidoFondo()
         {
-            sonidoFondo.play();
+            SonidoFondo.play();
         }
 
         public void dispose()
         {
-            sonidoFondo.dispose();
-            sonidoCaminar.dispose();
+            SonidoFondo.dispose();
+            SonidoCaminar.dispose();
         }
     }
 }

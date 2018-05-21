@@ -83,7 +83,7 @@ namespace TGC.Group.Model
         private float offsetForward = -800;
 
 
-        SoundManager soundManager = new SoundManager();
+        public SoundManager soundManager;
 
         public override void Init()
         {
@@ -100,6 +100,9 @@ namespace TGC.Group.Model
             //Objeto que conoce todos los path de MediaDir
             directorio = new Directorio(MediaDir);
 
+            //Cargo el SoundManager
+            SoundManager soundManager = new SoundManager(directorio);
+            soundManager.playSonidoFondo();
             //Cagar escenario especifico para el juego.
             escenario = new Escenario(directorio.EscenaCrash);
 
@@ -508,7 +511,7 @@ namespace TGC.Group.Model
 
                 }
 
-                soundManager.playSonidoFondo();
+                //soundManager.playSonidoFondo();
 
             }
             else
