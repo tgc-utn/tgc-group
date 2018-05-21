@@ -33,8 +33,8 @@ namespace TGC.Group.Model
             sonidoCaminar = new TgcStaticSound();
             sonidoFondo = new TgcStaticSound();
 
-            sonidoFondo.loadSound("Media\\Sound\\Background.wav", DsDevice);
-            sonidoCaminar.loadSound("Media\\Sound\\FootSteps.wav", DsDevice);
+            sonidoFondo.loadSound("Sound\\muelle, continuo", DsDevice);
+            sonidoCaminar.loadSound("Sound\\muelle, continuo", DsDevice);
 
         }
 
