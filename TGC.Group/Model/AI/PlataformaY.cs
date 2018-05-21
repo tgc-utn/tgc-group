@@ -26,7 +26,7 @@ namespace TGC.Group.Model.AI
 
 		public override TGCVector3 VectorMovimiento()
         {
-            if (vectorMovimiento.Y < 0) return new TGCVector3(0, 0, 0);
+            if (vectorMovimiento.Y < 0) return new TGCVector3(0f, 0.05f, 0f);
             else return vectorMovimiento;
         }
 

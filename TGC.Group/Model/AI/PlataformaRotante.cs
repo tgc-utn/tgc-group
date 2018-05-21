@@ -57,6 +57,34 @@ namespace TGC.Group.Model.AI
             return TgcCollisionUtils.testSphereOBB(esferaPersonaje, obb);
         }
 
+        private TGCVector3 EPSILON = new TGCVector3(0f, 0.05f, 0f);
+
+        public TGCVector3 colisionConRotante(TgcBoundingSphere esfera, TGCVector3 movementVector)
+        {
+            if(TgcCollisionUtils.testSphereOBB(esfera,this.obb))//distancia(esfera, this.obb) <= esfera.Radius) --> update
+            {
+                movementVector += EPSILON;
+                esfera.moveCenter(movementVector);
+            }
+            return movementVector;
+        }
+
+        private float distancia(TgcBoundingSphere esfera, TgcBoundingOrientedBox obb)
+        {
+            var v = esfera.Center - obb.Center;
+            float sqDist = 0f;
+            foreach(TGCVector3 eje in obb.Orientation)
+            {
+                float d = TGCVector3.Dot(v, eje), excess = 0f;
+                if (d < -eje.Length()) excess = d + eje.LengthSq();
+                else if (d > eje.Length()) excess = d - eje.LengthSq();
+                sqDist += FastMath.Pow2(excess);
+
+            }
+
+
+            return sqDist;
+        }
 
     }
 }

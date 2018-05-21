@@ -306,18 +306,23 @@ namespace TGC.Group.Model
             
             if (objetoEscenario != null) generarMovimiento(objetoEscenario, movementVector);
 
-            //var platRot = plataformasRotantes.Find(plat => plat.colisionaConPersonaje(esferaPersonaje));
-//            if (platRot != null) movimientoPorPlataforma = platRot.colisionConRotante(esferaPersonaje, movementVector);
-             movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movementVector, escenario.MeshesColisionablesBB());
 
             movimientoPorPlataformas();
-            personaje.Move(movimientoRealPersonaje + movimientoPorPlataforma);
-            
 
-            //Actualizamos la esfera del personaje.
+            var platRot = plataformasRotantes.Find(plat => plat.colisionaConPersonaje(esferaPersonaje));
+            if (platRot != null)
+            {
+                movimientoRealPersonaje = platRot.colisionConRotante(esferaPersonaje, movementVector);
+                
+            }
+            else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movementVector, escenario.MeshesColisionablesBB());
+
             
+            personaje.Move(movimientoRealPersonaje + movimientoPorPlataforma);
             esferaPersonaje.moveCenter(movimientoPorPlataforma);
-            esferaSecurePos = esferaPersonaje.Position;
+            //Actualizamos la esfera del personaje.     
+
+
         }
 
         public void movimientoDePlataformas()
