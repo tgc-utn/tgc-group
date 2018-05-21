@@ -82,8 +82,7 @@ namespace TGC.Group.Model
         private float offsetHeight = 400;
         private float offsetForward = -800;
 
-
-        public SoundManager soundManager;
+        public static SoundManager soundManager;
 
         public override void Init()
         {
@@ -100,7 +99,10 @@ namespace TGC.Group.Model
             //Objeto que conoce todos los path de MediaDir
             directorio = new Directorio(MediaDir);
 
-            
+            //Cargo el SoundManager
+            soundManager = new SoundManager(directorio);
+            soundManager.playSonidoFondo();
+
             //Cagar escenario especifico para el juego.
             escenario = new Escenario(directorio.EscenaCrash);
 
@@ -161,9 +163,7 @@ namespace TGC.Group.Model
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara = camaraInterna;
 
-            //Cargo el SoundManager
-            SoundManager soundManager = new SoundManager(directorio);
-            soundManager.playSonidoFondo();
+            
 
         }
 
@@ -252,7 +252,7 @@ namespace TGC.Group.Model
                     moveForward = -velocidadCaminar;
                     movX = FastMath.Sin(personaje.Rotation.Y) * moveForward * ElapsedTime;
                     movZ = FastMath.Cos(personaje.Rotation.Y) * moveForward * ElapsedTime;
-                    //soundManager.playSonidoCaminar();
+                    soundManager.playSonidoCaminar();
                 }
                 else animacion = "Parado";
 

@@ -10,50 +10,45 @@ namespace TGC.Group.Model
     public class SoundManager
     {
         private static TgcDirectSound DirectSound = new TgcDirectSound();
-        private TgcMp3Player mp3Player = new TgcMp3Player();
+        private TgcMp3Player mp3BackgroundPlayer = new TgcMp3Player();
         private static Directorio Directorio { get; set; }
 
-        private static TgcStaticSound SonidoCaminar = new TgcStaticSound();
-        private static TgcStaticSound SonidoSalto = new TgcStaticSound();
+       // private static TgcStaticSound SonidoCaminar = new TgcStaticSound();
+       // private static TgcStaticSound SonidoSalto = new TgcStaticSound();
 
-        public static SoundManager Instance;
-
-        public static SoundManager getInstance()
-        {
-            if (Instance == null)
-            {
-                Instance = new SoundManager(Directorio);
-            }
-            return Instance;
-        }
+        private TgcMp3Player mp3PasosPlayer = new TgcMp3Player();
 
         public SoundManager(Directorio directorio)
         {
             Directorio = directorio;
 
             //Cargo archivo de sonido background mp3.
-            mp3Player.closeFile();
-            mp3Player.FileName = directorio.SonidoFondo;
+            mp3BackgroundPlayer.closeFile();
+            mp3BackgroundPlayer.FileName = directorio.SonidoFondo;
 
             //Cargo sonidos estaticos.
             //SonidoSalto.loadSound(directorio.SonidoSalto, DirectSound.DsDevice);
-           // SonidoCaminar.loadSound(directorio.SonidoCaminar, DirectSound.DsDevice);
+            //SonidoCaminar.loadSound(directorio.SonidoCaminar, DirectSound.DsDevice);
+
+
+            mp3PasosPlayer.closeFile();
+            mp3PasosPlayer.FileName = directorio.SonidoCaminar;
         }
 
         public void playSonidoCaminar()
         {
-           
-            SonidoCaminar.play();
+            mp3PasosPlayer.play(true);
+            //SonidoCaminar.play();
         }
 
         public void playSonidoFondo()
         {
-            mp3Player.play(true);
+            mp3BackgroundPlayer.play(true);
         }
 
         public void dispose()
         {
-            SonidoCaminar.dispose();
+           // SonidoCaminar.dispose();
         }
     }
 }
