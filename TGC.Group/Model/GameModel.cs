@@ -158,9 +158,10 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
-            tiempoAcumulado += ElapsedTime;
+            tiempoAcumulado += 0.01f;
 
-            //TODO: Redificar estos valores.
+
+            //TODO: Reificar estos valores.
             //Obtenemos los valores default
             var velocidadCaminar = 600f;
             var coeficienteSalto = 30f;
@@ -487,6 +488,8 @@ namespace TGC.Group.Model
                 DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
 
                 escenario.RenderAll();
+                plataformasRotantes.ForEach(plat => plat.RotateOBB(tiempoAcumulado));
+           
                
                 if (!paused)
                 {
@@ -502,7 +505,6 @@ namespace TGC.Group.Model
 
                     personaje.BoundingBox.Render();
                     esferaPersonaje.Render();
-                     plataformasRotantes.ForEach(plat => plat.RotateOBB(tiempoAcumulado));
                     escenario.RenderizarBoundingBoxes();
                    // directionArrow.Render();
                     /*if (esferaCaja != null)

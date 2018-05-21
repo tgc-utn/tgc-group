@@ -56,18 +56,25 @@ namespace TGC.Group.Model
             return MeshesColisionablesSin("PLATAFORMA").Exists(x => TgcCollisionUtils.testAABBAABB(x.BoundingBox, mesh.BoundingBox));
         }
 
+        private int coeficienteRotacion = 1;
+
         public List<Plataforma> Plataformas()
         {
             List<Plataforma> plataformas = new List<Plataforma>();
 
             foreach (TgcMesh plataformaMesh in PlataformasMesh())
             {
+                
                 Plataforma plataforma;
 
                 if (plataformaMesh.Name == "PlataformaY") plataforma = new PlataformaY(plataformaMesh, this);
                 else if (plataformaMesh.Name == "PlataformaX") plataforma = new PlataformaX(plataformaMesh, this);
                 else if (plataformaMesh.Name == "PlataformaZ") plataforma = new PlataformaZ(plataformaMesh, this);
-                else if (plataformaMesh.Name == "PlataformaRotante") plataforma = new PlataformaRotante(plataformaMesh, this);
+                else if (plataformaMesh.Name == "PlataformaRotante")
+                {
+                    coeficienteRotacion *= -1;
+                    plataforma = new PlataformaRotante(plataformaMesh, this, coeficienteRotacion);
+                }
                 else plataforma = new Plataforma(plataformaMesh, this);
 
                 plataformas.Add(plataforma);
