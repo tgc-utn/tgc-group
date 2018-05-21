@@ -7,12 +7,15 @@ using TGC.Core.Text;
 
 namespace TGC.Group.Model
 {
-    public class SoundManager : TgcDirectSound
+    public class SoundManager
     {
-        public TgcStaticSound SonidoCaminar;
-        public TgcStaticSound SonidoFondo;
-        public static Directorio Directorio { get; set; }
-        
+        private static TgcDirectSound DirectSound = new TgcDirectSound();
+        private TgcMp3Player mp3Player = new TgcMp3Player();
+        private static Directorio Directorio { get; set; }
+
+        private static TgcStaticSound SonidoCaminar = new TgcStaticSound();
+        private static TgcStaticSound SonidoSalto = new TgcStaticSound();
+
         public static SoundManager Instance;
 
         public static SoundManager getInstance()
@@ -28,27 +31,28 @@ namespace TGC.Group.Model
         {
             Directorio = directorio;
 
-            SonidoCaminar = new TgcStaticSound();
-            SonidoFondo = new TgcStaticSound();
+            //Cargo archivo de sonido background mp3.
+            mp3Player.closeFile();
+            mp3Player.FileName = directorio.SonidoFondo;
 
-            SonidoFondo.loadSound(directorio.SonidoFondo, DsDevice);
-            SonidoCaminar.loadSound(directorio.SonidoCaminar, DsDevice);
-
+            //Cargo sonidos estaticos.
+            //SonidoSalto.loadSound(directorio.SonidoSalto, DirectSound.DsDevice);
+           // SonidoCaminar.loadSound(directorio.SonidoCaminar, DirectSound.DsDevice);
         }
 
         public void playSonidoCaminar()
         {
+           
             SonidoCaminar.play();
         }
 
         public void playSonidoFondo()
         {
-            SonidoFondo.play();
+            mp3Player.play(true);
         }
 
         public void dispose()
         {
-            SonidoFondo.dispose();
             SonidoCaminar.dispose();
         }
     }
