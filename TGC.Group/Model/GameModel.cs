@@ -54,8 +54,8 @@ namespace TGC.Group.Model
         private TGCVector3 movimientoRelativoPersonaje = TGCVector3.Empty;
         private TGCVector3 movimientoRealCaja = TGCVector3.Empty;
         private TgcBoundingSphere esferaCaja;
-        TGCVector3 movimientoPorPlataforma = new TGCVector3(0, 0, 0);
-        private bool colisionPlataforma = false;
+        //TGCVector3 movimientoPorPlataforma = new TGCVector3(0, 0, 0);
+       // private bool colisionPlataforma = false;
         private List<Plataforma> plataformas;
         private List<PlataformaRotante> plataformasRotantes;
 
@@ -295,33 +295,31 @@ namespace TGC.Group.Model
             }
         }
 
+        //Objeto Movible del escenario, utilizado para mantener la referencia a una caja cuando cae
         TgcMesh objetoEscenario;
-        TGCVector3 esferaSecurePos;
-
         public void moverMundo(TGCVector3 movementVector)
         {
 
-             var cajaColisionante = obtenerColisionCajaPersonaje();
-             if (cajaColisionante != null && cajaColisionante != objetoEscenario) objetoEscenario = cajaColisionante;
+            //Busca la caja con la cual se esta colisionando
+            var cajaColisionante = obtenerColisionCajaPersonaje();
+            //Si es una caja nueva updatea la referencia global
+            if (cajaColisionante != null && cajaColisionante != objetoEscenario) objetoEscenario = cajaColisionante;
 
-            
             if (objetoEscenario != null) generarMovimiento(objetoEscenario, movementVector);
 
+            //Retorna vector del movimiento de una plataforma con la cual se este colisionando
+            var movimientoPorPlataforma = movimientoPorPlataformas();
 
-            movimientoPorPlataformas();
-
+            //Busca una plataforma rotante con la que se este colisionando
+            //NOTA: para estas plataformas se colisiona Esfera -> OBB y no Esfera -> AABB como las demás colisiones
             var platRot = plataformasRotantes.Find(plat => plat.colisionaConPersonaje(esferaPersonaje));
-            if (platRot != null)
-            {
-                movimientoRealPersonaje = platRot.colisionConRotante(esferaPersonaje, movementVector);
-                
-            }
+            //Si colisiona con una maneja la colision para las rotantes sino usa el metodo general
+            if (platRot != null) movimientoRealPersonaje = platRot.colisionConRotante(esferaPersonaje, movementVector);
             else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movementVector, escenario.MeshesColisionablesBB());
-
-            
+             
             personaje.Move(movimientoRealPersonaje + movimientoPorPlataforma);
-            esferaPersonaje.moveCenter(movimientoPorPlataforma);
             //Actualizamos la esfera del personaje.     
+            esferaPersonaje.moveCenter(movimientoPorPlataforma);
 
 
         }
@@ -330,15 +328,15 @@ namespace TGC.Group.Model
         {
             foreach (Plataforma plataforma in plataformas) plataforma.Update(tiempoAcumulado);
         }
-        public void movimientoPorPlataformas()
+        public TGCVector3 movimientoPorPlataformas()
         {
 
             Plataforma plataformaColisionante = plataformas.Find(plataforma => plataforma.colisionaConPersonaje(esferaPersonaje));
-            if (plataformaColisionante != null) colisionPlataforma = true;
-            else colisionPlataforma = false;
+            /*if (plataformaColisionante != null) colisionPlataforma = true;
+            else colisionPlataforma = false;*/
 
-            if (colisionPlataforma) movimientoPorPlataforma = plataformaColisionante.VectorMovimiento();
-            else movimientoPorPlataforma = new TGCVector3(0, 0, 0);
+            if (plataformaColisionante != null/*colisionPlataforma*/) return plataformaColisionante.VectorMovimiento();
+            else return TGCVector3.Empty;
         }
 
         public void generarMovimiento(TgcMesh objetoMovible, TGCVector3 movementV)
@@ -346,7 +344,7 @@ namespace TGC.Group.Model
             if (objetoMovibleG == null || objetoMovibleG != objetoMovible) objetoMovibleG = objetoMovible;
 
             esferaCaja = new TgcBoundingSphere(objetoMovible.BoundingBox.calculateBoxCenter() + new TGCVector3(0f, 15f, 0f), objetoMovible.BoundingBox.calculateBoxRadius() * 0.7f);
-          //  escenario.MeshesColisionables();
+
             movimientoRealCaja = ColisionadorEsferico.moveCharacter(esferaCaja, movementV, escenario.MeshesColisionablesBBSin(objetoMovible));
 
             var testCol = testColisionObjetoPersonaje(objetoMovible);
@@ -479,16 +477,18 @@ namespace TGC.Group.Model
 
                 DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
                            + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
-                           + "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
+                           /*+ "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
                            + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
                            + "Interaccion Con Caja: " + interaccionConCaja + "\n"
                            + "Colision Plataforma: " + colisionPlataforma + "\n"
-                           + "Movimiento por plataforma: " + movimientoPorPlataforma, 0, 30, Color.GhostWhite);
+                           + "Movimiento por plataforma: " + movimientoPorPlataforma*/, 0, 30, Color.GhostWhite);
 
                 DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
 
                 escenario.RenderAll();
-                plataformasRotantes.ForEach(plat => plat.RotateOBB(tiempoAcumulado));
+
+                //Renderizo OBB de las plataformas rotantes
+                plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
            
                
                 if (!paused)

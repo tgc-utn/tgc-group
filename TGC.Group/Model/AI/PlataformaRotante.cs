@@ -17,61 +17,66 @@ namespace TGC.Group.Model.AI
         private Escenario escenario;
         public float anguloRotacion;
 
-        private TGCVector3 initPosBB;
-        private TGCMatrix MTraslacionOrigen;
-        private TGCMatrix MTraslacionPos;
-        public TgcBoundingOrientedBox obb;
-        private TGCVector3 RotOBB;
+        private TGCVector3 posicionInicialBB;
+        private TGCMatrix mTraslacionAlOrigen;
+        private TGCMatrix mTraslacionPosInicial;
+        public TgcBoundingOrientedBox OBB;
+        private TGCVector3 vRotacionOBB;
 
         public PlataformaRotante(TgcMesh plataformaMesh, Escenario escenario, int coeficienteRotacion) : base(plataformaMesh, escenario)
         {
             this.plataformaMesh = plataformaMesh;
             this.escenario = escenario;
+
             this.plataformaMesh.AutoTransform = false;
             this.plataformaMesh.AutoUpdateBoundingBox = false;
+
+            //Defino angulo de rotacion --> coeficiente puede ser -1 o 1, define direccion de rotacion
             anguloRotacion = FastMath.ToRad(15f);
             anguloRotacion *= coeficienteRotacion;
 
-            initPosBB = this.plataformaMesh.BoundingBox.calculateBoxCenter(); //Posicion inicial BoundingBox (Se setea en la posición correcta)
-            MTraslacionPos = TGCMatrix.Translation(initPosBB);
-             
-            MTraslacionOrigen = TGCMatrix.Translation(new TGCVector3(-initPosBB.X, -initPosBB.Y, -initPosBB.Z));
 
-            obb = TgcBoundingOrientedBox.computeFromAABB(this.plataformaMesh.BoundingBox);
-            obb.setRenderColor(System.Drawing.Color.Red);
+            //Defino Matrices para rotacion del mesh de la plataforma
+            posicionInicialBB = this.plataformaMesh.BoundingBox.calculateBoxCenter(); 
+            mTraslacionPosInicial = TGCMatrix.Translation(posicionInicialBB);
+            mTraslacionAlOrigen = TGCMatrix.Translation(new TGCVector3(-posicionInicialBB.X, -posicionInicialBB.Y, -posicionInicialBB.Z));
+
+            //Defino OrientedBoundingBox y hago el Dispose() de la AABB
+            OBB = TgcBoundingOrientedBox.computeFromAABB(this.plataformaMesh.BoundingBox);
+            OBB.setRenderColor(System.Drawing.Color.Empty);
+            vRotacionOBB = new TGCVector3(0f, anguloRotacion, 0f);
+
             plataformaMesh.BoundingBox.Dispose();
-            RotOBB = new TGCVector3(0f, anguloRotacion, 0f);
+
         }
-        public void RotateOBB(float tiempo)
+        public void Render(float tiempo)
         {
-            obb.setRotation(TGCVector3.Multiply(RotOBB,tiempo));
-            obb.Render();            
+            OBB.setRotation(TGCVector3.Multiply(vRotacionOBB,tiempo));
+            OBB.Render();            
         }
         public override void Update(float tiempo)
         {
-            var Rot = MTraslacionOrigen * TGCMatrix.RotationY(anguloRotacion * tiempo) * MTraslacionPos;
-            plataformaMesh.Transform = Rot;
-            //obb.setRotation(new TGCVector3(0f, anguloRotacion * tiempo, 0f));
-
+            //Traslado Mesh al origen --> Roto el Mesh --> Vuelve a la posicion inicial
+            plataformaMesh.Transform = mTraslacionAlOrigen * TGCMatrix.RotationY(anguloRotacion * tiempo) * mTraslacionPosInicial;
         }
 
         override public bool colisionaConPersonaje(TgcBoundingSphere esferaPersonaje)
         {
-            return TgcCollisionUtils.testSphereOBB(esferaPersonaje, obb);
+            return TgcCollisionUtils.testSphereOBB(esferaPersonaje, OBB);
         }
 
         private TGCVector3 EPSILON = new TGCVector3(0f, 0.005f, 0f);
 
         public TGCVector3 colisionConRotante(TgcBoundingSphere esfera, TGCVector3 movementVector)
         {
-            if(TgcCollisionUtils.testSphereOBB(esfera,this.obb))//distancia(esfera, this.obb) <= esfera.Radius) --> update
+            if(TgcCollisionUtils.testSphereOBB(esfera, OBB))//distancia(esfera, this.obb) <= esfera.Radius) --> update
             {
                 movementVector += EPSILON;
                 esfera.moveCenter(movementVector);
             }
             return movementVector;
         }
-
+        /***********************************PROXIMAMENTE************************************************/
         private float distancia(TgcBoundingSphere esfera, TgcBoundingOrientedBox obb)
         {
             var v = esfera.Center - obb.Center;
