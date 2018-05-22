@@ -74,6 +74,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GUI\GUI.cs" />
+    <Compile Include="GUI\GUIItem.cs" />
+    <Compile Include="GUI\GUITest.cs" />
     <Compile Include="Model\AI\PlataformaZ.cs" />
     <Compile Include="Model\PisoInercia.cs" />
     <Compile Include="Model\AI\Plataforma.cs" />

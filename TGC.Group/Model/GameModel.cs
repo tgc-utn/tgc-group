@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using TGC.Examples.Collision.SphereCollision;
 using TGC.Group.Model.AI;
 
+
 namespace TGC.Group.Model
 {
     public class GameModel : TgcExample
@@ -71,6 +72,9 @@ namespace TGC.Group.Model
         private float offsetHeight = 400;
         private float offsetForward = -800;
         private float tiempoAcumulado;
+
+       
+        
 
         public override void Init()
         {
@@ -142,6 +146,7 @@ namespace TGC.Group.Model
             Camara = camaraInterna;
 
             personaje.BoundingBox.scaleTranslate(personaje.Position, scaleBoundingVector);
+
 
         }
 
