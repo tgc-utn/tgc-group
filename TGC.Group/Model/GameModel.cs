@@ -55,7 +55,7 @@ namespace TGC.Group.Model
         private TGCVector3 movimientoRealCaja = TGCVector3.Empty;
         private TgcBoundingSphere esferaCaja;
         //TGCVector3 movimientoPorPlataforma = new TGCVector3(0, 0, 0);
-       // private bool colisionPlataforma = false;
+        private bool colisionPlataforma = false;
         private List<Plataforma> plataformas;
         private List<PlataformaRotante> plataformasRotantes;
 
@@ -290,7 +290,6 @@ namespace TGC.Group.Model
 
                 //Reajustamos la camara
                 ajustarCamara();
-
                 PostUpdate();
             }
         }
@@ -332,10 +331,10 @@ namespace TGC.Group.Model
         {
 
             Plataforma plataformaColisionante = plataformas.Find(plataforma => plataforma.colisionaConPersonaje(esferaPersonaje));
-            /*if (plataformaColisionante != null) colisionPlataforma = true;
-            else colisionPlataforma = false;*/
+            if (plataformaColisionante != null) colisionPlataforma = true;
+            else colisionPlataforma = false;
 
-            if (plataformaColisionante != null/*colisionPlataforma*/) return plataformaColisionante.VectorMovimiento();
+            if (colisionPlataforma) return plataformaColisionante.VectorMovimiento();
             else return TGCVector3.Empty;
         }
 
@@ -479,9 +478,9 @@ namespace TGC.Group.Model
                            + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
                            /*+ "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
                            + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
-                           + "Interaccion Con Caja: " + interaccionConCaja + "\n"
+                           + "Interaccion Con Caja: " + interaccionConCaja + "\n"*/
                            + "Colision Plataforma: " + colisionPlataforma + "\n"
-                           + "Movimiento por plataforma: " + movimientoPorPlataforma*/, 0, 30, Color.GhostWhite);
+                           /*+ "Movimiento por plataforma: " + movimientoPorPlataforma*/, 0, 30, Color.GhostWhite);
 
                 DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
 

@@ -52,7 +52,7 @@ namespace TGC.Group.Model.AI
         public void Render(float tiempo)
         {
             OBB.setRotation(TGCVector3.Multiply(vRotacionOBB,tiempo));
-            OBB.Render();            
+            OBB.Render();
         }
         public override void Update(float tiempo)
         {
@@ -66,49 +66,29 @@ namespace TGC.Group.Model.AI
         //TODO: Reificar
         override public bool colisionaConPersonaje(TgcBoundingSphere esferaPersonaje)
         {
-            return TgcCollisionUtils.testSphereOBB(esferaPersonaje, OBB);
+            return TgcCollisionUtils.testSphereOBB(esferaPersonaje,OBB);//TgcCollisionUtils.testSphereOBB(esferaPersonaje,OBB);
         }
 
-        private TGCVector3 EPSILON = new TGCVector3(0f, 0.0000005f, 0f);
-
+        private float EPSILON = 0.4f;
         public TGCVector3 colisionConRotante(TgcBoundingSphere esfera, TGCVector3 movementVector)
         {
-            
-            if (distanciaEsferaOBB(esfera, OBB) <= esfera.Radius)
+            if (colisionaConPersonaje(esfera) && esfera.Center.Y > OBB.Center.Y + OBB.Extents.Y)
             {
-                if (movementVector.LengthSq() > EPSILON.Length())
-                {
-                    movementVector += EPSILON;
-                    esfera.moveCenter(movementVector);
-                }
+                esfera.moveCenter(movementVector);
+                return movementVector;
             }
-            return movementVector;
-        }
-        
-        private float distanciaEsferaOBB(TgcBoundingSphere esfera, TgcBoundingOrientedBox obb)
-        {
-            var closest = vMenorDistancia(esfera, obb);
-            float sqDist = TGCVector3.Dot(closest - esfera.Center, closest - esfera.Center);
-            return sqDist;
-
-        }
-
-        private TGCVector3 vMenorDistancia(TgcBoundingSphere esfera, TgcBoundingOrientedBox obb)
-        {
-            var v = esfera.Center - obb.Center;
-            var q = esfera.Center;
-            foreach(TGCVector3 eje in obb.Orientation)
+            else if (colisionaConPersonaje(esfera) && esfera.Center.Y < OBB.Center.Y - OBB.Extents.Y)
             {
-                //Distancia al eje de la caja
-                float dist = TGCVector3.Dot(v, eje), excess = 0f;
-
-                if (dist > eje.Length()) dist = eje.Length();
-                else if (dist < -eje.Length()) dist = -eje.Length();
-
-                TGCVector3.Add(q,TGCVector3.Multiply(eje,excess));
-
+                movementVector.Y = -EPSILON;
+                esfera.moveCenter(movementVector);
+                return movementVector;
             }
-            return q;
+            else
+            {
+                movementVector.Y = 25 * EPSILON;
+                esfera.moveCenter(-movementVector);
+                return -movementVector;
+            }
         }
 
     }
