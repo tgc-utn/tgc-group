@@ -40,6 +40,8 @@ namespace TGC.Group.Model.AI
             return colision;
         }
 
+        
+
         public override void Update(float tiempo)
         {
             TGCVector3 posicionSiguiente = plataformaMesh.Position + vectorMovimiento;

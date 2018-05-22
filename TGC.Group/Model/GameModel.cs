@@ -103,7 +103,7 @@ namespace TGC.Group.Model
 
             //Posicion inicial
             //personaje.Position = new TGCVector3(400, Ypiso, -900);
-            personaje.Position = new TGCVector3(-4133.616f, 1362f, -6640.231f);
+            personaje.Position = new TGCVector3(-4133.616f, 20f, 5000f);
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = false;
             
@@ -154,7 +154,7 @@ namespace TGC.Group.Model
 
             //TODO: Reificar estos valores.
             //Obtenemos los valores default
-            var velocidadCaminar = 600f;
+            var velocidadCaminar = 1000f;
             var coeficienteSalto = 30f;
             float saltoRealizado = 0;
             var moveForward = 0f;
@@ -243,7 +243,7 @@ namespace TGC.Group.Model
             }
         }
 
-        public TGCVector3 ObtenerVectorSlide(TGCVector3 movimientoOriginal)
+        public TGCVector3 MovimientoPorSliding(TGCVector3 movimientoOriginal)
         {
             var vectorSlide = new TGCVector3(0, 0, 0);
             foreach (TgcMesh mesh in escenario.ResbalososMesh())
@@ -279,14 +279,9 @@ namespace TGC.Group.Model
         TgcMesh objetoEscenario;
         public void moverMundo(TGCVector3 movimientoOriginal)
         {
-            //Consigo el vector por sliding.
-            var movimientoPorSliding = ObtenerVectorSlide(movimientoOriginal);
-            //Actualizo el vector de movimiento del personaje
-            movimientoOriginal += movimientoPorSliding;
             
-
-            movimientoDePlataformas();
-
+            //Actualizo el vector de movimiento del personaje segun el piso resbaloso
+            movimientoOriginal += MovimientoPorSliding(movimientoOriginal);
 
             //Busca la caja con la cual se esta colisionando
             var cajaColisionante = obtenerColisionCajaPersonaje();
@@ -295,19 +290,21 @@ namespace TGC.Group.Model
 
             if (objetoEscenario != null) generarMovimiento(objetoEscenario, movimientoOriginal);
 
-            //Retorna vector del movimiento de una plataforma con la cual se este colisionando
-            var movimientoPorPlataforma = movimientoPorPlataformas();
+            movimientoDePlataformas();
+            //Actualizo el vector de movimiento del personaje segun la plataforma colisionante
+            movimientoOriginal += movimientoPorPlataformas();
 
             //Busca una plataforma rotante con la que se este colisionando
             //NOTA: para estas plataformas se colisiona Esfera -> OBB y no Esfera -> AABB como las demás colisiones
-            var platRot = plataformasRotantes.Find(plat => plat.colisionaConPersonaje(esferaPersonaje));
+            var plataformaRotante = plataformasRotantes.Find(plat => plat.colisionaConPersonaje(esferaPersonaje));
             //Si colisiona con una maneja la colision para las rotantes sino usa el metodo general
-            if (platRot != null) movimientoRealPersonaje = platRot.colisionConRotante(esferaPersonaje, movimientoOriginal);
+            if (plataformaRotante != null) movimientoRealPersonaje = plataformaRotante.colisionConRotante(esferaPersonaje, movimientoOriginal);
             else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
              
-            personaje.Move(movimientoRealPersonaje + movimientoPorPlataforma);
-            //Actualizamos la esfera del personaje.     
-            esferaPersonaje.moveCenter(movimientoPorPlataforma);
+            personaje.Move(movimientoRealPersonaje);
+            //Actualizamos la esfera del personaje.    
+            
+           // esferaPersonaje.moveCenter(movimientoPorPlataforma);
 
 
         }
