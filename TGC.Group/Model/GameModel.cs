@@ -26,7 +26,6 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        private bool interaccionConCaja = false;
         private bool interaccionCaja = false;
 
 
@@ -49,7 +48,6 @@ namespace TGC.Group.Model
         private TgcBoundingSphere esferaPersonaje;
         private TGCVector3 scaleBoundingVector;
         private SphereCollisionManager ColisionadorEsferico;
-        private TgcArrow directionArrow;
         private TGCVector3 movimientoRealPersonaje;
         private TGCVector3 movimientoRelativoPersonaje = TGCVector3.Empty;
         private TGCVector3 movimientoRealCaja = TGCVector3.Empty;
@@ -129,13 +127,6 @@ namespace TGC.Group.Model
             
 
 
-            //Crear linea para mostrar la direccion del movimiento del personaje
-            directionArrow = new TgcArrow();
-            directionArrow.BodyColor = Color.Red;
-            directionArrow.HeadColor = Color.Green;
-            directionArrow.Thickness = 1;
-            directionArrow.HeadSize = new TGCVector2(10, 20);
-
             //Inicializamos el collisionManager.
             ColisionadorEsferico = new SphereCollisionManager();
             ColisionadorEsferico.GravityEnabled = true;
@@ -170,36 +161,22 @@ namespace TGC.Group.Model
             moving = false;
             var animacion = "";
 
-            while (ElapsedTime > 1)
-            {
-                ElapsedTime = ElapsedTime / 10;
-            };
-
+            while (ElapsedTime > 1) ElapsedTime = ElapsedTime / 10;
+            
             //Corroboramos si el jugador perdio la partida.
-            if (perdiste && Input.keyPressed(Key.Y))
-            {
-                Init();
-            }
-
+            if (perdiste && Input.keyPressed(Key.Y)) Init();
+            
             //Pausa
-            if (Input.keyPressed(Key.P))
-            {
-                paused = !paused;
-            }
-
+            if (Input.keyPressed(Key.P)) paused = !paused;
+            
             //Bounding Box activos.
-            if (Input.keyPressed(Key.F))
-            {
-                boundingBoxActivate = !boundingBoxActivate;
-            }
-
+            if (Input.keyPressed(Key.F))boundingBoxActivate = !boundingBoxActivate;
+            
             //Si el personaje se mantiene en caida, se pierda la partida.
-            if (personaje.Position.Y < -700)
-            {
-                perdiste = true;
-            }
+            if (personaje.Position.Y < -700)perdiste = true;
+            
 
-            //Si se sigue en juego, se continua con la logia del juego.
+            //Si se sigue en juego, se continua con la logica del juego.
             if (!paused && !perdiste)
             {
                 //MOVIMIENTOS BASICOS
@@ -225,8 +202,8 @@ namespace TGC.Group.Model
                 }
 
                 //Vector de movimiento
-                var movementVector = new TGCVector3(0,0,0);
 
+                var movimientoOriginal = new TGCVector3(0,0,0);
                 float movX = 0;
                 float movY = saltoRealizado;
                 float movZ = 0;
@@ -240,65 +217,64 @@ namespace TGC.Group.Model
                 }
                 else animacion = "Parado";
 
-                movementVector = new TGCVector3(movX, movY, movZ);
+                movimientoOriginal = new TGCVector3(movX, movY, movZ);
 
-                //MOVIMIENTOS POR PISO
-                var vectorSlide = new TGCVector3(0, 0, 0);
-
-                foreach (TgcMesh mesh in escenario.ResbalososMesh())
-                {
-                    if (pisoResbaloso == null)
-                    {
-                        pisoResbaloso = new PisoInercia(mesh, 0.999f);
-                    }
-
-                    if (pisoResbaloso.aCollisionFound(personaje))
-                    {
-                        var VectorSlideActual = pisoResbaloso.VectorEntrada;
-                        if (VectorSlideActual == TGCVector3.Empty)
-                        {
-                            pisoResbaloso.VectorEntrada = movementVector;
-                        }
-                        else
-                        {
-                           vectorSlide = VectorSlideActual;
-                        }
-                        break;
-                    }
-                    else
-                    {
-                        pisoResbaloso = null;
-                        //pisoResb.VectorEntrada = TGCVector3.Empty;
-                    }
-                }
-
+                
                 ColisionadorEsferico.GravityEnabled = true;
                 ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
                 ColisionadorEsferico.SlideFactor = 1.3f;
 
-                movimientoDePlataformas();
-                moverMundo(movementVector + vectorSlide);
-
-               //Actualizar valores de la linea de movimiento
-                directionArrow.PStart = esferaPersonaje.Center;
-                directionArrow.PEnd = esferaPersonaje.Center + TGCVector3.Multiply(movementVector, 50);
-                directionArrow.updateValues();
-
+                //MOVIMIENTOS POR PISO
+                var movimientoPorSliding = ObtenerVectorSlide(movimientoOriginal);
+                moverMundo(movimientoOriginal + movimientoPorSliding);
 
                 //Ejecuta la animacion del personaje
                 personaje.playAnimation(animacion, true);
 
                 //Reajustamos la camara
                 ajustarCamara();
+
                 PostUpdate();
             }
+        }
+
+        public TGCVector3 ObtenerVectorSlide(TGCVector3 movimientoOriginal)
+        {
+            var vectorSlide = new TGCVector3(0, 0, 0);
+            foreach (TgcMesh mesh in escenario.ResbalososMesh())
+            {
+                if (pisoResbaloso == null)
+                {
+                    pisoResbaloso = new PisoInercia(mesh, 0.999f);
+                }
+
+                if (pisoResbaloso.aCollisionFound(personaje))
+                {
+                    var VectorSlideActual = pisoResbaloso.VectorEntrada;
+                    if (VectorSlideActual == TGCVector3.Empty)
+                    {
+                        pisoResbaloso.VectorEntrada = movimientoOriginal;
+                    }
+                    else
+                    {
+                        vectorSlide = VectorSlideActual;
+                    }
+                    break;
+                }
+                else
+                {
+                    pisoResbaloso = null;
+                    //pisoResb.VectorEntrada = TGCVector3.Empty;
+                }
+            }
+            return vectorSlide;
         }
 
         //Objeto Movible del escenario, utilizado para mantener la referencia a una caja cuando cae
         TgcMesh objetoEscenario;
         public void moverMundo(TGCVector3 movementVector)
         {
-
+            movimientoDePlataformas();
             //Busca la caja con la cual se esta colisionando
             var cajaColisionante = obtenerColisionCajaPersonaje();
             //Si es una caja nueva updatea la referencia global
@@ -505,12 +481,7 @@ namespace TGC.Group.Model
                     personaje.BoundingBox.Render();
                     esferaPersonaje.Render();
                     escenario.RenderizarBoundingBoxes();
-                   // directionArrow.Render();
-                    /*if (esferaCaja != null)
-                    {
-                        esferaCaja.Render();
-
-                    }*/
+                   
 
                 }
 
