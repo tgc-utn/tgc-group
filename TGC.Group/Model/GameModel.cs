@@ -105,7 +105,7 @@ namespace TGC.Group.Model
             //personaje.Position = new TGCVector3(400, Ypiso, -900);
             personaje.Position = new TGCVector3(-4133.616f, 1362f, -6640.231f);
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
-            personaje.AutoTransform = true;
+            personaje.AutoTransform = false;
             
             
             //Rotar al robot en el Init para que mire hacia el otro lado
@@ -135,7 +135,7 @@ namespace TGC.Group.Model
             plataformas = escenario.Plataformas();
             plataformasRotantes = escenario.PlataformasRotantes();
 
-           //Posición de la camara.
+           //PosiciÃ³n de la camara.
             camaraInterna = new TgcThirdPersonCamera(personaje.Position, 500, -900);
            
             //Configuro donde esta la posicion de la camara y hacia donde mira.
@@ -217,7 +217,9 @@ namespace TGC.Group.Model
                 }
                 else animacion = "Parado";
 
+
                 movimientoOriginal = new TGCVector3(movX, movY, movZ);
+
 
                 
                 ColisionadorEsferico.GravityEnabled = true;
@@ -232,6 +234,10 @@ namespace TGC.Group.Model
 
                 //Reajustamos la camara
                 ajustarCamara();
+
+                //Esto soluciona el Autrotransform = false
+                personaje.UpdateMeshTransform();
+
 
                 PostUpdate();
             }
@@ -293,7 +299,7 @@ namespace TGC.Group.Model
             var movimientoPorPlataforma = movimientoPorPlataformas();
 
             //Busca una plataforma rotante con la que se este colisionando
-            //NOTA: para estas plataformas se colisiona Esfera -> OBB y no Esfera -> AABB como las demás colisiones
+            //NOTA: para estas plataformas se colisiona Esfera -> OBB y no Esfera -> AABB como las demÃ¡s colisiones
             var platRot = plataformasRotantes.Find(plat => plat.colisionaConPersonaje(esferaPersonaje));
             //Si colisiona con una maneja la colision para las rotantes sino usa el metodo general
             if (platRot != null) movimientoRealPersonaje = platRot.colisionConRotante(esferaPersonaje, movimientoOriginal);
@@ -450,7 +456,7 @@ namespace TGC.Group.Model
 
         public override void Render()
         {
-            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
+            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones segÃºn nuestra conveniencia.
             PreRender();
 
             if (!perdiste)
@@ -496,7 +502,7 @@ namespace TGC.Group.Model
             }
             else
             {
-                DrawText.drawText("Perdiste" + "\n" + "¿Reiniciar? (Y)", 500, 500, Color.Red);
+                DrawText.drawText("Perdiste" + "\n" + "Â¿Reiniciar? (Y)", 500, 500, Color.Red);
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
@@ -504,9 +510,9 @@ namespace TGC.Group.Model
         }
 
         /// <summary>
-        ///     Se llama cuando termina la ejecución del ejemplo.
+        ///     Se llama cuando termina la ejecuciÃ³n del ejemplo.
         ///     Hacer Dispose() de todos los objetos creados.
-        ///     Es muy importante liberar los recursos, sobretodo los gráficos ya que quedan bloqueados en el device de video.
+        ///     Es muy importante liberar los recursos, sobretodo los grÃ¡ficos ya que quedan bloqueados en el device de video.
         /// </summary>
         public override void Dispose()
         {
