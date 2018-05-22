@@ -72,18 +72,19 @@ namespace TGC.Group.Model.AI
         private float EPSILON = 0.4f;
         public TGCVector3 colisionConRotante(TgcBoundingSphere esfera, TGCVector3 movementVector)
         {
+            //Si esta parador Arriba de la caja
             if (colisionaConPersonaje(esfera) && esfera.Center.Y > OBB.Center.Y + OBB.Extents.Y)
             {
                 esfera.moveCenter(movementVector);
                 return movementVector;
-            }
+            }//Si choca por debajo a la plataforma
             else if (colisionaConPersonaje(esfera) && esfera.Center.Y < OBB.Center.Y - OBB.Extents.Y)
             {
                 movementVector.Y = -EPSILON;
                 esfera.moveCenter(movementVector);
                 return movementVector;
             }
-            else
+            else //Si la choca por los costados
             {
                 movementVector.Y = 25 * EPSILON;
                 esfera.moveCenter(-movementVector);
