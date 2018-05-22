@@ -225,8 +225,7 @@ namespace TGC.Group.Model
                 ColisionadorEsferico.SlideFactor = 1.3f;
 
                 //MOVIMIENTOS POR PISO
-                var movimientoPorSliding = ObtenerVectorSlide(movimientoOriginal);
-                moverMundo(movimientoOriginal + movimientoPorSliding);
+                moverMundo(movimientoOriginal);
 
                 //Ejecuta la animacion del personaje
                 personaje.playAnimation(animacion, true);
@@ -272,15 +271,23 @@ namespace TGC.Group.Model
 
         //Objeto Movible del escenario, utilizado para mantener la referencia a una caja cuando cae
         TgcMesh objetoEscenario;
-        public void moverMundo(TGCVector3 movementVector)
+        public void moverMundo(TGCVector3 movimientoOriginal)
         {
+            //Consigo el vector por sliding.
+            var movimientoPorSliding = ObtenerVectorSlide(movimientoOriginal);
+            //Actualizo el vector de movimiento del personaje
+            movimientoOriginal += movimientoPorSliding;
+            
+
             movimientoDePlataformas();
+
+
             //Busca la caja con la cual se esta colisionando
             var cajaColisionante = obtenerColisionCajaPersonaje();
             //Si es una caja nueva updatea la referencia global
             if (cajaColisionante != null && cajaColisionante != objetoEscenario) objetoEscenario = cajaColisionante;
 
-            if (objetoEscenario != null) generarMovimiento(objetoEscenario, movementVector);
+            if (objetoEscenario != null) generarMovimiento(objetoEscenario, movimientoOriginal);
 
             //Retorna vector del movimiento de una plataforma con la cual se este colisionando
             var movimientoPorPlataforma = movimientoPorPlataformas();
@@ -289,8 +296,8 @@ namespace TGC.Group.Model
             //NOTA: para estas plataformas se colisiona Esfera -> OBB y no Esfera -> AABB como las demás colisiones
             var platRot = plataformasRotantes.Find(plat => plat.colisionaConPersonaje(esferaPersonaje));
             //Si colisiona con una maneja la colision para las rotantes sino usa el metodo general
-            if (platRot != null) movimientoRealPersonaje = platRot.colisionConRotante(esferaPersonaje, movementVector);
-            else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movementVector, escenario.MeshesColisionablesBB());
+            if (platRot != null) movimientoRealPersonaje = platRot.colisionConRotante(esferaPersonaje, movimientoOriginal);
+            else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
              
             personaje.Move(movimientoRealPersonaje + movimientoPorPlataforma);
             //Actualizamos la esfera del personaje.     
