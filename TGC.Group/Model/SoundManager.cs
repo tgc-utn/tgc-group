@@ -13,7 +13,7 @@ namespace TGC.Group.Model
         private TgcMp3Player mp3BackgroundPlayer = new TgcMp3Player();
         private static Directorio Directorio { get; set; }
 
-       // private static TgcStaticSound SonidoCaminar = new TgcStaticSound();
+        private static TgcStaticSound SonidoCaminar = new TgcStaticSound();
        // private static TgcStaticSound SonidoSalto = new TgcStaticSound();
 
         private TgcMp3Player mp3PasosPlayer = new TgcMp3Player();
@@ -30,13 +30,13 @@ namespace TGC.Group.Model
             //SonidoSalto.loadSound(directorio.SonidoSalto, DirectSound.DsDevice);
             //SonidoCaminar.loadSound(directorio.SonidoCaminar, DirectSound.DsDevice);
 
-            mp3PasosPlayer.closeFile();
-            mp3PasosPlayer.FileName = directorio.SonidoCaminar;
+            //mp3PasosPlayer.closeFile();
+            //mp3PasosPlayer.FileName = directorio.SonidoCaminar;
         }
 
         public void playSonidoCaminar()
         {
-            mp3PasosPlayer.play(true);
+            //mp3PasosPlayer.play(true);
             //SonidoCaminar.play();
         }
 

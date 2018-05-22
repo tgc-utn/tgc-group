@@ -45,7 +45,7 @@ namespace TGC.Group.Model
             RobotTextura = RobotDirectorio + "Textures\\uvwGreen.jpg";
 
             SonidoFondo = mediaDir + "Sonidos\\background.mp3";
-            SonidoCaminar = mediaDir + "Sonidos\\footSteps.mp3";
+            SonidoCaminar = mediaDir + "Sonidos\\footStepsWAV.wav";
             SonidoSalto = mediaDir + "Sonidos\\salto.wav";
         }
 
