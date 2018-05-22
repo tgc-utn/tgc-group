@@ -2,7 +2,7 @@
   <name>CrashBandicoot</name>
   <texturesExport enabled="True" dir="Textures" />
   <lightmapExport enabled="False" dir="LightMaps" />
-  <sceneBoundingBox min="[-6427.833,-9291.755,-11716.18]" max="[3842.833,4511.308,13411.03]" />
+  <sceneBoundingBox min="[-9305.137,-9291.755,-11716.18]" max="[3842.833,4511.308,13411.03]" />
   <materials count="20">
     <m name="Multimaterial" type="Multimaterial">
       <subM name="Standardmaterial" type="Standardmaterial">
@@ -183,7 +183,7 @@
       <bitmap uvTiling="[1,1]" uvOffset="[1,1]">cajaMadera3.jpg</bitmap>
     </m>
   </materials>
-  <meshes count="334">
+  <meshes count="346">
     <mesh name="Object006" layer="PAREDES" type="Original" matId="0" color="[1,1,1]" visibility="1.0" lightmap="">
       <boundingBox min="[-1934.18,-9.8564,-3093.014]" max="[-482.239,615.177,1648.383]" />
       <coordinatesIdx count="144">0 1 2 2 3 0 4 0 3 3 5 4 6 7 8 8 9 6 7 2 1 1 8 7 10 11 12 12 13 10 13 12 1 1 0 13 14 15 16 16 17 14 17 16 3 3 2 17 18 10 13 13 19 18 19 13 0 0 4 19 15 20 21 21 16 15 16 21 5 5 3 16 22 23 24 24 25 22 25 24 7 7 6 25 26 27 28 28 29 26 29 28 9 9 8 29 23 14 17 17 24 23 24 17 2 2 7 24 11 26 29 29 12 11 12 29 8 8 1 12 10 18 30 30 31 10 11 10 31 31 32 11 26 11 32 32 33 26 27 26 33 33 34 27 </coordinatesIdx>
@@ -4933,14 +4933,14 @@
       <userProps count="0" />
     </mesh>
     <mesh name="Box_16" layer="PAREDES" type="Original" matId="13" color="[1,1,1]" visibility="1.0" lightmap="">
-      <boundingBox min="[-6402.581,-71.8003,6347.001]" max="[-6041.512,4511.307,8096.333]" />
+      <boundingBox min="[-6402.581,-71.8003,5937.922]" max="[-6041.512,4511.307,8987.725]" />
       <coordinatesIdx count="36">0 1 2 1 3 2 4 5 6 6 5 7 0 5 4 0 2 5 1 6 7 1 7 3 0 6 1 4 6 0 2 3 7 5 2 7 </coordinatesIdx>
       <textCoordsIdx count="36">0 1 2 1 3 2 0 2 1 1 2 3 0 3 1 0 2 3 0 1 3 0 3 2 0 3 1 2 3 0 0 1 3 2 0 3 </textCoordsIdx>
       <colorsIdx count="36">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </colorsIdx>
       <matIds count="1">0 </matIds>
       <textCoordsLightMapIdx count="0">
       </textCoordsLightMapIdx>
-      <vertices count="24">-6402.581 4511.307 8096.332 -6402.581 -71.8003 8096.332 -6041.512 4511.307 8096.332 -6041.512 -71.8003 8096.332 -6402.581 4511.307 6347.001 -6041.512 4511.307 6347.001 -6402.581 -71.8003 6347.001 -6041.512 -71.8003 6347.001 </vertices>
+      <vertices count="24">-6402.581 4511.307 8987.724 -6402.581 -71.8003 8987.724 -6041.512 4511.307 8987.724 -6041.512 -71.8003 8987.724 -6402.581 4511.307 5937.921 -6041.512 4511.307 5937.921 -6402.581 -71.8003 5937.921 -6041.512 -71.8003 5937.921 </vertices>
       <normals count="24">0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 </normals>
       <texCoords count="8">0 0 0 1 1 0 1 1 </texCoords>
       <colors count="3">255 255 255 </colors>
@@ -5277,6 +5277,198 @@
       <textCoordsLightMapIdx count="0">
       </textCoordsLightMapIdx>
       <vertices count="12">-4443.729 0 8878.025 -2793.973 0 8878.025 -2793.973 0 10624.71 -4443.729 0 10624.71 </vertices>
+      <normals count="12">0 -1 0 0 -1 0 0 -1 0 0 -1 0 </normals>
+      <texCoords count="8">1 1 0 1 0 0 1 0 </texCoords>
+      <colors count="3">255 255 255 </colors>
+      <texCoordsLightMap count="0">
+      </texCoordsLightMap>
+      <userProps count="0" />
+    </mesh>
+    <mesh name="Box_16" layer="PAREDES" type="Original" matId="13" color="[1,1,1]" visibility="1.0" lightmap="">
+      <boundingBox min="[-2800.137,-54.1846,8474.85]" max="[-2439.069,3243.184,10224.17]" />
+      <coordinatesIdx count="36">0 1 2 1 3 2 4 5 6 6 5 7 0 5 4 0 2 5 1 6 7 1 7 3 0 6 1 4 6 0 2 3 7 5 2 7 </coordinatesIdx>
+      <textCoordsIdx count="36">0 1 2 1 3 2 0 2 1 1 2 3 0 3 1 0 2 3 0 1 3 0 3 2 0 3 1 2 3 0 0 1 3 2 0 3 </textCoordsIdx>
+      <colorsIdx count="36">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </colorsIdx>
+      <matIds count="1">0 </matIds>
+      <textCoordsLightMapIdx count="0">
+      </textCoordsLightMapIdx>
+      <vertices count="24">-2800.137 3243.184 10224.17 -2800.137 -54.1846 10224.17 -2439.069 3243.184 10224.17 -2439.069 -54.1846 10224.17 -2800.137 3243.184 8474.849 -2439.069 3243.184 8474.849 -2800.137 -54.1846 8474.849 -2439.069 -54.1846 8474.849 </vertices>
+      <normals count="24">0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 </normals>
+      <texCoords count="8">0 0 0 1 1 0 1 1 </texCoords>
+      <colors count="3">255 255 255 </colors>
+      <texCoordsLightMap count="0">
+      </texCoordsLightMap>
+      <userProps count="0" />
+    </mesh>
+    <mesh name="Box_16" layer="PAREDES" type="Original" matId="13" color="[1,1,1]" visibility="1.0" lightmap="">
+      <boundingBox min="[-2800.137,-54.1846,9548.67]" max="[-2439.069,3243.184,12541.62]" />
+      <coordinatesIdx count="36">0 1 2 1 3 2 4 5 6 6 5 7 0 5 4 0 2 5 1 6 7 1 7 3 0 6 1 4 6 0 2 3 7 5 2 7 </coordinatesIdx>
+      <textCoordsIdx count="36">0 1 2 1 3 2 0 2 1 1 2 3 0 3 1 0 2 3 0 1 3 0 3 2 0 3 1 2 3 0 0 1 3 2 0 3 </textCoordsIdx>
+      <colorsIdx count="36">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </colorsIdx>
+      <matIds count="1">0 </matIds>
+      <textCoordsLightMapIdx count="0">
+      </textCoordsLightMapIdx>
+      <vertices count="24">-2800.137 3243.184 12541.62 -2800.137 -54.1846 12541.62 -2439.069 3243.184 12541.62 -2439.069 -54.1846 12541.62 -2800.137 3243.184 9548.669 -2439.069 3243.184 9548.669 -2800.137 -54.1846 9548.669 -2439.069 -54.1846 9548.669 </vertices>
+      <normals count="24">0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 </normals>
+      <texCoords count="8">0 0 0 1 1 0 1 1 </texCoords>
+      <colors count="3">255 255 255 </colors>
+      <texCoordsLightMap count="0">
+      </texCoordsLightMap>
+      <userProps count="0" />
+    </mesh>
+    <mesh name="Plane_22" layer="PISOS" type="Original" matId="10" color="[1,1,1]" visibility="1.0" lightmap="">
+      <boundingBox min="[-4443.729,0,10604.75]" max="[-2793.973,0,12351.44]" />
+      <coordinatesIdx count="6">0 1 2 0 2 3 </coordinatesIdx>
+      <textCoordsIdx count="6">0 1 2 0 2 3 </textCoordsIdx>
+      <colorsIdx count="6">0 0 0 0 0 0 </colorsIdx>
+      <matIds count="1">0 </matIds>
+      <textCoordsLightMapIdx count="0">
+      </textCoordsLightMapIdx>
+      <vertices count="12">-4443.729 0 10604.75 -2793.973 0 10604.75 -2793.973 0 12351.44 -4443.729 0 12351.44 </vertices>
+      <normals count="12">0 -1 0 0 -1 0 0 -1 0 0 -1 0 </normals>
+      <texCoords count="8">1 1 0 1 0 0 1 0 </texCoords>
+      <colors count="3">255 255 255 </colors>
+      <texCoordsLightMap count="0">
+      </texCoordsLightMap>
+      <userProps count="0" />
+    </mesh>
+    <mesh name="Plane_22" layer="PISOS" type="Original" matId="10" color="[1,1,1]" visibility="1.0" lightmap="">
+      <boundingBox min="[-6047.958,0,10604.75]" max="[-4398.188,0,12351.44]" />
+      <coordinatesIdx count="6">0 1 2 0 2 3 </coordinatesIdx>
+      <textCoordsIdx count="6">0 1 2 0 2 3 </textCoordsIdx>
+      <colorsIdx count="6">0 0 0 0 0 0 </colorsIdx>
+      <matIds count="1">0 </matIds>
+      <textCoordsLightMapIdx count="0">
+      </textCoordsLightMapIdx>
+      <vertices count="12">-6047.958 0 10604.75 -4398.188 0 10604.75 -4398.188 0 12351.44 -6047.958 0 12351.44 </vertices>
+      <normals count="12">0 -1 0 0 -1 0 0 -1 0 0 -1 0 </normals>
+      <texCoords count="8">1 1 0 1 0 0 1 0 </texCoords>
+      <colors count="3">255 255 255 </colors>
+      <texCoordsLightMap count="0">
+      </texCoordsLightMap>
+      <userProps count="0" />
+    </mesh>
+    <mesh name="Box_17" layer="PAREDES" type="Original" matId="13" color="[1,1,1]" visibility="1.0" lightmap="">
+      <boundingBox min="[-4124.516,-63.4552,12304.39]" max="[-2478.184,3242.057,12672.03]" />
+      <coordinatesIdx count="36">0 1 2 1 3 2 4 5 6 6 5 7 0 5 4 0 2 5 1 6 7 1 7 3 0 6 1 4 6 0 2 3 7 5 2 7 </coordinatesIdx>
+      <textCoordsIdx count="36">0 1 2 1 3 2 0 2 1 1 2 3 0 3 1 0 2 3 0 1 3 0 3 2 0 3 1 2 3 0 0 1 3 2 0 3 </textCoordsIdx>
+      <colorsIdx count="36">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </colorsIdx>
+      <matIds count="1">0 </matIds>
+      <textCoordsLightMapIdx count="0">
+      </textCoordsLightMapIdx>
+      <vertices count="24">-4124.515 3242.057 12672.03 -4124.515 -63.4552 12672.03 -2478.184 3242.057 12672.03 -2478.184 -63.4552 12672.03 -4124.515 3242.057 12304.39 -2478.184 3242.057 12304.39 -4124.515 -63.4552 12304.39 -2478.184 -63.4552 12304.39 </vertices>
+      <normals count="24">0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 </normals>
+      <texCoords count="8">0 0 0 1 1 0 1 1 </texCoords>
+      <colors count="3">255 255 255 </colors>
+      <texCoordsLightMap count="0">
+      </texCoordsLightMap>
+      <userProps count="0" />
+    </mesh>
+    <mesh name="Box_17" layer="PAREDES" type="Original" matId="13" color="[1,1,1]" visibility="1.0" lightmap="">
+      <boundingBox min="[-5731.698,-63.4552,12304.39]" max="[-4085.366,3242.057,12672.03]" />
+      <coordinatesIdx count="36">0 1 2 1 3 2 4 5 6 6 5 7 0 5 4 0 2 5 1 6 7 1 7 3 0 6 1 4 6 0 2 3 7 5 2 7 </coordinatesIdx>
+      <textCoordsIdx count="36">0 1 2 1 3 2 0 2 1 1 2 3 0 3 1 0 2 3 0 1 3 0 3 2 0 3 1 2 3 0 0 1 3 2 0 3 </textCoordsIdx>
+      <colorsIdx count="36">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </colorsIdx>
+      <matIds count="1">0 </matIds>
+      <textCoordsLightMapIdx count="0">
+      </textCoordsLightMapIdx>
+      <vertices count="24">-5731.698 3242.057 12672.03 -5731.698 -63.4552 12672.03 -4085.366 3242.057 12672.03 -4085.366 -63.4552 12672.03 -5731.698 3242.057 12304.39 -4085.366 3242.057 12304.39 -5731.698 -63.4552 12304.39 -4085.366 -63.4552 12304.39 </vertices>
+      <normals count="24">0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 </normals>
+      <texCoords count="8">0 0 0 1 1 0 1 1 </texCoords>
+      <colors count="3">255 255 255 </colors>
+      <texCoordsLightMap count="0">
+      </texCoordsLightMap>
+      <userProps count="0" />
+    </mesh>
+    <mesh name="Box_17" layer="PAREDES" type="Original" matId="13" color="[1,1,1]" visibility="1.0" lightmap="">
+      <boundingBox min="[-7328.913,-63.4552,12304.39]" max="[-5682.581,3242.057,12672.03]" />
+      <coordinatesIdx count="36">0 1 2 1 3 2 4 5 6 6 5 7 0 5 4 0 2 5 1 6 7 1 7 3 0 6 1 4 6 0 2 3 7 5 2 7 </coordinatesIdx>
+      <textCoordsIdx count="36">0 1 2 1 3 2 0 2 1 1 2 3 0 3 1 0 2 3 0 1 3 0 3 2 0 3 1 2 3 0 0 1 3 2 0 3 </textCoordsIdx>
+      <colorsIdx count="36">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </colorsIdx>
+      <matIds count="1">0 </matIds>
+      <textCoordsLightMapIdx count="0">
+      </textCoordsLightMapIdx>
+      <vertices count="24">-7328.912 3242.057 12672.03 -7328.912 -63.4552 12672.03 -5682.581 3242.057 12672.03 -5682.581 -63.4552 12672.03 -7328.912 3242.057 12304.39 -5682.581 3242.057 12304.39 -7328.912 -63.4552 12304.39 -5682.581 -63.4552 12304.39 </vertices>
+      <normals count="24">0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 </normals>
+      <texCoords count="8">0 0 0 1 1 0 1 1 </texCoords>
+      <colors count="3">255 255 255 </colors>
+      <texCoordsLightMap count="0">
+      </texCoordsLightMap>
+      <userProps count="0" />
+    </mesh>
+    <mesh name="Box_17" layer="PAREDES" type="Original" matId="13" color="[1,1,1]" visibility="1.0" lightmap="">
+      <boundingBox min="[-8875.265,-63.4552,12304.39]" max="[-7228.933,3242.057,12672.03]" />
+      <coordinatesIdx count="36">0 1 2 1 3 2 4 5 6 6 5 7 0 5 4 0 2 5 1 6 7 1 7 3 0 6 1 4 6 0 2 3 7 5 2 7 </coordinatesIdx>
+      <textCoordsIdx count="36">0 1 2 1 3 2 0 2 1 1 2 3 0 3 1 0 2 3 0 1 3 0 3 2 0 3 1 2 3 0 0 1 3 2 0 3 </textCoordsIdx>
+      <colorsIdx count="36">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </colorsIdx>
+      <matIds count="1">0 </matIds>
+      <textCoordsLightMapIdx count="0">
+      </textCoordsLightMapIdx>
+      <vertices count="24">-8875.264 3242.057 12672.03 -8875.264 -63.4552 12672.03 -7228.933 3242.057 12672.03 -7228.933 -63.4552 12672.03 -8875.264 3242.057 12304.39 -7228.933 3242.057 12304.39 -8875.264 -63.4552 12304.39 -7228.933 -63.4552 12304.39 </vertices>
+      <normals count="24">0 0 1 0 0 1 0 0 1 0 0 1 0 0 -1 0 0 -1 0 0 -1 0 0 -1 </normals>
+      <texCoords count="8">0 0 0 1 1 0 1 1 </texCoords>
+      <colors count="3">255 255 255 </colors>
+      <texCoordsLightMap count="0">
+      </texCoordsLightMap>
+      <userProps count="0" />
+    </mesh>
+    <mesh name="Plane_22" layer="PISOS" type="Original" matId="10" color="[1,1,1]" visibility="1.0" lightmap="">
+      <boundingBox min="[-7686.06,0,10604.75]" max="[-6036.29,0,12351.44]" />
+      <coordinatesIdx count="6">0 1 2 0 2 3 </coordinatesIdx>
+      <textCoordsIdx count="6">0 1 2 0 2 3 </textCoordsIdx>
+      <colorsIdx count="6">0 0 0 0 0 0 </colorsIdx>
+      <matIds count="1">0 </matIds>
+      <textCoordsLightMapIdx count="0">
+      </textCoordsLightMapIdx>
+      <vertices count="12">-7686.059 0 10604.75 -6036.289 0 10604.75 -6036.289 0 12351.44 -7686.059 0 12351.44 </vertices>
+      <normals count="12">0 -1 0 0 -1 0 0 -1 0 0 -1 0 </normals>
+      <texCoords count="8">1 1 0 1 0 0 1 0 </texCoords>
+      <colors count="3">255 255 255 </colors>
+      <texCoordsLightMap count="0">
+      </texCoordsLightMap>
+      <userProps count="0" />
+    </mesh>
+    <mesh name="Plane_22" layer="PISOS" type="Original" matId="10" color="[1,1,1]" visibility="1.0" lightmap="">
+      <boundingBox min="[-7686.06,0,8878.026]" max="[-6036.29,0,10624.72]" />
+      <coordinatesIdx count="6">0 1 2 0 2 3 </coordinatesIdx>
+      <textCoordsIdx count="6">0 1 2 0 2 3 </textCoordsIdx>
+      <colorsIdx count="6">0 0 0 0 0 0 </colorsIdx>
+      <matIds count="1">0 </matIds>
+      <textCoordsLightMapIdx count="0">
+      </textCoordsLightMapIdx>
+      <vertices count="12">-7686.059 0 8878.025 -6036.289 0 8878.025 -6036.289 0 10624.71 -7686.059 0 10624.71 </vertices>
+      <normals count="12">0 -1 0 0 -1 0 0 -1 0 0 -1 0 </normals>
+      <texCoords count="8">1 1 0 1 0 0 1 0 </texCoords>
+      <colors count="3">255 255 255 </colors>
+      <texCoordsLightMap count="0">
+      </texCoordsLightMap>
+      <userProps count="0" />
+    </mesh>
+    <mesh name="Plane_22" layer="PISOS" type="Original" matId="10" color="[1,1,1]" visibility="1.0" lightmap="">
+      <boundingBox min="[-9305.137,0,10604.75]" max="[-7655.367,0,12351.44]" />
+      <coordinatesIdx count="6">0 1 2 0 2 3 </coordinatesIdx>
+      <textCoordsIdx count="6">0 1 2 0 2 3 </textCoordsIdx>
+      <colorsIdx count="6">0 0 0 0 0 0 </colorsIdx>
+      <matIds count="1">0 </matIds>
+      <textCoordsLightMapIdx count="0">
+      </textCoordsLightMapIdx>
+      <vertices count="12">-9305.136 0 10604.75 -7655.366 0 10604.75 -7655.366 0 12351.44 -9305.136 0 12351.44 </vertices>
+      <normals count="12">0 -1 0 0 -1 0 0 -1 0 0 -1 0 </normals>
+      <texCoords count="8">1 1 0 1 0 0 1 0 </texCoords>
+      <colors count="3">255 255 255 </colors>
+      <texCoordsLightMap count="0">
+      </texCoordsLightMap>
+      <userProps count="0" />
+    </mesh>
+    <mesh name="Plane_22" layer="PISOS" type="Original" matId="10" color="[1,1,1]" visibility="1.0" lightmap="">
+      <boundingBox min="[-9305.137,0,8878.026]" max="[-7655.367,0,10624.72]" />
+      <coordinatesIdx count="6">0 1 2 0 2 3 </coordinatesIdx>
+      <textCoordsIdx count="6">0 1 2 0 2 3 </textCoordsIdx>
+      <colorsIdx count="6">0 0 0 0 0 0 </colorsIdx>
+      <matIds count="1">0 </matIds>
+      <textCoordsLightMapIdx count="0">
+      </textCoordsLightMapIdx>
+      <vertices count="12">-9305.136 0 8878.025 -7655.366 0 8878.025 -7655.366 0 10624.71 -9305.136 0 10624.71 </vertices>
       <normals count="12">0 -1 0 0 -1 0 0 -1 0 0 -1 0 </normals>
       <texCoords count="8">1 1 0 1 0 0 1 0 </texCoords>
       <colors count="3">255 255 255 </colors>
