@@ -152,8 +152,10 @@ namespace TGC.Group.Model
             KdTree.create(escenario.scene.Meshes, escenario.BoundingBox());
             KdTree.createDebugKdTreeMeshes();// --> Para renderizar las "cajas" que genera
 
-            
-
+            Frustum.Color = Color.Black;
+            /* Frustum.LeftPlane.Transform(TGCMatrix.Translation(new TGCVector3(-1000f, 0f, 0f)));
+             Frustum.RightPlane.Transform(TGCMatrix.Translation(new TGCVector3(1000f, 0f, 0f)));*/
+            Frustum.BottomPlane.Scale(600f);
         }
 
 
@@ -247,8 +249,8 @@ namespace TGC.Group.Model
 
                 //Esto soluciona el Autrotransform = false
                 personaje.UpdateMeshTransform();
-                
-                Frustum.updateMesh(camaraInterna.Position, camaraInterna.Position);
+
+                Frustum.updateMesh(camaraInterna.Position + new TGCVector3(0f,0f,-3000f), camaraInterna.LookAt);
                 PostUpdate();
             }
         }
@@ -457,6 +459,7 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
             Frustum.render();
+            KdTree.render(Frustum, boundingBoxActivate);
 
             if (!perdiste)
             {
@@ -479,7 +482,6 @@ namespace TGC.Group.Model
                 plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
 
                 //Renderizo con KdTree para Optimizar
-                KdTree.render(Frustum, boundingBoxActivate);
                
                 if (!paused)
                 {
