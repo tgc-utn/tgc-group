@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using TGC.Examples.Collision.SphereCollision;
 using TGC.Group.SphereCollisionUtils;
 using TGC.Group.Model.AI;
+using TGC.Group.Optimizacion;
 
 namespace TGC.Group.Model
 {
@@ -73,6 +74,9 @@ namespace TGC.Group.Model
         private float offsetForward = -800;
         private float tiempoAcumulado;
 
+        private KdTree KdTree;
+
+
         public override void Init()
         {
             perdiste = false;
@@ -103,8 +107,8 @@ namespace TGC.Group.Model
             personaje.playAnimation("Parado", true);
 
             //Posicion inicial
-            //personaje.Position = new TGCVector3(400, Ypiso, -900);
-            personaje.Position = new TGCVector3(-4133.616f, 20f, 5000f);
+            personaje.Position = new TGCVector3(400, Ypiso, -900);
+           // personaje.Position = new TGCVector3(-4133.616f, 20f, 5000f);
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = false;
             
@@ -137,12 +141,18 @@ namespace TGC.Group.Model
             plataformasRotantes = escenario.PlataformasRotantes();
 
            //Posición de la camara.
-            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 500, -900);
+            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 500, -1000);
            
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara = camaraInterna;
 
             personaje.BoundingBox.scaleTranslate(personaje.Position, scaleBoundingVector);
+
+            KdTree = new KdTree();
+            KdTree.create(escenario.scene.Meshes, escenario.BoundingBox());
+            KdTree.createDebugKdTreeMeshes();// --> Para renderizar las "cajas" que genera
+
+            
 
         }
 
@@ -151,7 +161,6 @@ namespace TGC.Group.Model
         {
             PreUpdate();
             tiempoAcumulado += 0.01f;
-
 
             //TODO: Reificar estos valores.
             //Obtenemos los valores default
@@ -186,8 +195,8 @@ namespace TGC.Group.Model
                 if (Input.keyDown(Key.R)) interaccionCaja = true;
                 else interaccionCaja = false;
 
-                //TODO: No debe saltar cuando ya esta saltando
                 // Para que no se pueda saltar cuando agarras algun objeto
+                //TODO: No debe saltar cuando ya esta saltando
                 if (!interaccionCaja)
                 {
                     if (Input.keyUp(Key.Space) && saltoActual < coeficienteSalto)
@@ -238,11 +247,12 @@ namespace TGC.Group.Model
 
                 //Esto soluciona el Autrotransform = false
                 personaje.UpdateMeshTransform();
-
-
+                
+                Frustum.updateMesh(camaraInterna.Position, camaraInterna.Position);
                 PostUpdate();
             }
         }
+
 
         public TGCVector3 MovimientoPorSliding(TGCVector3 movimientoOriginal)
         {
@@ -275,11 +285,9 @@ namespace TGC.Group.Model
             }
             return vectorSlide;
         }
-
         //Objeto Movible del escenario, utilizado para mantener la referencia a una caja cuando cae
         TgcMesh objetoEscenario;
         SphereOBBCollider colliderOBB = new SphereOBBCollider();
-
         public void moverMundo(TGCVector3 movimientoOriginal)
         {
             
@@ -311,7 +319,6 @@ namespace TGC.Group.Model
 
 
         }
-
         public void movimientoDePlataformas()
         {
             foreach (Plataforma plataforma in plataformas) plataforma.Update(tiempoAcumulado);
@@ -326,7 +333,6 @@ namespace TGC.Group.Model
             if (colisionPlataforma) return plataformaColisionante.VectorMovimiento();
             else return TGCVector3.Empty;
         }
-
         public void generarMovimiento(TgcMesh objetoMovible, TGCVector3 movementV)
         {
             if (objetoMovibleG == null || objetoMovibleG != objetoMovible) objetoMovibleG = objetoMovible;
@@ -347,7 +353,6 @@ namespace TGC.Group.Model
             else if (movimientoRealCaja.Y < 0) objetoMovible.Move(movimientoRealCaja);
 
         }
-
         public bool colisionEscenario()
         {
             return escenario.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, mesh.BoundingBox)) != null;
@@ -360,18 +365,15 @@ namespace TGC.Group.Model
         {
             return escenario.PilaresMesh().Exists(mesh => TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, mesh.BoundingBox));
         }
-        
         public bool testColisionObjetoPersonaje(TgcMesh objetoColisionable)
         {
             return TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, objetoColisionable.BoundingBox);
         }
-      
         public bool testColisionCajasObjetos(TgcMesh box)
         {
            // return escenario.Paredes().Exists(pared =>colisionConCajaOrientada(box,pared,movementVector));
             return escenario.ObjetosColisionablesConCajas().Exists(objeto => objeto != box && TgcCollisionUtils.testAABBAABB(box.BoundingBox, objeto.BoundingBox));
         }
-
         public void RotarPersonaje()
         {
             //Adelante
@@ -391,8 +393,7 @@ namespace TGC.Group.Model
             //DownRight
             if (Input.keyDown(Key.S) && Input.keyDown(Key.D)) RotateMesh(Key.S, Key.D);
         }
-
-         public void RotateMesh(Key input)
+        public void RotateMesh(Key input)
         {
             moving = true;
             personaje.RotateY(direccionPersonaje.RotationAngle(input));
@@ -402,7 +403,6 @@ namespace TGC.Group.Model
             moving = true;
             personaje.RotateY(direccionPersonaje.RotationAngle(i1,i2));
         }
-
         public void ajustarCamara()
         {
             //Actualizar valores de camara segun modifiers
@@ -452,12 +452,11 @@ namespace TGC.Group.Model
             camaraInterna.Target = personaje.Position;
         }
 
-
-
         public override void Render()
         {
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
+            Frustum.render();
 
             if (!perdiste)
             {
@@ -468,16 +467,19 @@ namespace TGC.Group.Model
                            /*+ "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
                            + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
                            + "Interaccion Con Caja: " + interaccionConCaja + "\n"*/
-                           + "Colision Plataforma: " + colisionPlataforma + "\n"
+                           /*+ "Frustum Pos:\n  NearPlane: " + Frustum.NearPlane + "\n"
+                           + "  FarPlane: " + Frustum.FarPlane + "\n"
+                           + "  LeftPlane: " + Frustum.LeftPlane + "\n"
+                           + "  RightPlane: " + Frustum.RightPlane + "\n"*/
                            /*+ "Movimiento por plataforma: " + movimientoPorPlataforma*/, 0, 30, Color.GhostWhite);
 
                 DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
-
-                escenario.RenderAll();
-
+                
                 //Renderizo OBB de las plataformas rotantes
                 plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
-           
+
+                //Renderizo con KdTree para Optimizar
+                KdTree.render(Frustum, boundingBoxActivate);
                
                 if (!paused)
                 {
@@ -508,19 +510,10 @@ namespace TGC.Group.Model
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
-
-        /// <summary>
-        ///     Se llama cuando termina la ejecución del ejemplo.
-        ///     Hacer Dispose() de todos los objetos creados.
-        ///     Es muy importante liberar los recursos, sobretodo los gráficos ya que quedan bloqueados en el device de video.
-        /// </summary>
         public override void Dispose()
         {
-           
-            
             personaje.Dispose();
-            escenario.DisposeAll();
-            
+            escenario.DisposeAll();  
         }
     }
 

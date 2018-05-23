@@ -80,6 +80,9 @@
     <Compile Include="Model\AI\PlataformaRotante.cs" />
     <Compile Include="Model\AI\PlataformaX.cs" />
     <Compile Include="Model\AI\PlataformaY.cs" />
+    <Compile Include="Optimizacion\KdTree.cs" />
+    <Compile Include="Optimizacion\KdTreeBuilder.cs" />
+    <Compile Include="Optimizacion\KdTreeNode.cs" />
     <Compile Include="SphereCollisionUtils\BoundingBoxCollider.cs" />
     <Compile Include="SphereCollisionUtils\SphereOBBCollider.cs" />
     <Compile Include="SphereCollisionUtils\Collider.cs" />

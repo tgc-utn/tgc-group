@@ -39,7 +39,7 @@ namespace TGC.Group.Model.AI
             OBB.setRenderColor(System.Drawing.Color.Empty);
             vRotacionOBB = new TGCVector3(0f, anguloRotacion, 0f);
 
-            plataformaMesh.BoundingBox.Dispose();
+           // plataformaMesh.BoundingBox.Dispose();
 
         }
         public void Render(float tiempo)
@@ -52,6 +52,5 @@ namespace TGC.Group.Model.AI
             //Traslado Mesh al origen --> Roto el Mesh --> Vuelve a la posicion inicial
             plataformaMesh.Transform = mTraslacionAlOrigen * TGCMatrix.RotationY(anguloRotacion * tiempo) * mTraslacionPosInicial;
         }
-
     }
 }
