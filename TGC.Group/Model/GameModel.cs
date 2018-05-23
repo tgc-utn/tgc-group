@@ -13,6 +13,7 @@ using TGC.Core.Collision;
 using System;
 using System.Collections.Generic;
 using TGC.Examples.Collision.SphereCollision;
+using TGC.Group.SphereCollisionUtils;
 using TGC.Group.Model.AI;
 
 namespace TGC.Group.Model
@@ -277,6 +278,8 @@ namespace TGC.Group.Model
 
         //Objeto Movible del escenario, utilizado para mantener la referencia a una caja cuando cae
         TgcMesh objetoEscenario;
+        SphereOBBCollider colliderOBB = new SphereOBBCollider();
+
         public void moverMundo(TGCVector3 movimientoOriginal)
         {
             
@@ -296,9 +299,9 @@ namespace TGC.Group.Model
 
             //Busca una plataforma rotante con la que se este colisionando
             //NOTA: para estas plataformas se colisiona Esfera -> OBB y no Esfera -> AABB como las demás colisiones
-            var plataformaRotante = plataformasRotantes.Find(plat => plat.colisionaConPersonaje(esferaPersonaje));
+            var plataformaRotante = plataformasRotantes.Find(plat => colliderOBB.colisionaEsferaOBB(esferaPersonaje,plat.OBB));
             //Si colisiona con una maneja la colision para las rotantes sino usa el metodo general
-            if (plataformaRotante != null) movimientoRealPersonaje = plataformaRotante.colisionConRotante(esferaPersonaje, movimientoOriginal);
+            if (plataformaRotante != null) movimientoRealPersonaje = colliderOBB.manageColisionEsferaOBB(esferaPersonaje, movimientoOriginal,plataformaRotante.OBB);
             else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
              
             personaje.Move(movimientoRealPersonaje);
