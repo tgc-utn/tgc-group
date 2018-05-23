@@ -233,12 +233,14 @@ namespace TGC.Group.Model
                     {
                         saltoActual = coeficienteSalto;
                         //jumping = false;
+                        soundManager.playSonidoSaltar();
                     }
                     if (Input.keyUp(Key.Space) || saltoActual > 0 )
                     {
                         saltoActual -= coeficienteSalto * ElapsedTime;
                         saltoRealizado = saltoActual;
-                       // jumping = true;
+                        // jumping = true;
+                        soundManager.playSonidoSaltar();
                     }
                    
                 }

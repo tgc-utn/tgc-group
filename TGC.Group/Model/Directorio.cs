@@ -46,7 +46,7 @@ namespace TGC.Group.Model
 
             SonidoFondo = mediaDir + "Sonidos\\background.mp3";
             SonidoCaminar = mediaDir + "Sonidos\\FootSteps.wav";
-            SonidoSalto = mediaDir + "Sonidos\\salto.wav";
+            SonidoSalto = mediaDir + "Sonidos\\jump.wav";
         }
 
     }
