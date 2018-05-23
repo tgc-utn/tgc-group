@@ -18,7 +18,7 @@ namespace TGC.Group.Model
 
         private TgcMp3Player mp3PasosPlayer = new TgcMp3Player();
 
-        public SoundManager(Directorio directorio)
+        public SoundManager(Directorio directorio,Microsoft.DirectX.DirectSound.Device dsDevice)
         {
             Directorio = directorio;
 
@@ -28,7 +28,7 @@ namespace TGC.Group.Model
 
             //Cargo sonidos estaticos.
             //SonidoSalto.loadSound(directorio.SonidoSalto, DirectSound.DsDevice);
-            //SonidoCaminar.loadSound(directorio.SonidoCaminar, DirectSound.DsDevice);
+            SonidoCaminar.loadSound(directorio.SonidoCaminar, dsDevice);
 
             //mp3PasosPlayer.closeFile();
             //mp3PasosPlayer.FileName = directorio.SonidoCaminar;
@@ -37,7 +37,7 @@ namespace TGC.Group.Model
         public void playSonidoCaminar()
         {
             //mp3PasosPlayer.play(true);
-            //SonidoCaminar.play();
+            SonidoCaminar.play();
         }
 
         public void playSonidoFondo()

@@ -39,6 +39,8 @@ namespace TGC.Group.Model
 
         static string mediaDir;
 
+        
+
         private Directorio directorio;
         private TgcSkeletalMesh personaje;
         private TgcThirdPersonCamera camaraInterna;
@@ -93,6 +95,8 @@ namespace TGC.Group.Model
             velocidad =new TGCVector3(0,0,0);
             aceleracion = new TGCVector3(0,0,0);
 
+            
+
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
@@ -100,7 +104,7 @@ namespace TGC.Group.Model
             directorio = new Directorio(MediaDir);
 
             //Cargo el SoundManager
-            soundManager = new SoundManager(directorio);
+            soundManager = new SoundManager(directorio,this.DirectSound.DsDevice);
             soundManager.playSonidoFondo();
 
             //Cagar escenario especifico para el juego.
