@@ -146,10 +146,10 @@ namespace TGC.Group.Model
             Camara = camaraInterna;
 
             personaje.BoundingBox.scaleTranslate(personaje.Position, scaleBoundingVector);
-            var meshesSinPlatXY = escenario.scene.Meshes.FindAll(mesh => mesh.Name != "PlataformaX" && mesh.Name != "PlataformaZ");
+            var meshesSinPlatXZ = escenario.scene.Meshes.FindAll(mesh => mesh.Name != "PlataformaX" && mesh.Name != "PlataformaZ");
 
             octree = new Octree();
-            octree.create(meshesSinPlatXY, escenario.BoundingBox());
+            octree.create(meshesSinPlatXZ, escenario.BoundingBox());
             octree.createDebugOctreeMeshes();// --> Para renderizar las "cajas" que genera
 
             Frustum.Color = Color.Black;
@@ -160,7 +160,6 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
-            tiempoAcumulado += ElapsedTime;
 
             //TODO: Reificar estos valores.
             //Obtenemos los valores default
@@ -172,6 +171,7 @@ namespace TGC.Group.Model
             var animacion = "";
 
             while (ElapsedTime > 1) ElapsedTime = ElapsedTime / 10;
+            tiempoAcumulado += ElapsedTime;
             
             //Corroboramos si el jugador perdio la partida.
             if (perdiste && Input.keyPressed(Key.Y)) Init();
@@ -449,25 +449,15 @@ namespace TGC.Group.Model
 
         public override void Render()
         {
-            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
             Frustum.render();
-
-
             if (!perdiste)
             {
                 
 
                 DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
                            + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
-                           /*+ "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
-                           + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
-                           + "Interaccion Con Caja: " + interaccionConCaja + "\n"*/
-                           + "Frustum Pos:\n  NearPlane: " + Frustum.NearPlane + "\n"
-                           /*+ "  FarPlane: " + Frustum.FarPlane + "\n"
-                           + "  LeftPlane: " + Frustum.LeftPlane + "\n"
-                           + "  RightPlane: " + Frustum.RightPlane + "\n"*/
-                           /*+ "Movimiento por plataforma: " + movimientoPorPlataforma*/, 0, 30, Color.GhostWhite);
+                               , 0, 30, Color.GhostWhite);
 
                 DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
                
