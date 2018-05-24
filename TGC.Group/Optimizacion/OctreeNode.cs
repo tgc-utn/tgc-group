@@ -3,18 +3,12 @@
 namespace TGC.Group.Optimizacion
 {
     /// <summary>
-    ///     Nodo del árbol KdTree
+    ///     Nodo del árbol Octree
     /// </summary>
-    internal class KdTreeNode
+    internal class OctreeNode
     {
-        public KdTreeNode[] children;
+        public OctreeNode[] children;
         public TgcMesh[] models;
-
-        //Corte realizado
-        public float xCut;
-
-        public float yCut;
-        public float zCut;
 
         public bool isLeaf()
         {

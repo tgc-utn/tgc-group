@@ -11,35 +11,40 @@ using TGC.Core.SceneLoader;
 namespace TGC.Group.Optimizacion
 {
     /// <summary>
-    ///     Herramienta para construir un KdTree
+    ///     Herramienta para construir un Octree
     /// </summary>
-    internal class KdTreeBuilder
+    internal class OctreeBuilder
     {
-        //Parametros de generacion de planos de corte
-        private readonly float D_DESPLAZAMIENTO = 1;
+        //Parametros de corte del Octree
+        private readonly int MAX_SECTOR_OCTREE_RECURSION = 3;
 
-        //Parametros de corte del KdTree
-        private readonly int MAX_SECTOR_KDTREE_RECURSION = 3;
+        private readonly int MIN_MESH_PER_LEAVE_THRESHOLD = 5;
 
-        private readonly int MIN_MESH_PER_LEAVE_THRESHOLD = 10;
-
-        private readonly float MIN_VOL = 10;
-
-        public KdTreeNode crearKdTree(List<TgcMesh> modelos, TgcBoundingAxisAlignBox sceneBounds)
+        public OctreeNode crearOctree(List<TgcMesh> modelos, TgcBoundingAxisAlignBox sceneBounds)
         {
-            var rootNode = new KdTreeNode();
+            var rootNode = new OctreeNode();
 
-            //iniciar generacion recursiva de KdTree
-            doSectorKdTreeX(rootNode, sceneBounds.PMin, sceneBounds.PMax, 0, modelos);
+            var pMax = sceneBounds.PMax;
+            var pMin = sceneBounds.PMin;
+
+            //Calcular punto medio y centro
+            var midSize = sceneBounds.calculateAxisRadius();
+            var center = sceneBounds.calculateBoxCenter();
+
+            //iniciar generacion recursiva de octree
+            doSectorOctreeX(rootNode, center, midSize, 0, modelos);
 
             //podar nodos innecesarios
-            optimizeSectorKdTree(rootNode.children);
+            deleteEmptyNodes(rootNode.children);
 
-            //imprimir por consola el KdTree
-            //printDebugKdTree(rootNode);
+            //eliminar hijos que subdividen sin necesidad
+            //deleteSameMeshCountChilds(rootNode);
+
+            //imprimir por consola el octree
+            //printDebugOctree(rootNode);
 
             //imprimir estadisticas de debug
-            //printEstadisticasKdTree(rootNode);
+            //printEstadisticasOctree(rootNode);
 
             return rootNode;
         }
@@ -47,162 +52,112 @@ namespace TGC.Group.Optimizacion
         /// <summary>
         ///     Corte con plano X
         /// </summary>
-        private void doSectorKdTreeX(KdTreeNode parent, TGCVector3 pMin, TGCVector3 pMax,
+        private void doSectorOctreeX(OctreeNode parent, TGCVector3 center, TGCVector3 size,
             int step, List<TgcMesh> meshes)
         {
+            var x = center.X;
+
             //Crear listas para realizar corte
             var possitiveList = new List<TgcMesh>();
             var negativeList = new List<TgcMesh>();
 
             //X-cut
-            float cutValue = 0;
-            var xCutPlane = getCutPlane(meshes, new TGCVector3(1, 0, 0), pMin.X, pMax.X, ref cutValue);
+            var xCutPlane = new TGCPlane(1, 0, 0, -x);
             splitByPlane(xCutPlane, meshes, possitiveList, negativeList);
 
             //recursividad de positivos con plano Y, usando resultados positivos y childIndex 0
-            doSectorKdTreeY(parent,
-                new TGCVector3(cutValue, pMin.Y, pMin.Z),
-                pMax,
-                step, possitiveList, 0, cutValue);
+            doSectorOctreeY(parent, new TGCVector3(x + size.X / 2, center.Y, center.Z),
+                new TGCVector3(size.X / 2, size.Y, size.Z),
+                step, possitiveList, 0);
 
             //recursividad de negativos con plano Y, usando resultados negativos y childIndex 4
-            doSectorKdTreeY(parent,
-                pMin,
-                new TGCVector3(cutValue, pMax.Y, pMax.Z),
-                step, negativeList, 4, cutValue);
+            doSectorOctreeY(parent, new TGCVector3(x - size.X / 2, center.Y, center.Z),
+                new TGCVector3(size.X / 2, size.Y, size.Z),
+                step, negativeList, 4);
         }
 
         /// <summary>
         ///     Corte con plano Y
         /// </summary>
-        private void doSectorKdTreeY(KdTreeNode parent, TGCVector3 pMin, TGCVector3 pMax, int step,
-            List<TgcMesh> meshes, int childIndex, float xCutValue)
+        private void doSectorOctreeY(OctreeNode parent, TGCVector3 center, TGCVector3 size, int step,
+            List<TgcMesh> meshes, int childIndex)
         {
+            var y = center.Y;
+
             //Crear listas para realizar corte
             var possitiveList = new List<TgcMesh>();
             var negativeList = new List<TgcMesh>();
 
             //Y-cut
-            float cutValue = 0;
-            var yCutPlane = getCutPlane(meshes, TGCVector3.Up, pMin.Y, pMax.Y, ref cutValue);
+            var yCutPlane = new TGCPlane(0, 1, 0, -y);
             splitByPlane(yCutPlane, meshes, possitiveList, negativeList);
 
             //recursividad de positivos con plano Z, usando resultados positivos y childIndex 0
-            doSectorKdTreeZ(parent,
-                new TGCVector3(pMin.X, cutValue, pMin.Z),
-                pMax,
-                step, possitiveList, childIndex + 0, xCutValue, cutValue);
+            doSectorOctreeZ(parent, new TGCVector3(center.X, y + size.Y / 2, center.Z),
+                new TGCVector3(size.X, size.Y / 2, size.Z),
+                step, possitiveList, childIndex + 0);
 
             //recursividad de negativos con plano Z, usando plano X negativo y childIndex 2
-            doSectorKdTreeZ(parent,
-                pMin,
-                new TGCVector3(pMax.X, cutValue, pMax.Z),
-                step, negativeList, childIndex + 2, xCutValue, cutValue);
+            doSectorOctreeZ(parent, new TGCVector3(center.X, y - size.Y / 2, center.Z),
+                new TGCVector3(size.X, size.Y / 2, size.Z),
+                step, negativeList, childIndex + 2);
         }
 
         /// <summary>
         ///     Corte de plano Z
         /// </summary>
-        private void doSectorKdTreeZ(KdTreeNode parent, TGCVector3 pMin, TGCVector3 pMax, int step,
-            List<TgcMesh> meshes, int childIndex, float xCutValue, float yCutValue)
+        private void doSectorOctreeZ(OctreeNode parent, TGCVector3 center, TGCVector3 size, int step,
+            List<TgcMesh> meshes, int childIndex)
         {
+            var z = center.Z;
+
             //Crear listas para realizar corte
             var possitiveList = new List<TgcMesh>();
             var negativeList = new List<TgcMesh>();
 
             //Z-cut
-            float cutValue = 0;
-            var zCutPlane = getCutPlane(meshes, new TGCVector3(0, 0, 1), pMin.Z, pMax.Z, ref cutValue);
+            var zCutPlane = new TGCPlane(0, 0, 1, -z);
             splitByPlane(zCutPlane, meshes, possitiveList, negativeList);
 
             //obtener lista de children del parent, con iniciacion lazy
             if (parent.children == null)
             {
-                parent.children = new KdTreeNode[8];
+                parent.children = new OctreeNode[8];
             }
 
             //crear nodo positivo en parent, segun childIndex
-            var posNode = new KdTreeNode();
+            var posNode = new OctreeNode();
             parent.children[childIndex] = posNode;
 
             //cargar nodo negativo en parent, segun childIndex
-            var negNode = new KdTreeNode();
+            var negNode = new OctreeNode();
             parent.children[childIndex + 1] = negNode;
 
-            //cargar cortes en parent
-            parent.xCut = xCutValue;
-            parent.yCut = yCutValue;
-            parent.zCut = cutValue;
-
-            //nuevos limites
-            var v1 = new TGCVector3(pMax.X - pMin.X, pMax.Y - pMin.Y, pMax.Z - cutValue);
-            var v2 = new TGCVector3(pMax.X - pMin.X, pMax.Y - pMin.Y, cutValue - pMin.Z);
-
             //condicion de corte
-            if (step >= MAX_SECTOR_KDTREE_RECURSION || meshes.Count <= MIN_MESH_PER_LEAVE_THRESHOLD
-                || v1.X < MIN_VOL || v1.Y < MIN_VOL || v1.Z < MIN_VOL
-                || v2.X < MIN_VOL || v2.Y < MIN_VOL || v2.Z < MIN_VOL
-                )
+            if (step >= MAX_SECTOR_OCTREE_RECURSION || meshes.Count <= MIN_MESH_PER_LEAVE_THRESHOLD)
             {
                 //cargar hijos de nodo positivo
                 posNode.models = possitiveList.ToArray();
 
                 //cargar hijos de nodo negativo
                 negNode.models = negativeList.ToArray();
+
+                //seguir recursividad
             }
-            //seguir recursividad
             else
             {
                 step++;
 
                 //recursividad de positivos con plano X, usando resultados positivos
-                doSectorKdTreeX(posNode,
-                    new TGCVector3(pMin.X, pMin.Y, cutValue),
-                    pMax,
+                doSectorOctreeX(posNode, new TGCVector3(center.X, center.Y, z + size.Z / 2),
+                    new TGCVector3(size.X, size.Y, size.Z / 2),
                     step, possitiveList);
 
                 //recursividad de negativos con plano Y, usando resultados negativos
-                doSectorKdTreeX(negNode,
-                    pMin,
-                    new TGCVector3(pMax.X, pMax.Y, cutValue),
+                doSectorOctreeX(negNode, new TGCVector3(center.X, center.Y, z - size.Z / 2),
+                    new TGCVector3(size.X, size.Y, size.Z / 2),
                     step, negativeList);
             }
-        }
-
-        /// <summary>
-        ///     Obtiene el mejor plano de corte recto, en el volumen dado, en la direccion dada
-        /// </summary>
-        private TGCPlane getCutPlane(List<TgcMesh> modelos, TGCVector3 n, float pMin, float pMax, ref float cutValue)
-        {
-            var vueltas = (int)((pMax - pMin) / D_DESPLAZAMIENTO);
-            var bestBalance = int.MaxValue;
-            var bestPlane = TGCPlane.Zero;
-            cutValue = 0;
-
-            for (var i = 0; i < vueltas; i++)
-            {
-                //crear plano de corte
-                var currentCutValue = pMin + D_DESPLAZAMIENTO * i;
-                var p = new TGCPlane(n.X, n.Y, n.Z, -currentCutValue);
-
-                //clasificar todos los modelos contra ese plano
-                var possitiveList = new List<TgcMesh>();
-                var negativeList = new List<TgcMesh>();
-                splitByPlane(p, modelos, possitiveList, negativeList);
-
-                //calcular balance
-                var balance = Math.Abs(possitiveList.Count - negativeList.Count);
-
-                //guardar mejor
-                if (balance < bestBalance)
-                {
-                    bestBalance = balance;
-                    bestPlane = p;
-                    cutValue = currentCutValue;
-                }
-            }
-
-            return bestPlane;
         }
 
         /// <summary>
@@ -238,35 +193,9 @@ namespace TGC.Group.Optimizacion
         }
 
         /// <summary>
-        ///     Separa los modelos en dos listas, segun el testo contra el plano de corte.
-        ///     No tiene en cuenta los que estan atravezando
-        /// </summary>
-        private void splitByPlaneWithoutRepeating(TGCPlane cutPlane, List<TgcMesh> modelos,
-            List<TgcMesh> possitiveList, List<TgcMesh> negativeList)
-        {
-            TgcCollisionUtils.PlaneBoxResult c;
-            foreach (var modelo in modelos)
-            {
-                c = TgcCollisionUtils.classifyPlaneAABB(cutPlane, modelo.BoundingBox);
-
-                //possitive side
-                if (c == TgcCollisionUtils.PlaneBoxResult.IN_FRONT_OF)
-                {
-                    possitiveList.Add(modelo);
-                }
-
-                //negative side
-                else if (c == TgcCollisionUtils.PlaneBoxResult.BEHIND)
-                {
-                    negativeList.Add(modelo);
-                }
-            }
-        }
-
-        /// <summary>
         ///     Se quitan padres cuyos nodos no tengan ningun triangulo
         /// </summary>
-        private void optimizeSectorKdTree(KdTreeNode[] children)
+        private void deleteEmptyNodes(OctreeNode[] children)
         {
             if (children == null)
             {
@@ -284,7 +213,7 @@ namespace TGC.Group.Optimizacion
                 }
                 else
                 {
-                    optimizeSectorKdTree(childNodeChildren);
+                    deleteEmptyNodes(childNodeChildren);
                 }
             }
         }
@@ -292,7 +221,7 @@ namespace TGC.Group.Optimizacion
         /// <summary>
         ///     Se fija si los hijos de un nodo no tienen mas hijos y no tienen ningun triangulo
         /// </summary>
-        private bool hasEmptyChilds(KdTreeNode node)
+        private bool hasEmptyChilds(OctreeNode node)
         {
             var children = node.children;
             for (var i = 0; i < children.Length; i++)
@@ -308,22 +237,71 @@ namespace TGC.Group.Optimizacion
         }
 
         /// <summary>
-        ///     Imprime por consola la generacion del KdTree
+        ///     Se quitan nodos cuyos hijos siguen teniendo la misma cantidad de modelos que el padre
         /// </summary>
-        private void printDebugKdTree(KdTreeNode rootNode)
+        private void deleteSameMeshCountChilds(OctreeNode node)
         {
-            Console.WriteLine("########## KdTree DEBUG ##########");
+            if (node == null || node.children == null)
+            {
+                return;
+            }
+
+            var nodeCount = getTotalNodeMeshCount(node);
+            for (var i = 0; i < node.children.Length; i++)
+            {
+                var childNode = node.children[i];
+                var childCount = getTotalNodeMeshCount(childNode);
+                if (childCount == nodeCount)
+                {
+                    node.children[i] = null;
+                }
+                else
+                {
+                    deleteSameMeshCountChilds(node.children[i]);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Cantidad de meshes que tiene un nodo, contando todos los de sus hijos recursivamente
+        /// </summary>
+        private int getTotalNodeMeshCount(OctreeNode node)
+        {
+            if (node.children == null)
+            {
+                return node.models.Length;
+            }
+
+            var meshCount = 0;
+            for (var i = 0; i < node.children.Length; i++)
+            {
+                meshCount += getTotalNodeMeshCount(node.children[i]);
+            }
+            return meshCount;
+        }
+
+        /// <summary>
+        ///     Imprime por consola la generacion del Octree
+        /// </summary>
+        private void printDebugOctree(OctreeNode rootNode)
+        {
+            Console.WriteLine("########## Octree DEBUG ##########");
             var sb = new StringBuilder();
-            doPrintDebugKdTree(rootNode, 0, sb);
+            doPrintDebugOctree(rootNode, 0, sb);
             Console.WriteLine(sb.ToString());
-            Console.WriteLine("########## FIN KdTree DEBUG ##########");
+            Console.WriteLine("########## FIN Octree DEBUG ##########");
         }
 
         /// <summary>
         ///     Impresion recursiva
         /// </summary>
-        private void doPrintDebugKdTree(KdTreeNode node, int index, StringBuilder sb)
+        private void doPrintDebugOctree(OctreeNode node, int index, StringBuilder sb)
         {
+            if (node == null)
+            {
+                return;
+            }
+
             var lineas = "";
             for (var i = 0; i < index; i++)
             {
@@ -347,32 +325,41 @@ namespace TGC.Group.Optimizacion
                 index++;
                 for (var i = 0; i < node.children.Length; i++)
                 {
-                    doPrintDebugKdTree(node.children[i], index, sb);
+                    doPrintDebugOctree(node.children[i], index, sb);
                 }
             }
         }
 
         /// <summary>
-        ///     Dibujar meshes que representan los sectores del KdTree
+        ///     Dibujar meshes que representan los sectores del Octree
         /// </summary>
-        public List<TgcBoxDebug> createDebugKdTreeMeshes(KdTreeNode rootNode, TgcBoundingAxisAlignBox sceneBounds)
+        public List<TgcBoxDebug> createDebugOctreeMeshes(OctreeNode rootNode, TgcBoundingAxisAlignBox sceneBounds)
         {
             var pMax = sceneBounds.PMax;
             var pMin = sceneBounds.PMin;
 
             var debugBoxes = new List<TgcBoxDebug>();
-            doCreateKdTreeDebugBox(rootNode, debugBoxes,
+            doCreateOctreeDebugBox(rootNode, debugBoxes,
                 pMin.X, pMin.Y, pMin.Z,
                 pMax.X, pMax.Y, pMax.Z, 0);
 
             return debugBoxes;
         }
 
-        private void doCreateKdTreeDebugBox(KdTreeNode node, List<TgcBoxDebug> debugBoxes,
+        private void doCreateOctreeDebugBox(OctreeNode node, List<TgcBoxDebug> debugBoxes,
             float boxLowerX, float boxLowerY, float boxLowerZ,
             float boxUpperX, float boxUpperY, float boxUpperZ, int step)
         {
+            if (node == null)
+            {
+                return;
+            }
+
             var children = node.children;
+
+            var midX = FastMath.Abs((boxUpperX - boxLowerX) / 2);
+            var midY = FastMath.Abs((boxUpperY - boxLowerY) / 2);
+            var midZ = FastMath.Abs((boxUpperZ - boxLowerZ) / 2);
 
             //Crear caja debug
             var box = createDebugBox(boxLowerX, boxLowerY, boxLowerZ, boxUpperX, boxUpperY, boxUpperZ, step);
@@ -388,29 +375,33 @@ namespace TGC.Group.Optimizacion
             {
                 step++;
 
-                var xCut = node.xCut;
-                var yCut = node.yCut;
-                var zCut = node.zCut;
-
                 //000
-                doCreateKdTreeDebugBox(children[0], debugBoxes, xCut, yCut, zCut, boxUpperX, boxUpperY, boxUpperZ, step);
+                doCreateOctreeDebugBox(children[0], debugBoxes, boxLowerX + midX, boxLowerY + midY, boxLowerZ + midZ,
+                    boxUpperX, boxUpperY, boxUpperZ, step);
                 //001
-                doCreateKdTreeDebugBox(children[1], debugBoxes, xCut, yCut, boxLowerZ, boxUpperX, boxUpperY, zCut, step);
+                doCreateOctreeDebugBox(children[1], debugBoxes, boxLowerX + midX, boxLowerY + midY, boxLowerZ, boxUpperX,
+                    boxUpperY, boxUpperZ - midZ, step);
 
                 //010
-                doCreateKdTreeDebugBox(children[2], debugBoxes, xCut, boxLowerY, zCut, boxUpperX, yCut, boxUpperZ, step);
+                doCreateOctreeDebugBox(children[2], debugBoxes, boxLowerX + midX, boxLowerY, boxLowerZ + midZ, boxUpperX,
+                    boxUpperY - midY, boxUpperZ, step);
                 //011
-                doCreateKdTreeDebugBox(children[3], debugBoxes, xCut, boxLowerY, boxLowerZ, boxUpperX, yCut, zCut, step);
+                doCreateOctreeDebugBox(children[3], debugBoxes, boxLowerX + midX, boxLowerY, boxLowerZ, boxUpperX,
+                    boxUpperY - midY, boxUpperZ - midZ, step);
 
                 //100
-                doCreateKdTreeDebugBox(children[4], debugBoxes, boxLowerX, yCut, zCut, xCut, boxUpperY, boxUpperZ, step);
+                doCreateOctreeDebugBox(children[4], debugBoxes, boxLowerX, boxLowerY + midY, boxLowerZ + midZ,
+                    boxUpperX - midX, boxUpperY, boxUpperZ, step);
                 //101
-                doCreateKdTreeDebugBox(children[5], debugBoxes, boxLowerX, yCut, boxLowerZ, xCut, boxUpperY, zCut, step);
+                doCreateOctreeDebugBox(children[5], debugBoxes, boxLowerX, boxLowerY + midY, boxLowerZ, boxUpperX - midX,
+                    boxUpperY, boxUpperZ - midZ, step);
 
                 //110
-                doCreateKdTreeDebugBox(children[6], debugBoxes, boxLowerX, boxLowerY, zCut, xCut, yCut, boxUpperZ, step);
+                doCreateOctreeDebugBox(children[6], debugBoxes, boxLowerX, boxLowerY, boxLowerZ + midZ, boxUpperX - midX,
+                    boxUpperY - midY, boxUpperZ, step);
                 //111
-                doCreateKdTreeDebugBox(children[7], debugBoxes, boxLowerX, boxLowerY, boxLowerZ, xCut, yCut, zCut, step);
+                doCreateOctreeDebugBox(children[7], debugBoxes, boxLowerX, boxLowerY, boxLowerZ, boxUpperX - midX,
+                    boxUpperY - midY, boxUpperZ - midZ, step);
             }
         }
 
@@ -461,11 +452,11 @@ namespace TGC.Group.Optimizacion
         }
 
         /// <summary>
-        ///     Imprime estadisticas del KdTree
+        ///     Imprime estadisticas del Octree
         /// </summary>
-        private void printEstadisticasKdTree(KdTreeNode rootNode)
+        private void printEstadisticasOctree(OctreeNode rootNode)
         {
-            Console.WriteLine("*********** KdTree Statics ***********");
+            Console.WriteLine("*********** Octree Statics ***********");
 
             var minModels = int.MaxValue;
             var maxModels = int.MinValue;
@@ -478,7 +469,7 @@ namespace TGC.Group.Optimizacion
             Console.WriteLine("*********** FIN Octree Statics ************");
         }
 
-        private void obtenerEstadisticas(KdTreeNode node, ref int minModels, ref int maxModels)
+        private void obtenerEstadisticas(OctreeNode node, ref int minModels, ref int maxModels)
         {
             if (node.isLeaf())
             {

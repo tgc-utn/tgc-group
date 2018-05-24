@@ -74,8 +74,7 @@ namespace TGC.Group.Model
         private float offsetForward = -800;
         private float tiempoAcumulado;
 
-        private KdTree KdTree;
-
+        private Octree octree;
 
         public override void Init()
         {
@@ -147,22 +146,21 @@ namespace TGC.Group.Model
             Camara = camaraInterna;
 
             personaje.BoundingBox.scaleTranslate(personaje.Position, scaleBoundingVector);
+            var meshesSinPlatXY = escenario.scene.Meshes.FindAll(mesh => mesh.Name != "PlataformaX" && mesh.Name != "PlataformaZ");
 
-            KdTree = new KdTree();
-            KdTree.create(escenario.scene.Meshes, escenario.BoundingBox());
-            KdTree.createDebugKdTreeMeshes();// --> Para renderizar las "cajas" que genera
+            octree = new Octree();
+            octree.create(meshesSinPlatXY, escenario.BoundingBox());
+            octree.createDebugOctreeMeshes();// --> Para renderizar las "cajas" que genera
 
             Frustum.Color = Color.Black;
-            /* Frustum.LeftPlane.Transform(TGCMatrix.Translation(new TGCVector3(-1000f, 0f, 0f)));
-             Frustum.RightPlane.Transform(TGCMatrix.Translation(new TGCVector3(1000f, 0f, 0f)));*/
-            Frustum.BottomPlane.Scale(600f);
+          
         }
 
 
         public override void Update()
         {
             PreUpdate();
-            tiempoAcumulado += 0.01f;
+            tiempoAcumulado += ElapsedTime;
 
             //TODO: Reificar estos valores.
             //Obtenemos los valores default
@@ -249,12 +247,12 @@ namespace TGC.Group.Model
 
                 //Esto soluciona el Autrotransform = false
                 personaje.UpdateMeshTransform();
-
-                Frustum.updateMesh(camaraInterna.Position + new TGCVector3(0f,0f,-3000f), camaraInterna.LookAt);
+                //Actualizo posición del Frustum
+                Frustum.updateMesh(camaraInterna.Position + traslacionFrustum, camaraInterna.LookAt);
                 PostUpdate();
             }
         }
-
+        private TGCVector3 traslacionFrustum = new TGCVector3(0f, -0, -2800f);
 
         public TGCVector3 MovimientoPorSliding(TGCVector3 movimientoOriginal)
         {
@@ -315,11 +313,6 @@ namespace TGC.Group.Model
             else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
              
             personaje.Move(movimientoRealPersonaje);
-            //Actualizamos la esfera del personaje.    
-            
-           // esferaPersonaje.moveCenter(movimientoPorPlataforma);
-
-
         }
         public void movimientoDePlataformas()
         {
@@ -459,7 +452,7 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
             Frustum.render();
-            KdTree.render(Frustum, boundingBoxActivate);
+
 
             if (!perdiste)
             {
@@ -470,21 +463,19 @@ namespace TGC.Group.Model
                            /*+ "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
                            + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
                            + "Interaccion Con Caja: " + interaccionConCaja + "\n"*/
-                           /*+ "Frustum Pos:\n  NearPlane: " + Frustum.NearPlane + "\n"
-                           + "  FarPlane: " + Frustum.FarPlane + "\n"
+                           + "Frustum Pos:\n  NearPlane: " + Frustum.NearPlane + "\n"
+                           /*+ "  FarPlane: " + Frustum.FarPlane + "\n"
                            + "  LeftPlane: " + Frustum.LeftPlane + "\n"
                            + "  RightPlane: " + Frustum.RightPlane + "\n"*/
                            /*+ "Movimiento por plataforma: " + movimientoPorPlataforma*/, 0, 30, Color.GhostWhite);
 
                 DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
-                
-                //Renderizo OBB de las plataformas rotantes
-                plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
-
-                //Renderizo con KdTree para Optimizar
                
                 if (!paused)
                 {
+                    octree.render(Frustum, boundingBoxActivate);
+                    renderizarRestantes();
+
                     personaje.animateAndRender(ElapsedTime);
                 }
                 else
@@ -496,8 +487,8 @@ namespace TGC.Group.Model
                 {
 
                     personaje.BoundingBox.Render();
-                    esferaPersonaje.Render();
-                    escenario.RenderizarBoundingBoxes();
+                   // esferaPersonaje.Render();
+                   escenario.RenderizarBoundingBoxes();
                    
 
                 }
@@ -512,6 +503,9 @@ namespace TGC.Group.Model
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
+
+        private void renderizarRestantes() => plataformas.ForEach(plat => { if (plat.plataformaMesh.Name == "PlataformaX" || plat.plataformaMesh.Name == "PlataformaZ") plat.plataformaMesh.Render(); });
+
         public override void Dispose()
         {
             personaje.Dispose();
