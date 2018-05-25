@@ -6,10 +6,8 @@ using System.Windows.Forms;
 using TGC.Core.Direct3D;
 using TGC.Core.Mathematica;
 using TGC.Core.SkeletalAnimation;
-using TGC.Examples.Example;
-using TGC.Examples.UserControls;
 
-namespace TGC.Examples.WorkshopShaders
+namespace TGC.Group.GUI
 {
     public class GuiTest : TGCExampleViewer
     {

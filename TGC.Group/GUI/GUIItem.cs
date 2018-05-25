@@ -4,7 +4,7 @@ using System.Drawing;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 
-namespace TGC.Examples.WorkshopShaders
+namespace TGC.Group.GUI
 {
     // item generico, con soporte de texto, bitmap, etc
     public class GUIItem

@@ -9,7 +9,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.Camara;
 
 
-namespace TGC.Examples.WorkshopShaders
+namespace TGC.Group.GUI
 {
     public enum tipoCursor
     {
