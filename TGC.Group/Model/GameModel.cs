@@ -67,7 +67,7 @@ namespace TGC.Group.Model
 
         private PisoInercia pisoResbaloso = null; //Es null cuando no esta pisando ningun piso resbaloso
 
-        private bool paused = false;
+        private bool paused = true;
         private bool perdiste = false;
         private bool menu = true;
 
@@ -231,7 +231,11 @@ namespace TGC.Group.Model
             if (Input.keyPressed(Key.P)) paused = !paused;
 
             //Menu
-            if (Input.keyPressed(Key.M)) menu = true;
+            if (Input.keyPressed(Key.M))
+            {
+                menu = true;
+                paused = true;
+            }
              
             //Bounding Box activos.
             if (Input.keyPressed(Key.F))boundingBoxActivate = !boundingBoxActivate;
@@ -585,6 +589,8 @@ namespace TGC.Group.Model
             // levanto el GUI
             gui.Create(MediaDir);
 
+            
+
             // menu principal
             gui.InitDialog(true);
             int W = D3DDevice.Instance.Width;
@@ -594,13 +600,12 @@ namespace TGC.Group.Model
             int dy = 120;
             int dy2 = dy;
             int dx = 400;
-            
-            gui.InsertImage("menu.png",1920,450, directorio.Menu);
+            int item_epsilon = 50;
+            gui.InsertImage("menu.png",1850,450, directorio.Menu);
             
             gui.InsertMenuItem(ID_JUGAR, "Jugar", "open.png", x0, y0, MediaDir, dx, dy);
-            gui.InsertMenuItem(ID_CONFIGURAR, "Configurar", "navegar.png", x0, y0 += dy2, MediaDir, dx, dy);
+            gui.InsertMenuItem(ID_CONFIGURAR, "Configurar", "navegar.png", x0+dx+item_epsilon, y0 , MediaDir, dx, dy);
             gui.InsertMenuItem(ID_APP_EXIT, "Salir", "salir.png", x0, y0 += dy2, MediaDir, dx, dy);
-            // gui.InsertFrame("Menu", 10, 10, 200, 200, Color.FromArgb(32, 120, 255, 132), frameBorder.sin_borde);
 
             // lista de colores
             lst_colores[0] = Color.FromArgb(100, 220, 255);
@@ -648,6 +653,7 @@ namespace TGC.Group.Model
 
                         case ID_JUGAR:
                             menu=false;
+                            paused = false;
                             break;
 
                         /*case ID_CONFIGURAR:
@@ -655,7 +661,7 @@ namespace TGC.Group.Model
                             break;*/
 
                         case ID_APP_EXIT:
-                            gui.MessageBox("Desea Salir?", "TGC Gui Demo");
+                            gui.MessageBox("Desea Salir del Juego?",directorio.Menu, "Crash Bandicoot");
                             msg_box_app_exit = true;
                             break;
 

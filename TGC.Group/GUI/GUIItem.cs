@@ -698,7 +698,7 @@ namespace TGC.Group.GUI
     public class gui_circle_button : gui_tile_button
     {
         public Color c_border = Color.FromArgb(0, 0, 0);
-        public Color c_interior_sel = Color.FromArgb(30, 240, 40);
+        public Color c_interior_sel = Color.FromArgb(100,Color.Red);
         public bool texto_derecha;
 
         public gui_circle_button(DXGui gui, string s, string imagen, int id, int x, int y, string mediaDir, int r) :

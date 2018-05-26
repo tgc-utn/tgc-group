@@ -358,10 +358,12 @@ namespace TGC.Group.GUI
             int dy = (int)(450.0f / ey);
             int x0 = (int)((W - dx) / 2);
             int y0 = (int)((H - dy) / 2);
-            int r = 170;
+            int r = 100;
 
-            InsertFrame(titulo, x0, y0, dx, dy, Color.FromArgb(64, 32, 64));
-            InsertItem(msg, x0 + 50, y0 + 80);
+            InsertImage("menu_exit.png", 1850, 450, mediaDir);
+
+            InsertFrame(titulo, x0, y0, dx, dy, Color.FromArgb(0,0,0));
+            InsertItem(msg, x0 + 200, y0 + 200);
             InsertCircleButton(0, "OK", "ok.png", x0 + 70, y0 + dy - r - 90, mediaDir, r);
             InsertCircleButton(1, "CANCEL", "cancel.png", x0 + dx - r - 70, y0 + dy - r - 90, mediaDir, r);
         }
