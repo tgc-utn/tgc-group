@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TGC.Core.Mathematica;
+﻿using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
-using TGC.Core.Collision;
 using TGC.Core.BoundingVolumes;
-using TGC.Core.Geometry;
 
 namespace TGC.Group.Model.AI
 {
@@ -46,7 +39,7 @@ namespace TGC.Group.Model.AI
             OBB.setRenderColor(System.Drawing.Color.Empty);
             vRotacionOBB = new TGCVector3(0f, anguloRotacion, 0f);
 
-            plataformaMesh.BoundingBox.Dispose();
+           // plataformaMesh.BoundingBox.Dispose();
 
         }
         public void Render(float tiempo)
@@ -59,38 +52,5 @@ namespace TGC.Group.Model.AI
             //Traslado Mesh al origen --> Roto el Mesh --> Vuelve a la posicion inicial
             plataformaMesh.Transform = mTraslacionAlOrigen * TGCMatrix.RotationY(anguloRotacion * tiempo) * mTraslacionPosInicial;
         }
-
-
-
-        //Manejo de colision Esfera OBB
-        //TODO: Reificar
-        override public bool colisionaConPersonaje(TgcBoundingSphere esferaPersonaje)
-        {
-            return TgcCollisionUtils.testSphereOBB(esferaPersonaje,OBB);//TgcCollisionUtils.testSphereOBB(esferaPersonaje,OBB);
-        }
-
-        private float EPSILON = 0.4f;
-        public TGCVector3 colisionConRotante(TgcBoundingSphere esfera, TGCVector3 movementVector)
-        {
-            //Si esta parador Arriba de la caja
-            if (colisionaConPersonaje(esfera) && esfera.Center.Y > OBB.Center.Y + OBB.Extents.Y)
-            {
-                esfera.moveCenter(movementVector);
-                return movementVector;
-            }//Si choca por debajo a la plataforma
-            else if (colisionaConPersonaje(esfera) && esfera.Center.Y < OBB.Center.Y - OBB.Extents.Y)
-            {
-                movementVector.Y = -EPSILON;
-                esfera.moveCenter(movementVector);
-                return movementVector;
-            }
-            else //Si la choca por los costados
-            {
-                movementVector.Y = 25 * EPSILON;
-                esfera.moveCenter(-movementVector);
-                return -movementVector;
-            }
-        }
-
     }
 }

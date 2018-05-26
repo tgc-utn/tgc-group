@@ -91,7 +91,11 @@
     <Compile Include="Model\AI\PlataformaRotante.cs" />
     <Compile Include="Model\AI\PlataformaX.cs" />
     <Compile Include="Model\AI\PlataformaY.cs" />
+    <Compile Include="Optimizacion\Octree.cs" />
+    <Compile Include="Optimizacion\OctreeBuilder.cs" />
+    <Compile Include="Optimizacion\OctreeNode.cs" />
     <Compile Include="SphereCollisionUtils\BoundingBoxCollider.cs" />
+    <Compile Include="SphereCollisionUtils\SphereOBBCollider.cs" />
     <Compile Include="SphereCollisionUtils\Collider.cs" />
     <Compile Include="SphereCollisionUtils\SphereCollisionManager.cs" />
     <Compile Include="SphereCollisionUtils\SphereTriangleCollisionManager.cs" />

@@ -17,7 +17,7 @@ namespace TGC.Group.Model
 {
     class Escenario
     {
-       public TgcScene scene { get; set; }
+        public TgcScene scene { get; set; }
 
         public Escenario(string pathEscenario)
         {
@@ -25,7 +25,7 @@ namespace TGC.Group.Model
             scene = loader.loadSceneFromFile(pathEscenario);
         }
 
-        
+
 
         public List<TgcMesh> encontrarMeshes(string clave) => scene.Meshes.FindAll(x => x.Layer == clave);
         public List<TgcMesh> ParedesMesh() => encontrarMeshes("PAREDES");
@@ -57,7 +57,6 @@ namespace TGC.Group.Model
         }
 
         private int coeficienteRotacion = 1;
-
         public List<Plataforma> Plataformas()
         {
             List<Plataforma> plataformas = new List<Plataforma>();
