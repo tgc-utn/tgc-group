@@ -20,6 +20,7 @@ using System.Runtime.InteropServices;
 using TGC.Group.GUI;
 
 using TGC.Group.Optimizacion;
+using TGC.Core.Shaders;
 
 
 namespace TGC.Group.Model
@@ -48,7 +49,10 @@ namespace TGC.Group.Model
         private TGCVector3 velocidad = TGCVector3.Empty;
         private TGCVector3 aceleracion = TGCVector3.Empty;
         private float Ypiso = 20f;
-        
+
+        private Microsoft.DirectX.Direct3D.Effect effectLuzComun;
+        private Microsoft.DirectX.Direct3D.Effect effectLuzLava;
+        private Microsoft.DirectX.Direct3D.Effect personajeLightShader;
 
         //Define direccion del mesh del personaje dependiendo el movimiento
         private DireccionPersonaje direccionPersonaje = new DireccionPersonaje();
@@ -233,7 +237,50 @@ namespace TGC.Group.Model
            
 
             Frustum.Color = Color.Black;
-        
+
+            effectLuzComun = TgcShaders.Instance.TgcMeshPhongShader;
+            effectLuzLava = effectLuzComun.Clone(effectLuzComun.Device);
+            foreach (TgcMesh mesh in escenario.MeshesColisionables())
+            {
+                Microsoft.DirectX.Direct3D.Effect defaultEffect = mesh.Effect;
+
+                TgcMesh luz = escenario.getClosestLight(mesh.BoundingBox.calculateBoxCenter(), 2500f);
+
+                if(luz == null)
+                {
+                    mesh.Effect = defaultEffect;
+                }
+                else
+                {
+                    if(luz.Layer == "Luces")
+                    {
+                        mesh.Effect = effectLuzComun;
+                        mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
+                        mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
+                        mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+                        mesh.Effect.SetValue("ambientColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
+                        mesh.Effect.SetValue("diffuseColor", ColorValue.FromColor(Color.White));
+                        mesh.Effect.SetValue("specularColor", ColorValue.FromColor(Color.DimGray));
+                        mesh.Effect.SetValue("specularExp", 500f);
+                    }
+                    else
+                    {
+                        mesh.Effect = effectLuzLava;
+                        mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
+                        mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
+                        mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+                        mesh.Effect.SetValue("ambientColor", ColorValue.FromColor(Color.Red));
+                        mesh.Effect.SetValue("diffuseColor", ColorValue.FromColor(Color.Red));
+                        mesh.Effect.SetValue("specularColor", ColorValue.FromColor(Color.Orange));
+                        mesh.Effect.SetValue("specularExp", 1000f);
+                    }
+                }
+
+                //mesh.Technique = "RenderScene2";
+            }
+            personajeLightShader = TgcShaders.Instance.TgcSkeletalMeshPointLightShader;
+            personaje.Effect = personajeLightShader;
+            personaje.Technique = TgcShaders.Instance.getTgcSkeletalMeshTechnique(personaje.RenderType);
 
         }
 
@@ -364,7 +411,9 @@ namespace TGC.Group.Model
                 if (pisoResbaloso.aCollisionFound(personaje))
                 {
                     var VectorSlideActual = pisoResbaloso.VectorEntrada;
-                    if (VectorSlideActual == TGCVector3.Empty)
+                    var versorMovimientoOriginal = movimientoOriginal * (1 / TGCVector3.Length(movimientoOriginal));
+
+                    if (VectorSlideActual == TGCVector3.Empty || ((versorMovimientoOriginal != pisoResbaloso.VersorEntrada) && TGCVector3.Length(movimientoOriginal) > 0))
                     {
                         pisoResbaloso.VectorEntrada = movimientoOriginal;
                     }
@@ -576,10 +625,13 @@ namespace TGC.Group.Model
 
                     if (!paused)
                     {
+                        octree.render(Frustum, boundingBoxActivate);
+                        renderizarRestantes();
                         personaje.animateAndRender(ElapsedTime);
                     }
                     else
                     {
+                        DrawText.drawText("Perdiste" + "\n" + "¿Reiniciar? (Y)", 500, 500, Color.Red);
                         personaje.Render();
                     }
 
@@ -589,36 +641,27 @@ namespace TGC.Group.Model
                         personaje.BoundingBox.Render();
                         esferaPersonaje.Render();
                         escenario.RenderizarBoundingBoxes();
-
-
                     }
+                                    
+                    personaje.Effect.SetValue("lightColor", ColorValue.FromColor(Color.White));
+                    personaje.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(escenario.getClosestLight(personaje.Position,0f).Position));
+                    personaje.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
 
-                DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
-                           + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
-                               , 0, 30, Color.GhostWhite);
+                    personaje.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
+                    personaje.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
+                    personaje.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
+                    personaje.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Color.DimGray));
+                    personaje.Effect.SetValue("materialSpecularExp", 500f);
 
-                DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
-               
-                if (!paused)
-                {
-                    octree.render(Frustum, boundingBoxActivate);
-                    renderizarRestantes();
-
-                    personaje.animateAndRender(ElapsedTime);
-
-                }
-                else
-                {
-                    DrawText.drawText("Perdiste" + "\n" + "¿Reiniciar? (Y)", 500, 500, Color.Red);
-                }
-            }
+                    personaje.Effect.SetValue("lightIntensity", 20);
+                    personaje.Effect.SetValue("lightAttenuation", 25);
+                    
+              }
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
-
-
 
         public void inicializarGUI()
         {
@@ -662,6 +705,7 @@ namespace TGC.Group.Model
         {
             // ------------------------------------------------
             GuiMessage msg = gui.Update(elapsedTime, Input);
+
 
             // proceso el msg
             switch (msg.message)

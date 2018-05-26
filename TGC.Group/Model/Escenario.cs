@@ -37,6 +37,16 @@ namespace TGC.Group.Model
         public List<TgcMesh> PlataformasMesh() => encontrarMeshes("PLATAFORMA");
         public List<TgcMesh> ResbalososMesh() => encontrarMeshes("RESBALOSOS");
         public List<TgcMesh> LavaMesh() => encontrarMeshes("LAVA");
+        public List<TgcMesh> Luces() => encontrarMeshes("Luces");
+
+        public List<TgcMesh> FuentesDeLuz()
+        {
+            List<TgcMesh> fuentesDeLuz = new List<TgcMesh>();
+            fuentesDeLuz.AddRange(Luces());
+            fuentesDeLuz.AddRange(LavaMesh());
+
+            return fuentesDeLuz;
+        }
 
         public bool colisionaConPiso(TgcMesh mesh)
         {
@@ -167,7 +177,30 @@ namespace TGC.Group.Model
         }
 
 
+        public TgcMesh getClosestLight(TGCVector3 pos, float maxDistance)
+        {
+            var minDist = float.MaxValue;
+            TgcMesh minLight = null;
 
+            foreach (var light in FuentesDeLuz())
+            {
+                var distSq = TGCVector3.LengthSq(pos - light.BoundingBox.calculateBoxCenter());
+                if (distSq < minDist)
+                {
+                    minDist = distSq;
+                    minLight = light;
+                }
+            }
+
+            if (minLight != null)
+            {
+                if (maxDistance != 0 && TGCVector3.LengthSq(pos - minLight.BoundingBox.calculateBoxCenter()) > (maxDistance * maxDistance))
+                {
+                    return null;
+                }
+            }
+            return minLight;
+        }
 
     }
 }
