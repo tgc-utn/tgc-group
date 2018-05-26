@@ -4,6 +4,7 @@ using System.Drawing;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 
+
 namespace TGC.Group.GUI
 {
     // item generico, con soporte de texto, bitmap, etc
@@ -127,7 +128,10 @@ namespace TGC.Group.GUI
             if (rc.Width == 0 || rc.Height == 0)
             {
                 // Ajusta el rectangulo para que adapte al texto a dibujar
-                Rectangle tw = gui.font.MeasureString(gui.sprite, text, DrawTextFormat.NoClip | DrawTextFormat.Top, color);
+                Rectangle tw = new Rectangle();
+                int h = gui.font.DrawText(gui.sprite, text, tw, DrawTextFormat.NoClip | DrawTextFormat.Top , color);
+
+                //Rectangle tw = gui.font.DrawText(gui.sprite, text, DrawTextFormat.NoClip | DrawTextFormat.Top, color);
                 rc.Width = tw.Width + 20;
                 rc.Height = tw.Height + 10;
                 rc.X -= 10;
@@ -317,7 +321,13 @@ namespace TGC.Group.GUI
                 string p = text;
                 if (p.Length == 0)
                     p += "I";
-                Rectangle tw = gui.font.MeasureString(gui.sprite, p, DrawTextFormat.Top | DrawTextFormat.NoClip, color);
+
+                Rectangle tw = new Rectangle();
+                int h = gui.font.DrawText(gui.sprite, p,tw, DrawTextFormat.Top | DrawTextFormat.NoClip | DrawTextFormat.CalculateRect, color);
+
+                //Rectangle tw = gui.font.MeasureString(gui.sprite, p, DrawTextFormat.Top | DrawTextFormat.NoClip, color);
+
+
                 Rectangle rc2 = new Rectangle(rc.Right + tw.Width, rc.Top, 12, rc.Height);
                 // dibujo el cursor titilando
                 int cursor = (int)(gui.time * 5);

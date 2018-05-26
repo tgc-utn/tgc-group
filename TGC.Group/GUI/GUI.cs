@@ -8,7 +8,6 @@ using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.Camara;
 
-
 namespace TGC.Group.GUI
 {
     public enum tipoCursor
@@ -189,7 +188,7 @@ namespace TGC.Group.GUI
         public float delay_move0 = 0.5f;
 
         // Camara TGC
-        public TgcFpsCamera camera;
+        public TgcCamera camera;
 
         // Parametros srcoll automatico
         public float vel_scroll = 500;           // pixeles por segundo
@@ -1424,7 +1423,7 @@ namespace TGC.Group.GUI
             filename.TrimEnd();
             // cargo la textura
             Device d3dDevice = D3DDevice.Instance.Device;
-            string fname_aux = mediaDir + "WorkshopShaders\\gui\\" + filename;
+            string fname_aux = mediaDir  + filename;
             if (!File.Exists(fname_aux))
                 // Pruebo con el nombre directo
                 fname_aux = filename;
