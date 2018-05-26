@@ -26,15 +26,19 @@ namespace TGC.Group.Model
 {
     public class GameModel : TgcExample
     {
-        public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
+        public GameModel(string amediaDir, string shadersDir) : base(amediaDir, shadersDir)
         {
             Category = Game.Default.Category;
             Name = Game.Default.Name;
             Description = Game.Default.Description;
+            mediaDir = amediaDir;
         }
 
         private bool interaccionCaja = false;
 
+        static string mediaDir;
+
+        
 
         private Directorio directorio;
         private TgcSkeletalMesh personaje;
@@ -139,6 +143,8 @@ namespace TGC.Group.Model
         private Octree octree;
 
 
+        public static SoundManager soundManager;
+
         public override void Init()
         {
             perdiste = false;
@@ -148,11 +154,17 @@ namespace TGC.Group.Model
             velocidad =new TGCVector3(0,0,0);
             aceleracion = new TGCVector3(0,0,0);
 
+            
+
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
             //Objeto que conoce todos los path de MediaDir
             directorio = new Directorio(MediaDir);
+
+            //Cargo el SoundManager
+            soundManager = new SoundManager(directorio,this.DirectSound.DsDevice);
+            soundManager.playSonidoFondo();
 
             //Cagar escenario especifico para el juego.
             escenario = new Escenario(directorio.EscenaCrash);
@@ -221,7 +233,7 @@ namespace TGC.Group.Model
            
 
             Frustum.Color = Color.Black;
-          
+        
 
         }
 
@@ -278,6 +290,7 @@ namespace TGC.Group.Model
                     if (Input.keyUp(Key.Space) && saltoActual < coeficienteSalto)
                     {
                         saltoActual = coeficienteSalto;
+                        soundManager.playSonidoSaltar();
                     }
                     if (Input.keyUp(Key.Space) || saltoActual > 0 )
                     {
@@ -300,9 +313,17 @@ namespace TGC.Group.Model
                     moveForward = -velocidadCaminar;
                     movX = FastMath.Sin(personaje.Rotation.Y) * moveForward * ElapsedTime;
                     movZ = FastMath.Cos(personaje.Rotation.Y) * moveForward * ElapsedTime;
+                    soundManager.playSonidoCaminar();
                 }
-                else animacion = "Parado";
+                else
+                {
+                    animacion = "Parado";
+                    soundManager.stopSonidoCaminar();
+                }
+                movementVector = new TGCVector3(movX, movY, movZ);
 
+                //MOVIMIENTOS POR PISO
+                var vectorSlide = new TGCVector3(0, 0, 0);
 
                 movimientoOriginal = new TGCVector3(movX, movY, movZ);
 
@@ -604,7 +625,7 @@ namespace TGC.Group.Model
             // levanto el GUI
             gui.Create(MediaDir);
 
-            
+            //soundManager.playSonidoFondo();
 
             // menu principal
             gui.InitDialog(true);
