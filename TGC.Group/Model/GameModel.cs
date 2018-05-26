@@ -240,7 +240,6 @@ namespace TGC.Group.Model
                         saltoActual -= coeficienteSalto * ElapsedTime;
                         saltoRealizado = saltoActual;
                         // jumping = true;
-                        soundManager.playSonidoSaltar();
                     }
                    
                 }
@@ -260,8 +259,11 @@ namespace TGC.Group.Model
                     movZ = FastMath.Cos(personaje.Rotation.Y) * moveForward * ElapsedTime;
                     soundManager.playSonidoCaminar();
                 }
-                else animacion = "Parado";
-
+                else
+                {
+                    animacion = "Parado";
+                    soundManager.stopSonidoCaminar();
+                }
                 movementVector = new TGCVector3(movX, movY, movZ);
 
                 //MOVIMIENTOS POR PISO

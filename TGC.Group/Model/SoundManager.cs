@@ -40,10 +40,15 @@ namespace TGC.Group.Model
             SonidoCaminar.play();
         }
 
+        public void stopSonidoCaminar()
+        {
+            SonidoCaminar.stop();
+        }
+
         public void playSonidoSaltar()
         {
             //mp3SaltosPlayer.play(true);
-            SonidoSalto.play();
+            SonidoSalto.play(false);
         }
 
         public void playSonidoFondo()
