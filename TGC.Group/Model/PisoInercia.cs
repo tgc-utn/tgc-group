@@ -73,9 +73,24 @@ namespace TGC.Group.Model
             }
             set
             {
-                _vectorEntrada = new TGCVector3(value.X, 0f, value.Z);
+                if(TGCVector3.Length(_vectorEntrada) == 0)
+                {
+                    _vectorEntrada = new TGCVector3(value.X, 0f, value.Z);
+                }
+                else
+                {
+                    TGCVector3 versor = value * (1/TGCVector3.Length(value));
+                    _vectorEntrada = versor * TGCVector3.Length(_vectorEntrada);
+                }
             }
         }
+
+
+        public TGCVector3 VersorEntrada
+        {
+            get { return _vectorEntrada * (1 / TGCVector3.Length(_vectorEntrada)); }
+        }
+
 
         public bool AutoTransform
         {
