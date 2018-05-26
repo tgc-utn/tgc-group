@@ -17,7 +17,7 @@ using TGC.Core.Collision;
 
 namespace TGC.Group.Model
 {
-    class Directorio
+    public class Directorio
     {
 
         public string EscenaCrash {get;set;}
@@ -30,6 +30,11 @@ namespace TGC.Group.Model
         public string RobotSaltando { get; set; }
         public string RobotTextura { get; set; }
 
+        public string SonidoFondo { get; set; }
+        public string SonidoCaminar { get; set; }
+        public string SonidoSalto { get; set; }
+        public string Menu { get; set; }
+
         public Directorio(string mediaDir)
         {
             EscenaCrash = mediaDir + "Escenas\\CrashBandicoot-TgcScene.xml";
@@ -39,6 +44,12 @@ namespace TGC.Group.Model
             RobotCaminando = RobotDirectorio + "Caminando-TgcSkeletalAnim.xml";
             RobotParado = RobotDirectorio + "Parado-TgcSkeletalAnim.xml";
             RobotTextura = RobotDirectorio + "Textures\\uvwGreen.jpg";
+
+            SonidoFondo = mediaDir + "Sonidos\\background.mp3";
+            SonidoCaminar = mediaDir + "Sonidos\\FootSteps.wav";
+            SonidoSalto = mediaDir + "Sonidos\\jump.wav";
+          
+            Menu = mediaDir + "Menu\\";
         }
 
     }
