@@ -96,7 +96,7 @@ namespace TGC.Group.Model
         public bool msg_box_app_exit = false;
         public bool profiling = false;
 
-        private Microsoft.DirectX.Direct3D.Effect effect;
+        //private Microsoft.DirectX.Direct3D.Effect effect;
         public struct POINTAPI
         {
             public Int32 x;
@@ -671,7 +671,7 @@ namespace TGC.Group.Model
                                 // Cambio el color
                                 int color = msg.id;
 
-                                effect.SetValue("color_global", new TGCVector4((float)lst_colores[color].R / 255.0f, (float)lst_colores[color].G / 255.0f, (float)lst_colores[color].B / 255.0f, 1));
+                               // effect.SetValue("color_global", new TGCVector4((float)lst_colores[color].R / 255.0f, (float)lst_colores[color].G / 255.0f, (float)lst_colores[color].B / 255.0f, 1));
                             }
                             break;
                     }
@@ -683,52 +683,6 @@ namespace TGC.Group.Model
             gui.Render();
         }
 
-
-
-
-        public void ProgressBarDlg()
-        {
-            gui.InitDialog(false, false);
-
-            int W = D3DDevice.Instance.Width;
-            int H = D3DDevice.Instance.Height;
-            int x0 = -20;
-            int y0 = 100;
-            int dy = 350;
-            int dx = W + 50;
-
-            GUIItem frame = gui.InsertFrame("Cargando mision", x0, y0, dx, dy, Color.FromArgb(240, 240, 240), frameBorder.sin_borde);
-            frame.c_font = Color.FromArgb(0, 0, 0);
-            progress_bar = gui.InsertProgressBar(ID_PROGRESS1, 50, y0 + 150, W - 100, 60);
-
-            Microsoft.DirectX.Direct3D.Device d3dDevice = D3DDevice.Instance.Device;
-            int cant_textures = 5;
-            progress_bar.SetRange(0, cant_textures, "Descargando archivos..");
-            progress_bar.SetPos(1);
-            for (int i = 0; i < cant_textures; ++i)
-            {
-                progress_bar.SetPos(i);
-                progress_bar.text = "Descargando archivo: " + MediaDir + "Texturas\\f1\\f1piso2.png";
-
-                Texture textura_piso = Texture.FromBitmap(d3dDevice, (Bitmap)Bitmap.FromFile(MediaDir + "Texturas\\f1\\f1piso2.png"), Usage.None, Pool.Managed);
-                textura_piso.Dispose();
-                MessageLoop();
-            }
-
-            gui.EndDialog();            // progress bar dialog
-        }
-
-        public bool MessageLoop()
-        {
-            MSG msg = new MSG();
-            PeekMessage(ref msg, 0, 0, 0, PeekMessageOption.PM_REMOVE);
-            if (msg.message == WM_QUIT)
-                return false;
-            TranslateMessage(ref msg);
-            DispatchMessage(ref msg);
-
-            return true;
-        }
 
 
         /// <summary>
