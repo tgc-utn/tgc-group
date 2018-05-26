@@ -30,6 +30,8 @@ namespace TGC.Group.Model
         public string RobotSaltando { get; set; }
         public string RobotTextura { get; set; }
 
+        public string Menu { get; set; }
+
         public Directorio(string mediaDir)
         {
             EscenaCrash = mediaDir + "Escenas\\CrashBandicoot-TgcScene.xml";
@@ -39,6 +41,8 @@ namespace TGC.Group.Model
             RobotCaminando = RobotDirectorio + "Caminando-TgcSkeletalAnim.xml";
             RobotParado = RobotDirectorio + "Parado-TgcSkeletalAnim.xml";
             RobotTextura = RobotDirectorio + "Textures\\uvwGreen.jpg";
+
+            Menu = mediaDir + "Menu\\";
         }
 
     }

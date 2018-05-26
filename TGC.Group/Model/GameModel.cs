@@ -15,7 +15,12 @@ using System.Collections.Generic;
 using TGC.Examples.Collision.SphereCollision;
 using TGC.Group.SphereCollisionUtils;
 using TGC.Group.Model.AI;
+
+using System.Runtime.InteropServices;
+using TGC.Group.GUI;
+
 using TGC.Group.Optimizacion;
+
 
 namespace TGC.Group.Model
 {
@@ -67,14 +72,72 @@ namespace TGC.Group.Model
 
         private PisoInercia pisoResbaloso = null; //Es null cuando no esta pisando ningun piso resbaloso
 
-        private bool paused = false;
+        private bool paused = true;
         private bool perdiste = false;
+        private bool menu = true;
 
         private float offsetHeight = 400;
         private float offsetForward = -800;
         private float tiempoAcumulado;
 
+
+
+
+        private DXGui gui = new DXGui();
+
+        // Defines
+        public const int IDOK = 0;
+
+        public const int IDCANCEL = 1;
+        public const int ID_JUGAR = 100;
+        public const int ID_CONFIGURAR = 103;
+        public const int ID_APP_EXIT = 105;
+        public const int ID_PROGRESS1 = 107;
+        public const int ID_RESET_CAMARA = 108;
+
+        private Color[] lst_colores = new Color[12];
+        private int cant_colores = 12;
+
+        public TGC.Group.GUI.gui_progress_bar progress_bar;
+        public bool msg_box_app_exit = false;
+        public bool profiling = false;
+
+        //private Microsoft.DirectX.Direct3D.Effect effect;
+        public struct POINTAPI
+        {
+            public Int32 x;
+            public Int32 y;
+        }
+
+        public enum PeekMessageOption
+        {
+            PM_NOREMOVE = 0,
+            PM_REMOVE
+        }
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool PeekMessage(ref MSG lpMsg, Int32 hwnd, Int32 wMsgFilterMin, Int32 wMsgFilterMax, PeekMessageOption wRemoveMsg);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool TranslateMessage(ref MSG lpMsg);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern Int32 DispatchMessage(ref MSG lpMsg);
+
+        public const Int32 WM_QUIT = 0x12;
+
+        public struct MSG
+        {
+            public Int32 hwmd;
+            public Int32 message;
+            public Int32 wParam;
+            public Int32 lParam;
+            public Int32 time;
+            public POINTAPI pt;
+        }
+
         private Octree octree;
+
 
         public override void Init()
         {
@@ -152,8 +215,14 @@ namespace TGC.Group.Model
             octree.create(meshesSinPlatXZ, escenario.BoundingBox());
             octree.createDebugOctreeMeshes();// --> Para renderizar las "cajas" que genera
 
+
+            inicializarGUI();
+
+           
+
             Frustum.Color = Color.Black;
           
+
         }
 
 
@@ -178,7 +247,14 @@ namespace TGC.Group.Model
             
             //Pausa
             if (Input.keyPressed(Key.P)) paused = !paused;
-            
+
+            //Menu
+            if (Input.keyPressed(Key.M))
+            {
+                menu = true;
+                paused = true;
+            }
+             
             //Bounding Box activos.
             if (Input.keyPressed(Key.F))boundingBoxActivate = !boundingBoxActivate;
             
@@ -450,10 +526,51 @@ namespace TGC.Group.Model
         public override void Render()
         {
             PreRender();
-            Frustum.render();
-            if (!perdiste)
+
+
+            if(menu)gui_render(ElapsedTime);
+            else
+            
             {
-                
+                 Frustum.render();
+                if (!perdiste)
+                {
+
+
+                    DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
+                               + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
+                               /*+ "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
+                               + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
+                               + "Interaccion Con Caja: " + interaccionConCaja + "\n"*/
+                               + "Colision Plataforma: " + colisionPlataforma + "\n"
+                               /*+ "Movimiento por plataforma: " + movimientoPorPlataforma*/, 0, 30, Color.GhostWhite);
+
+                    DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
+
+                    escenario.RenderAll();
+
+                    //Renderizo OBB de las plataformas rotantes
+                    plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
+
+
+                    if (!paused)
+                    {
+                        personaje.animateAndRender(ElapsedTime);
+                    }
+                    else
+                    {
+                        personaje.Render();
+                    }
+
+                    if (boundingBoxActivate)
+                    {
+
+                        personaje.BoundingBox.Render();
+                        esferaPersonaje.Render();
+                        escenario.RenderizarBoundingBoxes();
+
+
+                    }
 
                 DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
                            + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
@@ -467,34 +584,131 @@ namespace TGC.Group.Model
                     renderizarRestantes();
 
                     personaje.animateAndRender(ElapsedTime);
+
                 }
                 else
                 {
-                    personaje.Render();
+                    DrawText.drawText("Perdiste" + "\n" + "¿Reiniciar? (Y)", 500, 500, Color.Red);
                 }
-
-                if (boundingBoxActivate)
-                {
-
-                    personaje.BoundingBox.Render();
-                   // esferaPersonaje.Render();
-                   escenario.RenderizarBoundingBoxes();
-                   
-
-                }
-
-
             }
-            else
-            {
-                DrawText.drawText("Perdiste" + "\n" + "¿Reiniciar? (Y)", 500, 500, Color.Red);
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
 
+
+
+        public void inicializarGUI()
+        {
+            // levanto el GUI
+            gui.Create(MediaDir);
+
+            
+
+            // menu principal
+            gui.InitDialog(true);
+            int W = D3DDevice.Instance.Width;
+            int H = D3DDevice.Instance.Height;
+            int x0 = 70;
+            int y0 = 10;
+            int dy = 120;
+            int dy2 = dy;
+            int dx = 400;
+            int item_epsilon = 50;
+            gui.InsertImage("menu.png",1850,450, directorio.Menu);
+            
+            gui.InsertMenuItem(ID_JUGAR, "Jugar", "open.png", x0, y0, MediaDir, dx, dy);
+            gui.InsertMenuItem(ID_CONFIGURAR, "Configurar", "navegar.png", x0+dx+item_epsilon, y0 , MediaDir, dx, dy);
+            gui.InsertMenuItem(ID_APP_EXIT, "Salir", "salir.png", x0, y0 += dy2, MediaDir, dx, dy);
+
+            // lista de colores
+            lst_colores[0] = Color.FromArgb(100, 220, 255);
+            lst_colores[1] = Color.FromArgb(100, 255, 220);
+            lst_colores[2] = Color.FromArgb(220, 100, 255);
+            lst_colores[3] = Color.FromArgb(220, 255, 100);
+            lst_colores[4] = Color.FromArgb(255, 100, 220);
+            lst_colores[5] = Color.FromArgb(255, 220, 100);
+            lst_colores[6] = Color.FromArgb(128, 128, 128);
+            lst_colores[7] = Color.FromArgb(64, 255, 64);
+            lst_colores[8] = Color.FromArgb(64, 64, 255);
+            lst_colores[9] = Color.FromArgb(255, 0, 255);
+            lst_colores[10] = Color.FromArgb(255, 255, 0);
+            lst_colores[11] = Color.FromArgb(0, 255, 255);
+        }
+
+        public void gui_render(float elapsedTime)
+        {
+            // ------------------------------------------------
+            GuiMessage msg = gui.Update(elapsedTime, Input);
+
+            // proceso el msg
+            switch (msg.message)
+            {
+                case MessageType.WM_COMMAND:
+                    switch (msg.id)
+                    {
+                        case IDOK:
+
+                        case IDCANCEL:
+                            // Resultados OK, y CANCEL del ultimo messagebox
+                            gui.EndDialog();
+                            profiling = false;
+                            if (msg_box_app_exit)
+                            {
+                                // Es la resupuesta a un messagebox de salir del sistema
+                                if (msg.id == IDOK)
+                                {
+                                    // Salgo del sistema
+                                    System.Windows.Forms.Application.Exit();
+                                }
+                            }
+                            msg_box_app_exit = false;
+                            break;
+
+                        case ID_JUGAR:
+                            menu=false;
+                            paused = false;
+                            break;
+
+                        /*case ID_CONFIGURAR:
+                            Configurar();
+                            break;*/
+
+                        case ID_APP_EXIT:
+                            gui.MessageBox("Desea Salir del Juego?",directorio.Menu, "Crash Bandicoot");
+                            msg_box_app_exit = true;
+                            break;
+
+                        default:
+                            if (msg.id >= 0 && msg.id < cant_colores)
+                            {
+                                // Cambio el color
+                                int color = msg.id;
+
+                               // effect.SetValue("color_global", new TGCVector4((float)lst_colores[color].R / 255.0f, (float)lst_colores[color].G / 255.0f, (float)lst_colores[color].B / 255.0f, 1));
+                            }
+                            break;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            gui.Render();
+        }
+
+
+
+
+        /// <summary>
+        ///     Se llama cuando termina la ejecución del ejemplo.
+        ///     Hacer Dispose() de todos los objetos creados.
+        ///     Es muy importante liberar los recursos, sobretodo los gráficos ya que quedan bloqueados en el device de video.
+        /// </summary>
+
         private void renderizarRestantes() => plataformas.ForEach(plat => { if (plat.plataformaMesh.Name == "PlataformaX" || plat.plataformaMesh.Name == "PlataformaZ") plat.plataformaMesh.Render(); });
+
 
         public override void Dispose()
         {
