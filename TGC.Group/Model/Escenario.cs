@@ -17,7 +17,7 @@ namespace TGC.Group.Model
 {
     class Escenario
     {
-       public TgcScene scene { get; set; }
+        public TgcScene scene { get; set; }
 
         public Escenario(string pathEscenario)
         {
@@ -25,7 +25,7 @@ namespace TGC.Group.Model
             scene = loader.loadSceneFromFile(pathEscenario);
         }
 
-        
+
 
         public List<TgcMesh> encontrarMeshes(string clave) => scene.Meshes.FindAll(x => x.Layer == clave);
         public List<TgcMesh> ParedesMesh() => encontrarMeshes("PAREDES");
@@ -56,23 +56,39 @@ namespace TGC.Group.Model
             return MeshesColisionablesSin("PLATAFORMA").Exists(x => TgcCollisionUtils.testAABBAABB(x.BoundingBox, mesh.BoundingBox));
         }
 
+        private int coeficienteRotacion = 1;
         public List<Plataforma> Plataformas()
         {
             List<Plataforma> plataformas = new List<Plataforma>();
 
             foreach (TgcMesh plataformaMesh in PlataformasMesh())
             {
+                
                 Plataforma plataforma;
 
                 if (plataformaMesh.Name == "PlataformaY") plataforma = new PlataformaY(plataformaMesh, this);
                 else if (plataformaMesh.Name == "PlataformaX") plataforma = new PlataformaX(plataformaMesh, this);
                 else if (plataformaMesh.Name == "PlataformaZ") plataforma = new PlataformaZ(plataformaMesh, this);
-                else if (plataformaMesh.Name == "PlataformaRotante") plataforma = new PlataformaRotante(plataformaMesh, this);
+                else if (plataformaMesh.Name == "PlataformaRotante")
+                {
+                    coeficienteRotacion *= -1;
+                    plataforma = new PlataformaRotante(plataformaMesh, this, coeficienteRotacion);
+                }
                 else plataforma = new Plataforma(plataformaMesh, this);
 
                 plataformas.Add(plataforma);
+                
             }
 
+            return plataformas;
+        }
+        public List<PlataformaRotante> PlataformasRotantes()
+        {
+            List<PlataformaRotante> plataformas = new List<PlataformaRotante>();
+            foreach(PlataformaRotante plataforma in Plataformas().FindAll(plat => plat.plataformaMesh.Name == "PlataformaRotante"))
+            {
+                plataformas.Add(plataforma);
+            }
             return plataformas;
         }
 
@@ -94,7 +110,7 @@ namespace TGC.Group.Model
 
         public List<TgcBoundingAxisAlignBox> MeshesColisionablesBB()
         {
-            return MeshesColisionables().Select(mesh => mesh.BoundingBox).ToList();
+            return MeshesColisionables().FindAll(mesh => mesh.Name != "PlataformaRotante").Select(mesh => mesh.BoundingBox).ToList();
         }
 
         public List<TgcMesh> ObjetosColisionablesConCajas()
@@ -114,10 +130,15 @@ namespace TGC.Group.Model
 
             return obstaculos;
         }
-        
+
         public void RenderizarBoundingBoxes()
         {
-            MeshesColisionables().ForEach(mesh => mesh.BoundingBox.Render());
+            MeshesColisionables().ForEach(mesh => BoundingBoxRender(mesh));
+           
+        }
+        private void BoundingBoxRender(TgcMesh mesh)
+        {
+            if (mesh.Name != "PlataformaRotante") mesh.BoundingBox.Render();
         }
 
         public void RenderAll() => scene.RenderAll();

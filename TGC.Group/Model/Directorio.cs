@@ -33,6 +33,7 @@ namespace TGC.Group.Model
         public string SonidoFondo { get; set; }
         public string SonidoCaminar { get; set; }
         public string SonidoSalto { get; set; }
+        public string Menu { get; set; }
 
         public Directorio(string mediaDir)
         {
@@ -47,6 +48,8 @@ namespace TGC.Group.Model
             SonidoFondo = mediaDir + "Sonidos\\background.mp3";
             SonidoCaminar = mediaDir + "Sonidos\\FootSteps.wav";
             SonidoSalto = mediaDir + "Sonidos\\jump.wav";
+          
+            Menu = mediaDir + "Menu\\";
         }
 
     }

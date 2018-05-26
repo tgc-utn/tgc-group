@@ -13,17 +13,17 @@ using TGC.Core.Collision;
 using System;
 using System.Collections.Generic;
 using TGC.Examples.Collision.SphereCollision;
+using TGC.Group.SphereCollisionUtils;
 using TGC.Group.Model.AI;
+
+using System.Runtime.InteropServices;
+using TGC.Group.GUI;
+
+using TGC.Group.Optimizacion;
 
 
 namespace TGC.Group.Model
 {
-    /// <summary>
-    ///     Ejemplo para implementar el TP.
-    ///     Inicialmente puede ser renombrado o copiado para hacer m·s ejemplos chicos, en el caso de copiar para que se
-    ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
-    ///     line 97.
-    /// </summary>
     public class GameModel : TgcExample
     {
         public GameModel(string amediaDir, string shadersDir) : base(amediaDir, shadersDir)
@@ -34,7 +34,6 @@ namespace TGC.Group.Model
             mediaDir = amediaDir;
         }
 
-        private bool interaccionConCaja = false;
         private bool interaccionCaja = false;
 
         static string mediaDir;
@@ -60,29 +59,89 @@ namespace TGC.Group.Model
         private TgcBoundingSphere esferaPersonaje;
         private TGCVector3 scaleBoundingVector;
         private SphereCollisionManager ColisionadorEsferico;
-        private TgcArrow directionArrow;
         private TGCVector3 movimientoRealPersonaje;
         private TGCVector3 movimientoRelativoPersonaje = TGCVector3.Empty;
         private TGCVector3 movimientoRealCaja = TGCVector3.Empty;
         private TgcBoundingSphere esferaCaja;
-        TGCVector3 movimientoPorPlataforma = new TGCVector3(0, 0, 0);
+        //TGCVector3 movimientoPorPlataforma = new TGCVector3(0, 0, 0);
         private bool colisionPlataforma = false;
         private List<Plataforma> plataformas;
+        private List<PlataformaRotante> plataformasRotantes;
 
 
         private bool boundingBoxActivate = false;
 
         private float saltoActual = 0;
-        private bool jumping;
         private bool moving;
 
         private PisoInercia pisoResbaloso = null; //Es null cuando no esta pisando ningun piso resbaloso
 
-        private bool paused = false;
+        private bool paused = true;
         private bool perdiste = false;
+        private bool menu = true;
 
         private float offsetHeight = 400;
         private float offsetForward = -800;
+        private float tiempoAcumulado;
+
+
+
+
+        private DXGui gui = new DXGui();
+
+        // Defines
+        public const int IDOK = 0;
+
+        public const int IDCANCEL = 1;
+        public const int ID_JUGAR = 100;
+        public const int ID_CONFIGURAR = 103;
+        public const int ID_APP_EXIT = 105;
+        public const int ID_PROGRESS1 = 107;
+        public const int ID_RESET_CAMARA = 108;
+
+        private Color[] lst_colores = new Color[12];
+        private int cant_colores = 12;
+
+        public TGC.Group.GUI.gui_progress_bar progress_bar;
+        public bool msg_box_app_exit = false;
+        public bool profiling = false;
+
+        //private Microsoft.DirectX.Direct3D.Effect effect;
+        public struct POINTAPI
+        {
+            public Int32 x;
+            public Int32 y;
+        }
+
+        public enum PeekMessageOption
+        {
+            PM_NOREMOVE = 0,
+            PM_REMOVE
+        }
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool PeekMessage(ref MSG lpMsg, Int32 hwnd, Int32 wMsgFilterMin, Int32 wMsgFilterMax, PeekMessageOption wRemoveMsg);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool TranslateMessage(ref MSG lpMsg);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern Int32 DispatchMessage(ref MSG lpMsg);
+
+        public const Int32 WM_QUIT = 0x12;
+
+        public struct MSG
+        {
+            public Int32 hwmd;
+            public Int32 message;
+            public Int32 wParam;
+            public Int32 lParam;
+            public Int32 time;
+            public POINTAPI pt;
+        }
+
+        private Octree octree;
+
 
         public static SoundManager soundManager;
 
@@ -123,9 +182,9 @@ namespace TGC.Group.Model
 
             //Posicion inicial
             personaje.Position = new TGCVector3(400, Ypiso, -900);
-
+           // personaje.Position = new TGCVector3(-4133.616f, 20f, 5000f);
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
-            personaje.AutoTransform = true;
+            personaje.AutoTransform = false;
             
             
             //Rotar al robot en el Init para que mire hacia el otro lado
@@ -147,27 +206,34 @@ namespace TGC.Group.Model
             
 
 
-            //Crear linea para mostrar la direccion del movimiento del personaje
-            directionArrow = new TgcArrow();
-            directionArrow.BodyColor = Color.Red;
-            directionArrow.HeadColor = Color.Green;
-            directionArrow.Thickness = 1;
-            directionArrow.HeadSize = new TGCVector2(10, 20);
-
             //Inicializamos el collisionManager.
             ColisionadorEsferico = new SphereCollisionManager();
             ColisionadorEsferico.GravityEnabled = true;
 
             //Obtenemos las plataformas segun su tipo de movimiento.
             plataformas = escenario.Plataformas();
+            plataformasRotantes = escenario.PlataformasRotantes();
 
-           //PosiciÛn de la camara.
-            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 500, -900);
+           //Posici√≥n de la camara.
+            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 500, -1000);
            
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara = camaraInterna;
 
-            
+            personaje.BoundingBox.scaleTranslate(personaje.Position, scaleBoundingVector);
+            var meshesSinPlatXZ = escenario.scene.Meshes.FindAll(mesh => mesh.Name != "PlataformaX" && mesh.Name != "PlataformaZ");
+
+            octree = new Octree();
+            octree.create(meshesSinPlatXZ, escenario.BoundingBox());
+            octree.createDebugOctreeMeshes();// --> Para renderizar las "cajas" que genera
+
+
+            inicializarGUI();
+
+           
+
+            Frustum.Color = Color.Black;
+        
 
         }
 
@@ -176,47 +242,39 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
-            personaje.BoundingBox.scaleTranslate(personaje.Position, scaleBoundingVector);
-
-            //TODO: Redificar estos valores.
+            //TODO: Reificar estos valores.
             //Obtenemos los valores default
-            var velocidadCaminar = 600f;
+            var velocidadCaminar = 1000f;
             var coeficienteSalto = 30f;
             float saltoRealizado = 0;
             var moveForward = 0f;
             moving = false;
             var animacion = "";
 
-            while (ElapsedTime > 1)
-            {
-                ElapsedTime = ElapsedTime / 10;
-            };
-
+            while (ElapsedTime > 1) ElapsedTime = ElapsedTime / 10;
+            tiempoAcumulado += ElapsedTime;
+            
             //Corroboramos si el jugador perdio la partida.
-            if (perdiste && Input.keyPressed(Key.Y))
-            {
-                Init();
-            }
-
+            if (perdiste && Input.keyPressed(Key.Y)) Init();
+            
             //Pausa
-            if (Input.keyPressed(Key.P))
-            {
-                paused = !paused;
-            }
+            if (Input.keyPressed(Key.P)) paused = !paused;
 
+            //Menu
+            if (Input.keyPressed(Key.M))
+            {
+                menu = true;
+                paused = true;
+            }
+             
             //Bounding Box activos.
-            if (Input.keyPressed(Key.F))
-            {
-                boundingBoxActivate = !boundingBoxActivate;
-            }
-
+            if (Input.keyPressed(Key.F))boundingBoxActivate = !boundingBoxActivate;
+            
             //Si el personaje se mantiene en caida, se pierda la partida.
-            if (personaje.Position.Y < -700)
-            {
-                perdiste = true;
-            }
+            if (personaje.Position.Y < -700)perdiste = true;
+            
 
-            //Si se sigue en juego, se continua con la logia del juego.
+            //Si se sigue en juego, se continua con la logica del juego.
             if (!paused && !perdiste)
             {
                 //MOVIMIENTOS BASICOS
@@ -225,28 +283,26 @@ namespace TGC.Group.Model
                 if (Input.keyDown(Key.R)) interaccionCaja = true;
                 else interaccionCaja = false;
 
-                //TODO: No debe saltar cuando ya esta saltando
                 // Para que no se pueda saltar cuando agarras algun objeto
+                //TODO: No debe saltar cuando ya esta saltando
                 if (!interaccionCaja)
                 {
                     if (Input.keyUp(Key.Space) && saltoActual < coeficienteSalto)
                     {
                         saltoActual = coeficienteSalto;
-                        //jumping = false;
                         soundManager.playSonidoSaltar();
                     }
                     if (Input.keyUp(Key.Space) || saltoActual > 0 )
                     {
                         saltoActual -= coeficienteSalto * ElapsedTime;
                         saltoRealizado = saltoActual;
-                        // jumping = true;
                     }
                    
                 }
 
                 //Vector de movimiento
-                var movementVector = new TGCVector3(0,0,0);
 
+                var movimientoOriginal = new TGCVector3(0,0,0);
                 float movX = 0;
                 float movY = saltoRealizado;
                 float movZ = 0;
@@ -269,46 +325,16 @@ namespace TGC.Group.Model
                 //MOVIMIENTOS POR PISO
                 var vectorSlide = new TGCVector3(0, 0, 0);
 
-                foreach (TgcMesh mesh in escenario.ResbalososMesh())
-                {
-                    if (pisoResbaloso == null)
-                    {
-                        pisoResbaloso = new PisoInercia(mesh, 0.999f);
-                    }
+                movimientoOriginal = new TGCVector3(movX, movY, movZ);
 
-                    if (pisoResbaloso.aCollisionFound(personaje))
-                    {
-                        var VectorSlideActual = pisoResbaloso.VectorEntrada;
-                        if (VectorSlideActual == TGCVector3.Empty)
-                        {
-                            pisoResbaloso.VectorEntrada = movementVector;
-                        }
-                        else
-                        {
-                            vectorSlide = VectorSlideActual;
-                        }
-                        break;
-                    }
-                    else
-                    {
-                        pisoResbaloso = null;
-                        //pisoResb.VectorEntrada = TGCVector3.Empty;
-                    }
-                }
-                //movimientoRelativoPersonaje = movementVector; Variable de log.
 
+                
                 ColisionadorEsferico.GravityEnabled = true;
                 ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
                 ColisionadorEsferico.SlideFactor = 1.3f;
 
-
-                moverMundo(movementVector + vectorSlide);
-
-               //Actualizar valores de la linea de movimiento
-                directionArrow.PStart = esferaPersonaje.Center;
-                directionArrow.PEnd = esferaPersonaje.Center + TGCVector3.Multiply(movementVector, 50);
-                directionArrow.updateValues();
-
+                //MOVIMIENTOS POR PISO
+                moverMundo(movimientoOriginal);
 
                 //Ejecuta la animacion del personaje
                 personaje.playAnimation(animacion, true);
@@ -316,47 +342,95 @@ namespace TGC.Group.Model
                 //Reajustamos la camara
                 ajustarCamara();
 
+                //Esto soluciona el Autrotransform = false
+                personaje.UpdateMeshTransform();
+                //Actualizo posici√≥n del Frustum
+                Frustum.updateMesh(camaraInterna.Position + traslacionFrustum, camaraInterna.LookAt);
                 PostUpdate();
             }
         }
-        TgcMesh objetoEscenario;
-        public void moverMundo(TGCVector3 movementVector)
+        private TGCVector3 traslacionFrustum = new TGCVector3(0f, -0, -2800f);
+
+        public TGCVector3 MovimientoPorSliding(TGCVector3 movimientoOriginal)
         {
+            var vectorSlide = new TGCVector3(0, 0, 0);
+            foreach (TgcMesh mesh in escenario.ResbalososMesh())
+            {
+                if (pisoResbaloso == null)
+                {
+                    pisoResbaloso = new PisoInercia(mesh, 0.999f);
+                }
 
-             var cajaColisionante = obtenerColisionCajaPersonaje();
-             if (cajaColisionante != null && cajaColisionante != objetoEscenario) objetoEscenario = cajaColisionante;
-
+                if (pisoResbaloso.aCollisionFound(personaje))
+                {
+                    var VectorSlideActual = pisoResbaloso.VectorEntrada;
+                    if (VectorSlideActual == TGCVector3.Empty)
+                    {
+                        pisoResbaloso.VectorEntrada = movimientoOriginal;
+                    }
+                    else
+                    {
+                        vectorSlide = VectorSlideActual;
+                    }
+                    break;
+                }
+                else
+                {
+                    pisoResbaloso = null;
+                    //pisoResb.VectorEntrada = TGCVector3.Empty;
+                }
+            }
+            return vectorSlide;
+        }
+        //Objeto Movible del escenario, utilizado para mantener la referencia a una caja cuando cae
+        TgcMesh objetoEscenario;
+        SphereOBBCollider colliderOBB = new SphereOBBCollider();
+        public void moverMundo(TGCVector3 movimientoOriginal)
+        {
             
-            if (objetoEscenario != null) generarMovimiento(objetoEscenario, movementVector);
+            //Actualizo el vector de movimiento del personaje segun el piso resbaloso
+            movimientoOriginal += MovimientoPorSliding(movimientoOriginal);
 
-            
-            movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movementVector, escenario.MeshesColisionablesBB());
+            //Busca la caja con la cual se esta colisionando
+            var cajaColisionante = obtenerColisionCajaPersonaje();
+            //Si es una caja nueva updatea la referencia global
+            if (cajaColisionante != null && cajaColisionante != objetoEscenario) objetoEscenario = cajaColisionante;
 
-            //MOVIMIENTOS POR PLATAFORMAS
-            foreach (Plataforma plataforma in plataformas) plataforma.Update();
+            if (objetoEscenario != null) generarMovimiento(objetoEscenario, movimientoOriginal);
+
+            movimientoDePlataformas();
+            //Actualizo el vector de movimiento del personaje segun la plataforma colisionante
+            movimientoOriginal += movimientoPorPlataformas();
+
+            //Busca una plataforma rotante con la que se este colisionando
+            //NOTA: para estas plataformas se colisiona Esfera -> OBB y no Esfera -> AABB como las dem√°s colisiones
+            var plataformaRotante = plataformasRotantes.Find(plat => colliderOBB.colisionaEsferaOBB(esferaPersonaje,plat.OBB));
+            //Si colisiona con una maneja la colision para las rotantes sino usa el metodo general
+            if (plataformaRotante != null) movimientoRealPersonaje = colliderOBB.manageColisionEsferaOBB(esferaPersonaje, movimientoOriginal,plataformaRotante.OBB);
+            else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
+             
+            personaje.Move(movimientoRealPersonaje);
+        }
+        public void movimientoDePlataformas()
+        {
+            foreach (Plataforma plataforma in plataformas) plataforma.Update(tiempoAcumulado);
+        }
+        public TGCVector3 movimientoPorPlataformas()
+        {
 
             Plataforma plataformaColisionante = plataformas.Find(plataforma => plataforma.colisionaConPersonaje(esferaPersonaje));
             if (plataformaColisionante != null) colisionPlataforma = true;
             else colisionPlataforma = false;
 
-            if (colisionPlataforma) movimientoPorPlataforma = plataformaColisionante.VectorMovimiento();
-            else movimientoPorPlataforma = new TGCVector3(0, 0, 0);
-
-            personaje.Move(movimientoRealPersonaje + movimientoPorPlataforma);
-
-            //Actualizamos la esfera del personaje.
-            TGCVector3 movimientoCentroEsfera = movimientoPorPlataforma;
-            esferaPersonaje.moveCenter(movimientoCentroEsfera);
+            if (colisionPlataforma) return plataformaColisionante.VectorMovimiento();
+            else return TGCVector3.Empty;
         }
-
-      
-
         public void generarMovimiento(TgcMesh objetoMovible, TGCVector3 movementV)
         {
             if (objetoMovibleG == null || objetoMovibleG != objetoMovible) objetoMovibleG = objetoMovible;
 
             esferaCaja = new TgcBoundingSphere(objetoMovible.BoundingBox.calculateBoxCenter() + new TGCVector3(0f, 15f, 0f), objetoMovible.BoundingBox.calculateBoxRadius() * 0.7f);
-            escenario.MeshesColisionables();
+
             movimientoRealCaja = ColisionadorEsferico.moveCharacter(esferaCaja, movementV, escenario.MeshesColisionablesBBSin(objetoMovible));
 
             var testCol = testColisionObjetoPersonaje(objetoMovible);
@@ -371,7 +445,6 @@ namespace TGC.Group.Model
             else if (movimientoRealCaja.Y < 0) objetoMovible.Move(movimientoRealCaja);
 
         }
-
         public bool colisionEscenario()
         {
             return escenario.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, mesh.BoundingBox)) != null;
@@ -384,18 +457,15 @@ namespace TGC.Group.Model
         {
             return escenario.PilaresMesh().Exists(mesh => TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, mesh.BoundingBox));
         }
-        
         public bool testColisionObjetoPersonaje(TgcMesh objetoColisionable)
         {
             return TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, objetoColisionable.BoundingBox);
         }
-      
         public bool testColisionCajasObjetos(TgcMesh box)
         {
            // return escenario.Paredes().Exists(pared =>colisionConCajaOrientada(box,pared,movementVector));
             return escenario.ObjetosColisionablesConCajas().Exists(objeto => objeto != box && TgcCollisionUtils.testAABBAABB(box.BoundingBox, objeto.BoundingBox));
         }
-
         public void RotarPersonaje()
         {
             //Adelante
@@ -415,8 +485,7 @@ namespace TGC.Group.Model
             //DownRight
             if (Input.keyDown(Key.S) && Input.keyDown(Key.D)) RotateMesh(Key.S, Key.D);
         }
-
-         public void RotateMesh(Key input)
+        public void RotateMesh(Key input)
         {
             moving = true;
             personaje.RotateY(direccionPersonaje.RotationAngle(input));
@@ -426,7 +495,6 @@ namespace TGC.Group.Model
             moving = true;
             personaje.RotateY(direccionPersonaje.RotationAngle(i1,i2));
         }
-
         public void ajustarCamara()
         {
             //Actualizar valores de camara segun modifiers
@@ -476,75 +544,199 @@ namespace TGC.Group.Model
             camaraInterna.Target = personaje.Position;
         }
 
-
         public override void Render()
         {
-            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones seg˙n nuestra conveniencia.
             PreRender();
 
-            if (!perdiste)
+
+            if(menu)gui_render(ElapsedTime);
+            else
+            
             {
-                
-
-                DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
-                           + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
-                           + "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
-                           + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
-                           + "Interaccion Con Caja: " + interaccionConCaja + "\n"
-                           + "Colision Plataforma: " + colisionPlataforma + "\n"
-                           + "Movimiento por plataforma: " + movimientoPorPlataforma, 0, 30, Color.GhostWhite);
-
-                DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
-
-                escenario.RenderAll();
-                if (!paused)
-                {
-                    personaje.animateAndRender(ElapsedTime);
-                }
-                else
-                {
-                    personaje.Render();
-                }
-
-                if (boundingBoxActivate)
+                 Frustum.render();
+                if (!perdiste)
                 {
 
-                    personaje.BoundingBox.Render();
-                    esferaPersonaje.Render();
-                    escenario.RenderizarBoundingBoxes();
-                    directionArrow.Render();
-                    if (esferaCaja != null)
+
+                    DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
+                               + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
+                               /*+ "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
+                               + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
+                               + "Interaccion Con Caja: " + interaccionConCaja + "\n"*/
+                               + "Colision Plataforma: " + colisionPlataforma + "\n"
+                               /*+ "Movimiento por plataforma: " + movimientoPorPlataforma*/, 0, 30, Color.GhostWhite);
+
+                    DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
+
+                    escenario.RenderAll();
+
+                    //Renderizo OBB de las plataformas rotantes
+                    plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
+
+
+                    if (!paused)
                     {
-                        esferaCaja.Render();
+                        personaje.animateAndRender(ElapsedTime);
+                    }
+                    else
+                    {
+                        personaje.Render();
+                    }
+
+                    if (boundingBoxActivate)
+                    {
+
+                        personaje.BoundingBox.Render();
+                        esferaPersonaje.Render();
+                        escenario.RenderizarBoundingBoxes();
+
 
                     }
 
+                DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
+                           + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
+                               , 0, 30, Color.GhostWhite);
+
+                DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
+               
+                if (!paused)
+                {
+                    octree.render(Frustum, boundingBoxActivate);
+                    renderizarRestantes();
+
+                    personaje.animateAndRender(ElapsedTime);
+
                 }
-
-                //soundManager.playSonidoFondo();
-
+                else
+                {
+                    DrawText.drawText("Perdiste" + "\n" + "¬øReiniciar? (Y)", 500, 500, Color.Red);
+                }
             }
-            else
-            {
-                DrawText.drawText("Perdiste" + "\n" + "øReiniciar? (Y)", 500, 500, Color.Red);
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
 
+
+
+        public void inicializarGUI()
+        {
+            // levanto el GUI
+            gui.Create(MediaDir);
+
+            //soundManager.playSonidoFondo();
+
+            // menu principal
+            gui.InitDialog(true);
+            int W = D3DDevice.Instance.Width;
+            int H = D3DDevice.Instance.Height;
+            int x0 = 70;
+            int y0 = 10;
+            int dy = 120;
+            int dy2 = dy;
+            int dx = 400;
+            int item_epsilon = 50;
+            gui.InsertImage("menu.png",1850,450, directorio.Menu);
+            
+            gui.InsertMenuItem(ID_JUGAR, "Jugar", "open.png", x0, y0, MediaDir, dx, dy);
+            gui.InsertMenuItem(ID_CONFIGURAR, "Configurar", "navegar.png", x0+dx+item_epsilon, y0 , MediaDir, dx, dy);
+            gui.InsertMenuItem(ID_APP_EXIT, "Salir", "salir.png", x0, y0 += dy2, MediaDir, dx, dy);
+
+            // lista de colores
+            lst_colores[0] = Color.FromArgb(100, 220, 255);
+            lst_colores[1] = Color.FromArgb(100, 255, 220);
+            lst_colores[2] = Color.FromArgb(220, 100, 255);
+            lst_colores[3] = Color.FromArgb(220, 255, 100);
+            lst_colores[4] = Color.FromArgb(255, 100, 220);
+            lst_colores[5] = Color.FromArgb(255, 220, 100);
+            lst_colores[6] = Color.FromArgb(128, 128, 128);
+            lst_colores[7] = Color.FromArgb(64, 255, 64);
+            lst_colores[8] = Color.FromArgb(64, 64, 255);
+            lst_colores[9] = Color.FromArgb(255, 0, 255);
+            lst_colores[10] = Color.FromArgb(255, 255, 0);
+            lst_colores[11] = Color.FromArgb(0, 255, 255);
+        }
+
+        public void gui_render(float elapsedTime)
+        {
+            // ------------------------------------------------
+            GuiMessage msg = gui.Update(elapsedTime, Input);
+
+            // proceso el msg
+            switch (msg.message)
+            {
+                case MessageType.WM_COMMAND:
+                    switch (msg.id)
+                    {
+                        case IDOK:
+
+                        case IDCANCEL:
+                            // Resultados OK, y CANCEL del ultimo messagebox
+                            gui.EndDialog();
+                            profiling = false;
+                            if (msg_box_app_exit)
+                            {
+                                // Es la resupuesta a un messagebox de salir del sistema
+                                if (msg.id == IDOK)
+                                {
+                                    // Salgo del sistema
+                                    System.Windows.Forms.Application.Exit();
+                                }
+                            }
+                            msg_box_app_exit = false;
+                            break;
+
+                        case ID_JUGAR:
+                            menu=false;
+                            paused = false;
+                            break;
+
+                        /*case ID_CONFIGURAR:
+                            Configurar();
+                            break;*/
+
+                        case ID_APP_EXIT:
+                            gui.MessageBox("Desea Salir del Juego?",directorio.Menu, "Crash Bandicoot");
+                            msg_box_app_exit = true;
+                            break;
+
+                        default:
+                            if (msg.id >= 0 && msg.id < cant_colores)
+                            {
+                                // Cambio el color
+                                int color = msg.id;
+
+                               // effect.SetValue("color_global", new TGCVector4((float)lst_colores[color].R / 255.0f, (float)lst_colores[color].G / 255.0f, (float)lst_colores[color].B / 255.0f, 1));
+                            }
+                            break;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+            gui.Render();
+        }
+
+
+
+
         /// <summary>
-        ///     Se llama cuando termina la ejecuciÛn del ejemplo.
+        ///     Se llama cuando termina la ejecuci√≥n del ejemplo.
         ///     Hacer Dispose() de todos los objetos creados.
-        ///     Es muy importante liberar los recursos, sobretodo los gr·ficos ya que quedan bloqueados en el device de video.
+        ///     Es muy importante liberar los recursos, sobretodo los gr√°ficos ya que quedan bloqueados en el device de video.
         /// </summary>
+
+        private void renderizarRestantes() => plataformas.ForEach(plat => { if (plat.plataformaMesh.Name == "PlataformaX" || plat.plataformaMesh.Name == "PlataformaZ") plat.plataformaMesh.Render(); });
+
+
         public override void Dispose()
         {
-           
-            
             personaje.Dispose();
-            escenario.DisposeAll();
-            
+            escenario.DisposeAll();  
         }
     }
+
+
 }
