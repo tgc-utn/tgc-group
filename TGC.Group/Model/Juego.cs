@@ -1,85 +1,78 @@
 using Microsoft.DirectX.DirectInput;
-using System.Drawing;
 using Microsoft.DirectX.Direct3D;
+
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Runtime.InteropServices;
+
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
-using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.Collision;
-using System;
-using System.Collections.Generic;
-using TGC.Examples.Collision.SphereCollision;
+using TGC.Core.Shaders;
+
 using TGC.Group.SphereCollisionUtils;
 using TGC.Group.Model.AI;
-
-using System.Runtime.InteropServices;
 using TGC.Group.GUI;
-
 using TGC.Group.Optimizacion;
-using TGC.Core.Shaders;
 
 
 namespace TGC.Group.Model
 {
-    public class GameModel : TgcExample
+    public class Juego : TgcExample
     {
-        public GameModel(string amediaDir, string shadersDir) : base(amediaDir, shadersDir)
+        public Juego(string amediaDir, string shadersDir) : base(amediaDir, shadersDir)
         {
             Category = Game.Default.Category;
             Name = Game.Default.Name;
             Description = Game.Default.Description;
             mediaDir = amediaDir;
         }
-
-        private bool interaccionCaja = false;
+                 
 
         static string mediaDir;
-
-        
-
         private Directorio directorio;
+
         private TgcSkeletalMesh personaje;
         private TgcThirdPersonCamera camaraInterna;
-        private Calculos calculo = new Calculos();
 
         private TGCVector3 velocidad = TGCVector3.Empty;
         private TGCVector3 aceleracion = TGCVector3.Empty;
         private float Ypiso = 20f;
 
-        private Microsoft.DirectX.Direct3D.Effect effectLuzComun;
-        private Microsoft.DirectX.Direct3D.Effect effectLuzLava;
-        private Microsoft.DirectX.Direct3D.Effect personajeLightShader;
+        private Escenario escenario;
 
         //Define direccion del mesh del personaje dependiendo el movimiento
         private DireccionPersonaje direccionPersonaje = new DireccionPersonaje();
-        private Escenario escenario;
         private TgcMesh objetoMovibleG;
+        private bool interaccionCaja = false;
+        private bool colisionPlataforma = false;
 
 
-        private TgcBoundingSphere esferaPersonaje;
-        private TGCVector3 scaleBoundingVector;
         private SphereCollisionManager ColisionadorEsferico;
+        private TgcBoundingSphere esferaPersonaje;
+        private TgcBoundingSphere esferaCaja;
+
+        private TGCVector3 scaleBoundingVector;
         private TGCVector3 movimientoRealPersonaje;
         private TGCVector3 movimientoRelativoPersonaje = TGCVector3.Empty;
         private TGCVector3 movimientoRealCaja = TGCVector3.Empty;
-        private TgcBoundingSphere esferaCaja;
+        private float saltoActual = 0;
         //TGCVector3 movimientoPorPlataforma = new TGCVector3(0, 0, 0);
-        private bool colisionPlataforma = false;
         private List<Plataforma> plataformas;
         private List<PlataformaRotante> plataformasRotantes;
-
-
         private bool boundingBoxActivate = false;
-
-        private float saltoActual = 0;
-        private bool moving;
-
         private PisoInercia pisoResbaloso = null; //Es null cuando no esta pisando ningun piso resbaloso
 
+        private bool jumping;
+        private bool moving;
+
+        //Estados
         private bool paused = true;
         private bool perdiste = false;
         private bool menu = true;
@@ -89,11 +82,13 @@ namespace TGC.Group.Model
         private float tiempoAcumulado;
 
 
+        private Microsoft.DirectX.Direct3D.Effect effectLuzComun;
+        private Microsoft.DirectX.Direct3D.Effect effectLuzLava;
+        private Microsoft.DirectX.Direct3D.Effect personajeLightShader;
 
-
+        //Api gui
         private DXGui gui = new DXGui();
 
-        // Defines
         public const int IDOK = 0;
 
         public const int IDCANCEL = 1;
@@ -103,10 +98,6 @@ namespace TGC.Group.Model
         public const int ID_PROGRESS1 = 107;
         public const int ID_RESET_CAMARA = 108;
 
-        private Color[] lst_colores = new Color[12];
-        private int cant_colores = 12;
-
-        public TGC.Group.GUI.gui_progress_bar progress_bar;
         public bool msg_box_app_exit = false;
         public bool profiling = false;
 
@@ -146,7 +137,6 @@ namespace TGC.Group.Model
 
         private Octree octree;
 
-
         public static SoundManager soundManager;
 
         public override void Init()
@@ -170,8 +160,6 @@ namespace TGC.Group.Model
             soundManager = new SoundManager(directorio,this.DirectSound.DsDevice);
             soundManager.playSonidoFondo();
 
-            //Cagar escenario especifico para el juego.
-            escenario = new Escenario(directorio.EscenaCrash);
 
             //Cargar personaje con animaciones
             var skeletalLoader = new TgcSkeletalLoader();
@@ -181,15 +169,17 @@ namespace TGC.Group.Model
                                                       directorio.RobotDirectorio,
                                                       pathAnimacionesPersonaje);
 
+            //Cagar escenario especifico para el juego.
+            escenario = new Escenario(directorio.EscenaCrash,personaje);
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
 
             //Posicion inicial
             personaje.Position = new TGCVector3(400, Ypiso, -900);
            // personaje.Position = new TGCVector3(-4133.616f, 20f, 5000f);
+
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.AutoTransform = false;
-            
             
             //Rotar al robot en el Init para que mire hacia el otro lado
             personaje.RotateY(FastMath.ToRad(180f));
@@ -231,56 +221,11 @@ namespace TGC.Group.Model
             octree.create(meshesSinPlatXZ, escenario.BoundingBox());
             octree.createDebugOctreeMeshes();// --> Para renderizar las "cajas" que genera
 
-
-            inicializarGUI();
-
-           
-
             Frustum.Color = Color.Black;
 
-            effectLuzComun = TgcShaders.Instance.TgcMeshPhongShader;
-            effectLuzLava = effectLuzComun.Clone(effectLuzComun.Device);
-            foreach (TgcMesh mesh in escenario.MeshesColisionables())
-            {
-                Microsoft.DirectX.Direct3D.Effect defaultEffect = mesh.Effect;
-
-                TgcMesh luz = escenario.getClosestLight(mesh.BoundingBox.calculateBoxCenter(), 2500f);
-
-                if(luz == null)
-                {
-                    mesh.Effect = defaultEffect;
-                }
-                else
-                {
-                    if(luz.Layer == "Luces")
-                    {
-                        mesh.Effect = effectLuzComun;
-                        mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
-                        mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
-                        mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
-                        mesh.Effect.SetValue("ambientColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
-                        mesh.Effect.SetValue("diffuseColor", ColorValue.FromColor(Color.White));
-                        mesh.Effect.SetValue("specularColor", ColorValue.FromColor(Color.DimGray));
-                        mesh.Effect.SetValue("specularExp", 500f);
-                    }
-                    else
-                    {
-                        mesh.Effect = effectLuzLava;
-                        mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
-                        mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
-                        mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
-                        mesh.Effect.SetValue("ambientColor", ColorValue.FromColor(Color.Red));
-                        mesh.Effect.SetValue("diffuseColor", ColorValue.FromColor(Color.Red));
-                        mesh.Effect.SetValue("specularColor", ColorValue.FromColor(Color.Orange));
-                        mesh.Effect.SetValue("specularExp", 1000f);
-                    }
-                }
-
-                //mesh.Technique = "RenderScene2";
-            }
-            personajeLightShader = TgcShaders.Instance.TgcSkeletalMeshPointLightShader;
-            personaje.Effect = personajeLightShader;
-            personaje.Technique = TgcShaders.Instance.getTgcSkeletalMeshTechnique(personaje.RenderType);
+            inicializarGUI();
+            inicializarIluminacion();
+           
 
         }
 
@@ -367,7 +312,6 @@ namespace TGC.Group.Model
                     animacion = "Parado";
                     soundManager.stopSonidoCaminar();
                 }
-                movementVector = new TGCVector3(movX, movY, movZ);
 
                 //MOVIMIENTOS POR PISO
                 var vectorSlide = new TGCVector3(0, 0, 0);
@@ -441,7 +385,7 @@ namespace TGC.Group.Model
             movimientoOriginal += MovimientoPorSliding(movimientoOriginal);
 
             //Busca la caja con la cual se esta colisionando
-            var cajaColisionante = obtenerColisionCajaPersonaje();
+            var cajaColisionante = escenario.obtenerColisionCajaPersonaje(objetoMovibleG);
             //Si es una caja nueva updatea la referencia global
             if (cajaColisionante != null && cajaColisionante != objetoEscenario) objetoEscenario = cajaColisionante;
 
@@ -486,35 +430,20 @@ namespace TGC.Group.Model
 
             if (interaccionCaja && testCol)
             {
-                if (!colisionEscenario()) objetoMovible.Move(movimientoRealCaja);
-                else if (colisionConPilar() || testColisionObjetoPersonaje(objetoMovible)) movimientoRealCaja = TGCVector3.Empty;
+                if (!escenario.colisionEscenario()) objetoMovible.Move(movimientoRealCaja);
+                else if (escenario.colisionConPilar() || testColisionObjetoPersonaje(objetoMovible)) movimientoRealCaja = TGCVector3.Empty;
                 else objetoMovible.Move(-movimientoRealCaja);
                 
             }
             else if (movimientoRealCaja.Y < 0) objetoMovible.Move(movimientoRealCaja);
 
         }
-        public bool colisionEscenario()
-        {
-            return escenario.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, mesh.BoundingBox)) != null;
-        } 
-        public TgcMesh obtenerColisionCajaPersonaje()
-        {
-            return escenario.CajasMesh().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.BoundingBox) && caja != objetoMovibleG);
-        }
-        public bool colisionConPilar()
-        {
-            return escenario.PilaresMesh().Exists(mesh => TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, mesh.BoundingBox));
-        }
+        
         public bool testColisionObjetoPersonaje(TgcMesh objetoColisionable)
         {
             return TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, objetoColisionable.BoundingBox);
         }
-        public bool testColisionCajasObjetos(TgcMesh box)
-        {
-           // return escenario.Paredes().Exists(pared =>colisionConCajaOrientada(box,pared,movementVector));
-            return escenario.ObjetosColisionablesConCajas().Exists(objeto => objeto != box && TgcCollisionUtils.testAABBAABB(box.BoundingBox, objeto.BoundingBox));
-        }
+        
         public void RotarPersonaje()
         {
             //Adelante
@@ -662,6 +591,20 @@ namespace TGC.Group.Model
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
+        private void renderizarRestantes() => plataformas.ForEach(plat => { if (plat.plataformaMesh.Name == "PlataformaX" || plat.plataformaMesh.Name == "PlataformaZ") plat.plataformaMesh.Render(); });
+
+
+        /// <summary>
+        ///     Se llama cuando termina la ejecución del ejemplo.
+        ///     Hacer Dispose() de todos los objetos creados.
+        ///     Es muy importante liberar los recursos, sobretodo los gráficos ya que quedan bloqueados en el device de video.
+        /// </summary>
+
+        public override void Dispose()
+        {
+            personaje.Dispose();
+            escenario.DisposeAll();
+        }
 
         public void inicializarGUI()
         {
@@ -686,19 +629,6 @@ namespace TGC.Group.Model
             gui.InsertMenuItem(ID_CONFIGURAR, "Configurar", "navegar.png", x0+dx+item_epsilon, y0 , MediaDir, dx, dy);
             gui.InsertMenuItem(ID_APP_EXIT, "Salir", "salir.png", x0, y0 += dy2, MediaDir, dx, dy);
 
-            // lista de colores
-            lst_colores[0] = Color.FromArgb(100, 220, 255);
-            lst_colores[1] = Color.FromArgb(100, 255, 220);
-            lst_colores[2] = Color.FromArgb(220, 100, 255);
-            lst_colores[3] = Color.FromArgb(220, 255, 100);
-            lst_colores[4] = Color.FromArgb(255, 100, 220);
-            lst_colores[5] = Color.FromArgb(255, 220, 100);
-            lst_colores[6] = Color.FromArgb(128, 128, 128);
-            lst_colores[7] = Color.FromArgb(64, 255, 64);
-            lst_colores[8] = Color.FromArgb(64, 64, 255);
-            lst_colores[9] = Color.FromArgb(255, 0, 255);
-            lst_colores[10] = Color.FromArgb(255, 255, 0);
-            lst_colores[11] = Color.FromArgb(0, 255, 255);
         }
 
         public void gui_render(float elapsedTime)
@@ -746,13 +676,6 @@ namespace TGC.Group.Model
                             break;
 
                         default:
-                            if (msg.id >= 0 && msg.id < cant_colores)
-                            {
-                                // Cambio el color
-                                int color = msg.id;
-
-                               // effect.SetValue("color_global", new TGCVector4((float)lst_colores[color].R / 255.0f, (float)lst_colores[color].G / 255.0f, (float)lst_colores[color].B / 255.0f, 1));
-                            }
                             break;
                     }
                     break;
@@ -763,23 +686,53 @@ namespace TGC.Group.Model
             gui.Render();
         }
 
-
-
-
-        /// <summary>
-        ///     Se llama cuando termina la ejecución del ejemplo.
-        ///     Hacer Dispose() de todos los objetos creados.
-        ///     Es muy importante liberar los recursos, sobretodo los gráficos ya que quedan bloqueados en el device de video.
-        /// </summary>
-
-        private void renderizarRestantes() => plataformas.ForEach(plat => { if (plat.plataformaMesh.Name == "PlataformaX" || plat.plataformaMesh.Name == "PlataformaZ") plat.plataformaMesh.Render(); });
-
-
-        public override void Dispose()
+        public void inicializarIluminacion()
         {
-            personaje.Dispose();
-            escenario.DisposeAll();  
+            effectLuzComun = TgcShaders.Instance.TgcMeshPhongShader;
+            effectLuzLava = effectLuzComun.Clone(effectLuzComun.Device);
+            foreach (TgcMesh mesh in escenario.MeshesColisionables())
+            {
+                Microsoft.DirectX.Direct3D.Effect defaultEffect = mesh.Effect;
+
+                TgcMesh luz = escenario.getClosestLight(mesh.BoundingBox.calculateBoxCenter(), 2500f);
+
+                if (luz == null)
+                {
+                    mesh.Effect = defaultEffect;
+                }
+                else
+                {
+                    if (luz.Layer == "Luces")
+                    {
+                        mesh.Effect = effectLuzComun;
+                        mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
+                        mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
+                        mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+                        mesh.Effect.SetValue("ambientColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
+                        mesh.Effect.SetValue("diffuseColor", ColorValue.FromColor(Color.White));
+                        mesh.Effect.SetValue("specularColor", ColorValue.FromColor(Color.DimGray));
+                        mesh.Effect.SetValue("specularExp", 500f);
+                    }
+                    else
+                    {
+                        mesh.Effect = effectLuzLava;
+                        mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
+                        mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
+                        mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+                        mesh.Effect.SetValue("ambientColor", ColorValue.FromColor(Color.Red));
+                        mesh.Effect.SetValue("diffuseColor", ColorValue.FromColor(Color.Red));
+                        mesh.Effect.SetValue("specularColor", ColorValue.FromColor(Color.Orange));
+                        mesh.Effect.SetValue("specularExp", 1000f);
+                    }
+                }
+
+                //mesh.Technique = "RenderScene2";
+            }
+            personajeLightShader = TgcShaders.Instance.TgcSkeletalMeshPointLightShader;
+            personaje.Effect = personajeLightShader;
+            personaje.Technique = TgcShaders.Instance.getTgcSkeletalMeshTechnique(personaje.RenderType);
         }
+
     }
 
 

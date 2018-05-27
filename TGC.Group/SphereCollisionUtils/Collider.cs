@@ -1,7 +1,7 @@
 ﻿using TGC.Core.BoundingVolumes;
 using TGC.Core.Mathematica;
 
-namespace TGC.Examples.Collision.SphereCollision
+namespace TGC.Group.SphereCollisionUtils
 {
     /// <summary>
     ///     Colisionador abstracto

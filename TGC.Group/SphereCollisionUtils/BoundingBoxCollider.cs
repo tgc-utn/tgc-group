@@ -2,7 +2,7 @@
 using TGC.Core.Collision;
 using TGC.Core.Mathematica;
 
-namespace TGC.Examples.Collision.SphereCollision
+namespace TGC.Group.SphereCollisionUtils
 {
     /// <summary>
     ///     Collider BoundingBox

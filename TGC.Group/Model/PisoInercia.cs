@@ -12,7 +12,7 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.Collision;
-using TGC.Examples.Collision.SphereCollision;
+using TGC.Group.SphereCollisionUtils;
 
 
 namespace TGC.Group.Model

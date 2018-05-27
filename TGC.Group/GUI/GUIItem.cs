@@ -323,7 +323,7 @@ namespace TGC.Group.GUI
                     p += "I";
 
                 Rectangle tw = new Rectangle();
-                int h = gui.font.DrawText(gui.sprite, p,tw, DrawTextFormat.Top | DrawTextFormat.NoClip | DrawTextFormat.CalculateRect, color);
+                int h = gui.font.DrawText(gui.sprite, p,tw, DrawTextFormat.Top | DrawTextFormat.NoClip , color);
 
                 //Rectangle tw = gui.font.MeasureString(gui.sprite, p, DrawTextFormat.Top | DrawTextFormat.NoClip, color);
 

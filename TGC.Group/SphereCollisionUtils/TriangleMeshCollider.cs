@@ -3,7 +3,7 @@ using TGC.Core.Collision;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 
-namespace TGC.Examples.Collision.SphereCollision
+namespace TGC.Group.SphereCollisionUtils
 {
     /// <summary>
     ///     Colisionador a base de triangulos

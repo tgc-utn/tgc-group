@@ -4,7 +4,7 @@ using TGC.Core.Collision;
 using TGC.Core.Mathematica;
 using System;
 
-namespace TGC.Examples.Collision.SphereCollision
+namespace TGC.Group.SphereCollisionUtils
 {
     /// <summary>
     ///     Herramienta para realizar el movimiento de una Esfera con detección de colisiones,
