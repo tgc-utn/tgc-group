@@ -67,8 +67,10 @@
     </Reference>
     <Reference Include="Microsoft.VisualC" />
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
     <Reference Include="TGC.Core, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\TGC.Core.2.3.1\lib\net471\TGC.Core.dll</HintPath>
     </Reference>
@@ -87,13 +89,18 @@
     </Compile>
     <Compile Include="Model\Caja.cs" />
     <Compile Include="Model\GameModel.cs" />
-    <Compile Include="Model\Nivel.cs" />
+    <Compile Include="Model\IUpdateable.cs" />
+    <Compile Include="Model\Niveles\NivelDemo.cs" />
+    <Compile Include="Model\Niveles\Nivel.cs" />
     <Compile Include="Model\Personaje.cs" />
     <Compile Include="Model\Collision\SphereCollisionManager.cs" />
     <Compile Include="Model\Plataforma.cs" />
     <Compile Include="Model\PlataformaAscensor.cs" />
     <Compile Include="Model\PlataformaDesplazante.cs" />
     <Compile Include="Model\PlataformaRotante.cs" />
+    <Compile Include="Model\Escenas\GameEscena.cs" />
+    <Compile Include="Model\Escenas\Escena.cs" />
+    <Compile Include="Model\Escenas\EscenaManager.cs" />
     <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
     <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
     <Compile Include="obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
