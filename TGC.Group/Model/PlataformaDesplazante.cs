@@ -3,7 +3,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.Textures;
 
 namespace TGC.Group.Model {
-    class PlataformaDesplazante : Plataforma {
+    public class PlataformaDesplazante : Plataforma, IUpdateable {
         private TGCVector3 posInicial;
         private TGCVector3 posFinal;
         private TGCVector3 vel;
@@ -15,7 +15,7 @@ namespace TGC.Group.Model {
             this.vel = vel;
         }
 
-        public void update(float deltaTime) {
+        public void Update(float deltaTime) {
             move(vel);
 
             if (posInicial.X < posFinal.X) {
@@ -58,7 +58,7 @@ namespace TGC.Group.Model {
             return vel;
         }
 
-        new public void render() {
+        new public void Render() {
             box.Render();
             box.BoundingBox.Render();
         }

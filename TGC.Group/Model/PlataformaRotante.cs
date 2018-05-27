@@ -3,7 +3,7 @@ using TGC.Core.Textures;
 
 namespace TGC.Group.Model {
     // TODO: podría ser un cilindro en vez de un rectángulo
-    class PlataformaRotante : Plataforma {
+    public class PlataformaRotante : Plataforma, IUpdateable {
         private float vel;
 
         public PlataformaRotante(TGCVector3 pos, TGCVector3 size, TgcTexture textura, float velAng) 
@@ -14,7 +14,7 @@ namespace TGC.Group.Model {
             box.Transform = TGCMatrix.Translation(box.Position);
         }
 
-        public void update(float deltaTime) {
+        public void Update(float deltaTime) {
             box.RotateY(vel * deltaTime);
             box.Transform = TGCMatrix.RotationY(box.Rotation.Y) * TGCMatrix.Translation(box.Position);
         }

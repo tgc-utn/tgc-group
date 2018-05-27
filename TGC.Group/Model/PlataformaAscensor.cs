@@ -2,7 +2,7 @@
 using TGC.Core.Textures;
 
 namespace TGC.Group.Model {
-    class PlataformaAscensor : Plataforma {
+    public class PlataformaAscensor : Plataforma, IUpdateable {
         private float altura;
         private float alturaRecorrida;
         private float vel;
@@ -13,7 +13,7 @@ namespace TGC.Group.Model {
             this.vel = vel;
         }
 
-        public void update(float deltaTime) {
+        public void Update(float deltaTime) {
             box.Move(TGCVector3.Up * vel);
             box.Transform = TGCMatrix.Translation(box.Position);
             alturaRecorrida += vel;
@@ -27,7 +27,7 @@ namespace TGC.Group.Model {
             return TGCVector3.Up * vel;
         }
 
-        public void render() {
+        public void Render() {
             box.Render();
             box.BoundingBox.Render();
         }

@@ -3,6 +3,7 @@ using TGC.Core.BoundingVolumes;
 using TGC.Core.Direct3D;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
+using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 
 namespace TGC.Group.Model {
@@ -10,12 +11,14 @@ namespace TGC.Group.Model {
     // si se patinan, entonces deberiamos refactorizar esta clase y la clase personaje
     // en una sola clase "entidad fisica" o algo asi    
 
-    class Caja {
+    public class Caja : IRenderObject {
         private TgcBoundingAxisAlignBox cuerpo;
         private TgcBoundingAxisAlignBox superior;
 
         private TGCBox box;
         private TGCVector3 vel;
+
+        public bool AlphaBlendEnable { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
         public Caja(string mediaDir, TGCVector3 pos) :
             this(mediaDir, pos, new TGCVector3(80, 80, 80)) { }
@@ -49,7 +52,7 @@ namespace TGC.Group.Model {
             vel = TGCVector3.Empty;
         }
 
-        public void render() {
+        public void Render() {
             box.Render();
             
             // para debuggear
@@ -59,7 +62,7 @@ namespace TGC.Group.Model {
             superior.Render();
         }
 
-        public void dispose() {
+        public void Dispose() {
             box.Dispose();
         }
 
