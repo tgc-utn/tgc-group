@@ -21,12 +21,15 @@ namespace TGC.Group.Model
         private Personaje personaje;
         public float Ypiso { get; }
 
+        private float danioLava;
+
         public Escenario(string pathEscenario,Personaje personaje)
         {
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(pathEscenario);
             this.personaje = personaje;
             Ypiso = 20f;
+            danioLava = 0.001f;
         }
 
 
@@ -63,7 +66,7 @@ namespace TGC.Group.Model
 
         public void quemarPersonaje()
         {
-            personaje.vida -= 0.1f ;
+            personaje.vida -= danioLava ;
         }
         #endregion
 

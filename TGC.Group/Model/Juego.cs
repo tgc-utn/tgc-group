@@ -600,11 +600,7 @@ namespace TGC.Group.Model
                         renderizarRestantes();
                         personaje.animateAndRender(ElapsedTime);
                     }
-                    else
-                    {
-                        DrawText.drawText("Perdiste" + "\n" + "¿Reiniciar? (Y)", 500, 500, Color.Red);
-                        personaje.render();
-                    }
+                    
 
                     if (boundingBoxActivate)
                     {
@@ -627,6 +623,13 @@ namespace TGC.Group.Model
                     personaje.effect().SetValue("lightIntensity", 20);
                     personaje.effect().SetValue("lightAttenuation", 25);
 
+                    
+                }
+                else
+                {
+                        DrawText.drawText("Perdiste" + "\n" + "¿Reiniciar? (Y)", 500, 500, Color.Red);
+                        personaje.render();
+                       //TODO: menu perdiste
                     
                 }
             }
