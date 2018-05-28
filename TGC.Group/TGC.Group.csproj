@@ -90,6 +90,9 @@
     <Compile Include="Model\Caja.cs" />
     <Compile Include="Model\Escenas\InicioEscena.cs" />
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Model\Interfaz\Boton.cs" />
+    <Compile Include="Model\Interfaz\Elemento.cs" />
+    <Compile Include="Model\Interfaz\ElementoTexto.cs" />
     <Compile Include="Model\IUpdateable.cs" />
     <Compile Include="Model\Niveles\Nivel2.cs" />
     <Compile Include="Model\Niveles\NivelDemo.cs" />

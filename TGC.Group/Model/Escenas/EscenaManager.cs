@@ -6,10 +6,18 @@ namespace TGC.Group.Model.Scenes {
     class EscenaManager {
         private Stack<Escena> scenes;
         private static EscenaManager instance;
+        private string mediaDir;
+
+        private Escena actual;
+        private Escena proxima;
 
         // singleton
         private EscenaManager() {
             scenes = new Stack<Escena>();
+        }
+
+        public void setMediaDir(string mediaDir) {
+            this.mediaDir = mediaDir;
         }
 
         public static EscenaManager getInstance() {
@@ -21,11 +29,20 @@ namespace TGC.Group.Model.Scenes {
         }
 
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara) {
-            scenes.Peek().update(deltaTime, input, camara);
+            if (proxima != null) {
+                actual = proxima;
+                proxima = null;
+            }
+
+            if (actual == null) return;
+
+            actual.update(deltaTime, input, camara);
         }
 
         public void render(float deltaTime) {
-            scenes.Peek().render(deltaTime);
+            if (actual == null) return;
+
+            actual.render(deltaTime);
         }
 
         public void dispose() {
@@ -36,7 +53,9 @@ namespace TGC.Group.Model.Scenes {
         }
 
         public void addScene(Escena scene) {
+            scene.init(mediaDir);
             scenes.Push(scene);
+            proxima = scene;
         }
 
         public void goBack() {
