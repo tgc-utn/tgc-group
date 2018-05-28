@@ -20,6 +20,7 @@ using TGC.Group.SphereCollisionUtils;
 using TGC.Group.Model.AI;
 using TGC.Group.GUI;
 using TGC.Group.Optimizacion;
+using TGC.Group.Sprites;
 
 
 namespace TGC.Group.Model
@@ -139,6 +140,11 @@ namespace TGC.Group.Model
 
         public static SoundManager soundManager;
 
+        public CustomSprite barraDeVida;
+        public CustomSprite fruta;
+        public CustomSprite mascara;
+        public Drawer2D drawer2D;
+
         public override void Init()
         {
             perdiste = false;
@@ -225,8 +231,19 @@ namespace TGC.Group.Model
 
             inicializarGUI();
             inicializarIluminacion();
-           
 
+            drawer2D = new Drawer2D();
+            barraDeVida = new CustomSprite();
+            barraDeVida.Bitmap = new CustomBitmap(directorio.BarraVida,d3dDevice);
+            barraDeVida.Position = new TGCVector2(10, 20);
+
+            fruta = new CustomSprite();
+            fruta.Bitmap = new CustomBitmap(directorio.Fruta, d3dDevice);
+            fruta.Position = new TGCVector2(20, 70);
+
+            mascara = new CustomSprite();
+            mascara.Bitmap = new CustomBitmap(directorio.Mascara, d3dDevice);
+            mascara.Position = new TGCVector2(25, 150);
         }
 
 
@@ -534,16 +551,21 @@ namespace TGC.Group.Model
                  Frustum.render();
                 if (!perdiste)
                 {
+                    drawer2D.BeginDrawSprite();
 
+                    drawer2D.DrawSprite(barraDeVida);
+                    drawer2D.DrawSprite(fruta);
+                    drawer2D.DrawSprite(mascara);
+                    drawer2D.EndDrawSprite();
 
-                    DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
+                   /* DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
                                + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
                                /*+ "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
                                + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
-                               + "Interaccion Con Caja: " + interaccionConCaja + "\n"*/
+                               + "Interaccion Con Caja: " + interaccionConCaja + "\n"
                                + "Colision Plataforma: " + colisionPlataforma + "\n"
-                               /*+ "Movimiento por plataforma: " + movimientoPorPlataforma*/, 0, 30, Color.GhostWhite);
-
+                               /*+ "Movimiento por plataforma: " + movimientoPorPlataforma, 0, 30, Color.GhostWhite);
+                    */
                     DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
 
                     escenario.RenderAll();
@@ -584,8 +606,9 @@ namespace TGC.Group.Model
 
                     personaje.Effect.SetValue("lightIntensity", 20);
                     personaje.Effect.SetValue("lightAttenuation", 25);
+
                     
-              }
+                }
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
@@ -604,6 +627,9 @@ namespace TGC.Group.Model
         {
             personaje.Dispose();
             escenario.DisposeAll();
+            barraDeVida.Dispose();
+            fruta.Dispose();
+            mascara.Dispose();
         }
 
         public void inicializarGUI()

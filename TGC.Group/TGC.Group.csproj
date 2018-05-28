@@ -102,6 +102,10 @@
     <Compile Include="SphereCollisionUtils\SphereCollisionManager.cs" />
     <Compile Include="SphereCollisionUtils\SphereTriangleCollisionManager.cs" />
     <Compile Include="SphereCollisionUtils\TriangleMeshCollider.cs" />
+    <Compile Include="Sprites\AnimatedSprite.cs" />
+    <Compile Include="Sprites\CustomBitmap.cs" />
+    <Compile Include="Sprites\CustomSprite.cs" />
+    <Compile Include="Sprites\Drawer2D.cs" />
     <Compile Include="VectorMovement\DirectionAngle.cs" />
     <Compile Include="VectorMovement\DownDirection.cs" />
     <Compile Include="VectorMovement\DownLeftDirection.cs" />
