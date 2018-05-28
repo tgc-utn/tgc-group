@@ -62,14 +62,7 @@ namespace TGC.Group.Model.Scenes {
                 }
             }
 
-
-            // manejo de muerte
-            // todo: poner en otra funcion
-            foreach (var box in nivel.getDeathPlanes()) {
-                if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), box)) {
-                    personaje.volverAlOrigen();
-                }
-            }
+            checkearMuerte();
 
             if (personaje.getPosition().Y < -1500) personaje.volverAlOrigen();
 
@@ -144,5 +137,17 @@ namespace TGC.Group.Model.Scenes {
                 caja.applyGravity();
             }
         }
+
+        private void checkearMuerte()
+        {
+            foreach (var box in nivel.getDeathPlanes())
+            {
+                if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), box))
+                {
+                    personaje.volverAlOrigen();
+                }
+            }
+        }
+
     }
 }

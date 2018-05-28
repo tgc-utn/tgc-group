@@ -2,10 +2,18 @@
 using System.Linq;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Geometry;
+using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Core.Textures;
 
 namespace TGC.Group.Model.Niveles {
+
     public abstract class Nivel {
+
+        // Para debug, cada uno en su PC
+        protected const float VELPEPE = 0.1f;
+        protected const float VELCRIS = 2f;
+
         protected List<TgcPlane> pisosNormales;
         protected List<TgcPlane> pisosResbaladizos;
         protected List<TgcPlane> pMuerte;
@@ -14,8 +22,12 @@ namespace TGC.Group.Model.Niveles {
         protected List<PlataformaDesplazante> pDesplazan;
         protected List<PlataformaRotante> pRotantes;
         protected List<PlataformaAscensor> pAscensor;
+        protected List<TgcMesh> decorativos;
+        protected List<TgcBoundingAxisAlignBox> aabbDeDecorativos;
+        protected TgcSceneLoader loaderDeco;
 
         public Nivel(string mediaDir) {
+
             pisosNormales = new List<TgcPlane>();
             pisosResbaladizos = new List<TgcPlane>();
             cajas = new List<Caja>();
@@ -23,6 +35,9 @@ namespace TGC.Group.Model.Niveles {
             pDesplazan = new List<PlataformaDesplazante>();
             pRotantes = new List<PlataformaRotante>();
             pAscensor = new List<PlataformaAscensor>();
+            decorativos = new List<TgcMesh>();
+            aabbDeDecorativos = new List<TgcBoundingAxisAlignBox>();
+            loaderDeco = new TgcSceneLoader();
 
             // TODO: ver si estos son necesarios
             pMuerte = new List<TgcPlane>();
@@ -54,6 +69,7 @@ namespace TGC.Group.Model.Niveles {
                 .Concat(pDesplazan)
                 .Concat(pRotantes)
                 .Concat(pAscensor)
+                .Concat(decorativos)
                 .ToList();
         }
 
@@ -69,7 +85,13 @@ namespace TGC.Group.Model.Niveles {
             var list = new List<TgcBoundingAxisAlignBox>();
             list.AddRange(getPisos().ToArray());
             list.AddRange(cajas.Select(caja => caja.getSuperior()).ToArray());
-            // list.AddRange(cajas.Select(caja => caja.getCuerpo()).ToArray());
+            //list.AddRange(cajas.Select(caja => caja.getCuerpo()).ToArray());
+            list.AddRange(pEstaticas.Select(plataforma => plataforma.getAABB()).ToArray());
+            list.AddRange(pDesplazan.Select(desplazante => desplazante.getAABB()).ToArray());
+            list.AddRange(pRotantes.Select(rotante => rotante.getAABB()).ToArray());
+            list.AddRange(pAscensor.Select(ascensor => ascensor.getAABB()).ToArray());
+            list.AddRange(aabbDeDecorativos);
+
             return list;
         }
 
@@ -121,5 +143,32 @@ namespace TGC.Group.Model.Niveles {
             return pMuerte.Select(p => p.BoundingBox).ToList();
         }
 
-    }
+        public void agregarPisoNormal(TGCVector3 origen, TGCVector3 tamanio, TgcTexture textura) {
+            var piso = new TgcPlane(origen, tamanio, TgcPlane.Orientations.XZplane, textura);
+            pisosNormales.Add(piso);
+        }
+
+        public void agregarPisoResbaladizo(TGCVector3 origen, TGCVector3 tamanio, TgcTexture textura)
+        {
+            var piso = new TgcPlane(origen, tamanio, TgcPlane.Orientations.XZplane, textura);
+            pisosResbaladizos.Add(piso);
+        }
+
+        public void agregarPared(TGCVector3 centro, TGCVector3 tamanio, TgcTexture textura)
+        {
+            var pared = new Plataforma(centro, tamanio, textura);
+            pEstaticas.Add(pared);
+        }
+
+        public void cargarDecorativo(TgcMesh unDecorativo, TgcScene unaEscena, TGCVector3 posicion, TGCVector3 escala, float rotacion)
+        {
+            unDecorativo = unaEscena.Meshes[0];
+            unDecorativo.Position = posicion;
+            unDecorativo.Scale = escala;
+            unDecorativo.RotateY(rotacion);
+            decorativos.Add(unDecorativo);
+            aabbDeDecorativos.Add(unDecorativo.BoundingBox);
+        }
+
+}
 }

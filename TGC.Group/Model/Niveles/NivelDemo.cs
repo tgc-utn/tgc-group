@@ -1,116 +1,117 @@
 ﻿using TGC.Core.Direct3D;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
+using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Group.Model.Niveles;
 
+//NIVEL INICIAL, JUNGLA
+
 namespace TGC.Group.Model {
     class NivelDemo : Nivel {
-        TgcTexture piso, hielo, caja, paredJungla, desierto, piedra, precipicio, madera;
+
+        TgcTexture piso, limites, caja;
+        TgcScene[] escenasBananas;
+        TgcScene[] escenasSelvaticos;
+        TgcScene[] escenasPalmeras;
+        TgcScene[] escenasRocas;
+        private TgcMesh arbolBananas;
+        private TgcMesh arbolSelvatico;
+        private TgcMesh palmera;
+        private TgcMesh roca;
 
         public NivelDemo(string mediaDir) : base(mediaDir) {
         }
 
         public override void init(string mediaDir) {
+
+            // Texturas empleadas
             piso = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "pisoJungla.jpg");
-            hielo = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "hielo.jpg");
+            limites = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "paredJungla.jpg");
             caja = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "caja.jpg");
-            paredJungla = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "paredJungla.jpg");
-            desierto = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "arena.jpg");
-            piedra = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "piedra.png");
-            precipicio = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "precipicio.jpg");
-            madera = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "tronco.jpg");
 
-            var plano = new TgcPlane(new TGCVector3(-500, 0, -500), new TGCVector3(2500, 0, 2500), TgcPlane.Orientations.XZplane, piso);
-            pisosNormales.Add(plano); //piso de la jungla
+            // Bloques de piso (no precipicios)
+            agregarPisoNormal(new TGCVector3(-700, 0, 8000), new TGCVector3(1400, 0, 2000), piso);
+            agregarPisoNormal(new TGCVector3(-700, 0, 5000), new TGCVector3(1400, 0, 2000), piso);
+            agregarPisoNormal(new TGCVector3(-400, 0, 3500), new TGCVector3(800, 0, 1500), piso);
+            agregarPisoNormal(new TGCVector3(-700, 0, 2000), new TGCVector3(1400, 0, 1500), piso);
+            agregarPisoNormal(new TGCVector3(-700, 0, 0), new TGCVector3(1400, 0, 1000), piso);
 
-            // pisos del desierto
-            plano = new TgcPlane(new TGCVector3(-500, -180, 2600), new TGCVector3(1000, 0, 700), TgcPlane.Orientations.XZplane, desierto);
-            pisosNormales.Add(plano);
-            plano = new TgcPlane(new TGCVector3(-500, -180, 3300), new TGCVector3(350, 0, 800), TgcPlane.Orientations.XZplane, desierto);
-            pisosNormales.Add(plano);
-            plano = new TgcPlane(new TGCVector3(350, -180, 3300), new TGCVector3(150, 0, 2800), TgcPlane.Orientations.XZplane, desierto);
-            pisosNormales.Add(plano);
-            plano = new TgcPlane(new TGCVector3(-150, -180, 3500), new TGCVector3(500, 0, 2600), TgcPlane.Orientations.XZplane, desierto);
-            pisosNormales.Add(plano);
-            plano = new TgcPlane(new TGCVector3(-500, -180, 4100), new TGCVector3(100, 0, 2000), TgcPlane.Orientations.XZplane, desierto);
-            pisosNormales.Add(plano);
-            plano = new TgcPlane(new TGCVector3(-400, -180, 4900), new TGCVector3(250, 0, 1200), TgcPlane.Orientations.XZplane, desierto);
-            pisosNormales.Add(plano);
+            // Limites del pasillo-escenario
+            // DEFINIR: Van en precipicio tambien o no?
+            agregarPared(new TGCVector3(710, 40, 5000), new TGCVector3(20, 80, 10000), limites);  //limite izquierdo
+            agregarPared(new TGCVector3(-710, 40, 5000), new TGCVector3(20, 80, 10000), limites); //limite derecho
+            agregarPared(new TGCVector3(0, 40, 9990), new TGCVector3(1400, 80, 20), limites);     // frente
+            agregarPared(new TGCVector3(0, 40, 10), new TGCVector3(1400, 80, 20), limites);       // fondo
 
-            plano = new TgcPlane(new TGCVector3(-500, 0, -3000), new TGCVector3(2500, 0, 2500), TgcPlane.Orientations.XZplane, hielo);
-            pisosResbaladizos.Add(plano); // piso de hielo
+            // Cajas empujables
+            cajas.Add(new Caja(mediaDir, new TGCVector3(300, 40, 9000)));
+            cajas.Add(new Caja(mediaDir, new TGCVector3(-300, 40, 9000)));
+            cajas.Add(new Caja(mediaDir, new TGCVector3(0, 40, 4000)));
 
-            // paredes de la jungla
-            pEstaticas.Add(new Plataforma(new TGCVector3(-500, 150, 600), new TGCVector3(100, 300, 2800), paredJungla)); //laterales jungla derecha
-            pEstaticas.Add(new Plataforma(new TGCVector3(500, 150, 600), new TGCVector3(100, 300, 2800), paredJungla));
-            pEstaticas.Add(new Plataforma(new TGCVector3(1975, 150, 0), new TGCVector3(50, 300, 1600), paredJungla)); // borde izquierdo jungla derecha
-            pEstaticas.Add(new Plataforma(new TGCVector3(1250, 30, 1990), new TGCVector3(1500, 60, 20), paredJungla)); // fondo jungla izquierda
+            // Plataformas para precipicios
+            pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(0, -25, 7900), new TGCVector3(200, 50, 200), caja, new TGCVector3(0, -25, 7100), new TGCVector3(0, 0, VELPEPE))); // Precipicio 1, desplaza en Z
+            pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(400, -25, 1950), new TGCVector3(200, 50, 100), caja, new TGCVector3(-4000, -25, 1150), new TGCVector3(VELPEPE, 0, VELPEPE))); // Precipicio 2, desplaza en XZ
 
-            // paredes del desierto; el desierto está a un nivel inferior que la jungla y los glaciares
-            pEstaticas.Add(new Plataforma(new TGCVector3(500, -150, 4350), new TGCVector3(100, 60, 3500), desierto));
-            pEstaticas.Add(new Plataforma(new TGCVector3(-500, -150, 4350), new TGCVector3(100, 60, 3500), desierto));
-            pEstaticas.Add(new Plataforma(new TGCVector3(0, -165, 6090), new TGCVector3(900, 70, 20), desierto));
-
-            // precipicios del desierto
-            plano = new TgcPlane(new TGCVector3(-150, -380, 3300), new TGCVector3(500, 0, 200), TgcPlane.Orientations.XZplane, precipicio);
-            pMuerte.Add(plano); // precipicio ancho
-            plano = new TgcPlane(new TGCVector3(-400, -380, 4100), new TGCVector3(250, 0, 800), TgcPlane.Orientations.XZplane, precipicio);
-            pMuerte.Add(plano); // precipicio largo
-            pEstaticas.Add(new Plataforma(new TGCVector3(100, -280, 3300), new TGCVector3(500, 200, 2), precipicio)); // paredes precipicio ancho
-            pEstaticas.Add(new Plataforma(new TGCVector3(350, -280, 3400), new TGCVector3(2, 200, 200), precipicio));
-            pEstaticas.Add(new Plataforma(new TGCVector3(-150, -280, 3400), new TGCVector3(2, 200, 200), precipicio));
-            pEstaticas.Add(new Plataforma(new TGCVector3(100, -280, 3500), new TGCVector3(500, 200, 2), precipicio));
-            pEstaticas.Add(new Plataforma(new TGCVector3(-275, -280, 4100), new TGCVector3(250, 200, 2), precipicio)); // paredes precipicio largo
-            pEstaticas.Add(new Plataforma(new TGCVector3(-150, -280, 4500), new TGCVector3(2, 200, 800), precipicio));
-            pEstaticas.Add(new Plataforma(new TGCVector3(-400, -280, 4500), new TGCVector3(2, 200, 800), precipicio));
-            pEstaticas.Add(new Plataforma(new TGCVector3(-275, -280, 4900), new TGCVector3(250, 200, 2), precipicio));
-
-            // escalinatas de piedra, separan jungla de desierto
-            var tamanioEscalinata = new TGCVector3(900, 60, 200);
-            pEstaticas.Add(new Plataforma(new TGCVector3(0, -150, 2500), tamanioEscalinata, piedra));  // escalinata inferior
-            pEstaticas.Add(new Plataforma(new TGCVector3(0, -90, 2300), tamanioEscalinata, piedra));   // escalinata del medio
-            pEstaticas.Add(new Plataforma(new TGCVector3(0, -30, 2100), tamanioEscalinata, piedra));   // escalinata superior
-            pEstaticas.Add(new Plataforma(new TGCVector3(500, -140, 2500), new TGCVector3(100, 80, 200), piedra));  // contornos inferior
-            pEstaticas.Add(new Plataforma(new TGCVector3(-500, -140, 2500), new TGCVector3(100, 80, 200), piedra));
-            pEstaticas.Add(new Plataforma(new TGCVector3(500, -115, 2300), new TGCVector3(100, 130, 200), piedra));  // contornos del medio
-            pEstaticas.Add(new Plataforma(new TGCVector3(-500, -115, 2300), new TGCVector3(100, 130, 200), piedra));
-            pEstaticas.Add(new Plataforma(new TGCVector3(500, -80, 2100), new TGCVector3(100, 200, 200), piedra));  // contornos superior
-            pEstaticas.Add(new Plataforma(new TGCVector3(-500, -80, 2100), new TGCVector3(100, 200, 200), piedra));
-
-            //paredes de los glaciares
-            pEstaticas.Add(new Plataforma(new TGCVector3(-500, 200, -1900), new TGCVector3(100, 400, 2200), hielo)); // derecha
-            pEstaticas.Add(new Plataforma(new TGCVector3(750, 200, -2510), new TGCVector3(2500, 400, 20), hielo));  // fondo
-            pEstaticas.Add(new Plataforma(new TGCVector3(1975, 200, -1900), new TGCVector3(50, 400, 2200), hielo)); // izquierda
-
-            // precipicio del tronco
-            plano = new TgcPlane(new TGCVector3(2000, -200, 800), new TGCVector3(1000, 0, 1200), TgcPlane.Orientations.XZplane, precipicio);
-            pMuerte.Add(plano); //TODO: Configurar el deathplane, deberia ir ahi?
-            pEstaticas.Add(new Plataforma(new TGCVector3(2500, -100, 800), new TGCVector3(1000, 200, 2), precipicio)); // fondo
-            pEstaticas.Add(new Plataforma(new TGCVector3(2000, -100, 1400), new TGCVector3(2, 200, 1200), precipicio)); // derecha
-            pEstaticas.Add(new Plataforma(new TGCVector3(3000, -100, 1400), new TGCVector3(2, 200, 1200), precipicio)); // izquierda
-            pEstaticas.Add(new Plataforma(new TGCVector3(2500, -100, 2000), new TGCVector3(1000, 200, 2), precipicio)); // frontal
-
-            pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(0, -50, 5000), new TGCVector3(200, 50, 200), caja, new TGCVector3(-200, -50, 5000), new TGCVector3(2f, 0, 0)));
-            pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(2075, -60, 1400), new TGCVector3(150, 50, 80), madera, new TGCVector3(2925, -60, 1400), new TGCVector3(2f, 0, 0)));
-
+            // Plataforma rotante del final
             pRotantes.Add(new PlataformaRotante(new TGCVector3(0, 50, 300), new TGCVector3(200, 50, 200), caja, FastMath.PI * 100));
-            pAscensor.Add(new PlataformaAscensor(new TGCVector3(0, -200, 5200), new TGCVector3(200, 50, 200), caja, 200, 1));
 
-            cajas.Add(new Caja(mediaDir, new TGCVector3(0, 0, 5800)));
+            // Scenes para objetos decorativos
+            escenasBananas = new TgcScene[6];
+            for(int i = 0; i <= 5; i++) {
+                escenasBananas[i] = loaderDeco.loadSceneFromFile(mediaDir + "\\Decorativos\\ArbolBananas\\ArbolBananas-TgcScene.xml");
+            }
+            escenasPalmeras = new TgcScene[4];
+            for (int i = 0; i <= 3; i++)
+            {
+                escenasPalmeras[i] = loaderDeco.loadSceneFromFile(mediaDir + "\\Decorativos\\Palmera\\Palmera-TgcScene.xml");
+            }
+            escenasSelvaticos = new TgcScene[2];
+            for (int i = 0; i <= 1; i++)
+            {
+                escenasSelvaticos[i] = loaderDeco.loadSceneFromFile(mediaDir + "\\Decorativos\\ArbolSelvatico2\\ArbolSelvatico2-TgcScene.xml");
+            }
+            escenasRocas = new TgcScene[8];
+            for (int i = 0; i <= 7; i++)
+            {
+                escenasRocas[i] = loaderDeco.loadSceneFromFile(mediaDir + "\\Decorativos\\Roca\\Roca-TgcScene.xml");
+            }
+
+            // Objetos decorativos
+            // Arboles de bananas
+            cargarDecorativo(arbolBananas, escenasBananas[0], new TGCVector3(600, 0, 9300), new TGCVector3(1.5f, 1.5f, 1.5f), 0);
+            cargarDecorativo(arbolBananas, escenasBananas[1], new TGCVector3(600, 0, 8700), new TGCVector3(1.5f, 1.5f, 1.5f), 0);
+            cargarDecorativo(arbolBananas, escenasBananas[2], new TGCVector3(-600, 0, 9300), new TGCVector3(1.5f, 1.5f, 1.5f), 0);
+            cargarDecorativo(arbolBananas, escenasBananas[3], new TGCVector3(-600, 0, 8700), new TGCVector3(1.5f, 1.5f, 1.5f), 0);
+            cargarDecorativo(arbolBananas, escenasBananas[4], new TGCVector3(500, 0, 2400), new TGCVector3(1.5f, 1.5f, 1.5f), 0);
+            cargarDecorativo(arbolBananas, escenasBananas[5], new TGCVector3(-500, 0, 2400), new TGCVector3(1.5f, 1.5f, 1.5f), 0);
+            // Arboles selvaticos
+            cargarDecorativo(arbolSelvatico, escenasSelvaticos[0], new TGCVector3(600, 0, 5400), new TGCVector3(5, 5, 5), 0);
+            cargarDecorativo(arbolSelvatico, escenasSelvaticos[1], new TGCVector3(-600, 0, 5400), new TGCVector3(5, 5, 5), 0);
+            // Palmeras
+            cargarDecorativo(palmera, escenasPalmeras[0], new TGCVector3(600, 0, 850), new TGCVector3(0.7f, 0.7f, 0.7f), 0);
+            cargarDecorativo(palmera, escenasPalmeras[1], new TGCVector3(-600, 0, 850), new TGCVector3(0.7f, 0.7f, 0.7f), 0);
+            cargarDecorativo(palmera, escenasPalmeras[2], new TGCVector3(600, 0, 2150), new TGCVector3(0.7f, 0.7f, 0.7f), 0);
+            cargarDecorativo(palmera, escenasPalmeras[3], new TGCVector3(-600, 0, 2150), new TGCVector3(0.7f, 0.7f, 0.7f), 0);
+            // Rocas
+            cargarDecorativo(roca, escenasRocas[0], new TGCVector3(300, 0, 3800), new TGCVector3(1, 1, 1), 0);
+            cargarDecorativo(roca, escenasRocas[1], new TGCVector3(-300, 0, 3800), new TGCVector3(1, 1, 1), 0);
+            cargarDecorativo(roca, escenasRocas[2], new TGCVector3(300, 0, 4100), new TGCVector3(2, 3, 2), 0);
+            cargarDecorativo(roca, escenasRocas[3], new TGCVector3(-300, 0, 4100), new TGCVector3(2, 3, 2), 0);
+            cargarDecorativo(roca, escenasRocas[4], new TGCVector3(300, 0, 4400), new TGCVector3(2, 3, 2), 0);
+            cargarDecorativo(roca, escenasRocas[5], new TGCVector3(-300, 0, 4400), new TGCVector3(2, 3, 2), 0);
+            cargarDecorativo(roca, escenasRocas[6], new TGCVector3(300, 0, 4700), new TGCVector3(1, 1, 1), 0);
+            cargarDecorativo(roca, escenasRocas[7], new TGCVector3(-300, 0, 4700), new TGCVector3(1, 1, 1), 0);
+
         }
 
         public override void dispose() {
-            piso.dispose();
-            hielo.dispose();
-            caja.dispose();
-            paredJungla.dispose();
-            desierto.dispose();
-            piedra.dispose();
-            precipicio.dispose();
-            madera.dispose();
 
+            piso.dispose();
+            caja.dispose();
+            limites.dispose();
             getRenderizables().ForEach(r => r.Dispose());
+
         }
     }
 }

@@ -9,7 +9,7 @@ namespace TGC.Group.Model {
         private TgcBoundingSphere boundingSphere;
         private TgcBoundingSphere pies;
 
-        private TGCVector3 POS_ORIGEN = new TGCVector3(0, -170, 5800);
+        private TGCVector3 POS_ORIGEN = new TGCVector3(0, 7.5f, 5000);
 
         // animaciones
         private TgcSkeletalMesh mesh;
@@ -27,7 +27,8 @@ namespace TGC.Group.Model {
         // saltos
         private int saltosRestantes = 0;
         private const int SALTOS_TOTALES = 2;
-        private const float JUMP_SPEED = 1000f;
+        // private const float JUMP_SPEED = 1000f; PC Cristian
+        private const float JUMP_SPEED = 10000f; // PC Pepe
 
         public Personaje(string MediaDir) {
             vel = TGCVector3.Empty;
