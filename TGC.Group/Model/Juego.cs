@@ -44,7 +44,6 @@ namespace TGC.Group.Model
 
         private TGCVector3 velocidad = TGCVector3.Empty;
         private TGCVector3 aceleracion = TGCVector3.Empty;
-        private float Ypiso = 20f;
 
         private Escenario escenario;
 
@@ -176,8 +175,8 @@ namespace TGC.Group.Model
             personaje.playAnimation("Parado", true);
 
             //Posicion inicial
-            personaje.position(new TGCVector3(400, Ypiso, -900));
-           // personaje.Position = new TGCVector3(-4133.616f, 20f, 5000f);
+           // personaje.position(new TGCVector3(400, escenario.Ypiso, -900));
+            personaje.position(new TGCVector3(-4133.616f, 20f, 5000f));
 
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.autoTransform(false);
@@ -303,6 +302,32 @@ namespace TGC.Group.Model
                     }
                    
                 }
+
+                #region Danio
+                if (escenario.personajeSobreLava()) escenario.quemarPersonaje();
+                #endregion
+
+                #region BarraVida
+
+                if (personaje.vivo())
+                {
+
+                    if (!personaje.vidaCompleta())
+                    {
+                        barraDeVida.Scaling = new TGCVector2(personaje.vida, 1);
+                        barraDeVida.Color = Color.FromArgb(Convert.ToInt32((1 - personaje.vida) * 255), Convert.ToInt32(personaje.vida * 255), 0);
+                    }
+                    else
+                    {
+                        barraDeVida.Scaling = new TGCVector2(1, 1);
+                        barraDeVida.Color = Color.FromArgb(0, 255, 0);
+                    }
+                }
+                else
+                {
+                    perdiste = true;
+                }
+            #endregion
 
                 //Vector de movimiento
 

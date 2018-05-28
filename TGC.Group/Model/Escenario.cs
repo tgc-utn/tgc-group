@@ -19,11 +19,14 @@ namespace TGC.Group.Model
     {
         public TgcScene scene { get; set; }
         private Personaje personaje;
+        public float Ypiso { get; }
+
         public Escenario(string pathEscenario,Personaje personaje)
         {
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(pathEscenario);
             this.personaje = personaje;
+            Ypiso = 20f;
         }
 
 
@@ -48,6 +51,21 @@ namespace TGC.Group.Model
 
             return fuentesDeLuz;
         }
+
+        #region Personaje
+        public bool personajeSobreLava()
+        {
+            var auxiliarBoundingBox = personaje.boundingBox();
+            auxiliarBoundingBox.move(new TGCVector3(0, -Ypiso, 0));
+            return LavaMesh().Exists(lava => TgcCollisionUtils.testAABBAABB(lava.BoundingBox, auxiliarBoundingBox));
+
+        }
+
+        public void quemarPersonaje()
+        {
+            personaje.vida -= 0.1f ;
+        }
+        #endregion
 
         public bool colisionConPilar()
         {
@@ -129,6 +147,7 @@ namespace TGC.Group.Model
             meshesColisionables.AddRange(PilaresMesh());
             meshesColisionables.AddRange(ResbalososMesh());
             meshesColisionables.AddRange(PlataformasMesh());
+            meshesColisionables.AddRange(LavaMesh());
             
             return meshesColisionables;
         }

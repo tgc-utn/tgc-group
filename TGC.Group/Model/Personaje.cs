@@ -16,14 +16,15 @@ namespace TGC.Group.Model
 {
     public class Personaje
     {
-
-        public int vida;
-        private TgcSkeletalMesh personajeMesh;
+        private static float vidaMaxima = 1;
+        public float vida { get; set; }
+        public TgcSkeletalMesh personajeMesh { get; }
         private Directorio directorio;
 
         public Personaje(Directorio directorio)
         {
             this.directorio = directorio;
+            vida = vidaMaxima;
 
             var skeletalLoader = new TgcSkeletalLoader();
 
@@ -36,6 +37,9 @@ namespace TGC.Group.Model
             
         }
 
+        public bool vidaCompleta() => vida == vidaMaxima;
+        public bool vivo() => vida > 0;
+        #region MeshAdapter
         public TgcBoundingAxisAlignBox boundingBox() => personajeMesh.BoundingBox;
 
         public void playAnimation(string animation, bool playLoop) => personajeMesh.playAnimation(animation, playLoop);
@@ -58,5 +62,6 @@ namespace TGC.Group.Model
         public TgcSkeletalMesh.MeshRenderType renderType() => personajeMesh.RenderType;
         public void render() => personajeMesh.Render();
         public void dispose() => personajeMesh.Dispose();
+        #endregion
     }
 }
