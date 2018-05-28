@@ -51,14 +51,40 @@ namespace TGC.Group.Model
         public List<TgcMesh> Mascaras() => encontrarMeshes("MASCARA");
         #endregion
 
-        public List<TgcMesh> FuentesDeLuz()
+        #region Colisiones
+        public bool colisionConPilar()
         {
-            List<TgcMesh> fuentesDeLuz = new List<TgcMesh>();
-            fuentesDeLuz.AddRange(Luces());
-            fuentesDeLuz.AddRange(LavaMesh());
-
-            return fuentesDeLuz;
+            return this.PilaresMesh().Exists(mesh => TgcCollisionUtils.testAABBAABB(personaje.boundingBox(), mesh.BoundingBox));
         }
+
+        public bool colisionaConPiso(TgcMesh mesh)
+        {
+            return PisosMesh().Exists(piso => TgcCollisionUtils.testAABBAABB(piso.BoundingBox, mesh.BoundingBox));
+        }
+        public bool colisionaConLava(TgcMesh mesh)
+        {
+            return LavaMesh().Exists(lava => TgcCollisionUtils.testAABBAABB(lava.BoundingBox, mesh.BoundingBox));
+        }
+        public bool colisionaConPared(TgcMesh mesh)
+        {
+            return ParedesMesh().Exists(pared => TgcCollisionUtils.testAABBAABB(pared.BoundingBox, mesh.BoundingBox));
+        }
+
+        public bool colisionaCon(TgcMesh mesh)
+        {
+            return MeshesColisionablesSin("PLATAFORMA").Exists(x => TgcCollisionUtils.testAABBAABB(x.BoundingBox, mesh.BoundingBox));
+        }
+
+        public bool colisionEscenario()
+        {
+            return this.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => TgcCollisionUtils.testAABBAABB(personaje.boundingBox(), mesh.BoundingBox)) != null;
+        }
+
+        public TgcMesh obtenerColisionCajaPersonaje(TgcMesh objetoMovibleG)
+        {
+            return this.CajasMesh().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.boundingBox()) && caja != objetoMovibleG);
+        }
+        #endregion
 
         #region Personaje
 
@@ -98,37 +124,13 @@ namespace TGC.Group.Model
         }
         #endregion
 
-        public bool colisionConPilar()
+        public List<TgcMesh> FuentesDeLuz()
         {
-            return this.PilaresMesh().Exists(mesh => TgcCollisionUtils.testAABBAABB(personaje.boundingBox(), mesh.BoundingBox));
-        }
+            List<TgcMesh> fuentesDeLuz = new List<TgcMesh>();
+            fuentesDeLuz.AddRange(Luces());
+            fuentesDeLuz.AddRange(LavaMesh());
 
-        public bool colisionaConPiso(TgcMesh mesh)
-        {
-            return PisosMesh().Exists(piso => TgcCollisionUtils.testAABBAABB(piso.BoundingBox, mesh.BoundingBox));
-        }
-        public bool colisionaConLava(TgcMesh mesh)
-        {
-            return LavaMesh().Exists(lava => TgcCollisionUtils.testAABBAABB(lava.BoundingBox, mesh.BoundingBox));
-        }
-        public bool colisionaConPared(TgcMesh mesh)
-        {
-            return ParedesMesh().Exists(pared => TgcCollisionUtils.testAABBAABB(pared.BoundingBox, mesh.BoundingBox));
-        }
-
-        public bool colisionaCon(TgcMesh mesh)
-        {
-            return MeshesColisionablesSin("PLATAFORMA").Exists(x => TgcCollisionUtils.testAABBAABB(x.BoundingBox, mesh.BoundingBox));
-        }
-
-        public bool colisionEscenario()
-        {
-            return this.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => TgcCollisionUtils.testAABBAABB(personaje.boundingBox(), mesh.BoundingBox)) != null;
-        }
-
-        public TgcMesh obtenerColisionCajaPersonaje(TgcMesh objetoMovibleG)
-        {
-            return this.CajasMesh().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.boundingBox()) && caja != objetoMovibleG);
+            return fuentesDeLuz;
         }
 
         private int coeficienteRotacion = 1;

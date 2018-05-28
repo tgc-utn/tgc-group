@@ -40,22 +40,6 @@ namespace TGC.Group.Model
 
             
         }
-
-        public bool vidaCompleta() => vida == vidaMaxima;
-        public bool vivo() => vida > 0;
-        public void aumentarVida(float aumento)
-        {
-            vida += aumento;
-        }
-
-        public void aumentarFrutas()
-        {
-            frutas++;
-        }
-        public void aumentarMascaras()
-        {
-            mascaras++;
-        }
         #region MeshAdapter
         public TgcBoundingAxisAlignBox boundingBox() => personajeMesh.BoundingBox;
 
@@ -80,5 +64,22 @@ namespace TGC.Group.Model
         public void render() => personajeMesh.Render();
         public void dispose() => personajeMesh.Dispose();
         #endregion
+
+        public bool vidaCompleta() => vida == vidaMaxima;
+        public bool vivo() => vida > 0;
+        public void aumentarVida(float aumento)
+        {
+            vida += aumento;
+        }
+
+        public void aumentarFrutas()
+        {
+            frutas++;
+        }
+        public void aumentarMascaras()
+        {
+            mascaras++;
+        }
+
     }
 }
