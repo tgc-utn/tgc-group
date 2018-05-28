@@ -62,6 +62,11 @@ namespace TGC.Group.Model.Scenes {
                 }
             }
 
+            // Checkear si toque la levelFinishBox
+            if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), nivel.getLFBox())) {
+                setNivel(nivel.siguienteNivel);
+            }
+
             checkearMuerte();
 
             if (personaje.getPosition().Y < -1500) personaje.volverAlOrigen();

@@ -25,6 +25,8 @@ namespace TGC.Group.Model.Niveles {
         protected List<TgcMesh> decorativos;
         protected List<TgcBoundingAxisAlignBox> aabbDeDecorativos;
         protected TgcSceneLoader loaderDeco;
+        protected Plataforma lfBox;
+        public Nivel siguienteNivel;
 
         public Nivel(string mediaDir) {
 
@@ -109,6 +111,11 @@ namespace TGC.Group.Model.Niveles {
 
         public List<Caja> getCajas() {
             return cajas;
+        }
+
+        public TgcBoundingAxisAlignBox getLFBox()
+        {
+            return lfBox.getAABB();
         }
 
         public bool esPisoResbaladizo(TgcBoundingAxisAlignBox piso) {
