@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TGC.Core.Direct3D;
+using TGC.Core.Input;
 
 namespace TGC.Group.Model.Interfaz {
     class ElementoTexto : Elemento {
@@ -11,7 +12,7 @@ namespace TGC.Group.Model.Interfaz {
             : base(contenido, xpos, ypos) {
         }
 
-        public override void Update(float deltaTime) {
+        public override void Update(float deltaTime, TgcD3dInput input) {
         }
 
         public override void Render() {
