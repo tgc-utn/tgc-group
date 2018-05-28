@@ -39,7 +39,7 @@ namespace TGC.Group.Model
         static string mediaDir;
         private Directorio directorio;
 
-        private TgcSkeletalMesh personaje;
+        private Personaje personaje;
         private TgcThirdPersonCamera camaraInterna;
 
         private TGCVector3 velocidad = TGCVector3.Empty;
@@ -159,21 +159,16 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
+
             //Objeto que conoce todos los path de MediaDir
             directorio = new Directorio(MediaDir);
+
+            personaje = new Personaje(directorio);
 
             //Cargo el SoundManager
             soundManager = new SoundManager(directorio,this.DirectSound.DsDevice);
             soundManager.playSonidoFondo();
 
-
-            //Cargar personaje con animaciones
-            var skeletalLoader = new TgcSkeletalLoader();
-            var pathAnimacionesPersonaje = new[] { directorio.RobotCaminando, directorio.RobotParado, };
-            personaje = skeletalLoader.
-                        loadMeshAndAnimationsFromFile(directorio.RobotSkeletalMesh,
-                                                      directorio.RobotDirectorio,
-                                                      pathAnimacionesPersonaje);
 
             //Cagar escenario especifico para el juego.
             escenario = new Escenario(directorio.EscenaCrash,personaje);
@@ -181,11 +176,11 @@ namespace TGC.Group.Model
             personaje.playAnimation("Parado", true);
 
             //Posicion inicial
-            personaje.Position = new TGCVector3(400, Ypiso, -900);
+            personaje.position(new TGCVector3(400, Ypiso, -900));
            // personaje.Position = new TGCVector3(-4133.616f, 20f, 5000f);
 
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
-            personaje.AutoTransform = false;
+            personaje.autoTransform(false);
             
             //Rotar al robot en el Init para que mire hacia el otro lado
             personaje.RotateY(FastMath.ToRad(180f));
@@ -200,8 +195,8 @@ namespace TGC.Group.Model
             TGCVector3 vectorAjuste = new TGCVector3(0f, 50f, 0f);
             //Para reducir el radio de la esfera.
             float coeficienteReductivo = 0.4f;
-            esferaPersonaje = new TgcBoundingSphere(personaje.BoundingBox.calculateBoxCenter()-vectorAjuste, 
-                                                    personaje.BoundingBox.calculateBoxRadius()*coeficienteReductivo);
+            esferaPersonaje = new TgcBoundingSphere(personaje.boundingBox().calculateBoxCenter()-vectorAjuste, 
+                                                    personaje.boundingBox().calculateBoxRadius()*coeficienteReductivo);
             scaleBoundingVector = new TGCVector3(1.5f, 1f, 1.2f);
             
 
@@ -215,12 +210,12 @@ namespace TGC.Group.Model
             plataformasRotantes = escenario.PlataformasRotantes();
 
            //Posición de la camara.
-            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 500, -1000);
+            camaraInterna = new TgcThirdPersonCamera(personaje.position(), 500, -1000);
            
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara = camaraInterna;
 
-            personaje.BoundingBox.scaleTranslate(personaje.Position, scaleBoundingVector);
+            personaje.boundingBox().scaleTranslate(personaje.position(), scaleBoundingVector);
             var meshesSinPlatXZ = escenario.scene.Meshes.FindAll(mesh => mesh.Name != "PlataformaX" && mesh.Name != "PlataformaZ");
 
             octree = new Octree();
@@ -280,7 +275,7 @@ namespace TGC.Group.Model
             if (Input.keyPressed(Key.F))boundingBoxActivate = !boundingBoxActivate;
             
             //Si el personaje se mantiene en caida, se pierda la partida.
-            if (personaje.Position.Y < -700)perdiste = true;
+            if (personaje.position().Y < -700)perdiste = true;
             
 
             //Si se sigue en juego, se continua con la logica del juego.
@@ -320,8 +315,8 @@ namespace TGC.Group.Model
                 {
                     animacion = "Caminando";
                     moveForward = -velocidadCaminar;
-                    movX = FastMath.Sin(personaje.Rotation.Y) * moveForward * ElapsedTime;
-                    movZ = FastMath.Cos(personaje.Rotation.Y) * moveForward * ElapsedTime;
+                    movX = FastMath.Sin(personaje.rotation().Y) * moveForward * ElapsedTime;
+                    movZ = FastMath.Cos(personaje.rotation().Y) * moveForward * ElapsedTime;
                     soundManager.playSonidoCaminar();
                 }
                 else
@@ -419,7 +414,7 @@ namespace TGC.Group.Model
             if (plataformaRotante != null) movimientoRealPersonaje = colliderOBB.manageColisionEsferaOBB(esferaPersonaje, movimientoOriginal,plataformaRotante.OBB);
             else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
              
-            personaje.Move(movimientoRealPersonaje);
+            personaje.move(movimientoRealPersonaje);
         }
         public void movimientoDePlataformas()
         {
@@ -458,7 +453,7 @@ namespace TGC.Group.Model
         
         public bool testColisionObjetoPersonaje(TgcMesh objetoColisionable)
         {
-            return TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, objetoColisionable.BoundingBox);
+            return TgcCollisionUtils.testAABBAABB(personaje.boundingBox(), objetoColisionable.BoundingBox);
         }
         
         public void RotarPersonaje()
@@ -536,7 +531,7 @@ namespace TGC.Group.Model
             camaraInterna.SetCamera(position, target);
 
             //Hacer que la camara siga al personaje en su nueva posicion
-            camaraInterna.Target = personaje.Position;
+            camaraInterna.Target = personaje.position();
         }
 
         public override void Render()
@@ -583,29 +578,29 @@ namespace TGC.Group.Model
                     else
                     {
                         DrawText.drawText("Perdiste" + "\n" + "¿Reiniciar? (Y)", 500, 500, Color.Red);
-                        personaje.Render();
+                        personaje.render();
                     }
 
                     if (boundingBoxActivate)
                     {
 
-                        personaje.BoundingBox.Render();
+                        personaje.boundingBox().Render();
                         esferaPersonaje.Render();
                         escenario.RenderizarBoundingBoxes();
                     }
                                     
-                    personaje.Effect.SetValue("lightColor", ColorValue.FromColor(Color.White));
-                    personaje.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(escenario.getClosestLight(personaje.Position,0f).Position));
-                    personaje.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+                    personaje.effect().SetValue("lightColor", ColorValue.FromColor(Color.White));
+                    personaje.effect().SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(escenario.getClosestLight(personaje.position(),0f).Position));
+                    personaje.effect().SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
 
-                    personaje.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
-                    personaje.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
-                    personaje.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
-                    personaje.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Color.DimGray));
-                    personaje.Effect.SetValue("materialSpecularExp", 500f);
+                    personaje.effect().SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
+                    personaje.effect().SetValue("materialAmbientColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
+                    personaje.effect().SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
+                    personaje.effect().SetValue("materialSpecularColor", ColorValue.FromColor(Color.DimGray));
+                    personaje.effect().SetValue("materialSpecularExp", 500f);
 
-                    personaje.Effect.SetValue("lightIntensity", 20);
-                    personaje.Effect.SetValue("lightAttenuation", 25);
+                    personaje.effect().SetValue("lightIntensity", 20);
+                    personaje.effect().SetValue("lightAttenuation", 25);
 
                     
                 }
@@ -625,7 +620,7 @@ namespace TGC.Group.Model
 
         public override void Dispose()
         {
-            personaje.Dispose();
+            personaje.dispose();
             escenario.DisposeAll();
             barraDeVida.Dispose();
             fruta.Dispose();
@@ -755,8 +750,8 @@ namespace TGC.Group.Model
                 //mesh.Technique = "RenderScene2";
             }
             personajeLightShader = TgcShaders.Instance.TgcSkeletalMeshPointLightShader;
-            personaje.Effect = personajeLightShader;
-            personaje.Technique = TgcShaders.Instance.getTgcSkeletalMeshTechnique(personaje.RenderType);
+            personaje.effect(personajeLightShader);
+            personaje.technique(TgcShaders.Instance.getTgcSkeletalMeshTechnique(personaje.renderType()));
         }
 
     }

@@ -18,8 +18,8 @@ namespace TGC.Group.Model
     class Escenario
     {
         public TgcScene scene { get; set; }
-        private TgcSkeletalMesh personaje;
-        public Escenario(string pathEscenario,TgcSkeletalMesh personaje)
+        private Personaje personaje;
+        public Escenario(string pathEscenario,Personaje personaje)
         {
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(pathEscenario);
@@ -51,7 +51,7 @@ namespace TGC.Group.Model
 
         public bool colisionConPilar()
         {
-            return this.PilaresMesh().Exists(mesh => TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, mesh.BoundingBox));
+            return this.PilaresMesh().Exists(mesh => TgcCollisionUtils.testAABBAABB(personaje.boundingBox(), mesh.BoundingBox));
         }
 
         public bool colisionaConPiso(TgcMesh mesh)
@@ -74,12 +74,12 @@ namespace TGC.Group.Model
 
         public bool colisionEscenario()
         {
-            return this.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, mesh.BoundingBox)) != null;
+            return this.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => TgcCollisionUtils.testAABBAABB(personaje.boundingBox(), mesh.BoundingBox)) != null;
         }
 
         public TgcMesh obtenerColisionCajaPersonaje(TgcMesh objetoMovibleG)
         {
-            return this.CajasMesh().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.BoundingBox) && caja != objetoMovibleG);
+            return this.CajasMesh().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.boundingBox()) && caja != objetoMovibleG);
         }
 
         private int coeficienteRotacion = 1;
