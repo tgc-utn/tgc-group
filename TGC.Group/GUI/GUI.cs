@@ -348,7 +348,7 @@ namespace TGC.Group.GUI
         }
 
         // Alerts
-        public void MessageBox(string msg, string mediaDir, string titulo = "")
+        public void Menu_Exit(string msg, string mediaDir, string titulo = "")
         {
             InitDialog(false, false);
             float W = D3DDevice.Instance.Width / ex;
@@ -366,6 +366,27 @@ namespace TGC.Group.GUI
             InsertItem(msg, x0 + 200, y0 + 200);
             InsertCircleButton(0, "OK", "ok.png", x0 + 70, y0 + dy - r - 90, mediaDir, r);
             InsertCircleButton(1, "CANCEL", "cancel.png", x0 + dx - r - 70, y0 + dy - r - 90, mediaDir, r);
+        }
+
+        public void Menu_Perdiste(string msg, string mediaDir, string titulo = "")
+        {
+            InitDialog(false, false);
+            float W = D3DDevice.Instance.Width / ex;
+            float H = D3DDevice.Instance.Height / ey;
+
+            int dx = (int)(700.0f / ex);
+            int dy = (int)(450.0f / ey);
+            int x0 = (int)((W - dx) / 2);
+            int y0 = (int)((H - dy) / 2);
+            int r = 100;
+
+            InsertImage("menu_perdiste.png", 1850, 450, mediaDir);
+
+            InsertFrame(titulo, x0, y0, dx, dy, Color.FromArgb(0, 0, 0));
+            InsertItem(msg, x0 + 200, y0 + 200);
+            InsertCircleButton(0, "OK", "ok.png", x0 + 70, y0 + dy - r - 90, mediaDir, r);
+            InsertCircleButton(1, "CANCEL", "cancel.png", x0 + dx - r - 70, y0 + dy - r - 90, mediaDir, r);
+
         }
 
         // input

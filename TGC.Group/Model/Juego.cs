@@ -92,7 +92,8 @@ namespace TGC.Group.Model
         public const int IDOK = 0;
 
         public const int IDCANCEL = 1;
-        public const int ID_JUGAR = 100;
+        public const int ID_JUGAR = 10;
+        public const int ID_RESTART = 101;
         public const int ID_CONFIGURAR = 103;
         public const int ID_APP_EXIT = 105;
         public const int ID_PROGRESS1 = 107;
@@ -627,10 +628,15 @@ namespace TGC.Group.Model
                 }
                 else
                 {
-                        DrawText.drawText("Perdiste" + "\n" + "¿Reiniciar? (Y)", 500, 500, Color.Red);
-                        personaje.render();
-                       //TODO: menu perdiste
-                    
+                    DrawText.drawText("Perdiste" + "\n" + "¿Reiniciar? (Y)", 500, 500, Color.Red);
+                    //personaje.render();
+                    //gui_render(ElapsedTime);
+                    //GuiMessage gs = gui.Update(ElapsedTime, Input);
+                    //gui.Menu_Perdiste("Perdiste, Desea Reiniciar el Juego?", directorio.Menu, "Crash Bandicoot");
+
+                    //menu = true;
+                    //TODO: menu perdiste
+
                 }
             }
 
@@ -680,6 +686,8 @@ namespace TGC.Group.Model
 
         }
 
+       
+
         public void gui_render(float elapsedTime)
         {
             // ------------------------------------------------
@@ -715,12 +723,17 @@ namespace TGC.Group.Model
                             paused = false;
                             break;
 
+                        case ID_RESTART:
+                            menu = true;
+                            gui.Menu_Perdiste("Perdiste, Desea Reiniciar el Juego?", directorio.Menu, "Crash Bandicoot");
+                            break;
+
                         /*case ID_CONFIGURAR:
                             Configurar();
                             break;*/
 
                         case ID_APP_EXIT:
-                            gui.MessageBox("Desea Salir del Juego?",directorio.Menu, "Crash Bandicoot");
+                            gui.Menu_Exit("Desea Salir del Juego?",directorio.Menu, "Crash Bandicoot");
                             msg_box_app_exit = true;
                             break;
 
