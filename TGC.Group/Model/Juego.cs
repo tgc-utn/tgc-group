@@ -15,6 +15,7 @@ using TGC.Core.Textures;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.Collision;
 using TGC.Core.Shaders;
+using TGC.Core.Text;
 
 using TGC.Group.SphereCollisionUtils;
 using TGC.Group.Model.AI;
@@ -145,6 +146,10 @@ namespace TGC.Group.Model
         public CustomSprite mascara;
         public Drawer2D drawer2D;
 
+        public TgcText2D textoFrutas;
+        public TgcText2D textoMascaras;
+        
+
         public override void Init()
         {
             perdiste = false;
@@ -176,8 +181,8 @@ namespace TGC.Group.Model
             personaje.playAnimation("Parado", true);
 
             //Posicion inicial
-           // personaje.position(new TGCVector3(400, escenario.Ypiso, -900));
-            personaje.position(new TGCVector3(-4133.616f, 20f, 5000f));
+            personaje.position(new TGCVector3(400, escenario.Ypiso, -900));
+            //personaje.position(new TGCVector3(-4133.616f, 20f, 5000f));
 
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.autoTransform(false);
@@ -226,19 +231,10 @@ namespace TGC.Group.Model
 
             inicializarGUI();
             inicializarIluminacion();
+            inicializarHUDS(d3dDevice);
 
-            drawer2D = new Drawer2D();
-            barraDeVida = new CustomSprite();
-            barraDeVida.Bitmap = new CustomBitmap(directorio.BarraVida,d3dDevice);
-            barraDeVida.Position = new TGCVector2(10, 20);
+           
 
-            fruta = new CustomSprite();
-            fruta.Bitmap = new CustomBitmap(directorio.Fruta, d3dDevice);
-            fruta.Position = new TGCVector2(20, 70);
-
-            mascara = new CustomSprite();
-            mascara.Bitmap = new CustomBitmap(directorio.Mascara, d3dDevice);
-            mascara.Position = new TGCVector2(25, 150);
         }
 
 
@@ -328,7 +324,29 @@ namespace TGC.Group.Model
                 {
                     perdiste = true;
                 }
-            #endregion
+                #endregion
+
+                #region Frutas
+                if (escenario.personajeSobreFruta())
+                {
+                    personaje.aumentarFrutas();
+                    escenario.eliminarFrutaColisionada();
+                 }
+
+                textoFrutas.Text = personaje.frutas.ToString();
+
+                #endregion
+
+                #region Mascaras
+                if (escenario.personajeSobreMascara())
+                {
+                    personaje.aumentarMascaras();
+                    escenario.eliminarMascaraColisionada();
+                }
+
+                textoMascaras.Text = personaje.mascaras.ToString();
+
+                #endregion
 
                 //Vector de movimiento
 
@@ -579,6 +597,9 @@ namespace TGC.Group.Model
                     drawer2D.DrawSprite(mascara);
                     drawer2D.EndDrawSprite();
 
+                    textoFrutas.render();
+                    textoMascaras.render();
+
                    /* DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
                                + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
                                /*+ "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
@@ -659,6 +680,8 @@ namespace TGC.Group.Model
             barraDeVida.Dispose();
             fruta.Dispose();
             mascara.Dispose();
+            textoFrutas.Dispose();
+            textoMascaras.Dispose();
         }
 
         public void inicializarGUI()
@@ -793,6 +816,41 @@ namespace TGC.Group.Model
             personajeLightShader = TgcShaders.Instance.TgcSkeletalMeshPointLightShader;
             personaje.effect(personajeLightShader);
             personaje.technique(TgcShaders.Instance.getTgcSkeletalMeshTechnique(personaje.renderType()));
+        }
+
+        public void inicializarHUDS(Microsoft.DirectX.Direct3D.Device d3dDevice)
+        {
+            drawer2D = new Drawer2D();
+            barraDeVida = new CustomSprite();
+            barraDeVida.Bitmap = new CustomBitmap(directorio.BarraVida, d3dDevice);
+            barraDeVida.Position = new TGCVector2(10, 20);
+
+            fruta = new CustomSprite();
+            fruta.Bitmap = new CustomBitmap(directorio.Fruta, d3dDevice);
+            fruta.Position = new TGCVector2(20, 70);
+
+            textoFrutas = new TgcText2D();
+            textoFrutas.Text = "0";
+            textoFrutas.Color = Color.White;
+            textoFrutas.Align = TgcText2D.TextAlign.LEFT;
+            textoFrutas.Position = new Point(100, 80);
+            textoFrutas.Size = new Size(350, 140);
+            textoFrutas.changeFont(new System.Drawing.Font("TimesNewRoman", 30,FontStyle.Bold));
+
+
+            mascara = new CustomSprite();
+            mascara.Bitmap = new CustomBitmap(directorio.Mascara, d3dDevice);
+            mascara.Position = new TGCVector2(25, 150);
+
+            textoMascaras = new TgcText2D();
+            textoMascaras.Text = "0";
+            textoMascaras.Color = Color.White;
+            textoMascaras.Align = TgcText2D.TextAlign.LEFT;
+            textoMascaras.Position = new Point(100, 200);
+            textoMascaras.Size = new Size(350, 140);
+            textoMascaras.changeFont(new System.Drawing.Font("TimesNewRoman", 30, FontStyle.Bold));
+
+
         }
 
     }

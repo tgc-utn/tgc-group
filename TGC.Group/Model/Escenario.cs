@@ -21,6 +21,7 @@ namespace TGC.Group.Model
         private Personaje personaje;
         public float Ypiso { get; }
 
+        private List<TgcMesh> frutas;
         private float danioLava;
 
         public Escenario(string pathEscenario,Personaje personaje)
@@ -30,10 +31,11 @@ namespace TGC.Group.Model
             this.personaje = personaje;
             Ypiso = 20f;
             danioLava = 0.001f;
+            frutas = Frutas();
         }
 
 
-
+        #region MeshLists
         public List<TgcMesh> encontrarMeshes(string clave) => scene.Meshes.FindAll(x => x.Layer == clave);
         public List<TgcMesh> ParedesMesh() => encontrarMeshes("PAREDES");
         public List<TgcMesh> RocasMesh() => encontrarMeshes("ROCAS");
@@ -45,6 +47,9 @@ namespace TGC.Group.Model
         public List<TgcMesh> ResbalososMesh() => encontrarMeshes("RESBALOSOS");
         public List<TgcMesh> LavaMesh() => encontrarMeshes("LAVA");
         public List<TgcMesh> Luces() => encontrarMeshes("Luces");
+        public List<TgcMesh> Frutas() => encontrarMeshes("FRUTA");
+        public List<TgcMesh> Mascaras() => encontrarMeshes("MASCARA");
+        #endregion
 
         public List<TgcMesh> FuentesDeLuz()
         {
@@ -56,6 +61,29 @@ namespace TGC.Group.Model
         }
 
         #region Personaje
+
+        public bool personajeSobreMascara()
+        {
+            return Mascaras().Exists(mascara => TgcCollisionUtils.testAABBAABB(mascara.BoundingBox, personaje.boundingBox()));
+        }
+
+        public void eliminarMascaraColisionada()
+        {
+            TgcMesh mascaraColisionada = Mascaras().Find(mascara => TgcCollisionUtils.testAABBAABB(mascara.BoundingBox, personaje.boundingBox()));
+            mascaraColisionada.Enabled = false;
+        }
+
+        public bool personajeSobreFruta()
+        {
+            return Frutas().Exists(fruta => TgcCollisionUtils.testAABBAABB(fruta.BoundingBox, personaje.boundingBox()));
+        }
+
+        public void eliminarFrutaColisionada()
+        {
+            TgcMesh frutaColisionada = Frutas().Find(fruta => TgcCollisionUtils.testAABBAABB(fruta.BoundingBox, personaje.boundingBox()));
+            frutaColisionada.Enabled = false;
+        }
+
         public bool personajeSobreLava()
         {
             var auxiliarBoundingBox = personaje.boundingBox();
