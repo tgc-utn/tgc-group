@@ -65,10 +65,16 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.DirectInput.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DirectX.Direct3DX, Version=1.0.2910.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2910.0\Microsoft.DirectX.Direct3DX.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualC" />
     <Reference Include="System" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
     <Reference Include="TGC.Core, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\TGC.Core.2.3.1\lib\net471\TGC.Core.dll</HintPath>
     </Reference>
@@ -85,12 +91,36 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\Entidades\Caja.cs" />
+    <Compile Include="Model\Entidades\Personaje.cs" />
+    <Compile Include="Model\Entidades\Plataforma.cs" />
+    <Compile Include="Model\Entidades\PlataformaAscensor.cs" />
+    <Compile Include="Model\Entidades\PlataformaDesplazante.cs" />
+    <Compile Include="Model\Entidades\PlataformaRotante.cs" />
+    <Compile Include="Model\Escenas\GameOverEscena.cs" />
+    <Compile Include="Model\Escenas\InicioEscena.cs" />
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Model\Interfaz\Boton.cs" />
+    <Compile Include="Model\Interfaz\Elemento.cs" />
+    <Compile Include="Model\Interfaz\ElementoTexto.cs" />
+    <Compile Include="Model\IUpdateable.cs" />
+    <Compile Include="Model\Niveles\Nivel3.cs" />
+    <Compile Include="Model\Niveles\Nivel2.cs" />
+    <Compile Include="Model\Niveles\Nivel1.cs" />
+    <Compile Include="Model\Niveles\Nivel.cs" />
+    <Compile Include="Model\Escenas\GameEscena.cs" />
+    <Compile Include="Model\Escenas\Escena.cs" />
+    <Compile Include="Model\Escenas\EscenaManager.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="obj\Debug\TGC.Group.Form.GameForm.resources" />
+    <EmbeddedResource Include="obj\Debug\TGC.Group.Properties.Resources.resources" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -101,10 +131,44 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="bin\Debug\TGC.Group.exe.config" />
     <None Include="Game.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Game.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Media\BasicHuman\Animations\BasicHuman_CrouchWalk.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_FlyingKick.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_HighKick.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_Jump.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_LowKick.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_Push.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_Run.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_StandBy.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_Talk.max" />
+    <None Include="Media\BasicHuman\Animations\BasicHuman_Walk.max" />
+    <None Include="Media\BasicHuman\BasicHuman_InitialPose.max" />
+    <None Include="Media\BasicHuman\CombineSoldier_InitialPose.max" />
+    <None Include="Media\BasicHuman\CS_Arctic_InitialPose.max" />
+    <None Include="Media\BasicHuman\CS_Gign_InitialPose.max" />
+    <None Include="Media\BasicHuman\Pilot_InitialPose.max" />
+    <None Include="Media\BasicHuman\Quake2Scout_InitialPose.max" />
+    <None Include="Media\BasicHuman\WomanJeans_InitialPose.max" />
+    <None Include="Media\Ciudad\Ciudad.max" />
+    <None Include="Media\Decorativos\ArbolBananas\ArbolBananas.max" />
+    <None Include="Media\Decorativos\ArbolSelvatico2\ArbolSelvatico2.max" />
+    <None Include="Media\Decorativos\Arbusto2\Arbusto2.max" />
+    <None Include="Media\Decorativos\Calabera\Calabera.max" />
+    <None Include="Media\Decorativos\EsqueletoHumano\Esqueleto.max" />
+    <None Include="Media\Decorativos\EstatuaFaraon\EstatuaFaraon.max" />
+    <None Include="Media\Decorativos\Palmera\Palmera.max" />
+    <None Include="Media\Decorativos\PilarEgipcio\PilarEgipcio.max" />
+    <None Include="Media\Decorativos\Roca\Roca.max" />
+    <None Include="obj\Debug\build.force" />
+    <None Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="obj\Debug\TGC.Group.csproj.CopyComplete" />
+    <None Include="obj\Debug\TGC.Group.csproj.CoreCompileInputs.cache" />
+    <None Include="obj\Debug\TGC.Group.csproj.GenerateResource.cache" />
+    <None Include="obj\Debug\TGC.Group.csprojResolveAssemblyReference.cache" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -156,8 +220,164 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Media\cajaMadera4.jpg" />
+    <Content Include="bin\Debug\Microsoft.DirectX.Direct3D.dll" />
+    <Content Include="bin\Debug\Microsoft.DirectX.Direct3D.xml" />
+    <Content Include="bin\Debug\Microsoft.DirectX.Direct3DX.dll" />
+    <Content Include="bin\Debug\Microsoft.DirectX.Direct3DX.xml" />
+    <Content Include="bin\Debug\Microsoft.DirectX.DirectInput.dll" />
+    <Content Include="bin\Debug\Microsoft.DirectX.DirectInput.xml" />
+    <Content Include="bin\Debug\Microsoft.DirectX.DirectSound.dll" />
+    <Content Include="bin\Debug\Microsoft.DirectX.DirectSound.xml" />
+    <Content Include="bin\Debug\Microsoft.DirectX.dll" />
+    <Content Include="bin\Debug\Microsoft.DirectX.xml" />
+    <Content Include="bin\Debug\Shaders\TgcKeyFrameMeshShader.fx" />
+    <Content Include="bin\Debug\Shaders\TgcMeshPhongShader.fx" />
+    <Content Include="bin\Debug\Shaders\TgcMeshPointLightShader.fx" />
+    <Content Include="bin\Debug\Shaders\TgcMeshShader.fx" />
+    <Content Include="bin\Debug\Shaders\TgcMeshSpotLightShader.fx" />
+    <Content Include="bin\Debug\Shaders\TgcSkeletalMeshPointLightShader.fx" />
+    <Content Include="bin\Debug\Shaders\TgcSkeletalMeshShader.fx" />
+    <Content Include="bin\Debug\Shaders\Varios.fx" />
+    <Content Include="bin\Debug\TGC.Core.dll" />
+    <Content Include="bin\Debug\TGC.Core.pdb" />
+    <Content Include="bin\Debug\TGC.Core.xml" />
+    <Content Include="bin\Debug\TGC.Group.exe" />
+    <Content Include="bin\Debug\TGC.Group.pdb" />
+    <Content Include="Media\arena.jpg" />
+    <Content Include="Media\BasicHuman\Animations\CrouchWalk-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\FlyingKick-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\HighKick-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\Jump-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\LowKick-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\Push-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\Run-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\StandBy-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\Talk-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\Animations\Walk-TgcSkeletalAnim.xml" />
+    <Content Include="Media\BasicHuman\BasicHuman-TgcSkeletalMesh.xml" />
+    <Content Include="Media\BasicHuman\CombineSoldier-TgcSkeletalMesh.xml" />
+    <Content Include="Media\BasicHuman\CS_Arctic-TgcSkeletalMesh.xml" />
+    <Content Include="Media\BasicHuman\CS_Gign-TgcSkeletalMesh.xml" />
+    <Content Include="Media\BasicHuman\Pilot-TgcSkeletalMesh.xml" />
+    <Content Include="Media\BasicHuman\Quake2Scout-TgcSkeletalMesh.xml" />
+    <Content Include="Media\BasicHuman\Textures\arctic_skin.jpg" />
+    <Content Include="Media\BasicHuman\Textures\CombineSoldier_sheet.jpg" />
+    <Content Include="Media\BasicHuman\Textures\EuroSoldier_body.jpg" />
+    <Content Include="Media\BasicHuman\Textures\EuroSoldier_head.jpg" />
+    <Content Include="Media\BasicHuman\Textures\gign_skin.jpg" />
+    <Content Include="Media\BasicHuman\Textures\Pilot_body.jpg" />
+    <Content Include="Media\BasicHuman\Textures\Pilot_head.jpg" />
+    <Content Include="Media\BasicHuman\Textures\scout.jpg" />
+    <Content Include="Media\BasicHuman\Textures\WomanJeans_body.jpg" />
+    <Content Include="Media\BasicHuman\Textures\WomanJeans_head.jpg" />
+    <Content Include="Media\BasicHuman\WomanJeans-TgcSkeletalMesh.xml" />
+    <Content Include="Media\caja.jpg" />
+    <Content Include="Media\Ciudad\Ciudad-TgcScene.xml" />
+    <Content Include="Media\Ciudad\preview.jpg" />
+    <Content Include="Media\Ciudad\Textures\Door Rusty.jpg" />
+    <Content Include="Media\Ciudad\Textures\Floor.jpg" />
+    <Content Include="Media\Ciudad\Textures\GlassPattern.jpg" />
+    <Content Include="Media\Ciudad\Textures\Grass.jpg" />
+    <Content Include="Media\Ciudad\Textures\Grey Bricks.jpg" />
+    <Content Include="Media\Ciudad\Textures\Marble.jpg" />
+    <Content Include="Media\Ciudad\Textures\Metal Pattern.jpg" />
+    <Content Include="Media\Ciudad\Textures\Path.jpg" />
+    <Content Include="Media\Ciudad\Textures\Red Bricks.jpg" />
+    <Content Include="Media\Ciudad\Textures\Road Union.jpg" />
+    <Content Include="Media\Ciudad\Textures\Road.jpg" />
+    <Content Include="Media\Ciudad\Textures\Traffic Light.jpg" />
+    <Content Include="Media\Ciudad\Textures\White Wall.JPG" />
+    <Content Include="Media\Ciudad\Textures\Yellow Painted.jpg" />
+    <Content Include="Media\Decorativos\ArbolBananas\ArbolBananas-TgcScene.xml" />
+    <Content Include="Media\Decorativos\ArbolBananas\preview.jpg" />
+    <Content Include="Media\Decorativos\ArbolBananas\Textures\banana.jpg" />
+    <Content Include="Media\Decorativos\ArbolSelvatico2\ArbolSelvatico2-TgcScene.xml" />
+    <Content Include="Media\Decorativos\ArbolSelvatico2\preview.jpg" />
+    <Content Include="Media\Decorativos\ArbolSelvatico2\Textures\tree1.png" />
+    <Content Include="Media\Decorativos\Arbusto2\Arbusto2-TgcScene.xml" />
+    <Content Include="Media\Decorativos\Arbusto2\preview.jpg" />
+    <Content Include="Media\Decorativos\Arbusto2\Textures\Arbusto2.png" />
+    <Content Include="Media\Decorativos\Calabera\Calabera-TgcScene.xml" />
+    <Content Include="Media\Decorativos\Calabera\preview.jpg" />
+    <Content Include="Media\Decorativos\Calabera\Textures\spinesk.png" />
+    <Content Include="Media\Decorativos\EsqueletoHumano\Esqueleto-TgcScene.xml" />
+    <Content Include="Media\Decorativos\EsqueletoHumano\preview.jpg" />
+    <Content Include="Media\Decorativos\EsqueletoHumano\Textures\skeleton.png" />
+    <Content Include="Media\Decorativos\EstatuaFaraon\EstatuaFaraon-TgcScene.xml" />
+    <Content Include="Media\Decorativos\EstatuaFaraon\Textures\farao.png" />
+    <Content Include="Media\Decorativos\Palmera\Palmera-TgcScene.xml" />
+    <Content Include="Media\Decorativos\Palmera\preview.jpg" />
+    <Content Include="Media\Decorativos\Palmera\Textures\hojaPalmera.jpg" />
+    <Content Include="Media\Decorativos\Palmera\Textures\Palmera_Textura.jpg" />
+    <Content Include="Media\Decorativos\Palmera\Textures\troncoPalmera.jpg" />
+    <Content Include="Media\Decorativos\PilarEgipcio\PilarEgipcio-TgcScene.xml" />
+    <Content Include="Media\Decorativos\PilarEgipcio\preview.jpg" />
+    <Content Include="Media\Decorativos\PilarEgipcio\Textures\auvBG.jpg" />
+    <Content Include="Media\Decorativos\Roca\preview.jpg" />
+    <Content Include="Media\Decorativos\Roca\Roca-TgcScene.xml" />
+    <Content Include="Media\Decorativos\Roca\Textures\Piedra3.jpg" />
+    <Content Include="Media\hielo.jpg" />
+    <Content Include="Media\Jungla\Agua-TgcScene.xml" />
+    <Content Include="Media\Jungla\Jungla -TgcScene.xml" />
+    <Content Include="Media\Jungla\Plattform-TgcScene.xml" />
+    <Content Include="Media\Jungla\Textures\A3d_m1.jpg" />
+    <Content Include="Media\Jungla\Textures\agua.bmp" />
+    <Content Include="Media\Jungla\Textures\Agua.jpg" />
+    <Content Include="Media\Jungla\Textures\box1.jpg" />
+    <Content Include="Media\Jungla\Textures\box4.jpg" />
+    <Content Include="Media\Jungla\Textures\colonna1.jpg" />
+    <Content Include="Media\Jungla\Textures\Dark_wood.jpg" />
+    <Content Include="Media\Jungla\Textures\hojaPalmera.jpg" />
+    <Content Include="Media\Jungla\Textures\Hojas_selva.png" />
+    <Content Include="Media\Jungla\Textures\lianas.png" />
+    <Content Include="Media\Jungla\Textures\Palmera_Textura.jpg" />
+    <Content Include="Media\Jungla\Textures\pasto.jpg" />
+    <Content Include="Media\Jungla\Textures\pastoSelva2.jpg" />
+    <Content Include="Media\Jungla\Textures\Piedra3.jpg" />
+    <Content Include="Media\Jungla\Textures\piedraSelva.jpg" />
+    <Content Include="Media\Jungla\Textures\piedraSelva_pasto.jpg" />
+    <Content Include="Media\Jungla\Textures\piedraSelva_pasto2.jpg" />
+    <Content Include="Media\Jungla\Textures\piedra_piso-Selva2.jpg" />
+    <Content Include="Media\Jungla\Textures\PisoSelva11.jpg" />
+    <Content Include="Media\Jungla\Textures\Planta.png" />
+    <Content Include="Media\Jungla\Textures\Planta2.png" />
+    <Content Include="Media\Jungla\Textures\SassiWall1.jpg" />
+    <Content Include="Media\Jungla\Textures\WoodTexture.jpg" />
+    <Content Include="Media\logo.png" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
+    <Content Include="Media\nieve.jpg" />
+    <Content Include="Media\paredJungla.jpg" />
+    <Content Include="Media\piedra.png" />
+    <Content Include="Media\piso.jpg" />
+    <Content Include="Media\pisoJungla.jpg" />
+    <Content Include="Media\precipicio.jpg" />
+    <Content Include="Media\Robot\Arrojar-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\Caminando-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\Correr-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\Empujar-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\Parado-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\PasoDerecho-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\PasoIzquierdo-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\Patear-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\Pegar-TgcSkeletalAnim.xml" />
+    <Content Include="Media\Robot\Robot-TgcSkeletalMesh.xml" />
+    <Content Include="Media\Robot\Textures\uvw.jpg" />
+    <Content Include="Media\Robot\Textures\uvwGreen.jpg" />
+    <Content Include="Media\SkyBoxFaces\abajo.jpg" />
+    <Content Include="Media\SkyBoxFaces\arriba.jpg" />
+    <Content Include="Media\SkyBoxFaces\atras.jpg" />
+    <Content Include="Media\SkyBoxFaces\derecha.jpg" />
+    <Content Include="Media\SkyBoxFaces\frente.jpg" />
+    <Content Include="Media\SkyBoxFaces\izquierda.jpg" />
+    <Content Include="Media\stamina.png" />
+    <Content Include="Media\staminaUnidad.png" />
+    <Content Include="Media\tronco.jpg" />
+    <Content Include="obj\Debug\TGC.Group.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\Debug\TGC.Group.exe" />
+    <Content Include="obj\Debug\TGC.Group.pdb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="obj\Debug\TempPE\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
