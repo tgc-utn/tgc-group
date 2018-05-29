@@ -72,6 +72,8 @@ namespace TGC.Group.Model
         private bool jumping;
         private bool moving;
 
+        private List<TgcMesh> meshesConLuz;
+
         //Estados
         private bool paused = true;
         private bool perdiste = false;
@@ -571,11 +573,14 @@ namespace TGC.Group.Model
                         esferaPersonaje.Render();
                         escenario.RenderizarBoundingBoxes();
                     }
-                                    
-                    personaje.Effect.SetValue("lightColor", ColorValue.FromColor(Color.White));
-                    personaje.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(escenario.getClosestLight(personaje.Position,0f).Position));
-                    personaje.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
 
+                    TgcMesh closestLight = escenario.getClosestLight(personaje.Position, 0f);
+                    if(closestLight != null)
+                    {
+                        personaje.Effect.SetValue("lightColor", ColorValue.FromColor(Color.White));
+                        personaje.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(closestLight.Position));
+                        personaje.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+                    }
                     personaje.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
                     personaje.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
                     personaje.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
@@ -584,6 +589,12 @@ namespace TGC.Group.Model
 
                     personaje.Effect.SetValue("lightIntensity", 20);
                     personaje.Effect.SetValue("lightAttenuation", 25);
+
+                    foreach(TgcMesh mesh in meshesConLuz)
+                    {
+                        //mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
+                        mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+                    }
                     
               }
             }
@@ -688,6 +699,7 @@ namespace TGC.Group.Model
 
         public void inicializarIluminacion()
         {
+            meshesConLuz = new List<TgcMesh>();
             effectLuzComun = TgcShaders.Instance.TgcMeshPhongShader;
             effectLuzLava = effectLuzComun.Clone(effectLuzComun.Device);
             foreach (TgcMesh mesh in escenario.MeshesColisionables())
@@ -722,10 +734,10 @@ namespace TGC.Group.Model
                         mesh.Effect.SetValue("ambientColor", ColorValue.FromColor(Color.Red));
                         mesh.Effect.SetValue("diffuseColor", ColorValue.FromColor(Color.Red));
                         mesh.Effect.SetValue("specularColor", ColorValue.FromColor(Color.Orange));
-                        mesh.Effect.SetValue("specularExp", 1000f);
+                        mesh.Effect.SetValue("specularExp", 10000f);
                     }
+                meshesConLuz.Add(mesh);
                 }
-
                 //mesh.Technique = "RenderScene2";
             }
             personajeLightShader = TgcShaders.Instance.TgcSkeletalMeshPointLightShader;
