@@ -3,7 +3,6 @@ using TGC.Core.Camara;
 using TGC.Core.Collision;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
-using TGC.Examples.Collision.SphereCollision;
 using TGC.Group.Model.Niveles;
 
 namespace TGC.Group.Model.Scenes {

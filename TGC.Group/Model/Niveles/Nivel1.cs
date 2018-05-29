@@ -1,4 +1,5 @@
 ﻿using TGC.Core.Direct3D;
+using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
