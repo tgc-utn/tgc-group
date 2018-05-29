@@ -163,8 +163,6 @@ namespace TGC.Group.Model {
             // movimiento por teclado
             vel += dir * deltaTime;
 
-            if (dir.Y != 0) vel.Y = dir.Y;
-
             // movimiento por entorno
             TgcBoundingAxisAlignBox piso = nivel.getBoundingBoxes().Find(b => TgcCollisionUtils.testSphereAABB(pies, b));
 
@@ -175,10 +173,12 @@ namespace TGC.Group.Model {
                 }
             } else {
                 // si estoy en algun piso
-                dir.Y = 0;
+                vel.Y = 0;
                 aterrizar();
                 modificarMovimientoSegunPiso(piso, nivel, deltaTime);
             }
+
+            if (dir.Y != 0) vel.Y = dir.Y;
 
             TGCVector3 horizontal = new TGCVector3 {
                 X = vel.X,

@@ -14,9 +14,9 @@ namespace TGC.Group.Model {
         }
 
         public void Update(float deltaTime) {
-            box.Move(TGCVector3.Up * vel);
+            box.Move(TGCVector3.Up * vel * deltaTime);
             box.Transform = TGCMatrix.Translation(box.Position);
-            alturaRecorrida += vel;
+            alturaRecorrida += vel * deltaTime;
 
             if (alturaRecorrida > altura || alturaRecorrida < 0) {
                 vel *= -1;
@@ -27,7 +27,7 @@ namespace TGC.Group.Model {
             return TGCVector3.Up * vel;
         }
 
-        public void Render() {
+        public override void Render() {
             box.Render();
             box.BoundingBox.Render();
         }

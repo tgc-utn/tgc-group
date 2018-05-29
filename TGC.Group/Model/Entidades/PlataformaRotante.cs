@@ -19,6 +19,11 @@ namespace TGC.Group.Model {
             box.Transform = TGCMatrix.RotationY(box.Rotation.Y) * TGCMatrix.Translation(box.Position);
         }
 
+        public override void Render() {
+            base.Render();
+            box.BoundingBox.Render();
+        }
+
         public TGCVector3 getVelAsVector(TGCVector3 personajePos) {
             var distanceFromCenter = personajePos - box.Position;
             distanceFromCenter.Y = 0;

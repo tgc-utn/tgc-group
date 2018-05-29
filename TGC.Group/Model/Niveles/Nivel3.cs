@@ -69,7 +69,7 @@ namespace TGC.Group.Model.Niveles
             pDesplazan.Add(new PlataformaDesplazante(new TGCVector3(0, 275, 1900), new TGCVector3(200, 50, 200), caja, new TGCVector3(0, 275, 1100), new TGCVector3(0, 0, VELPEPE)));
 
             // Ascensor para pasar de inferiores a superiores
-            pAscensor.Add(new PlataformaAscensor(new TGCVector3(0, 25, 4750), new TGCVector3(300, 50, 500), piedra, 275f, 0.5f));
+            pAscensor.Add(new PlataformaAscensor(new TGCVector3(0, 25, 4750), new TGCVector3(300, 50, 500), piedra, 275f, 100));
 
             // Plataformas rotantes, en nivel superior
             pRotantes.Add(new PlataformaRotante(new TGCVector3(-200, 50, 3000), new TGCVector3(300, 50, 200), caja, FastMath.PI * 100));
