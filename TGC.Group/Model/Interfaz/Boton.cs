@@ -25,6 +25,8 @@ namespace TGC.Group.Model.Interfaz {
 
                     action();
                 }
+            } else {
+                texto.Color = Color.White;
             }
         }
     }
