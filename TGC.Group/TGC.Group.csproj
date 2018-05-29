@@ -327,6 +327,7 @@
     <Content Include="Media\Jungla\Textures\Planta2.png" />
     <Content Include="Media\Jungla\Textures\SassiWall1.jpg" />
     <Content Include="Media\Jungla\Textures\WoodTexture.jpg" />
+    <Content Include="Media\logo.png" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
     <Content Include="Media\nieve.jpg" />
     <Content Include="Media\paredJungla.jpg" />
@@ -346,6 +347,12 @@
     <Content Include="Media\Robot\Robot-TgcSkeletalMesh.xml" />
     <Content Include="Media\Robot\Textures\uvw.jpg" />
     <Content Include="Media\Robot\Textures\uvwGreen.jpg" />
+    <Content Include="Media\SkyBoxFaces\abajo.jpg" />
+    <Content Include="Media\SkyBoxFaces\arriba.jpg" />
+    <Content Include="Media\SkyBoxFaces\atras.jpg" />
+    <Content Include="Media\SkyBoxFaces\derecha.jpg" />
+    <Content Include="Media\SkyBoxFaces\frente.jpg" />
+    <Content Include="Media\SkyBoxFaces\izquierda.jpg" />
     <Content Include="Media\tronco.jpg" />
     <Content Include="obj\Debug\TGC.Group.csproj.FileListAbsolute.txt" />
     <Content Include="obj\Debug\TGC.Group.exe" />

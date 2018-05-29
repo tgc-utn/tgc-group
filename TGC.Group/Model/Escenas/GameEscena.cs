@@ -44,23 +44,7 @@ namespace TGC.Group.Model.Scenes {
             nivel.update(deltaTime);
 
             // checkeo sobre que estoy parado
-            // TODO: hacer funcion aparte
-            foreach (var box in nivel.getPisos()) {
-                if (TgcCollisionUtils.testSphereAABB(personaje.getPies(), box)) {
-                    if (nivel.esPisoDesplazante(box)) {
-                        personaje.addVelocity(nivel.getPlataformaDesplazante(box).getVelocity());
-                    } else if (nivel.esPisoRotante(box)) {
-                        var plataformaRotante = nivel.getPlataformaRotante(box);
-                        personaje.addVelocity(plataformaRotante.getVelAsVector(personaje.getPosition()) * deltaTime);
-                        personaje.setRotation(plataformaRotante.getAngle());
-                    } else if (nivel.esPisoAscensor(box)) {
-                        personaje.addVelocity(nivel.getPlataformaAscensor(box).getVel());
-                    }
-
-                    personaje.aterrizar();
-                    personaje.setPatinando(nivel.esPisoResbaladizo(box));
-                }
-            }
+            checkearDesplazamientoPorPlataformas(deltaTime);
 
             // Checkear si toque la levelFinishBox
             if (nivel.getLFBox() != null && TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), nivel.getLFBox())) {
@@ -124,6 +108,35 @@ namespace TGC.Group.Model.Scenes {
                     }
 
                     caja.move(cajaMovementDeseado); //TEMP
+                }
+            }
+        }
+
+        private void checkearDesplazamientoPorPlataformas(float deltaTime)
+        {
+            foreach (var box in nivel.getPisos())
+            {
+                if (TgcCollisionUtils.testSphereAABB(personaje.getPies(), box))
+                {
+
+                    if (nivel.esPisoDesplazante(box))
+                    {
+                        personaje.addVelocity(nivel.getPlataformaDesplazante(box).getVelocity());
+                    }
+                    else if (nivel.esPisoRotante(box))
+                    {
+                        var plataformaRotante = nivel.getPlataformaRotante(box);
+                        personaje.addVelocity(plataformaRotante.getVelAsVector(personaje.getPosition()) * deltaTime);
+                        personaje.setRotation(plataformaRotante.getAngle());
+                    }
+                    else if (nivel.esPisoAscensor(box))
+                    {
+                        personaje.addVelocity(nivel.getPlataformaAscensor(box).getVel());
+                    }
+
+                    personaje.aterrizar();
+                    personaje.setPatinando(nivel.esPisoResbaladizo(box));
+
                 }
             }
         }
