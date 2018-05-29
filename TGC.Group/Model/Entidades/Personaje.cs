@@ -410,5 +410,6 @@ namespace TGC.Group.Model {
         }
 
         public int getStamina() => stamina;
+        public int getVidas() => vidas;
     }
 }

@@ -20,6 +20,7 @@ namespace TGC.Group.Model.Scenes {
         private Sprite hud;
         private TgcTexture barraStamina;
         private TgcTexture unidadStamina;
+        private TgcTexture vida;
 
         public void init(string mediaDir) {
             cameraOffset = new TGCVector3(0, 200, 400);
@@ -29,6 +30,7 @@ namespace TGC.Group.Model.Scenes {
             hud = new Sprite(D3DDevice.Instance.Device);
             barraStamina = TgcTexture.createTexture(mediaDir + "stamina.png");
             unidadStamina = TgcTexture.createTexture(mediaDir + "staminaUnidad.png");
+            vida = TgcTexture.createTexture(mediaDir + "vida.png");
         }
 
         public void setNivel(Nivel nuevoNivel) {
@@ -76,6 +78,16 @@ namespace TGC.Group.Model.Scenes {
             hud.Draw(barraStamina.D3dTexture, Vector3.Empty, Vector3.Empty, 16777215);
             hud.Transform = TGCMatrix.Scaling(new TGCVector3(personaje.getStamina() / 200f * 256f, 2, 1));
             hud.Draw(unidadStamina.D3dTexture, Vector3.Empty, Vector3.Empty, 16777215);
+
+            int posVidas = D3DDevice.Instance.Device.Viewport.Width - vida.Width;
+
+            for (int i = 0; i < personaje.getVidas(); i++) {
+                hud.Transform = TGCMatrix.Translation(new TGCVector3(posVidas, 0, 0));
+                hud.Draw(vida.D3dTexture, Vector3.Empty, Vector3.Empty, 16777215);
+                posVidas -= vida.Width;
+            }
+
+
             hud.End();
         }
 
