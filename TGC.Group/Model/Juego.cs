@@ -170,6 +170,7 @@ namespace TGC.Group.Model
             var d3dDevice = D3DDevice.Instance.Device;
 
 
+
             //Objeto que conoce todos los path de MediaDir
             directorio = new Directorio(MediaDir);
 
@@ -210,7 +211,6 @@ namespace TGC.Group.Model
             scaleBoundingVector = new TGCVector3(1.5f, 1f, 1.2f);
             
 
-
             //Inicializamos el collisionManager.
             ColisionadorEsferico = new SphereCollisionManager();
             ColisionadorEsferico.GravityEnabled = true;
@@ -234,12 +234,12 @@ namespace TGC.Group.Model
 
             Frustum.Color = Color.Black;
 
+           
             inicializarGUIPrincipal();
             inicializarGUISecundaria();
             inicializarIluminacion();
             inicializarHUDS(d3dDevice);
 
-           
 
         }
 
