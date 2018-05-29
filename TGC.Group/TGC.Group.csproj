@@ -97,6 +97,7 @@
     <Compile Include="Model\Entidades\PlataformaAscensor.cs" />
     <Compile Include="Model\Entidades\PlataformaDesplazante.cs" />
     <Compile Include="Model\Entidades\PlataformaRotante.cs" />
+    <Compile Include="Model\Escenas\GameOverEscena.cs" />
     <Compile Include="Model\Escenas\InicioEscena.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\Interfaz\Boton.cs" />

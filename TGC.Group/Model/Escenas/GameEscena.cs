@@ -50,10 +50,10 @@ namespace TGC.Group.Model.Scenes {
 
             checkearMuerte();
 
-            if (personaje.getPosition().Y < -1500) personaje.volverAlOrigen();
+            if (personaje.getPosition().Y < -1500) personaje.morir();
 
             // tecla de reset
-            if (input.keyPressed(Key.F9)) personaje.volverAlOrigen();
+            if (input.keyPressed(Key.F9)) personaje.morir();
 
             camara.SetCamera(personaje.getPosition() + cameraOffset, personaje.getPosition());
         }
@@ -117,7 +117,7 @@ namespace TGC.Group.Model.Scenes {
         private void checkearMuerte() {
             foreach (var box in nivel.getDeathPlanes()) {
                 if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), box)) {
-                    personaje.volverAlOrigen();
+                    personaje.morir();
                 }
             }
         }

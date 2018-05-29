@@ -7,7 +7,9 @@ using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.Text;
+using TGC.Group.Model.Escenas;
 using TGC.Group.Model.Niveles;
+using TGC.Group.Model.Scenes;
 
 namespace TGC.Group.Model {
     class Personaje {
@@ -15,6 +17,8 @@ namespace TGC.Group.Model {
         private TgcBoundingSphere pies;
 
         private TGCVector3 POS_ORIGEN = new TGCVector3(0, 7.5f, 9000);
+
+        private int vidas;
 
         // animaciones
         private TgcSkeletalMesh mesh;
@@ -69,6 +73,7 @@ namespace TGC.Group.Model {
             posicionPies.Y = mesh.BoundingBox.PMin.Y;
 
             pies = new TgcBoundingSphere(posicionPies, 20);
+            vidas = 3;
         }
 
         public void update(float deltaTime, TgcD3dInput Input) {
@@ -85,9 +90,8 @@ namespace TGC.Group.Model {
             pies.Render();
 
             TgcText2D t = new TgcText2D();
-            t.Text = distance.ToString();
+            t.Text = vidas.ToString();
             t.render();
-
 
             // seria un post-update
             resetUpdateVariables();
@@ -335,7 +339,12 @@ namespace TGC.Group.Model {
             meshAngle = angle;
         }
 
-        public void volverAlOrigen() {
+        public void morir() {
+            if (vidas == 0) {
+                EscenaManager.getInstance().goBack();
+                EscenaManager.getInstance().addScene(new GameOverEscena());
+            }
+
             mesh.Position = POS_ORIGEN;
             boundingSphere.setValues(mesh.BoundingBox.calculateBoxCenter(), mesh.BoundingBox.calculateBoxRadius());
 
@@ -345,6 +354,7 @@ namespace TGC.Group.Model {
 
             dir = TGCVector3.Empty;
             vel = TGCVector3.Empty;
+            vidas--;
         }
     }
 }

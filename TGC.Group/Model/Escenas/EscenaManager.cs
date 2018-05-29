@@ -60,6 +60,7 @@ namespace TGC.Group.Model.Scenes {
 
         public void goBack() {
             scenes.Pop();
+            proxima = scenes.Peek();
         }
     }
 }
