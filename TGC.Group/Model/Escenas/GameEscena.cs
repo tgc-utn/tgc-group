@@ -16,7 +16,7 @@ namespace TGC.Group.Model.Scenes {
         private Nivel nivel;
         private TGCVector3 cameraOffset;
 
-        private TGCVector3 VEC_GRAVEDAD = new TGCVector3(0, -0.25f, 0);
+        private TGCVector3 VEC_GRAVEDAD = new TGCVector3(0, -25f, 0);
 
         public void init(string mediaDir) {
             cameraOffset = new TGCVector3(0, 200, 400);
@@ -40,29 +40,10 @@ namespace TGC.Group.Model.Scenes {
             checkearEmpujeCajas();
             aplicarGravedadCajas();
 
-            personaje.move(personaje.getVelocity(), deltaTime, nivel.getBoundingBoxes(), VEC_GRAVEDAD);
+            personaje.move(deltaTime, nivel.getBoundingBoxes(), VEC_GRAVEDAD);
 
 
             nivel.update(deltaTime);
-
-            // checkeo sobre que estoy parado
-            // TODO: hacer funcion aparte
-            foreach (var box in nivel.getPisos()) {
-                if (TgcCollisionUtils.testSphereAABB(personaje.getPies(), box)) {
-                    if (nivel.esPisoDesplazante(box)) {
-                        personaje.addVelocity(nivel.getPlataformaDesplazante(box).getVelocity());
-                    } else if (nivel.esPisoRotante(box)) {
-                        var plataformaRotante = nivel.getPlataformaRotante(box);
-                        personaje.addVelocity(plataformaRotante.getVelAsVector(personaje.getPosition()) * deltaTime);
-                        personaje.setRotation(plataformaRotante.getAngle());
-                    } else if (nivel.esPisoAscensor(box)) {
-                        personaje.addVelocity(nivel.getPlataformaAscensor(box).getVel());
-                    }
-
-                    personaje.aterrizar();
-                    personaje.setPatinando(nivel.esPisoResbaladizo(box));
-                }
-            }
 
             // Checkear si toque la levelFinishBox
             if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), nivel.getLFBox())) {
