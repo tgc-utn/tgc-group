@@ -43,6 +43,7 @@ namespace TGC.Group.Model {
         private const float MULT_CAMINAR = 0.5f;
         private const float VEL_TERMINAL = -10;
         private const float MODIFICADOR_HIELO = 0.75f;
+        private const int SIZE_PIES = 10;
         private TgcRay rayoVelocidad = new TgcRay();
 
         // saltos
@@ -82,7 +83,7 @@ namespace TGC.Group.Model {
             var posicionPies = mesh.BoundingBox.calculateBoxCenter();
             posicionPies.Y = mesh.BoundingBox.PMin.Y;
 
-            pies = new TgcBoundingSphere(posicionPies, 10);
+            pies = new TgcBoundingSphere(posicionPies, SIZE_PIES);
 
             sombraTexture = TgcTexture.createTexture(MediaDir + "sombra.png");
             sombra = TGCBox.fromSize(posicionPies, new TGCVector3(100, 1, 100), sombraTexture);
@@ -122,6 +123,7 @@ namespace TGC.Group.Model {
             float FRAME_WALK_SPEED = WALK_SPEED;
             dir = TGCVector3.Empty;
 
+            // caminar
             if (Input.keyDown(Key.W) || Input.keyDown(Key.UpArrow)) {
                 dir.Z = -FRAME_WALK_SPEED;
                 moving = true;
@@ -145,13 +147,9 @@ namespace TGC.Group.Model {
                 moving = true;
                 meshAngle = 3;
             }
-            
-            if (Input.keyPressed(Key.Space) && saltosRestantes > 0) {
-                dir.Y = JUMP_SPEED;
-                saltosRestantes--;
-            }
 
-            if (Input.keyDown(Key.LeftShift) && !agotado) {
+            // correr
+            if (Input.keyDown(Key.LeftShift) && !agotado && dir.Length() != 0) {
                 dir.X = dir.X * MULT_CORRER;
                 dir.Z = dir.Z * MULT_CORRER;
                 stamina--;
@@ -167,6 +165,12 @@ namespace TGC.Group.Model {
             if (stamina > MAX_STAMINA) {
                 stamina = MAX_STAMINA;
                 agotado = false;
+            }
+            
+            // saltar
+            if (Input.keyPressed(Key.Space) && saltosRestantes > 0) {
+                dir.Y = JUMP_SPEED;
+                saltosRestantes--;
             }
         }
 
@@ -398,11 +402,13 @@ namespace TGC.Group.Model {
 
             var posicionPies = mesh.BoundingBox.calculateBoxCenter();
             posicionPies.Y = mesh.BoundingBox.PMin.Y;
-            pies.setValues(posicionPies, 10);
+            pies.setValues(posicionPies, SIZE_PIES);
 
             dir = TGCVector3.Empty;
             vel = TGCVector3.Empty;
             vidas--;
         }
+
+        public int getStamina() => stamina;
     }
 }

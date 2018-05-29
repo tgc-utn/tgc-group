@@ -1,8 +1,12 @@
-﻿using Microsoft.DirectX.DirectInput;
+﻿using Microsoft.DirectX;
+using Microsoft.DirectX.Direct3D;
+using Microsoft.DirectX.DirectInput;
 using TGC.Core.Camara;
 using TGC.Core.Collision;
+using TGC.Core.Direct3D;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
+using TGC.Core.Textures;
 using TGC.Group.Model.Niveles;
 
 namespace TGC.Group.Model.Scenes {
@@ -13,10 +17,18 @@ namespace TGC.Group.Model.Scenes {
 
         private TGCVector3 VEC_GRAVEDAD = new TGCVector3(0, -25f, 0);
 
+        private Sprite hud;
+        private TgcTexture barraStamina;
+        private TgcTexture unidadStamina;
+
         public void init(string mediaDir) {
             cameraOffset = new TGCVector3(0, 200, 400);
             setNivel(new Nivel3(mediaDir));
             personaje = new Personaje(mediaDir);
+
+            hud = new Sprite(D3DDevice.Instance.Device);
+            barraStamina = TgcTexture.createTexture(mediaDir + "stamina.png");
+            unidadStamina = TgcTexture.createTexture(mediaDir + "staminaUnidad.png");
         }
 
         public void setNivel(Nivel nuevoNivel) {
@@ -58,11 +70,20 @@ namespace TGC.Group.Model.Scenes {
         public void render(float deltaTime) {
             nivel.render();
             personaje.render(deltaTime);
+
+            hud.Begin(SpriteFlags.None);
+            hud.Transform = TGCMatrix.Scaling(TGCVector3.One);
+            hud.Draw(barraStamina.D3dTexture, Vector3.Empty, Vector3.Empty, 16777215);
+            hud.Transform = TGCMatrix.Scaling(new TGCVector3(personaje.getStamina() / 200f * 256f, 2, 1));
+            hud.Draw(unidadStamina.D3dTexture, Vector3.Empty, Vector3.Empty, 16777215);
+            hud.End();
         }
 
         public void dispose() {
             personaje.dispose();
             nivel.dispose();
+            unidadStamina.dispose();
+            barraStamina.dispose();
         }
 
         private void checkearEmpujeCajas() {

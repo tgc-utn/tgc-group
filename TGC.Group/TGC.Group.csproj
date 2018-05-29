@@ -369,6 +369,8 @@
     <Content Include="Media\SkyBoxFaces\derecha.jpg" />
     <Content Include="Media\SkyBoxFaces\frente.jpg" />
     <Content Include="Media\SkyBoxFaces\izquierda.jpg" />
+    <Content Include="Media\stamina.png" />
+    <Content Include="Media\staminaUnidad.png" />
     <Content Include="Media\tronco.jpg" />
     <Content Include="obj\Debug\TGC.Group.csproj.FileListAbsolute.txt" />
     <Content Include="obj\Debug\TGC.Group.exe" />
