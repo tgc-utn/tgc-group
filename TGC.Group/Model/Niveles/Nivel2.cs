@@ -1,14 +1,11 @@
 ﻿using TGC.Core.Direct3D;
-using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
-using TGC.Group.Model.Niveles;
 
 // SEGUNDO NIVEL, GLACIARES
 
-namespace TGC.Group.Model.Niveles
-{
+namespace TGC.Group.Model.Niveles {
     class Nivel2 : Nivel
     {
 
@@ -19,10 +16,10 @@ namespace TGC.Group.Model.Niveles
         private TgcMesh roca;
 
         public Nivel2(string mediaDir) : base(mediaDir) {
+            siguienteNivel = null;
         }
 
-        public override void init(string mediaDir)
-        {
+        public override void init(string mediaDir) {
 
             // Texturas empleadas
             nieve = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "nieve.jpg");

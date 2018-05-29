@@ -25,7 +25,7 @@ namespace TGC.Group.Model.Niveles {
         protected List<TgcMesh> decorativos;
         protected List<TgcBoundingAxisAlignBox> aabbDeDecorativos;
         protected TgcSceneLoader loaderDeco;
-        protected Plataforma lfBox;
+        protected TGCBox lfBox;
         public Nivel siguienteNivel;
 
         public Nivel(string mediaDir) {
@@ -55,6 +55,7 @@ namespace TGC.Group.Model.Niveles {
 
         public void render() {
             getRenderizables().ForEach(r => r.Render());
+            if (lfBox != null) lfBox.BoundingBox.Render();
         }
 
         public abstract void dispose();
@@ -113,9 +114,9 @@ namespace TGC.Group.Model.Niveles {
             return cajas;
         }
 
-        public TgcBoundingAxisAlignBox getLFBox()
-        {
-            return lfBox.getAABB();
+        public TgcBoundingAxisAlignBox getLFBox() {
+            if (lfBox == null) return null;
+            return lfBox.BoundingBox;
         }
 
         public bool esPisoResbaladizo(TgcBoundingAxisAlignBox piso) {

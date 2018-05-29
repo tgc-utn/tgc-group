@@ -20,7 +20,7 @@ namespace TGC.Group.Model.Scenes {
             personaje = new Personaje(mediaDir);
 
             // TEMP
-            setNivel(new NivelDemo(mediaDir));
+            setNivel(new Nivel2(mediaDir));
 
             collisionManager = new SphereCollisionManager();
             collisionManager.GravityEnabled = true;
@@ -63,8 +63,12 @@ namespace TGC.Group.Model.Scenes {
             }
 
             // Checkear si toque la levelFinishBox
-            if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), nivel.getLFBox())) {
-                setNivel(nivel.siguienteNivel);
+            if (nivel.getLFBox() != null && TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), nivel.getLFBox())) {
+                if (nivel.siguienteNivel == null) {
+                    EscenaManager.getInstance().goBack();
+                } else {
+                    setNivel(nivel.siguienteNivel);
+                }
             }
 
             checkearMuerte();
