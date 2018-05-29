@@ -1,5 +1,8 @@
 ﻿using Microsoft.DirectX.DirectInput;
+using System.Collections.Generic;
+using System.Linq;
 using TGC.Core.BoundingVolumes;
+using TGC.Core.Collision;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SkeletalAnimation;
@@ -23,6 +26,7 @@ namespace TGC.Group.Model {
         private const float MULT_CORRER = 1.5f;
         private const float MULT_CAMINAR = 0.5f;
         private bool patinando = false;
+        private TgcRay rayoVelocidad = new TgcRay();
 
         // saltos
         private int saltosRestantes = 0;
@@ -86,6 +90,7 @@ namespace TGC.Group.Model {
         private void checkInputs(TgcD3dInput Input, float deltaTime) {
             float FRAME_WALK_SPEED = WALK_SPEED * deltaTime;
             float FRAME_JUMP_SPEED = JUMP_SPEED * deltaTime;
+
             if (Input.keyDown(Key.W) || Input.keyDown(Key.UpArrow)) {
                 vel.Z = -FRAME_WALK_SPEED;
                 moving = true;
@@ -144,20 +149,63 @@ namespace TGC.Group.Model {
             meshAngleAnterior = meshAngle;
         }
         
-        public void move(TGCVector3 movement) {
-            // deshago el movimiento del manager
-            boundingSphere.moveCenter(-movement);
-            // limite de velocidad
-            if (movement.X > WALK_SPEED * MULT_CORRER) movement.X = WALK_SPEED * 1.5f;
-            if (movement.Z > WALK_SPEED * MULT_CORRER) movement.Z = WALK_SPEED * 1.5f;
-            if (movement.X < WALK_SPEED * MULT_CORRER * -1) movement.X = WALK_SPEED * 1.5f * -1;
-            if (movement.Z < WALK_SPEED * MULT_CORRER * -1) movement.Z = WALK_SPEED * 1.5f * -1;
+        public void move(TGCVector3 movement, float deltaTime, List<TgcBoundingAxisAlignBox> colliders, TGCVector3 gravedad, int count) {
+            if (count > 5) return;
 
+            movimientoVertical(movement, colliders, gravedad);
+
+            rayoVelocidad.Origin = this.getPies().Center;
+            rayoVelocidad.Direction = movement;
+
+            TGCVector3 aux = new TGCVector3();
+
+            TgcBoundingAxisAlignBox paredCercana = colliders
+                // tomo las aabb que colisionan
+                .Where(b => TgcCollisionUtils.intersectRayAABB(rayoVelocidad, b, out aux))
+                // ordeno por distancia
+                .OrderBy(b => {
+                    TgcCollisionUtils.intersectRayAABB(rayoVelocidad, b, out aux);
+                    return aux.Length();
+                })
+                // tomo la primera
+                .DefaultIfEmpty(null)
+                .First();
+
+            if (paredCercana == null) {
+                this.translate(movement);
+            } else if (movement.Length() > 1) {
+                // llamo a la función una vez mas para obtener la intersección en aux
+                TgcCollisionUtils.intersectRayAABB(rayoVelocidad, paredCercana, out aux);
+
+                TGCVector3 radius = 
+                    TGCVector3.Normalize(movement) * this.getBoundingSphere().Radius;
+
+                TGCVector3 distance =
+                    TgcCollisionUtils.closestPointAABB(this.getBoundingSphere().Center, paredCercana) - this.getBoundingSphere().Center;
+                
+                if ((radius + movement).Length() < distance.Length()) {
+                    this.translate(movement);
+                } else {
+                    var foo = TGCVector3.Normalize(movement) * distance.Length();
+                    movement = TGCVector3.Normalize(foo - distance) * WALK_SPEED * deltaTime;
+
+                    this.move(movement, deltaTime, colliders, gravedad, count + 1);
+                }
+            }
+        }
+
+        public void move(TGCVector3 movement, float deltaTime, List<TgcBoundingAxisAlignBox> colliders, TGCVector3 gravedad) {
+            move(movement, deltaTime, colliders, gravedad, 0);
+        }
+
+        private void movimientoVertical(TGCVector3 movement, List<TgcBoundingAxisAlignBox> colliders TGCVector3 gravedad) {
+
+        }
+
+        private void translate(TGCVector3 movement) {
             mesh.Move(movement);
             pies.moveCenter(movement);
             boundingSphere.moveCenter(movement);
-
-            vel = movement;
         }
 
         private void resetUpdateVariables() {

@@ -1,8 +1,12 @@
 ﻿using Microsoft.DirectX.DirectInput;
+using System.Collections.Generic;
+using System.Linq;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.Camara;
 using TGC.Core.Collision;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
+using TGC.Core.Text;
 using TGC.Examples.Collision.SphereCollision;
 using TGC.Group.Model.Niveles;
 
@@ -11,7 +15,6 @@ namespace TGC.Group.Model.Scenes {
         private Personaje personaje;
         private Nivel nivel;
         private TGCVector3 cameraOffset;
-        private SphereCollisionManager collisionManager;
 
         private TGCVector3 VEC_GRAVEDAD = new TGCVector3(0, -0.25f, 0);
 
@@ -22,10 +25,6 @@ namespace TGC.Group.Model.Scenes {
             // TEMP
             setNivel(new NivelDemo(mediaDir));
 
-            collisionManager = new SphereCollisionManager();
-            collisionManager.GravityEnabled = true;
-            collisionManager.GravityForce = VEC_GRAVEDAD;
-            collisionManager.SlideFactor = 1.3f;
         }
 
         public void setNivel(Nivel nuevoNivel) {
@@ -40,6 +39,9 @@ namespace TGC.Group.Model.Scenes {
 
             checkearEmpujeCajas();
             aplicarGravedadCajas();
+
+            personaje.move(personaje.getVelocity(), deltaTime, nivel.getBoundingBoxes(), VEC_GRAVEDAD);
+
 
             nivel.update(deltaTime);
 
@@ -74,22 +76,16 @@ namespace TGC.Group.Model.Scenes {
             // tecla de reset
             if (input.keyPressed(Key.F9)) personaje.volverAlOrigen();
 
-            var movement = collisionManager.moveCharacter(
-                personaje.getBoundingSphere(),
-                personaje.getVelocity(),
-                nivel.getBoundingBoxes()
-            );
-
-            // muevo al personaje
-            personaje.move(movement);
-
-
             camara.SetCamera(personaje.getPosition() + cameraOffset, personaje.getPosition());
         }
 
         public void render(float deltaTime) {
             nivel.render();
             personaje.render(deltaTime);
+
+            TgcText2D t = new TgcText2D();
+            t.Text = personaje.getPosition().ToString();
+            t.render();
         }
 
         public void dispose() {
@@ -143,16 +139,13 @@ namespace TGC.Group.Model.Scenes {
             }
         }
 
-        private void checkearMuerte()
-        {
-            foreach (var box in nivel.getDeathPlanes())
-            {
-                if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), box))
-                {
+        private void checkearMuerte() {
+            foreach (var box in nivel.getDeathPlanes()) {
+                if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), box)) {
                     personaje.volverAlOrigen();
                 }
             }
         }
 
     }
-}
+} 

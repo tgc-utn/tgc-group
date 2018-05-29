@@ -65,6 +65,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.DirectInput.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DirectX.Direct3DX, Version=1.0.2910.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2910.0\Microsoft.DirectX.Direct3DX.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualC" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -87,7 +91,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
-    <Compile Include="Model\Caja.cs" />
+    <Compile Include="Model\Entidades\Caja.cs" />
+    <Compile Include="Model\Entidades\Personaje.cs" />
+    <Compile Include="Model\Entidades\Plataforma.cs" />
+    <Compile Include="Model\Entidades\PlataformaAscensor.cs" />
+    <Compile Include="Model\Entidades\PlataformaDesplazante.cs" />
+    <Compile Include="Model\Entidades\PlataformaRotante.cs" />
     <Compile Include="Model\Escenas\InicioEscena.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\Interfaz\Boton.cs" />
@@ -97,12 +106,7 @@
     <Compile Include="Model\Niveles\Nivel2.cs" />
     <Compile Include="Model\Niveles\NivelDemo.cs" />
     <Compile Include="Model\Niveles\Nivel.cs" />
-    <Compile Include="Model\Personaje.cs" />
     <Compile Include="Model\Collision\SphereCollisionManager.cs" />
-    <Compile Include="Model\Plataforma.cs" />
-    <Compile Include="Model\PlataformaAscensor.cs" />
-    <Compile Include="Model\PlataformaDesplazante.cs" />
-    <Compile Include="Model\PlataformaRotante.cs" />
     <Compile Include="Model\Escenas\GameEscena.cs" />
     <Compile Include="Model\Escenas\Escena.cs" />
     <Compile Include="Model\Escenas\EscenaManager.cs" />
@@ -323,6 +327,7 @@
     <Content Include="Media\Jungla\Textures\Planta2.png" />
     <Content Include="Media\Jungla\Textures\SassiWall1.jpg" />
     <Content Include="Media\Jungla\Textures\WoodTexture.jpg" />
+    <Content Include="Media\logo.png" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
     <Content Include="Media\nieve.jpg" />
     <Content Include="Media\paredJungla.jpg" />
