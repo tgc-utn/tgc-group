@@ -91,7 +91,8 @@ namespace TGC.Group.Model
 
         //Api gui
         private DXGui gui = new DXGui();
-
+        private DXGui gui_partida_perdidad = new DXGui();
+        
         public const int IDOK = 0;
 
         public const int IDCANCEL = 1;
@@ -183,8 +184,8 @@ namespace TGC.Group.Model
             personaje.playAnimation("Parado", true);
 
             //Posicion inicial
-            personaje.position(new TGCVector3(400, escenario.Ypiso, -900));
-            //personaje.position(new TGCVector3(-4133.616f, 20f, 5000f));
+            //personaje.position(new TGCVector3(400, escenario.Ypiso, -900));
+            personaje.position(new TGCVector3(-4133.616f, 20f, 5000f));
 
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.autoTransform(false);
@@ -231,7 +232,8 @@ namespace TGC.Group.Model
 
             Frustum.Color = Color.Black;
 
-            inicializarGUI();
+            inicializarGUIPrincipal();
+            inicializarGUISecundaria();
             inicializarIluminacion();
             inicializarHUDS(d3dDevice);
 
@@ -663,15 +665,7 @@ namespace TGC.Group.Model
                 }
                 else
                 {
-                    DrawText.drawText("Perdiste" + "\n" + "¿Reiniciar? (Y)", 500, 500, Color.Red);
-                    //personaje.render();
-                    //gui_render(ElapsedTime);
-                    //GuiMessage gs = gui.Update(ElapsedTime, Input);
-                    //gui.Menu_Perdiste("Perdiste, Desea Reiniciar el Juego?", directorio.Menu, "Crash Bandicoot");
-
-                    //menu = true;
-                    //TODO: menu perdiste
-
+                    gui_partida_perdida_render(ElapsedTime);
                 }
             }
 
@@ -698,7 +692,7 @@ namespace TGC.Group.Model
             textoMascaras.Dispose();
         }
 
-        public void inicializarGUI()
+        public void inicializarGUIPrincipal()
         {
             // levanto el GUI
             gui.Create(MediaDir);
@@ -706,7 +700,7 @@ namespace TGC.Group.Model
             //soundManager.playSonidoFondo();
 
             // menu principal
-            gui.InitDialog(true);
+            gui.InitDialog(false,false);
             int W = D3DDevice.Instance.Width;
             int H = D3DDevice.Instance.Height;
             int x0 = 70;
@@ -720,22 +714,74 @@ namespace TGC.Group.Model
             gui.InsertMenuItem(ID_JUGAR, "Jugar", "open.png", x0, y0, MediaDir, dx, dy);
             gui.InsertMenuItem(ID_CONFIGURAR, "Configurar", "navegar.png", x0+dx+item_epsilon, y0 , MediaDir, dx, dy);
             gui.InsertMenuItem(ID_APP_EXIT, "Salir", "salir.png", x0, y0 += dy2, MediaDir, dx, dy);
+           
+        }
+
+        public void inicializarGUISecundaria()
+        {
+           
+               
+            float W = D3DDevice.Instance.Width ;
+            float H = D3DDevice.Instance.Height ;
+
+            int dx = (int)(700.0f );
+            int dy = (int)(450.0f);
+            int x0 = (int)((W - dx) / 2);
+            int y0 = (int)((H - dy) / 2);
+            int r = 100;
+
+
+            gui_partida_perdidad.Create(MediaDir);
+            gui_partida_perdidad.InitDialog(false, false);
+            gui_partida_perdidad.InsertImage("menu_perdiste.png", 1850, 450, mediaDir);
+
+            gui_partida_perdidad.InsertFrame("", x0, y0, dx, dy, Color.FromArgb(0, 0, 0));
+            gui_partida_perdidad.InsertItem("Partida perdida, desea reiniciar el juego?", x0 + 200, y0 + 200);
+            gui_partida_perdidad.InsertCircleButton(0, "OK", "ok.png", x0 + 70, y0 + dy - r - 90, mediaDir, r);
+            gui_partida_perdidad.InsertCircleButton(1, "CANCEL", "cancel.png", x0 + dx - r - 70, y0 + dy - r - 90, mediaDir, r);
 
         }
 
-       
+        public void gui_partida_perdida_render(float elapsedTime)
+        {
+            GuiMessage mensaje_gui = gui_partida_perdidad.Update(elapsedTime, Input);
+
+
+            // proceso el msg
+            switch (mensaje_gui.message)
+            {
+                case MessageType.WM_COMMAND:
+                    switch (mensaje_gui.id)
+                    {
+                        case IDOK:
+                            Init();
+                            break;
+                        case IDCANCEL:
+                            System.Windows.Forms.Application.Exit();
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+
+            gui_partida_perdidad.Render();
+        }
 
         public void gui_render(float elapsedTime)
         {
             // ------------------------------------------------
-            GuiMessage msg = gui.Update(elapsedTime, Input);
-
-
+            GuiMessage mensaje_gui = gui.Update(elapsedTime, Input);
+            
+            
             // proceso el msg
-            switch (msg.message)
+            switch (mensaje_gui.message)
             {
                 case MessageType.WM_COMMAND:
-                    switch (msg.id)
+                    switch (mensaje_gui.id)
                     {
                         case IDOK:
 
@@ -746,7 +792,7 @@ namespace TGC.Group.Model
                             if (msg_box_app_exit)
                             {
                                 // Es la resupuesta a un messagebox de salir del sistema
-                                if (msg.id == IDOK)
+                                if (mensaje_gui.id == IDOK)
                                 {
                                     // Salgo del sistema
                                     System.Windows.Forms.Application.Exit();
@@ -760,11 +806,7 @@ namespace TGC.Group.Model
                             paused = false;
                             break;
 
-                        case ID_RESTART:
-                            menu = true;
-                            gui.Menu_Perdiste("Perdiste, Desea Reiniciar el Juego?", directorio.Menu, "Crash Bandicoot");
-                            break;
-
+                            
                         /*case ID_CONFIGURAR:
                             Configurar();
                             break;*/

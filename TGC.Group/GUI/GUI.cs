@@ -382,11 +382,11 @@ namespace TGC.Group.GUI
 
             InsertImage("menu_perdiste.png", 1850, 450, mediaDir);
 
-            InsertFrame(titulo, x0, y0, dx, dy, Color.FromArgb(0, 0, 0));
+            InsertFrame(titulo, x0, y0, dx, dy, Color.FromArgb(0,0,0));
             InsertItem(msg, x0 + 200, y0 + 200);
             InsertCircleButton(0, "OK", "ok.png", x0 + 70, y0 + dy - r - 90, mediaDir, r);
             InsertCircleButton(1, "CANCEL", "cancel.png", x0 + dx - r - 70, y0 + dy - r - 90, mediaDir, r);
-
+        
         }
 
         // input
