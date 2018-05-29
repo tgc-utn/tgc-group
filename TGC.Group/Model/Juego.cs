@@ -89,6 +89,7 @@ namespace TGC.Group.Model
         private Microsoft.DirectX.Direct3D.Effect effectLuzLava;
         private Microsoft.DirectX.Direct3D.Effect personajeLightShader;
 
+        #region APIGUI
         //Api gui
         private DXGui gui_primaria = new DXGui();
         private DXGui gui_secundaria = new DXGui();
@@ -139,6 +140,7 @@ namespace TGC.Group.Model
             public Int32 time;
             public POINTAPI pt;
         }
+        #endregion
 
         private Octree octree;
 
