@@ -108,6 +108,14 @@ namespace TGC.Group.Model.Niveles {
             return list;
         }
 
+        public List<TgcBoundingAxisAlignBox> getEstaticos()
+        {
+            var list = new List<TgcBoundingAxisAlignBox>();
+            list.AddRange(pEstaticas.Select(caja => caja.getAABB()).ToArray());
+
+            return list;
+        }
+
         public List<Caja> getCajas() {
             return cajas;
         }

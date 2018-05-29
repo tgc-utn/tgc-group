@@ -76,6 +76,7 @@ namespace TGC.Group.Model.Scenes {
                     var distanciaPersonajeCaja = caja.getCuerpo().calculateBoxCenter() - personaje.getBoundingSphere().Center;
                     var cajaMovementDeseado = TGCVector3.Empty;
 
+                    // TODO: Implementar checkearColisionesCajaEstaticos y evitar que queden pegadas
                     if (FastMath.Abs(distanciaPersonajeCaja.X) > FastMath.Abs(distanciaPersonajeCaja.Z)) {
                         if (distanciaPersonajeCaja.X > 0) {
                             cajaMovementDeseado = new TGCVector3(5, 0, 0);
@@ -93,6 +94,21 @@ namespace TGC.Group.Model.Scenes {
                     caja.move(cajaMovementDeseado); //TEMP
                 }
             }
+        }
+
+        // Checkeo si la caja esta colisionando con una plataforma estatica o pared
+        private bool checkearColisionCajaEstaticos(Caja unaCaja)
+        {
+
+            foreach(var estatico in nivel.getEstaticos())
+            {
+                if (TgcCollisionUtils.testAABBAABB(unaCaja.getCuerpo(), estatico))
+                {
+                    return true;
+                }
+            }
+            return false;
+
         }
 
         private void aplicarGravedadCajas() {

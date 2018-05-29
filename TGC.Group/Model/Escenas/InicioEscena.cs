@@ -1,6 +1,7 @@
 ﻿using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
 using System;
+using System.Drawing;
 using TGC.Core.Camara;
 using TGC.Core.Direct3D;
 using TGC.Core.Input;
@@ -24,10 +25,13 @@ namespace TGC.Group.Model.Escenas {
         }
 
         public void render(float deltaTime) {
+
+           // D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.White, 1.0f, 0);
             t.Render();
             s.Begin(SpriteFlags.None);
             s.Draw(logo, Vector3.Empty, Vector3.Empty, 16777215);
             s.End();
+
         }
 
         public void dispose() {

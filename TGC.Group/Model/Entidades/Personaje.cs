@@ -41,7 +41,8 @@ namespace TGC.Group.Model {
         // saltos
         private int saltosRestantes = 0;
         private const int SALTOS_TOTALES = 2;
-        private const float JUMP_SPEED = 10f;
+        private const float JUMP_SPEED = 10f; // PC Cristian
+        //private const float JUMP_SPEED = 5f; // PC Pepe
 
         public Personaje(string MediaDir) {
             dir = TGCVector3.Empty;
