@@ -348,6 +348,7 @@ namespace TGC.Group.Model
 
                 #endregion
 
+                #region Movimientos
                 //Vector de movimiento
 
                 var movimientoOriginal = new TGCVector3(0,0,0);
@@ -382,6 +383,7 @@ namespace TGC.Group.Model
 
                 //MOVIMIENTOS POR PISO
                 moverMundo(movimientoOriginal);
+                #endregion
 
                 //Ejecuta la animacion del personaje
                 personaje.playAnimation(animacion, true);
