@@ -1,11 +1,14 @@
 ﻿using TGC.Core.Direct3D;
+using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
+using TGC.Group.Model.Niveles;
 
 // SEGUNDO NIVEL, GLACIARES
 
 namespace TGC.Group.Model.Niveles {
+
     class Nivel2 : Nivel
     {
 
@@ -34,8 +37,8 @@ namespace TGC.Group.Model.Niveles {
 
             // Limites del pasillo-escenario
             // DEFINIR: Van en precipicio tambien o no?
-            agregarPared(new TGCVector3(710, 40, 5000), new TGCVector3(20, 80, 10000), hielo);  //limite izquierdo
-            agregarPared(new TGCVector3(-710, 40, 5000), new TGCVector3(20, 80, 10000), hielo); //limite derecho
+            agregarPared(new TGCVector3(710, 40, 5000), new TGCVector3(20, 80, 10000), hielo);  // limite izquierdo
+            agregarPared(new TGCVector3(-710, 40, 5000), new TGCVector3(20, 80, 10000), hielo); // limite derecho
             agregarPared(new TGCVector3(0, 40, 9990), new TGCVector3(1400, 80, 20), hielo);     // frente
             agregarPared(new TGCVector3(0, 40, 10), new TGCVector3(1400, 80, 20), hielo);       // fondo
 
@@ -89,6 +92,10 @@ namespace TGC.Group.Model.Niveles {
             cargarDecorativo(roca, escenasRocas[10], new TGCVector3(300, 0, 6500), new TGCVector3(8, 2, 5), 0);
             cargarDecorativo(roca, escenasRocas[11], new TGCVector3(-300, 0, 5500), new TGCVector3(8, 2, 5), 0);
 
+            lfBox = TGCBox.fromSize(new TGCVector3(0, 0, 100), new TGCVector3(100, 100, 100));
+
+            siguienteNivel = new Nivel3(mediaDir);
+
         }
 
         public override void dispose()
@@ -102,4 +109,5 @@ namespace TGC.Group.Model.Niveles {
         }
 
     }
+
 }

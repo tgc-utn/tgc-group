@@ -9,7 +9,7 @@ namespace TGC.Group.Model {
         private TgcBoundingSphere boundingSphere;
         private TgcBoundingSphere pies;
 
-        private TGCVector3 POS_ORIGEN = new TGCVector3(0, 7.5f, 200);
+        private TGCVector3 POS_ORIGEN = new TGCVector3(0, 7.5f, 9500);
 
         // animaciones
         private TgcSkeletalMesh mesh;

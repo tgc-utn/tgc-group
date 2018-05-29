@@ -20,7 +20,7 @@ namespace TGC.Group.Model.Scenes {
             personaje = new Personaje(mediaDir);
 
             // TEMP
-            setNivel(new Nivel2(mediaDir));
+            setNivel(new Nivel3(mediaDir));
 
             collisionManager = new SphereCollisionManager();
             collisionManager.GravityEnabled = true;

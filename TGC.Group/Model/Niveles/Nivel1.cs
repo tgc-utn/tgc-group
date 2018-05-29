@@ -7,8 +7,9 @@ using TGC.Group.Model.Niveles;
 
 //NIVEL INICIAL, JUNGLA
 
-namespace TGC.Group.Model {
-    class NivelDemo : Nivel {
+namespace TGC.Group.Model.Niveles {
+
+    class Nivel1 : Nivel {
 
         TgcTexture piso, limites, caja;
         TgcScene[] escenasBananas;
@@ -20,7 +21,7 @@ namespace TGC.Group.Model {
         private TgcMesh palmera;
         private TgcMesh roca;
 
-        public NivelDemo(string mediaDir) : base(mediaDir) {
+        public Nivel1(string mediaDir) : base(mediaDir) {
         }
 
         public override void init(string mediaDir) {
@@ -39,8 +40,8 @@ namespace TGC.Group.Model {
 
             // Limites del pasillo-escenario
             // DEFINIR: Van en precipicio tambien o no?
-            agregarPared(new TGCVector3(710, 40, 5000), new TGCVector3(20, 80, 10000), limites);  //limite izquierdo
-            agregarPared(new TGCVector3(-710, 40, 5000), new TGCVector3(20, 80, 10000), limites); //limite derecho
+            agregarPared(new TGCVector3(710, 40, 5000), new TGCVector3(20, 80, 10000), limites);  // limite izquierdo
+            agregarPared(new TGCVector3(-710, 40, 5000), new TGCVector3(20, 80, 10000), limites); // limite derecho
             agregarPared(new TGCVector3(0, 40, 9990), new TGCVector3(1400, 80, 20), limites);     // frente
             agregarPared(new TGCVector3(0, 40, 10), new TGCVector3(1400, 80, 20), limites);       // fondo
 
@@ -119,4 +120,5 @@ namespace TGC.Group.Model {
 
         }
     }
+
 }
