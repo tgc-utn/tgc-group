@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TGC.Core.Input;
 
 namespace TGC.Group.Model.Interfaz {
@@ -20,11 +16,12 @@ namespace TGC.Group.Model.Interfaz {
         }
 
         public override void Update(float deltaTime, TgcD3dInput input) {
-            if (input.buttonPressed(TgcD3dInput.MouseButtons.BUTTON_LEFT)) {
-                if (input.Xpos <= getRect().X + getRect().Width &&
-                    input.Xpos >= getRect().X &&
-                    input.Ypos <= getRect().Y + getRect().Height &&
-                    input.Ypos >= getRect().Y) {
+            if (input.Xpos <= getRect().X + getRect().Width &&
+                input.Xpos >= getRect().X &&
+                input.Ypos <= getRect().Y + getRect().Height &&
+                input.Ypos >= getRect().Y) {
+                texto.Color = Color.Red;
+                if (input.buttonPressed(TgcD3dInput.MouseButtons.BUTTON_LEFT)) {
 
                     action();
                 }
