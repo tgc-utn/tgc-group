@@ -70,7 +70,7 @@ namespace TGC.Group.Model
         private bool boundingBoxActivate = false;
         private PisoInercia pisoResbaloso = null; //Es null cuando no esta pisando ningun piso resbaloso
 
-        private bool jumping;
+        private int doubleJump = 0;
         private bool moving;
 
         private List<TgcMesh> meshesConLuz;
@@ -142,7 +142,7 @@ namespace TGC.Group.Model
         }
         #endregion
 
-        private Octree octree;
+        public static Octree octree;
 
         public static SoundManager soundManager;
 
@@ -186,8 +186,8 @@ namespace TGC.Group.Model
             personaje.playAnimation("Parado", true);
 
             //Posicion inicial
-            //personaje.position(new TGCVector3(400, escenario.Ypiso, -900));
-            personaje.position(new TGCVector3(-4133.616f, 20f, 5000f));
+            personaje.position(new TGCVector3(400, escenario.Ypiso, -900));
+           // personaje.position(new TGCVector3(-4133.616f, 20f, 5000f));
 
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.autoTransform(false);
@@ -250,6 +250,8 @@ namespace TGC.Group.Model
 
             //TODO: Reificar estos valores.
             //Obtenemos los valores default
+            if (movimientoRealPersonaje.Y == 0f) doubleJump = 2;
+
             var velocidadCaminar = 1000f;
             var coeficienteSalto = 30f;
             float saltoRealizado = 0;
@@ -293,9 +295,10 @@ namespace TGC.Group.Model
                 //TODO: No debe saltar cuando ya esta saltando
                 if (!interaccionCaja)
                 {
-                    if (Input.keyUp(Key.Space) && saltoActual < coeficienteSalto)
+                    if (Input.keyUp(Key.Space) && saltoActual < coeficienteSalto && doubleJump > 0)
                     {
                         saltoActual = coeficienteSalto;
+                        doubleJump -= 1;
                         soundManager.playSonidoSaltar();
                     }
                     if (Input.keyUp(Key.Space) || saltoActual > 0 )

@@ -14,7 +14,7 @@ namespace TGC.Group.Optimizacion
     {
         private readonly OctreeBuilder builder;
         private List<TgcBoxDebug> debugOctreeBoxes;
-        private List<TgcMesh> modelos;
+        public List<TgcMesh> modelos { get; set; }
         private OctreeNode octreeRootNode;
         private TgcBoundingAxisAlignBox sceneBounds;
 

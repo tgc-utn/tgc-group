@@ -96,8 +96,14 @@ namespace TGC.Group.Model
         public void eliminarMascaraColisionada()
         {
             TgcMesh mascaraColisionada = Mascaras().Find(mascara => TgcCollisionUtils.testAABBAABB(mascara.BoundingBox, personaje.boundingBox()));
-            mascaraColisionada.Enabled = false;
-            scene.Meshes.Remove(mascaraColisionada);
+            eliminarObjeto(mascaraColisionada);
+        }
+
+        private void eliminarObjeto(TgcMesh mesh)
+        {
+            mesh.Enabled = false;
+            scene.Meshes.Remove(mesh);
+            Juego.octree.modelos.Remove(mesh);
         }
 
         public bool personajeSobreFruta()
@@ -108,9 +114,7 @@ namespace TGC.Group.Model
         public void eliminarFrutaColisionada()
         {
             TgcMesh frutaColisionada = Frutas().Find(fruta => TgcCollisionUtils.testAABBAABB(fruta.BoundingBox, personaje.boundingBox()));
-            frutaColisionada.Enabled = false;
-            scene.Meshes.Remove(frutaColisionada);
-            //No se deberia renderizar mas
+            eliminarObjeto(frutaColisionada);
         }
 
         public bool personajeSobreLava()
