@@ -48,7 +48,6 @@ namespace TGC.Group.Model {
             skyBox.Init();
 
             // Setear musica de fondo
-
             musicaDeFondo = new TgcMp3Player();
             musicaDeFondo.FileName = (MediaDir + "\\NsanityBeach.mp3");
             musicaDeFondo.play(true);

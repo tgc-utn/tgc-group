@@ -316,6 +316,7 @@
     <Content Include="Media\Decorativos\Roca\preview.jpg" />
     <Content Include="Media\Decorativos\Roca\Roca-TgcScene.xml" />
     <Content Include="Media\Decorativos\Roca\Textures\Piedra3.jpg" />
+    <Content Include="Media\gameOverCrash.jpg" />
     <Content Include="Media\hielo.jpg" />
     <Content Include="Media\Jungla\Agua-TgcScene.xml" />
     <Content Include="Media\Jungla\Jungla -TgcScene.xml" />
@@ -346,6 +347,7 @@
     <Content Include="Media\logo.png" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
     <Content Include="Media\nieve.jpg" />
+    <Content Include="Media\NsanityBeach.mp3" />
     <Content Include="Media\paredJungla.jpg" />
     <Content Include="Media\piedra.png" />
     <Content Include="Media\piso.jpg" />
