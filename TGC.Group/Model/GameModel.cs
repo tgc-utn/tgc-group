@@ -15,7 +15,6 @@ namespace TGC.Group.Model {
 
         private TgcSkyBox skyBox;
 
-        private TgcMp3Player musicaDeFondo;
 
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir) {
 
@@ -47,10 +46,8 @@ namespace TGC.Group.Model {
             skyBox.SkyEpsilon = 25f;
             skyBox.Init();
 
-            // Setear musica de fondo
-            musicaDeFondo = new TgcMp3Player();
-            musicaDeFondo.FileName = (MediaDir + "\\NsanityBeach.mp3");
-            musicaDeFondo.play(true);
+            Musica.getInstance().setMusica(MediaDir + "\\NsanityBeach.mp3");
+            Musica.getInstance().play();
 
         }
 

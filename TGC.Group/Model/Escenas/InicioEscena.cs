@@ -12,21 +12,24 @@ using TGC.Group.Model.Scenes;
 
 namespace TGC.Group.Model.Escenas {
     class InicioEscena : Escena {
-        private ElementoTexto t;
+        private Boton jugar;
+        private Boton opciones;
         private Sprite s;
         private TgcTexture logo;
         private TgcTexture fondo;
         private Viewport viewport = D3DDevice.Instance.Device.Viewport;
 
         public void init(string mediaDir) {
-            t = new Boton("Jugar", 0f, 0.9f, () => EscenaManager.getInstance().addScene(new GameEscena()));
+            jugar = new Boton("Jugar", 0f, 0.8f, () => EscenaManager.getInstance().addScene(new GameEscena()));
+            opciones = new Boton("Opciones", 0f, 0.9f, () => EscenaManager.getInstance().addScene(new OpcionesEscena()));
             s = new Sprite(D3DDevice.Instance.Device);
             logo = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "logo.png");
             fondo = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "fondoInicio.jpg");
         }
 
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara) {
-            t.Update(deltaTime, input);
+            jugar.Update(deltaTime, input);
+            opciones.Update(deltaTime, input);
         }
 
         public void render(float deltaTime) {
@@ -47,11 +50,13 @@ namespace TGC.Group.Model.Escenas {
 
             s.End();
 
-            t.Render();
+            jugar.Render();
+            opciones.Render();
         }
 
         public void dispose() {
-            t.Dispose();
+            jugar.Dispose();
+            opciones.Dispose();
         }
 
     }

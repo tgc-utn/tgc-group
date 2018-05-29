@@ -23,5 +23,9 @@ namespace TGC.Group.Model.Interfaz {
             texto.Dispose();
         }
 
+        public void setText(string text) {
+            texto.Text = text;
+        }
+
     }
 }

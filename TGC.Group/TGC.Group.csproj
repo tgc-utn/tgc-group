@@ -99,11 +99,13 @@
     <Compile Include="Model\Entidades\PlataformaRotante.cs" />
     <Compile Include="Model\Escenas\GameOverEscena.cs" />
     <Compile Include="Model\Escenas\InicioEscena.cs" />
+    <Compile Include="Model\Escenas\OpcionesEscena.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\Interfaz\Boton.cs" />
     <Compile Include="Model\Interfaz\Elemento.cs" />
     <Compile Include="Model\Interfaz\ElementoTexto.cs" />
     <Compile Include="Model\IUpdateable.cs" />
+    <Compile Include="Model\Musica.cs" />
     <Compile Include="Model\Niveles\Nivel3.cs" />
     <Compile Include="Model\Niveles\Nivel2.cs" />
     <Compile Include="Model\Niveles\Nivel1.cs" />
@@ -111,6 +113,7 @@
     <Compile Include="Model\Escenas\GameEscena.cs" />
     <Compile Include="Model\Escenas\Escena.cs" />
     <Compile Include="Model\Escenas\EscenaManager.cs" />
+    <Compile Include="Model\Opciones.cs" />
     <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
     <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
     <Compile Include="obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
