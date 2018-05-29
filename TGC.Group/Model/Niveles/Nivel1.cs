@@ -1,5 +1,4 @@
 ﻿using TGC.Core.Direct3D;
-using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
@@ -112,12 +111,10 @@ namespace TGC.Group.Model.Niveles {
         }
 
         public override void dispose() {
-
             piso.dispose();
             caja.dispose();
             limites.dispose();
             getRenderizables().ForEach(r => r.Dispose());
-
         }
     }
 

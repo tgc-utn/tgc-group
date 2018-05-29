@@ -1,5 +1,6 @@
 ﻿using System;
 using TGC.Core.Mathematica;
+using TGC.Core.Text;
 using TGC.Core.Textures;
 
 namespace TGC.Group.Model {
@@ -16,7 +17,7 @@ namespace TGC.Group.Model {
         }
 
         public void Update(float deltaTime) {
-            move(vel);
+            move(vel * deltaTime);
 
             if (posInicial.X < posFinal.X) {
                 if (posInicial.Z < posFinal.Z) {
@@ -58,7 +59,7 @@ namespace TGC.Group.Model {
             return vel;
         }
 
-        new public void Render() {
+        public override void Render() {
             box.Render();
             box.BoundingBox.Render();
         }

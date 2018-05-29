@@ -91,7 +91,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
-    <Compile Include="Model\Caja.cs" />
+    <Compile Include="Model\Entidades\Caja.cs" />
+    <Compile Include="Model\Entidades\Personaje.cs" />
+    <Compile Include="Model\Entidades\Plataforma.cs" />
+    <Compile Include="Model\Entidades\PlataformaAscensor.cs" />
+    <Compile Include="Model\Entidades\PlataformaDesplazante.cs" />
+    <Compile Include="Model\Entidades\PlataformaRotante.cs" />
     <Compile Include="Model\Escenas\InicioEscena.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\Interfaz\Boton.cs" />
@@ -102,12 +107,6 @@
     <Compile Include="Model\Niveles\Nivel2.cs" />
     <Compile Include="Model\Niveles\Nivel1.cs" />
     <Compile Include="Model\Niveles\Nivel.cs" />
-    <Compile Include="Model\Personaje.cs" />
-    <Compile Include="Model\Collision\SphereCollisionManager.cs" />
-    <Compile Include="Model\Plataforma.cs" />
-    <Compile Include="Model\PlataformaAscensor.cs" />
-    <Compile Include="Model\PlataformaDesplazante.cs" />
-    <Compile Include="Model\PlataformaRotante.cs" />
     <Compile Include="Model\Escenas\GameEscena.cs" />
     <Compile Include="Model\Escenas\Escena.cs" />
     <Compile Include="Model\Escenas\EscenaManager.cs" />

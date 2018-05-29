@@ -11,9 +11,8 @@ namespace TGC.Group.Model.Scenes {
         private Personaje personaje;
         private Nivel nivel;
         private TGCVector3 cameraOffset;
-        private SphereCollisionManager collisionManager;
 
-        private TGCVector3 VEC_GRAVEDAD = new TGCVector3(0, -0.25f, 0);
+        private TGCVector3 VEC_GRAVEDAD = new TGCVector3(0, -25f, 0);
 
         public void init(string mediaDir) {
             cameraOffset = new TGCVector3(0, 200, 400);
@@ -22,10 +21,6 @@ namespace TGC.Group.Model.Scenes {
             // TEMP
             setNivel(new Nivel3(mediaDir));
 
-            collisionManager = new SphereCollisionManager();
-            collisionManager.GravityEnabled = true;
-            collisionManager.GravityForce = VEC_GRAVEDAD;
-            collisionManager.SlideFactor = 1.3f;
         }
 
         public void setNivel(Nivel nuevoNivel) {
@@ -41,10 +36,9 @@ namespace TGC.Group.Model.Scenes {
             checkearEmpujeCajas();
             aplicarGravedadCajas();
 
-            nivel.update(deltaTime);
+            personaje.move(deltaTime, nivel, VEC_GRAVEDAD);
 
-            // checkeo sobre que estoy parado
-            checkearDesplazamientoPorPlataformas(deltaTime);
+            nivel.update(deltaTime);
 
             // Checkear si toque la levelFinishBox
             if (nivel.getLFBox() != null && TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), nivel.getLFBox())) {
@@ -61,16 +55,6 @@ namespace TGC.Group.Model.Scenes {
 
             // tecla de reset
             if (input.keyPressed(Key.F9)) personaje.volverAlOrigen();
-
-            var movement = collisionManager.moveCharacter(
-                personaje.getBoundingSphere(),
-                personaje.getVelocity(),
-                nivel.getBoundingBoxes()
-            );
-
-            // muevo al personaje
-            personaje.move(movement);
-
 
             camara.SetCamera(personaje.getPosition() + cameraOffset, personaje.getPosition());
         }
@@ -112,35 +96,6 @@ namespace TGC.Group.Model.Scenes {
             }
         }
 
-        private void checkearDesplazamientoPorPlataformas(float deltaTime)
-        {
-            foreach (var box in nivel.getPisos())
-            {
-                if (TgcCollisionUtils.testSphereAABB(personaje.getPies(), box))
-                {
-
-                    if (nivel.esPisoDesplazante(box))
-                    {
-                        personaje.addVelocity(nivel.getPlataformaDesplazante(box).getVelocity());
-                    }
-                    else if (nivel.esPisoRotante(box))
-                    {
-                        var plataformaRotante = nivel.getPlataformaRotante(box);
-                        personaje.addVelocity(plataformaRotante.getVelAsVector(personaje.getPosition()) * deltaTime);
-                        personaje.setRotation(plataformaRotante.getAngle());
-                    }
-                    else if (nivel.esPisoAscensor(box))
-                    {
-                        personaje.addVelocity(nivel.getPlataformaAscensor(box).getVel());
-                    }
-
-                    personaje.aterrizar();
-                    personaje.setPatinando(nivel.esPisoResbaladizo(box));
-
-                }
-            }
-        }
-
         private void aplicarGravedadCajas() {
             foreach (var caja in nivel.getCajas()) {
                 var apoyada = false;
@@ -160,16 +115,13 @@ namespace TGC.Group.Model.Scenes {
             }
         }
 
-        private void checkearMuerte()
-        {
-            foreach (var box in nivel.getDeathPlanes())
-            {
-                if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), box))
-                {
+        private void checkearMuerte() {
+            foreach (var box in nivel.getDeathPlanes()) {
+                if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), box)) {
                     personaje.volverAlOrigen();
                 }
             }
         }
 
     }
-}
+} 
