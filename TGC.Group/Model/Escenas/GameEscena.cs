@@ -1,13 +1,9 @@
 ﻿using Microsoft.DirectX.DirectInput;
-using System.Collections.Generic;
-using System.Linq;
-using TGC.Core.BoundingVolumes;
 using TGC.Core.Camara;
 using TGC.Core.Collision;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.Text;
-using TGC.Examples.Collision.SphereCollision;
 using TGC.Group.Model.Niveles;
 
 namespace TGC.Group.Model.Scenes {
@@ -40,8 +36,7 @@ namespace TGC.Group.Model.Scenes {
             checkearEmpujeCajas();
             aplicarGravedadCajas();
 
-            personaje.move(deltaTime, nivel.getBoundingBoxes(), VEC_GRAVEDAD);
-
+            personaje.move(deltaTime, nivel, VEC_GRAVEDAD);
 
             nivel.update(deltaTime);
 
@@ -66,7 +61,7 @@ namespace TGC.Group.Model.Scenes {
 
             TgcText2D t = new TgcText2D();
             t.Text = personaje.getPosition().ToString();
-            t.render();
+            // t.render();
         }
 
         public void dispose() {

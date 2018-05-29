@@ -6,6 +6,8 @@ using TGC.Core.Collision;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SkeletalAnimation;
+using TGC.Core.Text;
+using TGC.Group.Model.Niveles;
 
 namespace TGC.Group.Model {
     class Personaje {
@@ -27,13 +29,15 @@ namespace TGC.Group.Model {
         private const float MULT_CORRER = 1.5f;
         private const float MULT_CAMINAR = 0.5f;
         private const float VEL_TERMINAL = -10;
-        private bool patinando = false;
+        private const float MODIFICADOR_HIELO = 0.75f;
         private TgcRay rayoVelocidad = new TgcRay();
+
+        private TGCVector3 distance;
 
         // saltos
         private int saltosRestantes = 0;
         private const int SALTOS_TOTALES = 2;
-        private const float JUMP_SPEED = 1000f; // PC Pepe
+        private const float JUMP_SPEED = 10f;
 
         public Personaje(string MediaDir) {
             dir = TGCVector3.Empty;
@@ -64,7 +68,7 @@ namespace TGC.Group.Model {
             var posicionPies = mesh.BoundingBox.calculateBoxCenter();
             posicionPies.Y = mesh.BoundingBox.PMin.Y;
 
-            pies = new TgcBoundingSphere(posicionPies, 10);
+            pies = new TgcBoundingSphere(posicionPies, 20);
         }
 
         public void update(float deltaTime, TgcD3dInput Input) {
@@ -80,6 +84,11 @@ namespace TGC.Group.Model {
             boundingSphere.Render();
             pies.Render();
 
+            TgcText2D t = new TgcText2D();
+            t.Text = distance.ToString();
+            t.render();
+
+
             // seria un post-update
             resetUpdateVariables();
             if (dir.Length() == 0) moving = false;
@@ -91,7 +100,6 @@ namespace TGC.Group.Model {
 
         private void checkInputs(TgcD3dInput Input) {
             float FRAME_WALK_SPEED = WALK_SPEED;
-            float FRAME_JUMP_SPEED = JUMP_SPEED;
             dir = TGCVector3.Empty;
 
             if (Input.keyDown(Key.W) || Input.keyDown(Key.UpArrow)) {
@@ -119,22 +127,17 @@ namespace TGC.Group.Model {
             }
             
             if (Input.keyPressed(Key.Space) && saltosRestantes > 0) {
-                dir.Y = FRAME_JUMP_SPEED;
+                dir.Y = JUMP_SPEED;
                 saltosRestantes--;
             }
 
-            // HACK: no puede correr mientras patina
-            // si pudiera correr mientras patina se hace quilombo con el sliding
-            // y le queda una velocidad constante, que podría ser un feature mas que
-            // un bug pero no se
-            if (Input.keyDown(Key.LeftShift) && !patinando) {
+            if (Input.keyDown(Key.LeftShift)) {
                 dir.X = dir.X * MULT_CORRER;
                 dir.Z = dir.Z * MULT_CORRER;
             } else if (Input.keyDown(Key.LeftAlt)) {
                 dir.X = dir.X * MULT_CAMINAR;
                 dir.Z = dir.Z * MULT_CAMINAR;
             }
-
         }
 
         private void updateAnimations() {
@@ -152,7 +155,7 @@ namespace TGC.Group.Model {
             meshAngleAnterior = meshAngle;
         }
         
-        public void move(float deltaTime, List<TgcBoundingAxisAlignBox> colliders, TGCVector3 gravedad) {
+        public void move(float deltaTime, Nivel nivel, TGCVector3 gravedad) {
             TGCVector3 velAnterior = vel;
             vel = TGCVector3.Empty;
             vel.Y = velAnterior.Y;
@@ -160,10 +163,10 @@ namespace TGC.Group.Model {
             // movimiento por teclado
             vel += dir * deltaTime;
 
-            if (dir.Y != 0) vel.Y = dir.Y * deltaTime;
+            if (dir.Y != 0) vel.Y = dir.Y;
 
             // movimiento por entorno
-            TgcBoundingAxisAlignBox piso = colliders.Find(b => TgcCollisionUtils.testSphereAABB(pies, b));
+            TgcBoundingAxisAlignBox piso = nivel.getBoundingBoxes().Find(b => TgcCollisionUtils.testSphereAABB(pies, b));
 
             if (piso == null) {
                 // si estoy en el aire
@@ -174,7 +177,7 @@ namespace TGC.Group.Model {
                 // si estoy en algun piso
                 dir.Y = 0;
                 aterrizar();
-                modificarMovimientoSegunPiso(piso);
+                modificarMovimientoSegunPiso(piso, nivel, deltaTime);
             }
 
             TGCVector3 horizontal = new TGCVector3 {
@@ -189,19 +192,30 @@ namespace TGC.Group.Model {
                 Z = 0
             };
 
-            movimientoHorizontal(horizontal, colliders, deltaTime, 0);
-            movimientoVertical(vertical, colliders, deltaTime);
+            movimientoHorizontal(horizontal, nivel.getBoundingBoxes(), deltaTime, 0);
+            movimientoVertical(vertical, nivel.getBoundingBoxes(), deltaTime, 0);
 
-            resetearMovimientoSegunPiso(piso);
+            resetearMovimientoSegunPiso(piso, nivel);
         }
 
-        private void modificarMovimientoSegunPiso(TgcBoundingAxisAlignBox piso) {
-
+        private void modificarMovimientoSegunPiso(TgcBoundingAxisAlignBox piso, Nivel nivel, float deltaTime) {
+            if (nivel.esPisoDesplazante(piso)) {
+                vel += nivel.getPlataformaDesplazante(piso).getVelocity() * deltaTime;
+            } else if (nivel.esPisoAscensor(piso)) {
+                vel += nivel.getPlataformaAscensor(piso).getVel() * deltaTime;
+            } else if (nivel.esPisoRotante(piso)) {
+                setRotation(nivel.getPlataformaRotante(piso).getAngle());
+            }
         }
 
-        private void resetearMovimientoSegunPiso(TgcBoundingAxisAlignBox piso) {
-            vel.X = 0;
-            vel.Z = 0;
+        private void resetearMovimientoSegunPiso(TgcBoundingAxisAlignBox piso, Nivel nivel) {
+            if (nivel.esPisoResbaladizo(piso)) {
+                vel.X = vel.X * MODIFICADOR_HIELO;
+                vel.Z = vel.Z * MODIFICADOR_HIELO;
+            } else {
+                vel.X = 0;
+                vel.Z = 0;
+            }
         }
 
         private void movimientoHorizontal(TGCVector3 movement, List<TgcBoundingAxisAlignBox> colliders, float deltaTime, int count) {
@@ -226,7 +240,7 @@ namespace TGC.Group.Model {
 
             if (paredCercana == null) {
                 this.translate(movement);
-            } else if (movement.Length() > 1) {
+            } else {
                 // llamo a la función una vez mas para obtener la intersección en aux
                 TgcCollisionUtils.intersectRayAABB(rayoVelocidad, paredCercana, out aux);
 
@@ -235,7 +249,9 @@ namespace TGC.Group.Model {
 
                 TGCVector3 distance =
                     TgcCollisionUtils.closestPointAABB(this.getBoundingSphere().Center, paredCercana) - this.getBoundingSphere().Center;
-                
+
+                if ((distance - radius).Length() < 1) return;
+
                 if ((radius + movement).Length() < distance.Length()) {
                     this.translate(movement);
                 } else {
@@ -247,7 +263,9 @@ namespace TGC.Group.Model {
             }
         }
 
-        private void movimientoVertical(TGCVector3 movement, List<TgcBoundingAxisAlignBox> colliders, float deltaTime) {
+        private void movimientoVertical(TGCVector3 movement, List<TgcBoundingAxisAlignBox> colliders, float deltaTime, int count) {
+            if (count > 5) return;
+
             rayoVelocidad.Origin = this.getPies().Center;
             rayoVelocidad.Direction = movement;
 
@@ -266,7 +284,7 @@ namespace TGC.Group.Model {
             // o salté y no hay ningún techo (caso comun)
             if (pisoCercano == null) {
                 this.translate(movement);
-            } else if (movement.Length() > 1) {
+            } else {
                 TgcCollisionUtils.intersectRayAABB(rayoVelocidad, pisoCercano, out aux);
 
                 TGCVector3 radius = 
@@ -274,6 +292,8 @@ namespace TGC.Group.Model {
 
                 TGCVector3 distance =
                     TgcCollisionUtils.closestPointAABB(this.getBoundingSphere().Center, pisoCercano) - this.getBoundingSphere().Center;
+
+                if ((distance - radius).Length() < 1) return;
                 
                 if ((radius + movement).Length() < distance.Length()) {
                     this.translate(movement);
@@ -281,7 +301,7 @@ namespace TGC.Group.Model {
                     var foo = TGCVector3.Normalize(movement) * distance.Length();
                     movement = TGCVector3.Normalize(foo - distance) * WALK_SPEED * deltaTime;
 
-                    this.movimientoVertical(movement, colliders, deltaTime);
+                    this.movimientoVertical(movement, colliders, deltaTime, count + 1);
                 }
             }
         }
@@ -296,7 +316,7 @@ namespace TGC.Group.Model {
         }
 
         public void aterrizar() {
-            saltosRestantes = SALTOS_TOTALES;
+             saltosRestantes = SALTOS_TOTALES;
         }
 
         public TGCVector3 getPosition() {
@@ -311,10 +331,6 @@ namespace TGC.Group.Model {
             return pies;
         }
 
-        public void setPatinando(bool b) {
-            patinando = b;
-        }
-
         public void setRotation(float angle) {
             meshAngle = angle;
         }
@@ -325,7 +341,7 @@ namespace TGC.Group.Model {
 
             var posicionPies = mesh.BoundingBox.calculateBoxCenter();
             posicionPies.Y = mesh.BoundingBox.PMin.Y;
-            pies.setValues(posicionPies, 10);
+            pies.setValues(posicionPies, 20);
 
             dir = TGCVector3.Empty;
             vel = TGCVector3.Empty;

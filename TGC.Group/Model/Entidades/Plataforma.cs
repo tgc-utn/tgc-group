@@ -17,7 +17,7 @@ namespace TGC.Group.Model {
             box.Transform = TGCMatrix.Translation(pos);
         }
 
-        public void Render() {
+        public virtual void Render() {
             box.Render();
         }
 

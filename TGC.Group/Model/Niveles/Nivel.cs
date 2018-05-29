@@ -10,9 +10,7 @@ namespace TGC.Group.Model.Niveles {
 
     public abstract class Nivel {
 
-        // Para debug, cada uno en su PC
-        protected const float VELPEPE = 0.1f;
-        protected const float VELCRIS = 2f;
+        protected const float VELPEPE = 200f;
 
         protected List<TgcPlane> pisosNormales;
         protected List<TgcPlane> pisosResbaladizos;

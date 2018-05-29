@@ -15,7 +15,7 @@ namespace TGC.Group.Model {
         }
 
         public override void Init() {
-            Escena escenaInicial = new GameEscena();
+            Escena escenaInicial = new InicioEscena();
             EscenaManager.getInstance().setMediaDir(MediaDir);
             EscenaManager.getInstance().addScene(escenaInicial);
         }

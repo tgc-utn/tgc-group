@@ -106,7 +106,6 @@
     <Compile Include="Model\Niveles\Nivel2.cs" />
     <Compile Include="Model\Niveles\NivelDemo.cs" />
     <Compile Include="Model\Niveles\Nivel.cs" />
-    <Compile Include="Model\Collision\SphereCollisionManager.cs" />
     <Compile Include="Model\Escenas\GameEscena.cs" />
     <Compile Include="Model\Escenas\Escena.cs" />
     <Compile Include="Model\Escenas\EscenaManager.cs" />
