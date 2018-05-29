@@ -3,6 +3,7 @@ using System.Drawing;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Mathematica;
+using TGC.Core.Sound;
 using TGC.Core.Terrain;
 using TGC.Core.Textures;
 using TGC.Group.Model.Escenas;
@@ -13,6 +14,8 @@ namespace TGC.Group.Model {
     public class GameModel : TgcExample {
 
         private TgcSkyBox skyBox;
+
+        private TgcMp3Player musicaDeFondo;
 
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir) {
 
@@ -44,9 +47,16 @@ namespace TGC.Group.Model {
             skyBox.SkyEpsilon = 25f;
             skyBox.Init();
 
+            // Setear musica de fondo
+
+            musicaDeFondo = new TgcMp3Player();
+            musicaDeFondo.FileName = (MediaDir + "\\NsanityBeach.mp3");
+            musicaDeFondo.play(true);
+
         }
 
         public override void Update() {
+
             PreUpdate();
 
             EscenaManager.getInstance().update(ElapsedTime, Input, Camara);
