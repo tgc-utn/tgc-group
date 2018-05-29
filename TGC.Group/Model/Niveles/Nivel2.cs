@@ -19,7 +19,7 @@ namespace TGC.Group.Model.Niveles {
         private TgcMesh roca;
 
         public Nivel2(string mediaDir) : base(mediaDir) {
-            siguienteNivel = null;
+            siguienteNivel = new Nivel3(mediaDir);
         }
 
         public override void init(string mediaDir) {

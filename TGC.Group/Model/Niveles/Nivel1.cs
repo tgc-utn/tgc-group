@@ -105,7 +105,8 @@ namespace TGC.Group.Model.Niveles {
             cargarDecorativo(roca, escenasRocas[7], new TGCVector3(-300, 0, 4700), new TGCVector3(1, 1, 1), 0);
 
             // LevelFinishBox : Box para verificar si pase de nivel
-            lfBox = TGCBox.fromSize(new TGCVector3(0, 0, 100), new TGCVector3(100, 100, 100));
+            lfBox = TGCBox.fromSize(new TGCVector3(0, 100, 100), new TGCVector3(100, 100, 100));
+            pEstaticas.Add(new Plataforma(new TGCVector3(0, 0, 100), new TGCVector3(100, 100, 100), caja));
 
             siguienteNivel = new Nivel2(mediaDir);
 

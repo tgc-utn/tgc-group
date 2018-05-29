@@ -24,7 +24,7 @@ namespace TGC.Group.Model.Scenes {
 
         public void init(string mediaDir) {
             cameraOffset = new TGCVector3(0, 200, 400);
-            setNivel(new Nivel3(mediaDir));
+            setNivel(new Nivel1(mediaDir));
             personaje = new Personaje(mediaDir);
 
             hud = new Sprite(D3DDevice.Instance.Device);
@@ -35,6 +35,7 @@ namespace TGC.Group.Model.Scenes {
 
         public void setNivel(Nivel nuevoNivel) {
             if (nivel != null) nivel.dispose();
+            if (personaje != null) personaje.resetear();
             nivel = nuevoNivel;
         }
 

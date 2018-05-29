@@ -19,7 +19,7 @@ namespace TGC.Group.Model {
         private TgcBoundingSphere boundingSphere;
         private TgcBoundingSphere pies;
 
-        private TGCVector3 POS_ORIGEN = new TGCVector3(0, 100, 9500);
+        private TGCVector3 POS_ORIGEN = new TGCVector3(0, 200, 9500);
 
         private int vidas;
         private int stamina;
@@ -42,7 +42,7 @@ namespace TGC.Group.Model {
         private const float MULT_CORRER = 1.75f;
         private const float MULT_CAMINAR = 0.5f;
         private const float VEL_TERMINAL = -10;
-        private const float MODIFICADOR_HIELO = 0.75f;
+        private const float MODIFICADOR_HIELO = 0.99f;
         private const int SIZE_PIES = 10;
         private TgcRay rayoVelocidad = new TgcRay();
 
@@ -191,12 +191,19 @@ namespace TGC.Group.Model {
         }
         
         public void move(float deltaTime, Nivel nivel, TGCVector3 gravedad) {
-            TGCVector3 velAnterior = vel;
-            vel = TGCVector3.Empty;
-            vel.Y = velAnterior.Y;
+            float velX = 0, velY = 0, velZ = 0;
 
-            // movimiento por teclado
-            vel += dir * deltaTime;
+            if (vel.X != 0) {
+                if (dir.X != 0) velX = dir.X * deltaTime;
+                else velX = vel.X;
+            } else velX = dir.X * deltaTime;
+
+            if (vel.Z != 0) {
+                if (dir.Z != 0) velZ = dir.Z * deltaTime;
+                else velZ = vel.Z;
+            } else velZ = dir.Z * deltaTime;
+
+            vel = new TGCVector3(velX, vel.Y + dir.Y * deltaTime, velZ);
 
             // movimiento por entorno
             TgcBoundingAxisAlignBox piso = nivel.getBoundingBoxes().Find(b => TgcCollisionUtils.testSphereAABB(pies, b));
@@ -398,6 +405,12 @@ namespace TGC.Group.Model {
                 EscenaManager.getInstance().addScene(new GameOverEscena());
             }
 
+            resetear();
+
+            vidas--;
+        }
+
+        public void resetear() {
             mesh.Position = POS_ORIGEN;
             boundingSphere.setValues(mesh.BoundingBox.calculateBoxCenter(), mesh.BoundingBox.calculateBoxRadius());
 
@@ -407,7 +420,6 @@ namespace TGC.Group.Model {
 
             dir = TGCVector3.Empty;
             vel = TGCVector3.Empty;
-            vidas--;
         }
 
         public int getStamina() => stamina;
