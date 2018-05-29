@@ -110,7 +110,7 @@ namespace TGC.Group.Model
             TgcMesh frutaColisionada = Frutas().Find(fruta => TgcCollisionUtils.testAABBAABB(fruta.BoundingBox, personaje.boundingBox()));
             frutaColisionada.Enabled = false;
             scene.Meshes.Remove(frutaColisionada);
-            
+            //No se deberia renderizar mas
         }
 
         public bool personajeSobreLava()
