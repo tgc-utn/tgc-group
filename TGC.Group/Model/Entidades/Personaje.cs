@@ -300,14 +300,14 @@ namespace TGC.Group.Model {
                 .DefaultIfEmpty(null)
                 .First();
 
-            // ya setie velocidad en y = 0
-            // cuando estaba agregando gravedad
             if (pisoCercano == null) {
+                // solo para sombra
                 pisoCercano = nivel.getBoundingBoxes().Find(b => TgcCollisionUtils.testSphereAABB(pies, b));
                 if (pisoCercano != null) pisoHeight = pisoCercano.PMax.Y;
+                // fin sombra
                 translate(movement);
             } else {
-                pisoHeight = pisoCercano.Position.Y;
+                pisoHeight = pisoCercano.PMax.Y;
 
                 TgcCollisionUtils.intersectRayAABB(rayoVelocidad, pisoCercano, out aux);
 
