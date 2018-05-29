@@ -18,16 +18,24 @@ namespace TGC.Group.Model
     class Escenario
     {
         public TgcScene scene { get; set; }
-        private TgcSkeletalMesh personaje;
-        public Escenario(string pathEscenario,TgcSkeletalMesh personaje)
+        private Personaje personaje;
+        public float Ypiso { get; }
+
+        private List<TgcMesh> frutas;
+        private float danioLava;
+
+        public Escenario(string pathEscenario,Personaje personaje)
         {
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(pathEscenario);
             this.personaje = personaje;
+            Ypiso = 20f;
+            danioLava = 0.001f;
+            frutas = Frutas();
         }
 
 
-
+        #region MeshLists
         public List<TgcMesh> encontrarMeshes(string clave) => scene.Meshes.FindAll(x => x.Layer == clave);
         public List<TgcMesh> ParedesMesh() => encontrarMeshes("PAREDES");
         public List<TgcMesh> RocasMesh() => encontrarMeshes("ROCAS");
@@ -39,19 +47,14 @@ namespace TGC.Group.Model
         public List<TgcMesh> ResbalososMesh() => encontrarMeshes("RESBALOSOS");
         public List<TgcMesh> LavaMesh() => encontrarMeshes("LAVA");
         public List<TgcMesh> Luces() => encontrarMeshes("Luces");
+        public List<TgcMesh> Frutas() => encontrarMeshes("FRUTA");
+        public List<TgcMesh> Mascaras() => encontrarMeshes("MASCARA");
+        #endregion
 
-        public List<TgcMesh> FuentesDeLuz()
-        {
-            List<TgcMesh> fuentesDeLuz = new List<TgcMesh>();
-            fuentesDeLuz.AddRange(Luces());
-            fuentesDeLuz.AddRange(LavaMesh());
-
-            return fuentesDeLuz;
-        }
-
+        #region Colisiones
         public bool colisionConPilar()
         {
-            return this.PilaresMesh().Exists(mesh => TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, mesh.BoundingBox));
+            return this.PilaresMesh().Exists(mesh => TgcCollisionUtils.testAABBAABB(personaje.boundingBox(), mesh.BoundingBox));
         }
 
         public bool colisionaConPiso(TgcMesh mesh)
@@ -74,12 +77,63 @@ namespace TGC.Group.Model
 
         public bool colisionEscenario()
         {
-            return this.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, mesh.BoundingBox)) != null;
+            return this.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => TgcCollisionUtils.testAABBAABB(personaje.boundingBox(), mesh.BoundingBox)) != null;
         }
 
         public TgcMesh obtenerColisionCajaPersonaje(TgcMesh objetoMovibleG)
         {
-            return this.CajasMesh().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.BoundingBox) && caja != objetoMovibleG);
+            return this.CajasMesh().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.boundingBox()) && caja != objetoMovibleG);
+        }
+        #endregion
+
+        #region Personaje
+
+        public bool personajeSobreMascara()
+        {
+            return Mascaras().Exists(mascara => TgcCollisionUtils.testAABBAABB(mascara.BoundingBox, personaje.boundingBox()));
+        }
+
+        public void eliminarMascaraColisionada()
+        {
+            TgcMesh mascaraColisionada = Mascaras().Find(mascara => TgcCollisionUtils.testAABBAABB(mascara.BoundingBox, personaje.boundingBox()));
+            mascaraColisionada.Enabled = false;
+            scene.Meshes.Remove(mascaraColisionada);
+        }
+
+        public bool personajeSobreFruta()
+        {
+            return Frutas().Exists(fruta => TgcCollisionUtils.testAABBAABB(fruta.BoundingBox, personaje.boundingBox()));
+        }
+
+        public void eliminarFrutaColisionada()
+        {
+            TgcMesh frutaColisionada = Frutas().Find(fruta => TgcCollisionUtils.testAABBAABB(fruta.BoundingBox, personaje.boundingBox()));
+            frutaColisionada.Enabled = false;
+            scene.Meshes.Remove(frutaColisionada);
+            //No se deberia renderizar mas
+        }
+
+        public bool personajeSobreLava()
+        {
+            var auxiliarBoundingBox = personaje.boundingBox();
+            auxiliarBoundingBox.move(new TGCVector3(0, -Ypiso, 0));
+            return LavaMesh().Exists(lava => TgcCollisionUtils.testAABBAABB(lava.BoundingBox, auxiliarBoundingBox));
+
+        }
+
+        public void quemarPersonaje()
+        {
+            personaje.vida -= danioLava ;
+        }
+        #endregion
+
+        public List<TgcMesh> FuentesDeLuz()
+        {
+            List<TgcMesh> fuentesDeLuz = new List<TgcMesh>();
+            fuentesDeLuz.AddRange(Luces());
+            fuentesDeLuz.AddRange(LavaMesh());
+
+            return fuentesDeLuz;
         }
 
         private int coeficienteRotacion = 1;
@@ -129,6 +183,7 @@ namespace TGC.Group.Model
             meshesColisionables.AddRange(PilaresMesh());
             meshesColisionables.AddRange(ResbalososMesh());
             meshesColisionables.AddRange(PlataformasMesh());
+            meshesColisionables.AddRange(LavaMesh());
             
             return meshesColisionables;
         }

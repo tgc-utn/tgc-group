@@ -15,11 +15,13 @@ using TGC.Core.Textures;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.Collision;
 using TGC.Core.Shaders;
+using TGC.Core.Text;
 
 using TGC.Group.SphereCollisionUtils;
 using TGC.Group.Model.AI;
 using TGC.Group.GUI;
 using TGC.Group.Optimizacion;
+using TGC.Group.Sprites;
 
 
 namespace TGC.Group.Model
@@ -38,12 +40,11 @@ namespace TGC.Group.Model
         static string mediaDir;
         private Directorio directorio;
 
-        private TgcSkeletalMesh personaje;
+        private Personaje personaje;
         private TgcThirdPersonCamera camaraInterna;
 
         private TGCVector3 velocidad = TGCVector3.Empty;
         private TGCVector3 aceleracion = TGCVector3.Empty;
-        private float Ypiso = 20f;
 
         private Escenario escenario;
 
@@ -94,7 +95,8 @@ namespace TGC.Group.Model
         public const int IDOK = 0;
 
         public const int IDCANCEL = 1;
-        public const int ID_JUGAR = 100;
+        public const int ID_JUGAR = 10;
+        public const int ID_RESTART = 101;
         public const int ID_CONFIGURAR = 103;
         public const int ID_APP_EXIT = 105;
         public const int ID_PROGRESS1 = 107;
@@ -141,6 +143,15 @@ namespace TGC.Group.Model
 
         public static SoundManager soundManager;
 
+        public CustomSprite barraDeVida;
+        public CustomSprite fruta;
+        public CustomSprite mascara;
+        public Drawer2D drawer2D;
+
+        public TgcText2D textoFrutas;
+        public TgcText2D textoMascaras;
+        
+
         public override void Init()
         {
             perdiste = false;
@@ -155,21 +166,16 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
+
             //Objeto que conoce todos los path de MediaDir
             directorio = new Directorio(MediaDir);
+
+            personaje = new Personaje(directorio);
 
             //Cargo el SoundManager
             soundManager = new SoundManager(directorio,this.DirectSound.DsDevice);
             soundManager.playSonidoFondo();
 
-
-            //Cargar personaje con animaciones
-            var skeletalLoader = new TgcSkeletalLoader();
-            var pathAnimacionesPersonaje = new[] { directorio.RobotCaminando, directorio.RobotParado, };
-            personaje = skeletalLoader.
-                        loadMeshAndAnimationsFromFile(directorio.RobotSkeletalMesh,
-                                                      directorio.RobotDirectorio,
-                                                      pathAnimacionesPersonaje);
 
             //Cagar escenario especifico para el juego.
             escenario = new Escenario(directorio.EscenaCrash,personaje);
@@ -177,11 +183,11 @@ namespace TGC.Group.Model
             personaje.playAnimation("Parado", true);
 
             //Posicion inicial
-            personaje.Position = new TGCVector3(400, Ypiso, -900);
-           // personaje.Position = new TGCVector3(-4133.616f, 20f, 5000f);
+            personaje.position(new TGCVector3(400, escenario.Ypiso, -900));
+            //personaje.position(new TGCVector3(-4133.616f, 20f, 5000f));
 
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
-            personaje.AutoTransform = false;
+            personaje.autoTransform(false);
             
             //Rotar al robot en el Init para que mire hacia el otro lado
             personaje.RotateY(FastMath.ToRad(180f));
@@ -196,8 +202,8 @@ namespace TGC.Group.Model
             TGCVector3 vectorAjuste = new TGCVector3(0f, 50f, 0f);
             //Para reducir el radio de la esfera.
             float coeficienteReductivo = 0.4f;
-            esferaPersonaje = new TgcBoundingSphere(personaje.BoundingBox.calculateBoxCenter()-vectorAjuste, 
-                                                    personaje.BoundingBox.calculateBoxRadius()*coeficienteReductivo);
+            esferaPersonaje = new TgcBoundingSphere(personaje.boundingBox().calculateBoxCenter()-vectorAjuste, 
+                                                    personaje.boundingBox().calculateBoxRadius()*coeficienteReductivo);
             scaleBoundingVector = new TGCVector3(1.5f, 1f, 1.2f);
             
 
@@ -211,12 +217,12 @@ namespace TGC.Group.Model
             plataformasRotantes = escenario.PlataformasRotantes();
 
            //Posición de la camara.
-            camaraInterna = new TgcThirdPersonCamera(personaje.Position, 500, -1000);
+            camaraInterna = new TgcThirdPersonCamera(personaje.position(), 500, -1000);
            
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara = camaraInterna;
 
-            personaje.BoundingBox.scaleTranslate(personaje.Position, scaleBoundingVector);
+            personaje.boundingBox().scaleTranslate(personaje.position(), scaleBoundingVector);
             var meshesSinPlatXZ = escenario.scene.Meshes.FindAll(mesh => mesh.Name != "PlataformaX" && mesh.Name != "PlataformaZ");
 
             octree = new Octree();
@@ -227,6 +233,8 @@ namespace TGC.Group.Model
 
             inicializarGUI();
             inicializarIluminacion();
+            inicializarHUDS(d3dDevice);
+
            
 
         }
@@ -265,7 +273,7 @@ namespace TGC.Group.Model
             if (Input.keyPressed(Key.F))boundingBoxActivate = !boundingBoxActivate;
             
             //Si el personaje se mantiene en caida, se pierda la partida.
-            if (personaje.Position.Y < -700)perdiste = true;
+            if (personaje.position().Y < -700)perdiste = true;
             
 
             //Si se sigue en juego, se continua con la logica del juego.
@@ -294,6 +302,55 @@ namespace TGC.Group.Model
                    
                 }
 
+                #region Danio
+                if (escenario.personajeSobreLava()) escenario.quemarPersonaje();
+                #endregion
+
+                #region BarraVida
+
+                if (personaje.vivo())
+                {
+
+                    if (!personaje.vidaCompleta())
+                    {
+                        barraDeVida.Scaling = new TGCVector2(personaje.vida, 1);
+                        barraDeVida.Color = Color.FromArgb(Convert.ToInt32((1 - personaje.vida) * 255), Convert.ToInt32(personaje.vida * 255), 0);
+                    }
+                    else
+                    {
+                        barraDeVida.Scaling = new TGCVector2(1, 1);
+                        barraDeVida.Color = Color.FromArgb(0, 255, 0);
+                    }
+                }
+                else
+                {
+                    perdiste = true;
+                }
+                #endregion
+
+                #region Frutas
+                if (escenario.personajeSobreFruta())
+                {
+                    personaje.aumentarFrutas();
+                    escenario.eliminarFrutaColisionada();
+                 }
+
+                textoFrutas.Text = personaje.frutas.ToString();
+
+                #endregion
+
+                #region Mascaras
+                if (escenario.personajeSobreMascara())
+                {
+                    personaje.aumentarMascaras();
+                    escenario.eliminarMascaraColisionada();
+                }
+
+                textoMascaras.Text = personaje.mascaras.ToString();
+
+                #endregion
+
+                #region Movimientos
                 //Vector de movimiento
 
                 var movimientoOriginal = new TGCVector3(0,0,0);
@@ -305,8 +362,8 @@ namespace TGC.Group.Model
                 {
                     animacion = "Caminando";
                     moveForward = -velocidadCaminar;
-                    movX = FastMath.Sin(personaje.Rotation.Y) * moveForward * ElapsedTime;
-                    movZ = FastMath.Cos(personaje.Rotation.Y) * moveForward * ElapsedTime;
+                    movX = FastMath.Sin(personaje.rotation().Y) * moveForward * ElapsedTime;
+                    movZ = FastMath.Cos(personaje.rotation().Y) * moveForward * ElapsedTime;
                     soundManager.playSonidoCaminar();
                 }
                 else
@@ -328,6 +385,7 @@ namespace TGC.Group.Model
 
                 //MOVIMIENTOS POR PISO
                 moverMundo(movimientoOriginal);
+                #endregion
 
                 //Ejecuta la animacion del personaje
                 personaje.playAnimation(animacion, true);
@@ -404,7 +462,7 @@ namespace TGC.Group.Model
             if (plataformaRotante != null) movimientoRealPersonaje = colliderOBB.manageColisionEsferaOBB(esferaPersonaje, movimientoOriginal,plataformaRotante.OBB);
             else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
              
-            personaje.Move(movimientoRealPersonaje);
+            personaje.move(movimientoRealPersonaje);
         }
         public void movimientoDePlataformas()
         {
@@ -443,7 +501,7 @@ namespace TGC.Group.Model
         
         public bool testColisionObjetoPersonaje(TgcMesh objetoColisionable)
         {
-            return TgcCollisionUtils.testAABBAABB(personaje.BoundingBox, objetoColisionable.BoundingBox);
+            return TgcCollisionUtils.testAABBAABB(personaje.boundingBox(), objetoColisionable.BoundingBox);
         }
         
         public void RotarPersonaje()
@@ -521,7 +579,7 @@ namespace TGC.Group.Model
             camaraInterna.SetCamera(position, target);
 
             //Hacer que la camara siga al personaje en su nueva posicion
-            camaraInterna.Target = personaje.Position;
+            camaraInterna.Target = personaje.position();
         }
 
         public override void Render()
@@ -536,16 +594,24 @@ namespace TGC.Group.Model
                  Frustum.render();
                 if (!perdiste)
                 {
+                    drawer2D.BeginDrawSprite();
 
+                    drawer2D.DrawSprite(barraDeVida);
+                    drawer2D.DrawSprite(fruta);
+                    drawer2D.DrawSprite(mascara);
+                    drawer2D.EndDrawSprite();
 
-                    DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
+                    textoFrutas.render();
+                    textoMascaras.render();
+
+                   /* DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
                                + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
                                /*+ "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
                                + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
-                               + "Interaccion Con Caja: " + interaccionConCaja + "\n"*/
+                               + "Interaccion Con Caja: " + interaccionConCaja + "\n"
                                + "Colision Plataforma: " + colisionPlataforma + "\n"
-                               /*+ "Movimiento por plataforma: " + movimientoPorPlataforma*/, 0, 30, Color.GhostWhite);
-
+                               /*+ "Movimiento por plataforma: " + movimientoPorPlataforma, 0, 30, Color.GhostWhite);
+                    */
                     DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
 
                     escenario.RenderAll();
@@ -560,43 +626,53 @@ namespace TGC.Group.Model
                         renderizarRestantes();
                         personaje.animateAndRender(ElapsedTime);
                     }
-                    else
-                    {
-                        DrawText.drawText("Perdiste" + "\n" + "¿Reiniciar? (Y)", 500, 500, Color.Red);
-                        personaje.Render();
-                    }
+                    
 
                     if (boundingBoxActivate)
                     {
 
-                        personaje.BoundingBox.Render();
+                        personaje.boundingBox().Render();
                         esferaPersonaje.Render();
                         escenario.RenderizarBoundingBoxes();
                     }
 
-                    TgcMesh closestLight = escenario.getClosestLight(personaje.Position, 0f);
+
+                    TgcMesh closestLight = escenario.getClosestLight(personaje.position(), 0f);
                     if(closestLight != null)
                     {
-                        personaje.Effect.SetValue("lightColor", ColorValue.FromColor(Color.White));
-                        personaje.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(closestLight.Position));
-                        personaje.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+                        personaje.effect().SetValue("lightColor", ColorValue.FromColor(Color.White));
+                        personaje.effect().SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(closestLight.Position));
+                        personaje.effect().SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
                     }
-                    personaje.Effect.SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
-                    personaje.Effect.SetValue("materialAmbientColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
-                    personaje.Effect.SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
-                    personaje.Effect.SetValue("materialSpecularColor", ColorValue.FromColor(Color.DimGray));
-                    personaje.Effect.SetValue("materialSpecularExp", 500f);
+                    personaje.effect().SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
+                    personaje.effect().SetValue("materialAmbientColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
+                    personaje.effect().SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
+                    personaje.effect().SetValue("materialSpecularColor", ColorValue.FromColor(Color.DimGray));
+                    personaje.effect().SetValue("materialSpecularExp", 500f);
 
-                    personaje.Effect.SetValue("lightIntensity", 20);
-                    personaje.Effect.SetValue("lightAttenuation", 25);
+                    personaje.effect().SetValue("lightIntensity", 20);
+                    personaje.effect().SetValue("lightAttenuation", 25);
 
                     foreach(TgcMesh mesh in meshesConLuz)
                     {
                         //mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
                         mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
                     }
+
                     
-              }
+                }
+                else
+                {
+                    DrawText.drawText("Perdiste" + "\n" + "¿Reiniciar? (Y)", 500, 500, Color.Red);
+                    //personaje.render();
+                    //gui_render(ElapsedTime);
+                    //GuiMessage gs = gui.Update(ElapsedTime, Input);
+                    //gui.Menu_Perdiste("Perdiste, Desea Reiniciar el Juego?", directorio.Menu, "Crash Bandicoot");
+
+                    //menu = true;
+                    //TODO: menu perdiste
+
+                }
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
@@ -613,8 +689,13 @@ namespace TGC.Group.Model
 
         public override void Dispose()
         {
-            personaje.Dispose();
+            personaje.dispose();
             escenario.DisposeAll();
+            barraDeVida.Dispose();
+            fruta.Dispose();
+            mascara.Dispose();
+            textoFrutas.Dispose();
+            textoMascaras.Dispose();
         }
 
         public void inicializarGUI()
@@ -641,6 +722,8 @@ namespace TGC.Group.Model
             gui.InsertMenuItem(ID_APP_EXIT, "Salir", "salir.png", x0, y0 += dy2, MediaDir, dx, dy);
 
         }
+
+       
 
         public void gui_render(float elapsedTime)
         {
@@ -677,12 +760,17 @@ namespace TGC.Group.Model
                             paused = false;
                             break;
 
+                        case ID_RESTART:
+                            menu = true;
+                            gui.Menu_Perdiste("Perdiste, Desea Reiniciar el Juego?", directorio.Menu, "Crash Bandicoot");
+                            break;
+
                         /*case ID_CONFIGURAR:
                             Configurar();
                             break;*/
 
                         case ID_APP_EXIT:
-                            gui.MessageBox("Desea Salir del Juego?",directorio.Menu, "Crash Bandicoot");
+                            gui.Menu_Exit("Desea Salir del Juego?",directorio.Menu, "Crash Bandicoot");
                             msg_box_app_exit = true;
                             break;
 
@@ -741,8 +829,43 @@ namespace TGC.Group.Model
                 //mesh.Technique = "RenderScene2";
             }
             personajeLightShader = TgcShaders.Instance.TgcSkeletalMeshPointLightShader;
-            personaje.Effect = personajeLightShader;
-            personaje.Technique = TgcShaders.Instance.getTgcSkeletalMeshTechnique(personaje.RenderType);
+            personaje.effect(personajeLightShader);
+            personaje.technique(TgcShaders.Instance.getTgcSkeletalMeshTechnique(personaje.renderType()));
+        }
+
+        public void inicializarHUDS(Microsoft.DirectX.Direct3D.Device d3dDevice)
+        {
+            drawer2D = new Drawer2D();
+            barraDeVida = new CustomSprite();
+            barraDeVida.Bitmap = new CustomBitmap(directorio.BarraVida, d3dDevice);
+            barraDeVida.Position = new TGCVector2(10, 20);
+
+            fruta = new CustomSprite();
+            fruta.Bitmap = new CustomBitmap(directorio.Fruta, d3dDevice);
+            fruta.Position = new TGCVector2(20, 70);
+
+            textoFrutas = new TgcText2D();
+            textoFrutas.Text = "0";
+            textoFrutas.Color = Color.White;
+            textoFrutas.Align = TgcText2D.TextAlign.LEFT;
+            textoFrutas.Position = new Point(100, 80);
+            textoFrutas.Size = new Size(350, 140);
+            textoFrutas.changeFont(new System.Drawing.Font("TimesNewRoman", 30,FontStyle.Bold));
+
+
+            mascara = new CustomSprite();
+            mascara.Bitmap = new CustomBitmap(directorio.Mascara, d3dDevice);
+            mascara.Position = new TGCVector2(25, 150);
+
+            textoMascaras = new TgcText2D();
+            textoMascaras.Text = "0";
+            textoMascaras.Color = Color.White;
+            textoMascaras.Align = TgcText2D.TextAlign.LEFT;
+            textoMascaras.Position = new Point(100, 200);
+            textoMascaras.Size = new Size(350, 140);
+            textoMascaras.changeFont(new System.Drawing.Font("TimesNewRoman", 30, FontStyle.Bold));
+
+
         }
 
     }

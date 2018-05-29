@@ -34,6 +34,10 @@ namespace TGC.Group.Model
         public string SonidoCaminar { get; set; }
         public string SonidoSalto { get; set; }
         public string Menu { get; set; }
+        
+        public string BarraVida { get; set; }
+        public string Fruta { get; set; }
+        public string Mascara { get; set; }
 
         public Directorio(string mediaDir)
         {
@@ -50,6 +54,10 @@ namespace TGC.Group.Model
             SonidoSalto = mediaDir + "Sonidos\\jump.wav";
           
             Menu = mediaDir + "Menu\\";
+
+            BarraVida = mediaDir + "Imagenes\\barra_vida.png";
+            Fruta = mediaDir + "Imagenes\\fruta.png";
+            Mascara = mediaDir + "Imagenes\\mascara.png";
         }
 
     }

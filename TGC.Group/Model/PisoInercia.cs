@@ -141,9 +141,9 @@ namespace TGC.Group.Model
         //    RenderMesh.updateValues();
         //}
 
-        public bool aCollisionFound(TgcSkeletalMesh personaje)
+        public bool aCollisionFound(Personaje personaje)
         {
-            var collisionResult = TgcCollisionUtils.classifyBoxBox(personaje.BoundingBox, this.SlidingBoundingBox);
+            var collisionResult = TgcCollisionUtils.classifyBoxBox(personaje.boundingBox(), this.SlidingBoundingBox);
             return (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera);
         }
 

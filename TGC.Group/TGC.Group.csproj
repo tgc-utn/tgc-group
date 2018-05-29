@@ -87,6 +87,7 @@
     <Compile Include="GUI\GUI.cs" />
     <Compile Include="GUI\GUIItem.cs" />
     <Compile Include="Model\AI\PlataformaZ.cs" />
+    <Compile Include="Model\Personaje.cs" />
     <Compile Include="Model\PisoInercia.cs" />
     <Compile Include="Model\AI\Plataforma.cs" />
     <Compile Include="Model\AI\PlataformaRotante.cs" />
@@ -102,6 +103,10 @@
     <Compile Include="SphereCollisionUtils\SphereCollisionManager.cs" />
     <Compile Include="SphereCollisionUtils\SphereTriangleCollisionManager.cs" />
     <Compile Include="SphereCollisionUtils\TriangleMeshCollider.cs" />
+    <Compile Include="Sprites\AnimatedSprite.cs" />
+    <Compile Include="Sprites\CustomBitmap.cs" />
+    <Compile Include="Sprites\CustomSprite.cs" />
+    <Compile Include="Sprites\Drawer2D.cs" />
     <Compile Include="VectorMovement\DirectionAngle.cs" />
     <Compile Include="VectorMovement\DownDirection.cs" />
     <Compile Include="VectorMovement\DownLeftDirection.cs" />
@@ -200,6 +205,9 @@
   <ItemGroup>
     <Content Include="Media\cajaMadera4.jpg" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Text\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
