@@ -15,11 +15,8 @@ namespace TGC.Group.Model.Scenes {
 
         public void init(string mediaDir) {
             cameraOffset = new TGCVector3(0, 200, 400);
-            personaje = new Personaje(mediaDir);
-
-            // TEMP
             setNivel(new Nivel3(mediaDir));
-
+            personaje = new Personaje(mediaDir);
         }
 
         public void setNivel(Nivel nuevoNivel) {
