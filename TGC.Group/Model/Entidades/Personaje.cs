@@ -106,11 +106,6 @@ namespace TGC.Group.Model {
             boundingSphere.Render();
             pies.Render();
 
-            TgcText2D t = new TgcText2D();
-            t.Text = stamina.ToString();
-            t.Color = Color.White;
-            t.render();
-
             // seria un post-update
             resetUpdateVariables();
             if (dir.Length() == 0) moving = false;
@@ -278,7 +273,7 @@ namespace TGC.Group.Model {
                 // ordeno por distancia
                 .OrderBy(b => {
                     TgcCollisionUtils.intersectRayAABB(rayoVelocidad, b, out aux);
-                    return aux.Length();
+                    return aux.LengthSq();
                 })
                 // tomo la primera
                 .DefaultIfEmpty(null)

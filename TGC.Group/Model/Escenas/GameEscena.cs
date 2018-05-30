@@ -72,7 +72,6 @@ namespace TGC.Group.Model.Scenes {
 
         public void render(float deltaTime) {
             nivel.render();
-            personaje.render(deltaTime);
 
             hud.Begin(SpriteFlags.None);
             hud.Transform = TGCMatrix.Scaling(TGCVector3.One);
@@ -90,6 +89,8 @@ namespace TGC.Group.Model.Scenes {
 
 
             hud.End();
+
+            personaje.render(deltaTime);
         }
 
         public void dispose() {
