@@ -188,7 +188,7 @@ namespace TGC.Group.Model
 
             //Posicion inicial
             personaje.position(new TGCVector3(400, escenario.Ypiso, -900));
-           // personaje.position(new TGCVector3(-4133.616f, 20f, 5000f));
+            //personaje.position(new TGCVector3(-4133.616f, 20f, 5000f));
 
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.autoTransform(false);
@@ -214,6 +214,8 @@ namespace TGC.Group.Model
             //Inicializamos el collisionManager.
             ColisionadorEsferico = new SphereCollisionManager();
             ColisionadorEsferico.GravityEnabled = true;
+            ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
+            ColisionadorEsferico.SlideFactor = 1.3f;
 
             //Obtenemos las plataformas segun su tipo de movimiento.
             plataformas = escenario.Plataformas();
@@ -378,19 +380,9 @@ namespace TGC.Group.Model
                     animacion = "Parado";
                     soundManager.stopSonidoCaminar();
                 }
-
-                //MOVIMIENTOS POR PISO
-                var vectorSlide = new TGCVector3(0, 0, 0);
-
+                
                 movimientoOriginal = new TGCVector3(movX, movY, movZ);
 
-
-                
-                ColisionadorEsferico.GravityEnabled = true;
-                ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
-                ColisionadorEsferico.SlideFactor = 1.3f;
-
-                //MOVIMIENTOS POR PISO
                 moverMundo(movimientoOriginal);
                 #endregion
 
@@ -462,13 +454,17 @@ namespace TGC.Group.Model
             //Actualizo el vector de movimiento del personaje segun la plataforma colisionante
             movimientoOriginal += movimientoPorPlataformas();
 
+           
             //Busca una plataforma rotante con la que se este colisionando
             //NOTA: para estas plataformas se colisiona Esfera -> OBB y no Esfera -> AABB como las demás colisiones
             var plataformaRotante = plataformasRotantes.Find(plat => colliderOBB.colisionaEsferaOBB(esferaPersonaje,plat.OBB));
             //Si colisiona con una maneja la colision para las rotantes sino usa el metodo general
             if (plataformaRotante != null) movimientoRealPersonaje = colliderOBB.manageColisionEsferaOBB(esferaPersonaje, movimientoOriginal,plataformaRotante.OBB);
             else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
-             
+
+
+            
+
             personaje.move(movimientoRealPersonaje);
         }
         public void movimientoDePlataformas()
