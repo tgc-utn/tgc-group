@@ -250,7 +250,7 @@ namespace TGC.Group.Model
 
             //TODO: Reificar estos valores.
             //Obtenemos los valores default
-            if (movimientoRealPersonaje.Y == 0f) doubleJump = 2;
+            if (movimientoRealPersonaje.Y == 0f || colisionPlataforma) doubleJump = 2;
 
             var velocidadCaminar = 1000f;
             var coeficienteSalto = 30f;
