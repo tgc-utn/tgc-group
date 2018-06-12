@@ -7,6 +7,7 @@ namespace TGC.Group.Model.Scenes {
         private Stack<Escena> scenes;
         private static EscenaManager instance;
         private string mediaDir;
+        private string shaderDir;
 
         private Escena actual;
         private Escena proxima;
@@ -18,6 +19,10 @@ namespace TGC.Group.Model.Scenes {
 
         public void setMediaDir(string mediaDir) {
             this.mediaDir = mediaDir;
+        }
+
+        public void setShaderDir(string shaderDir) {
+            this.shaderDir = shaderDir;
         }
 
         public static EscenaManager getInstance() {
@@ -53,7 +58,7 @@ namespace TGC.Group.Model.Scenes {
         }
 
         public void addScene(Escena scene) {
-            scene.init(mediaDir);
+            scene.init(mediaDir, shaderDir);
             scenes.Push(scene);
             proxima = scene;
         }

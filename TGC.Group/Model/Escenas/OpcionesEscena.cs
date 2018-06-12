@@ -20,7 +20,7 @@ namespace TGC.Group.Model.Escenas {
             volumenLabel.Dispose();
         }
 
-        public void init(string mediaDir) {
+        public void init(string mediaDir, string shaderDir) {
             volver = new Boton("Volver", 0, 0, () => EscenaManager.getInstance().goBack());
 
             volumenLabel = new ElementoTexto("Volumen:", 0.5f, 0.9f);

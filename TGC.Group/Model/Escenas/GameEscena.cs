@@ -22,10 +22,10 @@ namespace TGC.Group.Model.Scenes {
         private TgcTexture unidadStamina;
         private TgcTexture vida;
 
-        public void init(string mediaDir) {
+        public void init(string mediaDir, string shaderDir) {
             cameraOffset = new TGCVector3(0, 200, 400);
             setNivel(new Nivel1(mediaDir));
-            personaje = new Personaje(mediaDir);
+            personaje = new Personaje(mediaDir, shaderDir);
 
             hud = new Sprite(D3DDevice.Instance.Device);
             barraStamina = TgcTexture.createTexture(mediaDir + "stamina.png");

@@ -28,6 +28,7 @@ namespace TGC.Group.Model {
 
             Escena escenaInicial = new InicioEscena();
             EscenaManager.getInstance().setMediaDir(MediaDir);
+            EscenaManager.getInstance().setShaderDir(ShadersDir);
             EscenaManager.getInstance().addScene(escenaInicial);
 
             var pathSkyBoxCaras = MediaDir + "\\SkyBoxFaces\\";

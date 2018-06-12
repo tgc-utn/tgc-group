@@ -56,8 +56,8 @@ namespace TGC.Group.Model {
         private const float JUMP_SPEED = 10f; // PC Cristian
         //private const float JUMP_SPEED = 5f; // PC Pepe
 
-        public Personaje(string MediaDir) {
-            string shaderDir = "C:\\Users\\fulcano\\Desktop\\2018_1C_3011_LosPalmeras\\TGC.Group\\Shaders\\";
+        public Personaje(string MediaDir, string shaderDir) {
+            string shaderDirViejo = "C:\\Users\\fulcano\\Desktop\\2018_1C_3011_LosPalmeras\\TGC.Group\\Shaders\\";
 
             vidas = 3;
             stamina = MAX_STAMINA;

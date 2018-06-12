@@ -20,7 +20,7 @@ namespace TGC.Group.Model.Escenas {
         Sprite s;
         Texture crashDead;
 
-        public void init(string mediaDir) {
+        public void init(string mediaDir, string shaderDir) {
 
             textoGameOver = new ElementoTexto("GAME OVER", 0.4f, 0f);
             reiniciar = new Boton("REINICIAR", 0.5f, 0.5f, () => EscenaManager.getInstance().goBack());

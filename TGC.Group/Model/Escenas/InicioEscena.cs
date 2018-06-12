@@ -19,7 +19,7 @@ namespace TGC.Group.Model.Escenas {
         private TgcTexture fondo;
         private Viewport viewport = D3DDevice.Instance.Device.Viewport;
 
-        public void init(string mediaDir) {
+        public void init(string mediaDir, string shaderDir) {
             jugar = new Boton("Jugar", 0f, 0.8f, () => EscenaManager.getInstance().addScene(new GameEscena()));
             opciones = new Boton("Opciones", 0f, 0.9f, () => EscenaManager.getInstance().addScene(new OpcionesEscena()));
             s = new Sprite(D3DDevice.Instance.Device);
