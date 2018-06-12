@@ -9,6 +9,7 @@ namespace TGC.Group.Model.AI
         private TgcMesh plataformaMesh;
         private Escenario escenario;
         public float anguloRotacion;
+        public float coeficienteRotacion;
 
         private TGCVector3 posicionInicialBB;
         private TGCMatrix mTraslacionAlOrigen;
@@ -20,9 +21,11 @@ namespace TGC.Group.Model.AI
         {
             this.plataformaMesh = plataformaMesh;
             this.escenario = escenario;
+            this.coeficienteRotacion = coeficienteRotacion;
 
             this.plataformaMesh.AutoTransform = false;
             this.plataformaMesh.AutoUpdateBoundingBox = false;
+            
 
             //Defino angulo de rotacion --> coeficiente puede ser -1 o 1, define direccion de rotacion
             anguloRotacion = FastMath.ToRad(15f);
@@ -52,5 +55,7 @@ namespace TGC.Group.Model.AI
             //Traslado Mesh al origen --> Roto el Mesh --> Vuelve a la posicion inicial
             plataformaMesh.Transform = mTraslacionAlOrigen * TGCMatrix.RotationY(anguloRotacion * tiempo) * mTraslacionPosInicial;
         }
+
+        
     }
 }

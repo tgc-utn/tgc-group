@@ -20,8 +20,15 @@ namespace TGC.Group.Model
         public float vida { get; set; }
         public int frutas { get; set; }
         public int mascaras { get; set; }
+
         public TgcSkeletalMesh personajeMesh { get; }
         private Directorio directorio;
+
+        public TgcBoundingSphere esferaPersonaje { get; set; }
+
+        private TGCVector3 posicionInicial = new TGCVector3(400, 20f, -900);
+        private TGCVector3 posicionDesarrollo = new TGCVector3(-4738.616f, 1379f, -7531f);
+        
 
         public Personaje(Directorio directorio)
         {
@@ -37,9 +44,26 @@ namespace TGC.Group.Model
                             loadMeshAndAnimationsFromFile(directorio.RobotSkeletalMesh,
                                                       directorio.RobotDirectorio,
                                                       pathAnimacionesPersonaje);
+            var scaleBoundingVector = new TGCVector3(1.5f, 1f, 1.2f);
+            this.boundingBox().scaleTranslate(position(), scaleBoundingVector);
 
-            
+            position(posicionDesarrollo);
+            RotateY(FastMath.ToRad(180f));
         }
+
+       
+
+        public void inicializarEsferaColisionante()
+        {
+            //Para desplazar un poco el centro de la esfera.
+            TGCVector3 vectorAjuste = new TGCVector3(0f, 50f, 0f);
+            //Para reducir el radio de la esfera.
+            float coeficienteReductivo = 0.4f;
+            esferaPersonaje = new TgcBoundingSphere(boundingBox().calculateBoxCenter() - vectorAjuste,
+                                                    boundingBox().calculateBoxRadius() * coeficienteReductivo);
+           
+        }
+
         #region MeshAdapter
         public TgcBoundingAxisAlignBox boundingBox() => personajeMesh.BoundingBox;
 
@@ -55,6 +79,7 @@ namespace TGC.Group.Model
 
         public void move(TGCVector3 desplazamiento) => personajeMesh.Move(desplazamiento);
 
+        public TGCMatrix transform() => personajeMesh.Transform;
         public void autoTransform(bool state) => personajeMesh.AutoTransform = state;
         public void UpdateMeshTransform() => personajeMesh.UpdateMeshTransform();
         public void changeDiffuseMaps(TgcTexture[] newDiffuseMap) => personajeMesh.changeDiffuseMaps(newDiffuseMap);
@@ -65,6 +90,7 @@ namespace TGC.Group.Model
         public void dispose() => personajeMesh.Dispose();
         #endregion
 
+        #region Estado
         public bool vidaCompleta() => vida == vidaMaxima;
         public bool vivo() => vida > 0;
         public void aumentarVida(float aumento)
@@ -80,6 +106,6 @@ namespace TGC.Group.Model
         {
             mascaras++;
         }
-
+        #endregion
     }
 }

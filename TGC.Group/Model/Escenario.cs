@@ -33,7 +33,7 @@ namespace TGC.Group.Model
             danioLava = 0.001f;
             frutas = Frutas();
         }
-
+        
 
         #region MeshLists
         public List<TgcMesh> encontrarMeshes(string clave) => scene.Meshes.FindAll(x => x.Layer == clave);
@@ -49,6 +49,7 @@ namespace TGC.Group.Model
         public List<TgcMesh> Luces() => encontrarMeshes("Luces");
         public List<TgcMesh> Frutas() => encontrarMeshes("FRUTA");
         public List<TgcMesh> Mascaras() => encontrarMeshes("MASCARA");
+        public List<TgcMesh> Escalones() => encontrarMeshes("ESCALON");
         #endregion
 
         #region Colisiones
@@ -84,6 +85,8 @@ namespace TGC.Group.Model
         {
             return this.CajasMesh().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.boundingBox()) && caja != objetoMovibleG);
         }
+
+       
         #endregion
 
         #region Personaje
@@ -188,6 +191,7 @@ namespace TGC.Group.Model
             meshesColisionables.AddRange(ResbalososMesh());
             meshesColisionables.AddRange(PlataformasMesh());
             meshesColisionables.AddRange(LavaMesh());
+            meshesColisionables.AddRange(Escalones());
             
             return meshesColisionables;
         }

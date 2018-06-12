@@ -37,7 +37,7 @@ namespace TGC.Group.Model
         public void playSonidoCaminar()
         {
             //mp3PasosPlayer.play(true);
-            SonidoCaminar.play();
+            //SonidoCaminar.play();
         }
 
         public void stopSonidoCaminar()
@@ -48,12 +48,12 @@ namespace TGC.Group.Model
         public void playSonidoSaltar()
         {
             //mp3SaltosPlayer.play(true);
-            SonidoSalto.play(false);
+            //SonidoSalto.play(false);
         }
 
         public void playSonidoFondo()
         {
-            mp3BackgroundPlayer.play(true);
+           // mp3BackgroundPlayer.play(true);
         }
 
         public void dispose()
