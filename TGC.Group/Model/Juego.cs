@@ -441,18 +441,23 @@ namespace TGC.Group.Model
             movimientoDePlataformas();
             //Actualizo el vector de movimiento del personaje segun la plataforma colisionante
             movimientoOriginal += movimientoPorPlataformas();
-
+            
            
             //Busca una plataforma rotante con la que se este colisionando
             //NOTA: para estas plataformas se colisiona Esfera -> OBB y no Esfera -> AABB como las demás colisiones
             var plataformaRotante = plataformasRotantes.Find(plat => colliderOBB.colisionaEsferaOBB(personaje.esferaPersonaje,plat.OBB));
             //Si colisiona con una maneja la colision para las rotantes sino usa el metodo general
-            if (plataformaRotante != null) movimientoRealPersonaje = colliderOBB.manageColisionEsferaOBB(personaje.esferaPersonaje, movimientoOriginal,plataformaRotante.OBB);
+            if (plataformaRotante != null)
+            {
+                movimientoRealPersonaje = colliderOBB.manageColisionEsferaOBB(personaje.esferaPersonaje, movimientoOriginal, plataformaRotante.OBB);
+                //personaje.RotateY(plataformaRotante.anguloRotacion * ElapsedTime);
+                
+            }
             else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(personaje.esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
 
 
-            
 
+            
             personaje.move(movimientoRealPersonaje);
         }
         public void movimientoDePlataformas()
@@ -469,6 +474,8 @@ namespace TGC.Group.Model
             if (colisionPlataforma) return plataformaColisionante.VectorMovimiento();
             else return TGCVector3.Empty;
         }
+
+        
         public void generarMovimiento(TgcMesh objetoMovible, TGCVector3 movementV)
         {
             if (objetoMovibleG == null || objetoMovibleG != objetoMovible) objetoMovibleG = objetoMovible;

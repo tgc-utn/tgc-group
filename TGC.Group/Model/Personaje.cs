@@ -51,6 +51,8 @@ namespace TGC.Group.Model
             RotateY(FastMath.ToRad(180f));
         }
 
+       
+
         public void inicializarEsferaColisionante()
         {
             //Para desplazar un poco el centro de la esfera.
@@ -77,6 +79,7 @@ namespace TGC.Group.Model
 
         public void move(TGCVector3 desplazamiento) => personajeMesh.Move(desplazamiento);
 
+        public TGCMatrix transform() => personajeMesh.Transform;
         public void autoTransform(bool state) => personajeMesh.AutoTransform = state;
         public void UpdateMeshTransform() => personajeMesh.UpdateMeshTransform();
         public void changeDiffuseMaps(TgcTexture[] newDiffuseMap) => personajeMesh.changeDiffuseMaps(newDiffuseMap);
