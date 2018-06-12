@@ -18,7 +18,7 @@ using TGC.Core.Shaders;
 using TGC.Core.Text;
 
 using TGC.Group.SphereCollisionUtils;
-using TGC.Group.Model.AI;
+using TGC.Group.Model.Plataformas;
 using TGC.Group.GUI;
 using TGC.Group.Optimizacion;
 using TGC.Group.Sprites;
@@ -55,7 +55,7 @@ namespace TGC.Group.Model
         private bool colisionPlataforma = false;
 
 
-        private SphereCollisionManager ColisionadorEsferico;
+        private SphereTriangleCollisionManager ColisionadorEsferico;
         private TgcBoundingSphere esferaCaja;
 
         private TGCVector3 scaleBoundingVector;
@@ -200,7 +200,7 @@ namespace TGC.Group.Model
             personaje.inicializarEsferaColisionante();
 
             //Inicializamos el collisionManager.
-            ColisionadorEsferico = new SphereCollisionManager();
+            ColisionadorEsferico = new SphereTriangleCollisionManager();
             ColisionadorEsferico.GravityEnabled = true;
             ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
             ColisionadorEsferico.SlideFactor = 1.3f;
@@ -453,7 +453,7 @@ namespace TGC.Group.Model
                 //personaje.RotateY(plataformaRotante.anguloRotacion * ElapsedTime);
                 
             }
-            else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(personaje.esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
+            else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(personaje.esferaPersonaje, movimientoOriginal, escenario.colliders());
 
 
 
@@ -482,7 +482,7 @@ namespace TGC.Group.Model
 
             esferaCaja = new TgcBoundingSphere(objetoMovible.BoundingBox.calculateBoxCenter() + new TGCVector3(0f, 15f, 0f), objetoMovible.BoundingBox.calculateBoxRadius() * 0.7f);
 
-            movimientoRealCaja = ColisionadorEsferico.moveCharacter(esferaCaja, movementV, escenario.MeshesColisionablesBBSin(objetoMovible));
+            movimientoRealCaja = ColisionadorEsferico.moveCharacter(esferaCaja, movementV,  escenario.collidersSin(objetoMovible));
 
             var testCol = testColisionObjetoPersonaje(objetoMovible);
 

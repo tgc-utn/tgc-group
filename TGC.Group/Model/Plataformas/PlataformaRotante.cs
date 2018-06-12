@@ -2,7 +2,7 @@
 using TGC.Core.SceneLoader;
 using TGC.Core.BoundingVolumes;
 
-namespace TGC.Group.Model.AI
+namespace TGC.Group.Model.Plataformas
 {
     class PlataformaRotante : Plataforma
     {

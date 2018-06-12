@@ -11,7 +11,8 @@ using TGC.Core.Textures;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.Collision;
 using TGC.Core.BoundingVolumes;
-using TGC.Group.Model.AI;
+using TGC.Group.Model.Plataformas;
+using TGC.Group.SphereCollisionUtils;
 
 namespace TGC.Group.Model
 {
@@ -50,6 +51,58 @@ namespace TGC.Group.Model
         public List<TgcMesh> Frutas() => encontrarMeshes("FRUTA");
         public List<TgcMesh> Mascaras() => encontrarMeshes("MASCARA");
         public List<TgcMesh> Escalones() => encontrarMeshes("ESCALON");
+
+        public List<TgcMesh> MeshesColisionables()
+        {
+            List<TgcMesh> meshesColisionables = new List<TgcMesh>();
+            meshesColisionables.AddRange(ParedesMesh());
+            meshesColisionables.AddRange(RocasMesh());
+            meshesColisionables.AddRange(PisosMesh());
+            meshesColisionables.AddRange(CajasMesh());
+            meshesColisionables.AddRange(SarcofagosMesh());
+            meshesColisionables.AddRange(PilaresMesh());
+            meshesColisionables.AddRange(ResbalososMesh());
+            meshesColisionables.AddRange(PlataformasMesh());
+            meshesColisionables.AddRange(LavaMesh());
+            meshesColisionables.AddRange(Escalones());
+
+            return meshesColisionables;
+        }
+
+        public List<TgcMesh> MeshesColisionablesSin(TgcMesh box)
+        {
+            List<TgcMesh> obstaculos = MeshesColisionables();
+            var indice = -1;
+            indice = obstaculos.FindIndex(mesh => mesh.Name == box.Name);
+
+            if (indice != -1) obstaculos.RemoveAt(indice);
+            return obstaculos;
+        }
+
+        public List<Collider> collidersSin(TgcMesh _mesh)
+        {
+            List<Collider> colliders = new List<Collider>();
+            MeshesColisionablesSin(_mesh).ForEach(mesh => colliders.Add(mapMeshToCollider(mesh)));
+           
+            return colliders;
+        }
+
+        public List<Collider> colliders ()
+        {
+            List<Collider> colliders = new List<Collider>();
+            MeshesColisionables().ForEach(mesh => colliders.Add(mapMeshToCollider(mesh)));
+            
+            return colliders;
+        }
+
+        private Collider mapMeshToCollider(TgcMesh mesh)
+        {
+            //if (mesh.Layer == "PISOS") return TriangleMeshCollider.fromMesh(mesh);
+            // else 
+            return BoundingBoxCollider.fromBoundingBox(mesh.BoundingBox);
+        }
+
+        
         #endregion
 
         #region Colisiones
@@ -179,22 +232,7 @@ namespace TGC.Group.Model
             return plataformas;
         }
 
-        public List<TgcMesh> MeshesColisionables()
-        {
-            List<TgcMesh> meshesColisionables = new List<TgcMesh>();
-            meshesColisionables.AddRange(ParedesMesh());
-            meshesColisionables.AddRange(RocasMesh());
-            meshesColisionables.AddRange(PisosMesh());
-            meshesColisionables.AddRange(CajasMesh());
-            meshesColisionables.AddRange(SarcofagosMesh());
-            meshesColisionables.AddRange(PilaresMesh());
-            meshesColisionables.AddRange(ResbalososMesh());
-            meshesColisionables.AddRange(PlataformasMesh());
-            meshesColisionables.AddRange(LavaMesh());
-            meshesColisionables.AddRange(Escalones());
-            
-            return meshesColisionables;
-        }
+       
 
 
         public List<TgcBoundingAxisAlignBox> MeshesColisionablesBB()
@@ -236,15 +274,7 @@ namespace TGC.Group.Model
         
         public TgcBoundingAxisAlignBox BoundingBox() => scene.BoundingBox;
 
-        public List<TgcBoundingAxisAlignBox> MeshesColisionablesBBSin(TgcMesh box)
-        {
-            List<TgcMesh> obstaculos = MeshesColisionables();
-            var indice = -1;
-            indice = obstaculos.FindIndex(mesh => mesh.Name == box.Name);
-
-            if (indice != -1) obstaculos.RemoveAt(indice);
-            return obstaculos.ConvertAll(mesh => mesh.BoundingBox);
-        }
+        
 
         public List<TgcMesh> MeshesColisionablesSin(string layer)
         {

@@ -47,7 +47,7 @@ namespace TGC.Group.Model
             var scaleBoundingVector = new TGCVector3(1.5f, 1f, 1.2f);
             this.boundingBox().scaleTranslate(position(), scaleBoundingVector);
 
-            position(posicionDesarrollo);
+            position(posicionInicial);
             RotateY(FastMath.ToRad(180f));
         }
 

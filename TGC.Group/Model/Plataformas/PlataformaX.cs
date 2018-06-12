@@ -8,19 +8,20 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Collision;
 using TGC.Core.BoundingVolumes;
 
-namespace TGC.Group.Model.AI
+namespace TGC.Group.Model.Plataformas
 {
-    class PlataformaZ : Plataforma
+    class PlataformaX : Plataforma
     {
-
+       
         private TgcMesh plataformaMesh;
         private Escenario escenario;
+        
 
-        public PlataformaZ(TgcMesh plataformaMesh, Escenario escenario) : base(plataformaMesh, escenario)
+        public PlataformaX(TgcMesh plataformaMesh, Escenario escenario) : base(plataformaMesh, escenario)
         {
             this.plataformaMesh = plataformaMesh;
             this.escenario = escenario;
-            vectorMovimiento = new TGCVector3(0, 0, -10);
+            vectorMovimiento = new TGCVector3(-10, 0, 0);
         }
 
         public override bool colisionaConPersonaje(TgcBoundingSphere esferaPersonaje)
@@ -33,19 +34,21 @@ namespace TGC.Group.Model.AI
             centroTestColision.Y -= 50f;
             esferaAux.setCenter(centroTestColision);
 
-            colision = base.colisionaConPersonaje(esferaAux);
+            colision= base.colisionaConPersonaje(esferaAux);
 
             esferaAux.setCenter(centroOriginal);
             return colision;
         }
+
+        
 
         public override void Update(float tiempo)
         {
             TGCVector3 posicionSiguiente = plataformaMesh.Position + vectorMovimiento;
 
             //Si la plataforma colisiona con una pared, cambiamos el sentido de movimiento.
-            if (escenario.colisionaCon(plataformaMesh)) vectorMovimiento.Multiply(-1);
-
+            if (escenario.colisionaConPared(plataformaMesh)) vectorMovimiento.Multiply(-1);
+            
             //Desplazamos la plataforma en el sentido correcto.
             plataformaMesh.Move(vectorMovimiento);
         }

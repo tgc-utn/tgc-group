@@ -7,7 +7,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Collision;
 
-namespace TGC.Group.Model.AI
+namespace TGC.Group.Model.Plataformas
 {
     class PlataformaY : Plataforma
     {
