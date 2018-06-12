@@ -7,6 +7,7 @@ using TGC.Core.Collision;
 using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
+using TGC.Core.Shaders;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.Text;
 using TGC.Core.Textures;
@@ -25,6 +26,9 @@ namespace TGC.Group.Model {
         private int stamina;
         private bool agotado;
         private const int MAX_STAMINA = 200;
+
+
+        private Microsoft.DirectX.Direct3D.Effect effect;
 
         // animaciones
         private TgcSkeletalMesh mesh;
@@ -53,6 +57,8 @@ namespace TGC.Group.Model {
         //private const float JUMP_SPEED = 5f; // PC Pepe
 
         public Personaje(string MediaDir) {
+            string shaderDir = "C:\\Users\\fulcano\\Desktop\\2018_1C_3011_LosPalmeras\\TGC.Group\\Shaders\\";
+
             vidas = 3;
             stamina = MAX_STAMINA;
 
@@ -90,6 +96,11 @@ namespace TGC.Group.Model {
             sombra = TGCBox.fromSize(posicionPies, new TGCVector3(100, 1, 100), sombraTexture);
             sombra.Position = posicionPies;
             sombra.AlphaBlendEnable = true;
+
+            var effect = TgcShaders.loadEffect(shaderDir + "TgcSkeletalMeshShader.fx");
+            mesh.Effect = effect;
+            mesh.Technique = "DIFFUSE_MAP";
+
         }
 
         public void update(float deltaTime, TgcD3dInput Input) {

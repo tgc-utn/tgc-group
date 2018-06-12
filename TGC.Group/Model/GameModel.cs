@@ -62,18 +62,25 @@ namespace TGC.Group.Model {
 
         public override void Render() {
 
+            /*
             D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.CadetBlue, 1.0f, 0);
             D3DDevice.Instance.Device.BeginScene();
             TexturesManager.Instance.clearAll();
+            */
+
+            PreRender();
 
             EscenaManager.getInstance().render(ElapsedTime);
 
             skyBox.Render();
 
+            PostRender();
+            /*
             RenderAxis();
             RenderFPS();
             D3DDevice.Instance.Device.EndScene();
             D3DDevice.Instance.Device.Present();
+            */
         }
 
         public override void Dispose() {

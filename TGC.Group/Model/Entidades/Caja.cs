@@ -1,9 +1,11 @@
-﻿using System.Drawing;
+﻿using Microsoft.DirectX.Direct3D;
+using System.Drawing;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Direct3D;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Core.Shaders;
 using TGC.Core.Textures;
 
 namespace TGC.Group.Model {
@@ -18,10 +20,24 @@ namespace TGC.Group.Model {
         private TGCBox box;
         private TGCVector3 vel;
 
-        public bool AlphaBlendEnable { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        bool alpha = true;
+
+        public bool AlphaBlendEnable { get => alpha; set { alpha = value; } }
 
         public Caja(string mediaDir, TGCVector3 pos) :
             this(mediaDir, pos, new TGCVector3(80, 80, 80)) { }
+
+        private static Effect effect;
+
+        public static Effect getEffect() 
+        {
+            if(effect==null) 
+            {
+                effect = TgcShaders.loadEffect("C:/Users/fulcano/Desktop/2018_1C_3011_LosPalmeras/TGC.Group/Shaders/BasicShader.fx");
+            }
+
+            return effect;
+        }
 
         public Caja(string mediaDir, TGCVector3 pos, TGCVector3 size) {
             // TODO: tengo que hacer dispose de esta textura? la hago global?
@@ -50,6 +66,13 @@ namespace TGC.Group.Model {
 
             move(pos);
             vel = TGCVector3.Empty;
+
+            
+            box.Effect = getEffect();
+            box.Technique = "RenderScene";
+
+            effect.SetValue("time", 0);
+
         }
 
         public void Render() {
