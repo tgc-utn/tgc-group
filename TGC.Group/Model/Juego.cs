@@ -56,7 +56,6 @@ namespace TGC.Group.Model
 
 
         private SphereCollisionManager ColisionadorEsferico;
-        private TgcBoundingSphere esferaPersonaje;
         private TgcBoundingSphere esferaCaja;
 
         private TGCVector3 scaleBoundingVector;
@@ -183,33 +182,22 @@ namespace TGC.Group.Model
 
             //Cagar escenario especifico para el juego.
             escenario = new Escenario(directorio.EscenaCrash,personaje);
+
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
-
-            //Posicion inicial
-            personaje.position(new TGCVector3(400, escenario.Ypiso, -900));
-            //personaje.position(new TGCVector3(-4133.616f, 20f, 5000f));
-
+                       
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
             personaje.autoTransform(false);
             
-            //Rotar al robot en el Init para que mire hacia el otro lado
-            personaje.RotateY(FastMath.ToRad(180f));
-
             //Le cambiamos la textura para diferenciarlo un poco
             personaje.changeDiffuseMaps(new[]
             {
                 TgcTexture.createTexture(D3DDevice.Instance.Device, directorio.RobotTextura)
             });
 
-            //Para desplazar un poco el centro de la esfera.
-            TGCVector3 vectorAjuste = new TGCVector3(0f, 50f, 0f);
-            //Para reducir el radio de la esfera.
-            float coeficienteReductivo = 0.4f;
-            esferaPersonaje = new TgcBoundingSphere(personaje.boundingBox().calculateBoxCenter()-vectorAjuste, 
-                                                    personaje.boundingBox().calculateBoxRadius()*coeficienteReductivo);
-            scaleBoundingVector = new TGCVector3(1.5f, 1f, 1.2f);
             
+            //Inicializar la esfera para el manejo de colisiones del personaje
+            personaje.inicializarEsferaColisionante();
 
             //Inicializamos el collisionManager.
             ColisionadorEsferico = new SphereCollisionManager();
@@ -227,7 +215,7 @@ namespace TGC.Group.Model
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara = camaraInterna;
 
-            personaje.boundingBox().scaleTranslate(personaje.position(), scaleBoundingVector);
+            
             var meshesSinPlatXZ = escenario.scene.Meshes.FindAll(mesh => mesh.Name != "PlataformaX" && mesh.Name != "PlataformaZ");
 
             octree = new Octree();
@@ -457,10 +445,10 @@ namespace TGC.Group.Model
            
             //Busca una plataforma rotante con la que se este colisionando
             //NOTA: para estas plataformas se colisiona Esfera -> OBB y no Esfera -> AABB como las demás colisiones
-            var plataformaRotante = plataformasRotantes.Find(plat => colliderOBB.colisionaEsferaOBB(esferaPersonaje,plat.OBB));
+            var plataformaRotante = plataformasRotantes.Find(plat => colliderOBB.colisionaEsferaOBB(personaje.esferaPersonaje,plat.OBB));
             //Si colisiona con una maneja la colision para las rotantes sino usa el metodo general
-            if (plataformaRotante != null) movimientoRealPersonaje = colliderOBB.manageColisionEsferaOBB(esferaPersonaje, movimientoOriginal,plataformaRotante.OBB);
-            else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
+            if (plataformaRotante != null) movimientoRealPersonaje = colliderOBB.manageColisionEsferaOBB(personaje.esferaPersonaje, movimientoOriginal,plataformaRotante.OBB);
+            else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(personaje.esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
 
 
             
@@ -474,7 +462,7 @@ namespace TGC.Group.Model
         public TGCVector3 movimientoPorPlataformas()
         {
 
-            Plataforma plataformaColisionante = plataformas.Find(plataforma => plataforma.colisionaConPersonaje(esferaPersonaje));
+            Plataforma plataformaColisionante = plataformas.Find(plataforma => plataforma.colisionaConPersonaje(personaje.esferaPersonaje));
             if (plataformaColisionante != null) colisionPlataforma = true;
             else colisionPlataforma = false;
 
@@ -607,14 +595,14 @@ namespace TGC.Group.Model
                     textoFrutas.render();
                     textoMascaras.render();
 
-                   /* DrawText.drawText("Posicion Actual: " + personaje.Position + "\n"
+                    DrawText.drawText("Posicion Actual: " + personaje.position() + "\n"
                                + "Vector Movimiento Real Personaje" + movimientoRealPersonaje + "\n"
                                /*+ "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
                                + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
                                + "Interaccion Con Caja: " + interaccionConCaja + "\n"
                                + "Colision Plataforma: " + colisionPlataforma + "\n"
-                               /*+ "Movimiento por plataforma: " + movimientoPorPlataforma, 0, 30, Color.GhostWhite);
-                    */
+                               /*+ "Movimiento por plataforma: " + movimientoPorPlataforma*/, 500, 0, Color.GhostWhite);
+                    
                     DrawText.drawText((paused ? "EN PAUSA" : "") + "\n", 500, 500, Color.Red);
 
                     escenario.RenderAll();
@@ -633,9 +621,9 @@ namespace TGC.Group.Model
 
                     if (boundingBoxActivate)
                     {
-
+                        
                         personaje.boundingBox().Render();
-                        esferaPersonaje.Render();
+                        personaje.esferaPersonaje.Render();
                         escenario.RenderizarBoundingBoxes();
                     }
 
