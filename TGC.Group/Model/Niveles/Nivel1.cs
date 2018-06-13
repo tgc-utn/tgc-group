@@ -31,6 +31,7 @@ namespace TGC.Group.Model.Niveles {
             limites = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "paredJungla.jpg");
             caja = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "caja.jpg");
 
+            agregarPared(new TGCVector3(0, 125, 9000), new TGCVector3(200, 200, 200), piso);
             // Bloques de piso (no precipicios)
             agregarPisoNormal(new TGCVector3(-700, 0, 8000), new TGCVector3(1400, 0, 2000), piso);
             agregarPisoNormal(new TGCVector3(-700, 0, 5000), new TGCVector3(1400, 0, 2000), piso);

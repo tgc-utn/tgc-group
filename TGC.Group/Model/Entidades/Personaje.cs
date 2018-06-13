@@ -57,8 +57,6 @@ namespace TGC.Group.Model {
         //private const float JUMP_SPEED = 5f; // PC Pepe
 
         public Personaje(string MediaDir, string shaderDir) {
-            string shaderDirViejo = "C:\\Users\\fulcano\\Desktop\\2018_1C_3011_LosPalmeras\\TGC.Group\\Shaders\\";
-
             vidas = 3;
             stamina = MAX_STAMINA;
 
@@ -273,7 +271,7 @@ namespace TGC.Group.Model {
         private void movimientoHorizontal(TGCVector3 movement, List<TgcBoundingAxisAlignBox> colliders, float deltaTime, int count) {
             if (count > 5) return;
 
-            rayoVelocidad.Origin = this.getPies().Center;
+            rayoVelocidad.Origin = this.getBoundingSphere().Center;
             rayoVelocidad.Direction = movement;
 
             TGCVector3 aux = new TGCVector3();

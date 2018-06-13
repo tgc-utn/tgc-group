@@ -1,6 +1,7 @@
 ﻿using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
+using System.Drawing;
 using TGC.Core.Camara;
 using TGC.Core.Collision;
 using TGC.Core.Direct3D;
@@ -73,17 +74,17 @@ namespace TGC.Group.Model.Scenes {
         public void render(float deltaTime) {
             nivel.render();
 
-            hud.Begin(SpriteFlags.None);
+            hud.Begin(SpriteFlags.AlphaBlend | SpriteFlags.SortDepthFrontToBack);
             hud.Transform = TGCMatrix.Scaling(TGCVector3.One);
-            hud.Draw(barraStamina.D3dTexture, Vector3.Empty, Vector3.Empty, 16777215);
+            hud.Draw(barraStamina.D3dTexture, Rectangle.Empty, Vector3.Empty, Vector3.Empty, Color.White);
             hud.Transform = TGCMatrix.Scaling(new TGCVector3(personaje.getStamina() / 200f * 256f, 2, 1));
-            hud.Draw(unidadStamina.D3dTexture, Vector3.Empty, Vector3.Empty, 16777215);
+            hud.Draw(unidadStamina.D3dTexture, Rectangle.Empty, Vector3.Empty, Vector3.Empty, Color.White);
 
             int posVidas = D3DDevice.Instance.Device.Viewport.Width - vida.Width;
 
             for (int i = 0; i < personaje.getVidas(); i++) {
                 hud.Transform = TGCMatrix.Translation(new TGCVector3(posVidas, 0, 0));
-                hud.Draw(vida.D3dTexture, Vector3.Empty, Vector3.Empty, 16777215);
+                hud.Draw(vida.D3dTexture, Rectangle.Empty, Vector3.Empty, Vector3.Empty, Color.White);
                 posVidas -= vida.Width;
             }
 

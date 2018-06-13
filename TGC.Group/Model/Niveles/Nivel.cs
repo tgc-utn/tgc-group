@@ -54,6 +54,8 @@ namespace TGC.Group.Model.Niveles {
         public void render() {
             getRenderizables().ForEach(r => r.Render());
             if (lfBox != null) lfBox.BoundingBox.Render();
+
+            aabbDeDecorativos.ForEach(r => r.Render());
         }
 
         public abstract void dispose();

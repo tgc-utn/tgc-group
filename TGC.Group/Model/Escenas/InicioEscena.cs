@@ -34,7 +34,7 @@ namespace TGC.Group.Model.Escenas {
 
         public void render(float deltaTime) {
 
-            s.Begin(SpriteFlags.None);
+            s.Begin(SpriteFlags.AlphaBlend | SpriteFlags.SortDepthFrontToBack);
 
             var scaling = new TGCVector3(
                 (float) viewport.Width / fondo.Width,
@@ -42,11 +42,11 @@ namespace TGC.Group.Model.Escenas {
             0);
 
             s.Transform = TGCMatrix.Scaling(scaling);
-            s.Draw(fondo.D3dTexture, Vector3.Empty, Vector3.Empty, 0xFFFFFF);
+            s.Draw(fondo.D3dTexture, Rectangle.Empty, Vector3.Empty, Vector3.Empty, Color.White);
 
             s.Transform = TGCMatrix.Translation(new TGCVector3(
                 viewport.Width / 2 - logo.Width / 2, 0, 0));
-            s.Draw(logo.D3dTexture, Vector3.Empty, Vector3.Empty, 0xFFFFFF);
+            s.Draw(logo.D3dTexture, Rectangle.Empty, Vector3.Empty, Vector3.Empty, Color.White);
 
             s.End();
 
