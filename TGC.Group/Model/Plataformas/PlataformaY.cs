@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Collision;
+using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Model.Plataformas
 {
@@ -24,11 +25,6 @@ namespace TGC.Group.Model.Plataformas
             vectorMovimiento = new TGCVector3(0, -5, 0);
         }
 
-		public override TGCVector3 VectorMovimiento()
-        {
-            if (vectorMovimiento.Y < 0) return vectorMovimiento;
-            else return vectorMovimiento + vectorMovimiento;
-        }
 
         public override void Update(float tiempo)
         {

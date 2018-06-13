@@ -15,7 +15,7 @@ namespace TGC.Group.Model.Plataformas
         private TGCMatrix mTraslacionAlOrigen;
         private TGCMatrix mTraslacionPosInicial;
         public TgcBoundingOrientedBox OBB;
-        private TGCVector3 vRotacionOBB;
+        public TGCVector3 vRotacionOBB;
 
         public PlataformaRotante(TgcMesh plataformaMesh, Escenario escenario, int coeficienteRotacion) : base(plataformaMesh, escenario)
         {

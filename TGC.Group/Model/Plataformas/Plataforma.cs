@@ -33,6 +33,7 @@ namespace TGC.Group.Model.Plataformas
         public virtual TGCVector3 VectorMovimiento()
         {
             return vectorMovimiento;
+            
         }
 
         public virtual void Update(float tiempo)
