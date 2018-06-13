@@ -58,7 +58,7 @@ namespace TGC.Group.Model
                                                       pathAnimacionesPersonaje);
 
             //Descomentar para ubicarlo donde se este desarrollando
-            //posicionInicial = posicionDesarrollo;
+            posicionInicial = posicionDesarrollo;
 
             
             

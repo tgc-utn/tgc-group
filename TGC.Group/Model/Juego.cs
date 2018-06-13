@@ -511,7 +511,7 @@ namespace TGC.Group.Model
             if (solicitudInteraccionConCaja && testCol)
             {
                 if (!escenario.colisionEscenario()) objetoMovible.Move(movimientoRealCaja);
-                else if (escenario.colisionConPilar() || personaje.colisionaConBoundingBox(objetoMovible)) movimientoRealCaja = TGCVector3.Empty;
+                else if (escenario.colisionConPilar() || personaje.colisionaConCaja(objetoMovible)) movimientoRealCaja = TGCVector3.Empty;
                 else objetoMovible.Move(-movimientoRealCaja);
                 
             }
