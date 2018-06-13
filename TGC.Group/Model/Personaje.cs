@@ -89,9 +89,9 @@ namespace TGC.Group.Model
         {
             //Es la posicion del centro de la esfera, pero restandole el radio de la esfera en el eje Y
             TGCVector3 posicionActual = new TGCVector3(esferaPersonaje.Center.X, esferaPersonaje.Center.Y - RADIO_ESFERA, esferaPersonaje.Center.Z);
-
+            float anguloRotado = (personajeMesh.Rotation.Y + FastMath.ToRad(180f));
             personajeMesh.Transform =  TGCMatrix.Scaling(PERSONAJE_SCALE)
-                                      *TGCMatrix.RotationY(personajeMesh.Rotation.Y + FastMath.ToRad(180f))
+                                      *TGCMatrix.RotationY(anguloRotado)
                                       *TGCMatrix.Translation(posicionActual + ultimoDesplazamiento);
         }
 
