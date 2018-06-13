@@ -56,6 +56,8 @@ namespace TGC.Group.Model.Plataformas
             plataformaMesh.Transform = mTraslacionAlOrigen * TGCMatrix.RotationY(anguloRotacion * tiempo) * mTraslacionPosInicial;
         }
 
+        public TGCMatrix transform() => plataformaMesh.Transform;
+
         
     }
 }

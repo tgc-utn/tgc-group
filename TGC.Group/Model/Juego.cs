@@ -71,7 +71,9 @@ namespace TGC.Group.Model
         private PisoInercia pisoResbaloso = null; //Es null cuando no esta pisando ningun piso resbaloso
 
         private int doubleJump = 0;
-        private bool moving;
+        private bool moving = false;
+        private bool jumping = false;
+        
 
         private List<TgcMesh> meshesConLuz;
 
@@ -294,6 +296,7 @@ namespace TGC.Group.Model
                     {
                         saltoActual = coeficienteSalto;
                         doubleJump -= 1;
+                        jumping = true;
                         soundManager.playSonidoSaltar();
                     }
                     if (Input.keyUp(Key.Space) || saltoActual > 0 )
@@ -301,6 +304,7 @@ namespace TGC.Group.Model
                         saltoActual -= coeficienteSalto * ElapsedTime;
                         saltoRealizado = saltoActual;
                     }
+                    if (saltoRealizado == 0) jumping = false;
                    
                 }
 
@@ -450,16 +454,16 @@ namespace TGC.Group.Model
             if (plataformaRotante != null)
             {
                 movimientoRealPersonaje = colliderOBB.manageColisionEsferaOBB(personaje.esferaPersonaje, movimientoOriginal, plataformaRotante.OBB);
+                
+                personaje.matrizTransformacionPlataformaRotante = plataformaRotante.transform();
 
-                /*var a = plataformaRotante.vRotacionOBB * tiempoAcumulado;
-                direccionPersonaje.angleDir.setAngulo(plataformaRotante.anguloRotacion * tiempoAcumulado - FastMath.ToRad(90f));*/
-               // personaje.personajeMesh.Transform = MtrizRotacionSobreEjePlataforma;
-
-               // personaje.personajeMesh.Rotation = a;
-                //personaje.esferaPersonaje.rot
+                personaje.boundingBox().transform(TGCMatrix.Scaling(1000, 1000, 1000));
             }
-            else movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(personaje.esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
-
+            else
+            {
+                movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(personaje.esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
+                personaje.matrizTransformacionPlataformaRotante = TGCMatrix.Identity;
+            }
             
             personaje.move(movimientoRealPersonaje);
         }
@@ -684,6 +688,8 @@ namespace TGC.Group.Model
                                + "Vector Movimiento Real Personaje: " + movimientoRealPersonaje + "\n"
                                + "Colision con Caja: " + interaccionCaja + "\n"
                                + "Solicitud interaccion con caja: " + solicitudInteraccionConCaja + "\n"
+                               + "Moving: " + moving + "\n"
+                               + "Jumping: " + jumping + "\n"
                                /*+ "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
                                + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
                                + "Interaccion Con Caja: " + interaccionConCaja + "\n"

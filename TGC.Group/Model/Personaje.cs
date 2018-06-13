@@ -39,6 +39,7 @@ namespace TGC.Group.Model
         public float ultimaRotacion { get; set; }
         public TGCVector3 ultimoDesplazamiento { get; set; }
 
+        public TGCMatrix matrizTransformacionPlataformaRotante { get; set; }
         
 
         public Personaje(Directorio directorio)
@@ -71,6 +72,7 @@ namespace TGC.Group.Model
                                       *TGCMatrix.Translation(posicionInicial);
 
             move(posicionInicial);
+            matrizTransformacionPlataformaRotante = TGCMatrix.Identity;
             
         }
 
@@ -84,7 +86,6 @@ namespace TGC.Group.Model
 
         public void inicializarEsferaColisionante() => esferaPersonaje = new TgcBoundingSphere(POSICION_INICIAL_ESFERA,RADIO_ESFERA);
         
-
         public void transformar()
         {
             //Es la posicion del centro de la esfera, pero restandole el radio de la esfera en el eje Y
@@ -92,7 +93,8 @@ namespace TGC.Group.Model
             float anguloRotado = (personajeMesh.Rotation.Y + FastMath.ToRad(180f));
             personajeMesh.Transform =  TGCMatrix.Scaling(PERSONAJE_SCALE)
                                       *TGCMatrix.RotationY(anguloRotado)
-                                      *TGCMatrix.Translation(posicionActual + ultimoDesplazamiento);
+                                      *TGCMatrix.Translation(posicionActual + ultimoDesplazamiento)
+                                      *matrizTransformacionPlataformaRotante;
         }
 
         #region MeshAdapter
