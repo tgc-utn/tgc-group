@@ -126,9 +126,9 @@ namespace TGC.Group.Model
             return this.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => personaje.colisionaConBoundingBox(mesh)) != null;
         }
 
-        public TgcMesh obtenerColisionCajaPersonaje(TgcMesh objetoMovibleG)
+        public TgcMesh obtenerColisionCajaPersonaje()
         {
-            return this.CajasMesh().Find(caja => personaje.colisionaConBoundingBox(caja) && caja != objetoMovibleG);
+            return this.CajasMesh().Find(caja=>personaje.colisionaConCaja(caja));
         }
 
        
