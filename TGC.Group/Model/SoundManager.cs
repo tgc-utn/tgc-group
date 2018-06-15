@@ -58,7 +58,17 @@ namespace TGC.Group.Model
 
         public void playSonidoFondo()
         {
-           // mp3BackgroundPlayer.play(true);
+           //mp3BackgroundPlayer.play(true);
+        }
+
+        public void playSonidoFruta()
+        {
+            //mp3FruitPlayer.play(true);
+        }
+
+        public void playSonidoMoneda()
+        {
+            //SonidoMoneda.play(false);
         }
 
         public void dispose()
