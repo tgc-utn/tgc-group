@@ -163,13 +163,14 @@ namespace TGC.Group.Model
         #region Desarrollo
         private TGCVector3 movimientoRealCaja = TGCVector3.Empty;
         //TGCVector3 movimientoPorPlataforma = new TGCVector3(0, 0, 0);
-        
-        
+
+        float coeficienteDiferencialGlobal = 0f;
         TGCVector3 verticeMasAltoGlobal = new TGCVector3(0, 0, 0);
         bool colisionRampa = false;
         TGCVector3 vectorDiferenciaGlobal = new TGCVector3(0, 0, 0);
         float YPorDesnivelGlobal = 0f;
         float longitudRampaGlobal = 0f;
+        float alturaRampaGlobal = 0f;
         #endregion
 
         public override void Init()
@@ -471,17 +472,18 @@ namespace TGC.Group.Model
                 personaje.matrizTransformacionPlataformaRotante = TGCMatrix.Identity;
             }
 
-
-            float movimientoYOriginal = movimientoRealPersonaje.Y;
-            if ((movimientoRealPersonaje.Y = movimientoPorDesnivel()) < 0) movimientoRealPersonaje.Y = movimientoYOriginal;
-            else
+            float alturaPorDesnivel = 0f;
+            if ((alturaPorDesnivel = movimientoPorDesnivel()) >= 0)
             {
                 var xOriginal = personaje.esferaPersonaje.Center.X;
                 var zOriginal = personaje.esferaPersonaje.Center.Z;
-                personaje.esferaPersonaje.setCenter(new TGCVector3(xOriginal, movimientoRealPersonaje.Y + personaje.esferaPersonaje.Radius, zOriginal));
+                var YActualizado = alturaPorDesnivel;
+
+                personaje.esferaPersonaje.setCenter(new TGCVector3(xOriginal, YActualizado, zOriginal));
+                
             }
             
-            personaje.move(movimientoRealPersonaje);
+           // personaje.move(movimientoRealPersonaje);
         }
         public void movimientoDePlataformas()
         {
@@ -524,19 +526,19 @@ namespace TGC.Group.Model
             TGCVector3 verticeMasBajo = listaVertices[0];
             verticeMasAltoGlobal = verticeMasAlto;
 
-            float longitudRampa = verticeMasAlto.X - verticeMasBajo.X;
+            float alturaRampa = verticeMasAlto.X;
+            float longitudRampa = FastMath.Abs(verticeMasAlto.X - verticeMasBajo.X);
+            longitudRampaGlobal = longitudRampa;
+            alturaRampaGlobal = alturaRampa;
+
+            float pendienteRampa = (verticeMasAlto.Y-verticeMasBajo.Y) / FastMath.Abs(verticeMasAlto.X-verticeMasBajo.Y);
+            float diferenciaPersonajeRampa = FastMath.Abs(verticeMasAlto.X - personaje.position().X);
             
-            TGCVector3 diferencia = verticeMasAlto - personaje.position();
-            vectorDiferenciaGlobal = diferencia;
-
-          
-            float coeficienteDiferencial = (longitudRampa - diferencia.X) / longitudRampa;
-
-            float YPorDesnivel = coeficienteDiferencial * diferencia.Y;
+           
+            float YPorDesnivel = pendienteRampa*FastMath.Abs(longitudRampa - diferenciaPersonajeRampa);
             YPorDesnivelGlobal = YPorDesnivel;
 
-            
-            return YPorDesnivel + personaje.esferaPersonaje.Radius*coeficienteDiferencial;
+            return YPorDesnivel + personaje.esferaPersonaje.Radius ;
         }
         public void movimientoDeCajas(TGCVector3 movimientoOriginal)
         {
@@ -751,7 +753,9 @@ namespace TGC.Group.Model
                                + "Vector diferencia: " + vectorDiferenciaGlobal + "\n"
                                + "Y Por desnivel: " + YPorDesnivelGlobal + "\n"
                                + "Longitud Rampa: " + longitudRampaGlobal + "\n"
+                               + "Altura Rampa: " + alturaRampaGlobal + "\n"
                                + "Posicion bounding box: " + personaje.boundingBox().calculateBoxCenter() + "\n"
+                               + "Coeficiente Diferencial: " + coeficienteDiferencialGlobal + "\n"
                                /*+ "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
                                + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
                                + "Interaccion Con Caja: " + interaccionConCaja + "\n"

@@ -100,18 +100,19 @@ namespace TGC.Group.Model
         public bool colisionConPisoDesnivelado(TgcMesh pisoDesnivelado)
         {
             TgcBoundingSphere esferaAuxiliar = new TgcBoundingSphere(esferaPersonaje.Center, esferaPersonaje.Radius);
-            //esferaAuxiliar.moveCenter(new TGCVector3(0f,, 0f));
+            esferaAuxiliar.moveCenter(new TGCVector3(0f, -RADIO_ESFERA, 0f));
             return TgcCollisionUtils.testSphereAABB(esferaAuxiliar, pisoDesnivelado.BoundingBox);
         }
 
         public void transformar()
         {
             //Es la posicion del centro de la esfera, pero restandole el radio de la esfera en el eje Y
-            TGCVector3 posicionActual = new TGCVector3(esferaPersonaje.Center.X, esferaPersonaje.Center.Y - RADIO_ESFERA, esferaPersonaje.Center.Z);
+            TGCVector3 posicionActual = new TGCVector3(esferaPersonaje.Center.X, esferaPersonaje.Center.Y-RADIO_ESFERA, esferaPersonaje.Center.Z);
+            
             float anguloRotado = (personajeMesh.Rotation.Y + FastMath.ToRad(180f));
             personajeMesh.Transform =  TGCMatrix.Scaling(PERSONAJE_SCALE)
                                       *TGCMatrix.RotationY(anguloRotado)
-                                      *TGCMatrix.Translation(posicionActual + ultimoDesplazamiento)
+                                      *TGCMatrix.Translation(posicionActual)
                                       *matrizTransformacionPlataformaRotante;
         }
 
@@ -127,9 +128,9 @@ namespace TGC.Group.Model
         public void RotateY(float angle) => personajeMesh.RotateY(angle);
         public void move(TGCVector3 desplazamiento)
         {
-            ultimoDesplazamiento = desplazamiento;
+            //ultimoDesplazamiento = desplazamiento;
             //personajeMesh.
-            personajeMesh.Move(desplazamiento);
+            //personajeMesh.Move(desplazamiento);
           }        
        
         public TGCMatrix transform() => personajeMesh.Transform;
