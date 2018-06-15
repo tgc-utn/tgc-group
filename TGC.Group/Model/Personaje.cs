@@ -89,14 +89,20 @@ namespace TGC.Group.Model
             boundingBoxColision.scaleTranslate(position(), new TGCVector3(2.5f,2.5f,2.5f));
             return TgcCollisionUtils.testAABBAABB(boundingBoxColision, box.BoundingBox);
         }
-
-        internal bool colisionaConRampa(TgcMesh rampa)
+       public bool colisionaPorArribaDe(TgcMesh mesh)
         {
-            TgcBoundingSphere esferaAuxiliar = new TgcBoundingSphere(esferaPersonaje.Center,esferaPersonaje.Radius);
-            //esferaAuxiliar.moveCenter(new TGCVector3(0f,, 0f));
-            return TgcCollisionUtils.testSphereAABB(esferaAuxiliar,rampa.BoundingBox);
+            TgcBoundingSphere esferaAuxiliar = new TgcBoundingSphere(esferaPersonaje.Center, esferaPersonaje.Radius);
+            esferaAuxiliar.moveCenter(new TGCVector3(0f,-RADIO_ESFERA, 0f));
+            return TgcCollisionUtils.testSphereAABB(esferaAuxiliar, mesh.BoundingBox);
         }
 
+
+        public bool colisionConPisoDesnivelado(TgcMesh pisoDesnivelado)
+        {
+            TgcBoundingSphere esferaAuxiliar = new TgcBoundingSphere(esferaPersonaje.Center, esferaPersonaje.Radius);
+            //esferaAuxiliar.moveCenter(new TGCVector3(0f,, 0f));
+            return TgcCollisionUtils.testSphereAABB(esferaAuxiliar, pisoDesnivelado.BoundingBox);
+        }
 
         public void transformar()
         {

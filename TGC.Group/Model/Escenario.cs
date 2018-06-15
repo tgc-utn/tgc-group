@@ -125,7 +125,17 @@ namespace TGC.Group.Model
 
         public bool colisionEscenario()
         {
+            
             return this.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => personaje.colisionaConBoundingBox(mesh)) != null;
+        }
+
+        public bool colisionDeSalto()
+        {
+            
+            List<TgcMesh> colisionablesSalto = new List<TgcMesh>();
+            colisionablesSalto.AddRange(MeshesColisionables());
+            colisionablesSalto.AddRange(Rampas());
+            return colisionablesSalto.Exists(mesh => personaje.colisionaPorArribaDe(mesh));
         }
 
         public TgcMesh obtenerColisionCajaPersonaje()
@@ -135,8 +145,15 @@ namespace TGC.Group.Model
 
         public TgcMesh obtenerColisionRampaPersonaje()
         {
-            return this.Rampas().Find(rampa => personaje.colisionaConRampa(rampa));
+            return this.Rampas().Find(rampa => personaje.colisionConPisoDesnivelado(rampa));
         }
+
+        public bool personajeSobreDesnivel()
+        {
+            return Rampas().Exists(pisoDesnivelado => personaje.colisionConPisoDesnivelado(pisoDesnivelado));
+        }
+
+        
 
        
         #endregion

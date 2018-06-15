@@ -246,7 +246,8 @@ namespace TGC.Group.Model
 
             //TODO: Reificar estos valores.
             //Obtenemos los valores default
-            if (personaje.position().Y < 1) doubleJump = 2;
+            if (escenario.colisionDeSalto()) doubleJump = 2;
+            else doubleJump = 0;
 
             var velocidadCaminar = 1000f;
             var coeficienteSalto = 30f;
@@ -286,6 +287,8 @@ namespace TGC.Group.Model
 
                 if (Input.keyDown(Key.R)) solicitudInteraccionConCaja = true;
                 else solicitudInteraccionConCaja = false;
+
+               
 
                 // Para que no se pueda saltar cuando agarras algun objeto
                 //TODO: No debe saltar cuando ya esta saltando
@@ -464,13 +467,22 @@ namespace TGC.Group.Model
                 personaje.matrizTransformacionPlataformaRotante = TGCMatrix.Identity;
             }
 
-            
-            float alturaActual = movimientoRealPersonaje.Y;
-            movimientoRealPersonaje.Y = movimientoPorDesnivel();
-            if (movimientoRealPersonaje.Y < 0)movimientoRealPersonaje.Y = alturaActual;
-               
-            
-            if(moving)personaje.move(movimientoRealPersonaje);
+
+            float movimientoYOriginal = movimientoRealPersonaje.Y;
+            if ((movimientoRealPersonaje.Y = movimientoPorDesnivel()) < 0)
+            {
+                movimientoRealPersonaje.Y = movimientoYOriginal;
+            }
+            else
+            {
+               /* var xOriginal = personaje.esferaPersonaje.Center.X;
+                var zOriginal = personaje.esferaPersonaje.Center.Z;
+                personaje.esferaPersonaje.setCenter(new TGCVector3(xOriginal, movimientoRealPersonaje.Y + personaje.esferaPersonaje.Radius, zOriginal));
+                */
+            }
+
+
+            personaje.move(movimientoRealPersonaje);
         }
         public void movimientoDePlataformas()
         {
@@ -499,7 +511,7 @@ namespace TGC.Group.Model
 
             TgcMesh rampa = escenario.obtenerColisionRampaPersonaje();
 
-            if (rampa == null)
+            if (rampa == null || jumping)
             {
                 colisionRampa = false;
                 ColisionadorEsferico.GravityEnabled = true;
@@ -536,7 +548,8 @@ namespace TGC.Group.Model
             float YPorDesnivel = coeficienteDiferencial * diferencia.Y;
             YPorDesnivelGlobal = YPorDesnivel;
 
-            return YPorDesnivel + personaje.esferaPersonaje.Radius * coeficienteDiferencial;
+            
+            return YPorDesnivel + personaje.esferaPersonaje.Radius*coeficienteDiferencial;
         }
         public void movimientoDeCajas(TGCVector3 movimientoOriginal)
         {
