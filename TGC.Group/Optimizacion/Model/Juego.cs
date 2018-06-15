@@ -349,6 +349,7 @@ namespace TGC.Group.Model
                 if (escenario.personajeSobreFruta())
                 {
                     personaje.aumentarFrutas();
+                    soundManager.playSonidoFruta();
                     escenario.eliminarFrutaColisionada();
                  }
 
@@ -360,6 +361,7 @@ namespace TGC.Group.Model
                 if (escenario.personajeSobreMascara())
                 {
                     personaje.aumentarMascaras();
+                    soundManager.playSonidoMoneda();
                     escenario.eliminarMascaraColisionada();
                 }
 
