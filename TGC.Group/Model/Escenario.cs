@@ -13,6 +13,7 @@ using TGC.Core.Collision;
 using TGC.Core.BoundingVolumes;
 using TGC.Group.Model.Plataformas;
 using TGC.Group.SphereCollisionUtils;
+using TGC.Group.Model.Rampas;
 
 namespace TGC.Group.Model
 {
@@ -51,7 +52,7 @@ namespace TGC.Group.Model
         public List<TgcMesh> Frutas() => encontrarMeshes("FRUTA");
         public List<TgcMesh> Mascaras() => encontrarMeshes("MASCARA");
         public List<TgcMesh> Escalones() => encontrarMeshes("ESCALON");
-        public List<TgcMesh> Rampas() => encontrarMeshes("RAMPA");
+        public List<TgcMesh> RampasMesh() => encontrarMeshes("RAMPA");
 
         public List<TgcMesh> MeshesColisionables()
         {
@@ -134,7 +135,7 @@ namespace TGC.Group.Model
             
             List<TgcMesh> colisionablesSalto = new List<TgcMesh>();
             colisionablesSalto.AddRange(MeshesColisionables());
-            colisionablesSalto.AddRange(Rampas());
+            colisionablesSalto.AddRange(RampasMesh());
             return colisionablesSalto.Exists(mesh => personaje.colisionaPorArribaDe(mesh));
         }
 
@@ -143,9 +144,9 @@ namespace TGC.Group.Model
             return this.CajasMesh().Find(caja=>personaje.colisionaConCaja(caja));
         }
 
-        public TgcMesh obtenerColisionRampaPersonaje()
+        public Rampa obtenerColisionRampaPersonaje()
         {
-            return this.Rampas().Find(rampa => personaje.colisionConPisoDesnivelado(rampa));
+            return this.Rampas().Find(rampa => personaje.colisionConPisoDesnivelado(rampa.rampaMesh));
         }
 
         
@@ -196,7 +197,7 @@ namespace TGC.Group.Model
 
         public bool personajeSobreDesnivel()
         {
-            return Rampas().Exists(pisoDesnivelado => personaje.colisionConPisoDesnivelado(pisoDesnivelado));
+            return RampasMesh().Exists(pisoDesnivelado => personaje.colisionConPisoDesnivelado(pisoDesnivelado));
         }
 
         public void quemarPersonaje()
@@ -240,6 +241,24 @@ namespace TGC.Group.Model
 
             return plataformas;
         }
+
+        public List<Rampa> Rampas()
+        {
+            List<Rampa> rampas = new List<Rampa>();
+
+            foreach (TgcMesh rampaMesh in RampasMesh())
+            {
+
+                Rampa rampa;
+
+                if (rampaMesh.Name == "RAMPAX") rampa = new RampaX(rampaMesh, this);
+                else  rampa = new RampaZ(rampaMesh, this);
+                rampas.Add(rampa);
+
+            }
+
+            return rampas;
+        }
         public List<PlataformaRotante> PlataformasRotantes()
         {
             List<PlataformaRotante> plataformas = new List<PlataformaRotante>();
@@ -271,7 +290,7 @@ namespace TGC.Group.Model
         public void RenderizarBoundingBoxes()
         {
             MeshesColisionables().ForEach(mesh => BoundingBoxRender(mesh));
-           Rampas().ForEach(mesh => BoundingBoxRender(mesh));
+           Rampas().ForEach(rampa => BoundingBoxRender(rampa.rampaMesh));
         }
         private void BoundingBoxRender(TgcMesh mesh)
         {

@@ -94,6 +94,9 @@
     <Compile Include="Model\Plataformas\PlataformaRotante.cs" />
     <Compile Include="Model\Plataformas\PlataformaX.cs" />
     <Compile Include="Model\Plataformas\PlataformaY.cs" />
+    <Compile Include="Model\Rampas\Rampa.cs" />
+    <Compile Include="Model\Rampas\RampaX.cs" />
+    <Compile Include="Model\Rampas\RampaZ.cs" />
     <Compile Include="Model\SoundManager.cs" />
     <Compile Include="Optimizacion\Octree.cs" />
     <Compile Include="Optimizacion\OctreeBuilder.cs" />

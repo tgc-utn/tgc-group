@@ -15,9 +15,9 @@ namespace TGC.Group.Model
         {
         }
 
-        public int Compare(TGCVector3 x, TGCVector3 y)
+        public int Compare(TGCVector3 vector1, TGCVector3 vector2)
         {
-            if (x.Y > y.Y) return 0;
+            if (vector1.Y > vector2.Y) return 0;
             else return 1;
         }
 

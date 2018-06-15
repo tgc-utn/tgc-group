@@ -20,6 +20,7 @@ using TGC.Core.Text;
 
 using TGC.Group.SphereCollisionUtils;
 using TGC.Group.Model.Plataformas;
+using TGC.Group.Model.Rampas;
 using TGC.Group.GUI;
 using TGC.Group.Optimizacion;
 using TGC.Group.Sprites;
@@ -502,8 +503,7 @@ namespace TGC.Group.Model
 
          public float movimientoPorDesnivel()
         {
-            
-            TgcMesh rampa = escenario.obtenerColisionRampaPersonaje();
+            Rampa rampa = escenario.obtenerColisionRampaPersonaje();
 
             if (rampa == null || jumping)
             {
@@ -515,30 +515,8 @@ namespace TGC.Group.Model
 
             colisionRampa = true;
 
-            List<TGCVector3> listaVertices = new List<TGCVector3>();
-            var vertices = rampa.getVertexPositions().GetEnumerator();
-            
-            while(vertices.MoveNext()) listaVertices.Add((TGCVector3)(vertices.Current));
-            listaVertices.Sort(new ComparadorYTgcVector3());
+            return rampa.obtenerAlturaInstantanea(personaje.position()) + personaje.esferaPersonaje.Radius;
 
-            TGCVector3 verticeMasAlto = listaVertices[0];
-            listaVertices.Reverse();
-            TGCVector3 verticeMasBajo = listaVertices[0];
-            verticeMasAltoGlobal = verticeMasAlto;
-
-            float alturaRampa = verticeMasAlto.X;
-            float longitudRampa = FastMath.Abs(verticeMasAlto.X - verticeMasBajo.X);
-            longitudRampaGlobal = longitudRampa;
-            alturaRampaGlobal = alturaRampa;
-
-            float pendienteRampa = (verticeMasAlto.Y-verticeMasBajo.Y) / FastMath.Abs(verticeMasAlto.X-verticeMasBajo.Y);
-            float diferenciaPersonajeRampa = FastMath.Abs(verticeMasAlto.X - personaje.position().X);
-            
-           
-            float YPorDesnivel = pendienteRampa*FastMath.Abs(longitudRampa - diferenciaPersonajeRampa);
-            YPorDesnivelGlobal = YPorDesnivel;
-
-            return YPorDesnivel + personaje.esferaPersonaje.Radius ;
         }
         public void movimientoDeCajas(TGCVector3 movimientoOriginal)
         {
