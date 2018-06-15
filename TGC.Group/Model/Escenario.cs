@@ -148,10 +148,7 @@ namespace TGC.Group.Model
             return this.Rampas().Find(rampa => personaje.colisionConPisoDesnivelado(rampa));
         }
 
-        public bool personajeSobreDesnivel()
-        {
-            return Rampas().Exists(pisoDesnivelado => personaje.colisionConPisoDesnivelado(pisoDesnivelado));
-        }
+        
 
         
 
@@ -195,6 +192,11 @@ namespace TGC.Group.Model
             auxiliarBoundingBox.move(new TGCVector3(0, -Ypiso, 0));
             return LavaMesh().Exists(lava => TgcCollisionUtils.testAABBAABB(lava.BoundingBox, auxiliarBoundingBox));
 
+        }
+
+        public bool personajeSobreDesnivel()
+        {
+            return Rampas().Exists(pisoDesnivelado => personaje.colisionConPisoDesnivelado(pisoDesnivelado));
         }
 
         public void quemarPersonaje()
