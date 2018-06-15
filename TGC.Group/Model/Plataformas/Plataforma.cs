@@ -9,7 +9,7 @@ using TGC.Core.Collision;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.BoundingVolumes;
 
-namespace TGC.Group.Model.AI
+namespace TGC.Group.Model.Plataformas
 {
     class Plataforma 
     {
@@ -33,6 +33,7 @@ namespace TGC.Group.Model.AI
         public virtual TGCVector3 VectorMovimiento()
         {
             return vectorMovimiento;
+            
         }
 
         public virtual void Update(float tiempo)

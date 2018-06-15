@@ -14,7 +14,7 @@ namespace TGC.Group.Model
 
         private Calculos calculo = new Calculos();
 
-        private DirectionAngle angleDir = new DirectionAngle(90f);
+        public DirectionAngle angleDir = new DirectionAngle(90f);
         private DirectionAngle upDir = new UpDirection();
         private DirectionAngle downDir = new DownDirection();
         private DirectionAngle rightDir = new RightDirection();

@@ -86,13 +86,14 @@
   <ItemGroup>
     <Compile Include="GUI\GUI.cs" />
     <Compile Include="GUI\GUIItem.cs" />
-    <Compile Include="Model\AI\PlataformaZ.cs" />
+    <Compile Include="Model\ComparadorTgcVector3.cs" />
+    <Compile Include="Model\Plataformas\PlataformaZ.cs" />
     <Compile Include="Model\Personaje.cs" />
     <Compile Include="Model\PisoInercia.cs" />
-    <Compile Include="Model\AI\Plataforma.cs" />
-    <Compile Include="Model\AI\PlataformaRotante.cs" />
-    <Compile Include="Model\AI\PlataformaX.cs" />
-    <Compile Include="Model\AI\PlataformaY.cs" />
+    <Compile Include="Model\Plataformas\Plataforma.cs" />
+    <Compile Include="Model\Plataformas\PlataformaRotante.cs" />
+    <Compile Include="Model\Plataformas\PlataformaX.cs" />
+    <Compile Include="Model\Plataformas\PlataformaY.cs" />
     <Compile Include="Model\SoundManager.cs" />
     <Compile Include="Optimizacion\Octree.cs" />
     <Compile Include="Optimizacion\OctreeBuilder.cs" />

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TGC.Group.Model;
-
+using TGC.Core.Mathematica;
 namespace TGC.Group.VectorMovement
 {
     class DirectionAngle
@@ -17,6 +17,13 @@ namespace TGC.Group.VectorMovement
             angulo = unAngulo;
             anguloRad = calculo.AnguloARadianes(unAngulo, 1f);
         }
+
+        public void setAngulo(float radAngle)
+        {
+            anguloRad = radAngle;
+            angulo = FastMath.ToDeg(radAngle);
+        }
+
 
     }
 }

@@ -10,6 +10,8 @@ using TGC.Core.SkeletalAnimation;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Mathematica;
 using TGC.Core.Textures;
+using TGC.Core.Collision;
+using TGC.Core.SceneLoader;
 
 
 namespace TGC.Group.Model
@@ -25,9 +27,20 @@ namespace TGC.Group.Model
         private Directorio directorio;
 
         public TgcBoundingSphere esferaPersonaje { get; set; }
+        private TGCVector3 POSICION_INICIAL_ESFERA;
+        private float COEFICIENTE_REDUCTIVO_ESFERA = 0.85f;
+        private float RADIO_ESFERA;
 
-        private TGCVector3 posicionInicial = new TGCVector3(400, 20f, -900);
+        private TGCVector3 posicionInicial = new TGCVector3(400,0.1f, -900);
         private TGCVector3 posicionDesarrollo = new TGCVector3(-4738.616f, 1379f, -7531f);
+
+        public TGCVector3 PERSONAJE_SCALE = new TGCVector3(1f, 0.9f,1f);
+       // public float PERSONAJE_ALTURA_PISO { get; set; }
+
+        public float ultimaRotacion { get; set; }
+        public TGCVector3 ultimoDesplazamiento { get; set; }
+
+        public TGCMatrix matrizTransformacionPlataformaRotante { get; set; }
         
 
         public Personaje(Directorio directorio)
@@ -36,6 +49,7 @@ namespace TGC.Group.Model
             vida = vidaMaxima;
             frutas = 0;
             mascaras = 0;
+            ultimaRotacion = 0;
 
             var skeletalLoader = new TgcSkeletalLoader();
 
@@ -44,46 +58,85 @@ namespace TGC.Group.Model
                             loadMeshAndAnimationsFromFile(directorio.RobotSkeletalMesh,
                                                       directorio.RobotDirectorio,
                                                       pathAnimacionesPersonaje);
-            var scaleBoundingVector = new TGCVector3(1.5f, 1f, 1.2f);
-            this.boundingBox().scaleTranslate(position(), scaleBoundingVector);
 
-            position(posicionDesarrollo);
-            RotateY(FastMath.ToRad(180f));
+            //Descomentar para ubicarlo donde se este desarrollando
+            // posicionInicial = posicionDesarrollo;
+
+            //personajeMesh.AutoUpdateBoundingBox = false;
+            //personajeMesh.BoundingBox.transform(TGCMatrix.Scaling(PERSONAJE_SCALE) *TGCMatrix.Translation(posicionInicial));
+            
+            move(posicionInicial);
+
+            
+            RADIO_ESFERA = boundingBox().calculateBoxRadius() * COEFICIENTE_REDUCTIVO_ESFERA;
+            POSICION_INICIAL_ESFERA = new TGCVector3(posicionInicial.X,posicionInicial.Y + RADIO_ESFERA,posicionInicial.Z);
+            esferaPersonaje = new TgcBoundingSphere(POSICION_INICIAL_ESFERA, RADIO_ESFERA);
+            //Ubica al mesh en la posicion inicial.
+            personajeMesh.Transform = TGCMatrix.Scaling(PERSONAJE_SCALE) 
+                                      *TGCMatrix.RotationY(FastMath.ToRad(180f))
+                                      *TGCMatrix.Translation(posicionInicial);
+
+           
+            
+            matrizTransformacionPlataformaRotante = TGCMatrix.Identity;
+            
         }
 
-       
-
-        public void inicializarEsferaColisionante()
+        public bool colisionaConBoundingBox(TgcMesh mesh) => TgcCollisionUtils.testSphereAABB(esferaPersonaje, mesh.BoundingBox);
+        public bool colisionaConCaja(TgcMesh box)
         {
-            //Para desplazar un poco el centro de la esfera.
-            TGCVector3 vectorAjuste = new TGCVector3(0f, 50f, 0f);
-            //Para reducir el radio de la esfera.
-            float coeficienteReductivo = 0.4f;
-            esferaPersonaje = new TgcBoundingSphere(boundingBox().calculateBoxCenter() - vectorAjuste,
-                                                    boundingBox().calculateBoxRadius() * coeficienteReductivo);
-           
+            TgcBoundingAxisAlignBox boundingBoxColision = boundingBox();
+            boundingBoxColision.scaleTranslate(position(), new TGCVector3(2.5f,2.5f,2.5f));
+            return TgcCollisionUtils.testAABBAABB(boundingBoxColision, box.BoundingBox);
+        }
+       public bool colisionaPorArribaDe(TgcMesh mesh)
+        {
+            TgcBoundingSphere esferaAuxiliar = new TgcBoundingSphere(esferaPersonaje.Center, esferaPersonaje.Radius);
+            esferaAuxiliar.moveCenter(new TGCVector3(0f,-RADIO_ESFERA, 0f));
+            return TgcCollisionUtils.testSphereAABB(esferaAuxiliar, mesh.BoundingBox);
+        }
+
+
+        public bool colisionConPisoDesnivelado(TgcMesh pisoDesnivelado)
+        {
+            TgcBoundingSphere esferaAuxiliar = new TgcBoundingSphere(esferaPersonaje.Center, esferaPersonaje.Radius);
+            //esferaAuxiliar.moveCenter(new TGCVector3(0f,, 0f));
+            return TgcCollisionUtils.testSphereAABB(esferaAuxiliar, pisoDesnivelado.BoundingBox);
+        }
+
+        public void transformar()
+        {
+            //Es la posicion del centro de la esfera, pero restandole el radio de la esfera en el eje Y
+            TGCVector3 posicionActual = new TGCVector3(esferaPersonaje.Center.X, esferaPersonaje.Center.Y - RADIO_ESFERA, esferaPersonaje.Center.Z);
+            float anguloRotado = (personajeMesh.Rotation.Y + FastMath.ToRad(180f));
+            personajeMesh.Transform =  TGCMatrix.Scaling(PERSONAJE_SCALE)
+                                      *TGCMatrix.RotationY(anguloRotado)
+                                      *TGCMatrix.Translation(posicionActual + ultimoDesplazamiento)
+                                      *matrizTransformacionPlataformaRotante;
         }
 
         #region MeshAdapter
         public TgcBoundingAxisAlignBox boundingBox() => personajeMesh.BoundingBox;
-
         public void playAnimation(string animation, bool playLoop) => personajeMesh.playAnimation(animation, playLoop);
         public Effect effect() => personajeMesh.Effect;
         public void effect(Effect newEffect) => personajeMesh.Effect = newEffect;
         public void technique(string newTechnique) => personajeMesh.Technique = newTechnique;
-
-        public void position(TGCVector3 newPosition) => personajeMesh.Position = newPosition;
-        public TGCVector3 position() => personajeMesh.Position;
-        public TGCVector3 rotation() => personajeMesh.Rotation;
+        public void position(TGCVector3 newPosition) => esferaPersonaje = new TgcBoundingSphere(newPosition, RADIO_ESFERA);
+        public TGCVector3 position() => esferaPersonaje.Position;
+        public TGCVector3 rotation() =>  personajeMesh.Rotation;
         public void RotateY(float angle) => personajeMesh.RotateY(angle);
-
-        public void move(TGCVector3 desplazamiento) => personajeMesh.Move(desplazamiento);
-
+        public void move(TGCVector3 desplazamiento)
+        {
+            ultimoDesplazamiento = desplazamiento;
+            //personajeMesh.
+            personajeMesh.Move(desplazamiento);
+          }        
+       
         public TGCMatrix transform() => personajeMesh.Transform;
+        public void transform(TGCMatrix transformacion) => personajeMesh.Transform *= transformacion;
         public void autoTransform(bool state) => personajeMesh.AutoTransform = state;
         public void UpdateMeshTransform() => personajeMesh.UpdateMeshTransform();
         public void changeDiffuseMaps(TgcTexture[] newDiffuseMap) => personajeMesh.changeDiffuseMaps(newDiffuseMap);
-
         public void animateAndRender(float elapsedTime) => personajeMesh.animateAndRender(elapsedTime);
         public TgcSkeletalMesh.MeshRenderType renderType() => personajeMesh.RenderType;
         public void render() => personajeMesh.Render();

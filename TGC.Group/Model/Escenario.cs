@@ -11,14 +11,15 @@ using TGC.Core.Textures;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.Collision;
 using TGC.Core.BoundingVolumes;
-using TGC.Group.Model.AI;
+using TGC.Group.Model.Plataformas;
+using TGC.Group.SphereCollisionUtils;
 
 namespace TGC.Group.Model
 {
     class Escenario
     {
         public TgcScene scene { get; set; }
-        private Personaje personaje;
+        public Personaje personaje { get; }
         public float Ypiso { get; }
 
         private List<TgcMesh> frutas;
@@ -50,12 +51,57 @@ namespace TGC.Group.Model
         public List<TgcMesh> Frutas() => encontrarMeshes("FRUTA");
         public List<TgcMesh> Mascaras() => encontrarMeshes("MASCARA");
         public List<TgcMesh> Escalones() => encontrarMeshes("ESCALON");
+        public List<TgcMesh> Rampas() => encontrarMeshes("RAMPA");
+
+        public List<TgcMesh> MeshesColisionables()
+        {
+            List<TgcMesh> meshesColisionables = new List<TgcMesh>();
+            meshesColisionables.AddRange(ParedesMesh());
+            meshesColisionables.AddRange(RocasMesh());
+            meshesColisionables.AddRange(PisosMesh());
+            meshesColisionables.AddRange(CajasMesh());
+            meshesColisionables.AddRange(SarcofagosMesh());
+            meshesColisionables.AddRange(PilaresMesh());
+            meshesColisionables.AddRange(ResbalososMesh());
+            meshesColisionables.AddRange(PlataformasMesh());
+            meshesColisionables.AddRange(LavaMesh());
+            meshesColisionables.AddRange(Escalones());
+
+            return meshesColisionables;
+        }
+
+        public List<TgcBoundingAxisAlignBox> MeshesColisionablesBB()
+        {
+            return MeshesColisionables().FindAll(mesh => mesh.Name != "PlataformaRotante").Select(mesh => mesh.BoundingBox).ToList();
+        }
+        
+        public List<TgcMesh> MeshesColisionablesSin(TgcMesh box)
+        {
+            List<TgcMesh> obstaculos = MeshesColisionables();
+            var indice = -1;
+            indice = obstaculos.FindIndex(mesh => mesh.Name == box.Name);
+
+            if (indice != -1) obstaculos.RemoveAt(indice);
+            return obstaculos;
+        }
+
+        public List<TgcBoundingAxisAlignBox> MeshesColisionablesBBSin(TgcMesh box)
+        {
+            List<TgcMesh> obstaculos = MeshesColisionablesSin(box);
+            var indice = -1;
+            indice = obstaculos.FindIndex(mesh => mesh.Name == box.Name);
+
+            if (indice != -1) obstaculos.RemoveAt(indice);
+            return obstaculos.Select(mesh => mesh.BoundingBox).ToList();
+        }
+
+
         #endregion
 
         #region Colisiones
         public bool colisionConPilar()
         {
-            return this.PilaresMesh().Exists(mesh => TgcCollisionUtils.testAABBAABB(personaje.boundingBox(), mesh.BoundingBox));
+            return this.PilaresMesh().Exists(mesh => personaje.colisionaConBoundingBox(mesh));
         }
 
         public bool colisionaConPiso(TgcMesh mesh)
@@ -70,6 +116,7 @@ namespace TGC.Group.Model
         {
             return ParedesMesh().Exists(pared => TgcCollisionUtils.testAABBAABB(pared.BoundingBox, mesh.BoundingBox));
         }
+      
 
         public bool colisionaCon(TgcMesh mesh)
         {
@@ -78,13 +125,32 @@ namespace TGC.Group.Model
 
         public bool colisionEscenario()
         {
-            return this.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => TgcCollisionUtils.testAABBAABB(personaje.boundingBox(), mesh.BoundingBox)) != null;
+            
+            return this.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => personaje.colisionaConBoundingBox(mesh)) != null;
         }
 
-        public TgcMesh obtenerColisionCajaPersonaje(TgcMesh objetoMovibleG)
+        public bool colisionDeSalto()
         {
-            return this.CajasMesh().Find(caja => TgcCollisionUtils.testAABBAABB(caja.BoundingBox, personaje.boundingBox()) && caja != objetoMovibleG);
+            
+            List<TgcMesh> colisionablesSalto = new List<TgcMesh>();
+            colisionablesSalto.AddRange(MeshesColisionables());
+            colisionablesSalto.AddRange(Rampas());
+            return colisionablesSalto.Exists(mesh => personaje.colisionaPorArribaDe(mesh));
         }
+
+        public TgcMesh obtenerColisionCajaPersonaje()
+        {
+            return this.CajasMesh().Find(caja=>personaje.colisionaConCaja(caja));
+        }
+
+        public TgcMesh obtenerColisionRampaPersonaje()
+        {
+            return this.Rampas().Find(rampa => personaje.colisionConPisoDesnivelado(rampa));
+        }
+
+        
+
+        
 
        
         #endregion
@@ -93,12 +159,12 @@ namespace TGC.Group.Model
 
         public bool personajeSobreMascara()
         {
-            return Mascaras().Exists(mascara => TgcCollisionUtils.testAABBAABB(mascara.BoundingBox, personaje.boundingBox()));
+            return Mascaras().Exists(mascara => personaje.colisionaConBoundingBox(mascara));
         }
 
         public void eliminarMascaraColisionada()
         {
-            TgcMesh mascaraColisionada = Mascaras().Find(mascara => TgcCollisionUtils.testAABBAABB(mascara.BoundingBox, personaje.boundingBox()));
+            TgcMesh mascaraColisionada = Mascaras().Find(mascara => personaje.colisionaConBoundingBox(mascara));
             eliminarObjeto(mascaraColisionada);
         }
 
@@ -111,12 +177,12 @@ namespace TGC.Group.Model
 
         public bool personajeSobreFruta()
         {
-            return Frutas().Exists(fruta => TgcCollisionUtils.testAABBAABB(fruta.BoundingBox, personaje.boundingBox()));
+            return Frutas().Exists(fruta => personaje.colisionaConBoundingBox(fruta));
         }
 
         public void eliminarFrutaColisionada()
         {
-            TgcMesh frutaColisionada = Frutas().Find(fruta => TgcCollisionUtils.testAABBAABB(fruta.BoundingBox, personaje.boundingBox()));
+            TgcMesh frutaColisionada = Frutas().Find(fruta => personaje.colisionaConBoundingBox(fruta));
             eliminarObjeto(frutaColisionada);
         }
 
@@ -126,6 +192,11 @@ namespace TGC.Group.Model
             auxiliarBoundingBox.move(new TGCVector3(0, -Ypiso, 0));
             return LavaMesh().Exists(lava => TgcCollisionUtils.testAABBAABB(lava.BoundingBox, auxiliarBoundingBox));
 
+        }
+
+        public bool personajeSobreDesnivel()
+        {
+            return Rampas().Exists(pisoDesnivelado => personaje.colisionConPisoDesnivelado(pisoDesnivelado));
         }
 
         public void quemarPersonaje()
@@ -179,29 +250,6 @@ namespace TGC.Group.Model
             return plataformas;
         }
 
-        public List<TgcMesh> MeshesColisionables()
-        {
-            List<TgcMesh> meshesColisionables = new List<TgcMesh>();
-            meshesColisionables.AddRange(ParedesMesh());
-            meshesColisionables.AddRange(RocasMesh());
-            meshesColisionables.AddRange(PisosMesh());
-            meshesColisionables.AddRange(CajasMesh());
-            meshesColisionables.AddRange(SarcofagosMesh());
-            meshesColisionables.AddRange(PilaresMesh());
-            meshesColisionables.AddRange(ResbalososMesh());
-            meshesColisionables.AddRange(PlataformasMesh());
-            meshesColisionables.AddRange(LavaMesh());
-            meshesColisionables.AddRange(Escalones());
-            
-            return meshesColisionables;
-        }
-
-
-        public List<TgcBoundingAxisAlignBox> MeshesColisionablesBB()
-        {
-            return MeshesColisionables().FindAll(mesh => mesh.Name != "PlataformaRotante").Select(mesh => mesh.BoundingBox).ToList();
-        }
-
         public List<TgcMesh> ObjetosColisionablesConCajas()
         {
             return ParedesMesh().Concat(RocasMesh())
@@ -223,7 +271,7 @@ namespace TGC.Group.Model
         public void RenderizarBoundingBoxes()
         {
             MeshesColisionables().ForEach(mesh => BoundingBoxRender(mesh));
-           
+           Rampas().ForEach(mesh => BoundingBoxRender(mesh));
         }
         private void BoundingBoxRender(TgcMesh mesh)
         {
@@ -236,15 +284,7 @@ namespace TGC.Group.Model
         
         public TgcBoundingAxisAlignBox BoundingBox() => scene.BoundingBox;
 
-        public List<TgcBoundingAxisAlignBox> MeshesColisionablesBBSin(TgcMesh box)
-        {
-            List<TgcMesh> obstaculos = MeshesColisionables();
-            var indice = -1;
-            indice = obstaculos.FindIndex(mesh => mesh.Name == box.Name);
-
-            if (indice != -1) obstaculos.RemoveAt(indice);
-            return obstaculos.ConvertAll(mesh => mesh.BoundingBox);
-        }
+        
 
         public List<TgcMesh> MeshesColisionablesSin(string layer)
         {

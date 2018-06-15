@@ -2,7 +2,7 @@
 using TGC.Core.SceneLoader;
 using TGC.Core.BoundingVolumes;
 
-namespace TGC.Group.Model.AI
+namespace TGC.Group.Model.Plataformas
 {
     class PlataformaRotante : Plataforma
     {
@@ -15,7 +15,7 @@ namespace TGC.Group.Model.AI
         private TGCMatrix mTraslacionAlOrigen;
         private TGCMatrix mTraslacionPosInicial;
         public TgcBoundingOrientedBox OBB;
-        private TGCVector3 vRotacionOBB;
+        public TGCVector3 vRotacionOBB;
 
         public PlataformaRotante(TgcMesh plataformaMesh, Escenario escenario, int coeficienteRotacion) : base(plataformaMesh, escenario)
         {
@@ -55,6 +55,8 @@ namespace TGC.Group.Model.AI
             //Traslado Mesh al origen --> Roto el Mesh --> Vuelve a la posicion inicial
             plataformaMesh.Transform = mTraslacionAlOrigen * TGCMatrix.RotationY(anguloRotacion * tiempo) * mTraslacionPosInicial;
         }
+
+        public TGCMatrix transform() => plataformaMesh.Transform;
 
         
     }
