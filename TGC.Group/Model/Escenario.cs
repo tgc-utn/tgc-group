@@ -51,6 +51,7 @@ namespace TGC.Group.Model
         public List<TgcMesh> Frutas() => encontrarMeshes("FRUTA");
         public List<TgcMesh> Mascaras() => encontrarMeshes("MASCARA");
         public List<TgcMesh> Escalones() => encontrarMeshes("ESCALON");
+        public List<TgcMesh> Rampas() => encontrarMeshes("RAMPA");
 
         public List<TgcMesh> MeshesColisionables()
         {
@@ -115,6 +116,7 @@ namespace TGC.Group.Model
         {
             return ParedesMesh().Exists(pared => TgcCollisionUtils.testAABBAABB(pared.BoundingBox, mesh.BoundingBox));
         }
+      
 
         public bool colisionaCon(TgcMesh mesh)
         {
@@ -129,6 +131,11 @@ namespace TGC.Group.Model
         public TgcMesh obtenerColisionCajaPersonaje()
         {
             return this.CajasMesh().Find(caja=>personaje.colisionaConCaja(caja));
+        }
+
+        public TgcMesh obtenerColisionRampaPersonaje()
+        {
+            return this.Rampas().Find(rampa => personaje.colisionaConRampa(rampa));
         }
 
        
@@ -245,7 +252,7 @@ namespace TGC.Group.Model
         public void RenderizarBoundingBoxes()
         {
             MeshesColisionables().ForEach(mesh => BoundingBoxRender(mesh));
-           
+           Rampas().ForEach(mesh => BoundingBoxRender(mesh));
         }
         private void BoundingBoxRender(TgcMesh mesh)
         {

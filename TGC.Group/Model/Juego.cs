@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Direct3D;
@@ -60,7 +61,8 @@ namespace TGC.Group.Model
         private SphereCollisionManager ColisionadorEsferico;
         private TgcBoundingSphere esferaCaja;
 
-        private TGCVector3 movimientoRealPersonaje;
+
+        //private TGCVector3 movimientoRealPersonaje;
         private TGCVector3 movimientoRelativoPersonaje = TGCVector3.Empty;
         private TGCVector3 movimientoRealCaja = TGCVector3.Empty;
         private float saltoActual = 0;
@@ -201,10 +203,7 @@ namespace TGC.Group.Model
             {
                 TgcTexture.createTexture(D3DDevice.Instance.Device, directorio.RobotTextura)
             });
-
             
-            //Inicializar la esfera para el manejo de colisiones del personaje
-            personaje.inicializarEsferaColisionante();
 
             //Inicializamos el collisionManager.
             ColisionadorEsferico = new SphereCollisionManager();
@@ -247,7 +246,7 @@ namespace TGC.Group.Model
 
             //TODO: Reificar estos valores.
             //Obtenemos los valores default
-            if (movimientoRealPersonaje.Y == 0f) doubleJump = 2;
+            if (personaje.position().Y < 1) doubleJump = 2;
 
             var velocidadCaminar = 1000f;
             var coeficienteSalto = 30f;
@@ -437,15 +436,15 @@ namespace TGC.Group.Model
         SphereOBBCollider colliderOBB = new SphereOBBCollider();
         public void moverMundo(TGCVector3 movimientoOriginal)
         {
+            TGCVector3 movimientoRealPersonaje = new TGCVector3(0, 0, 0);
+            movimientoDePlataformas();
+            movimientoDeCajas(movimientoOriginal);
             
             //Actualizo el vector de movimiento del personaje segun el piso resbaloso
             movimientoOriginal += MovimientoPorSliding(movimientoOriginal);
-
-            movimientoDePlataformas();
-            movimientoDeCajas(movimientoOriginal);
             //Actualizo el vector de movimiento del personaje segun la plataforma colisionante
             movimientoOriginal += movimientoPorPlataformas();
-            
+
            
             //Busca una plataforma rotante con la que se este colisionando
             //NOTA: para estas plataformas se colisiona Esfera -> OBB y no Esfera -> AABB como las demás colisiones
@@ -464,8 +463,14 @@ namespace TGC.Group.Model
                 movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(personaje.esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
                 personaje.matrizTransformacionPlataformaRotante = TGCMatrix.Identity;
             }
+
             
-            personaje.move(movimientoRealPersonaje);
+            float alturaActual = movimientoRealPersonaje.Y;
+            movimientoRealPersonaje.Y = movimientoPorDesnivel();
+            if (movimientoRealPersonaje.Y < 0)movimientoRealPersonaje.Y = alturaActual;
+               
+            
+            if(moving)personaje.move(movimientoRealPersonaje);
         }
         public void movimientoDePlataformas()
         {
@@ -482,6 +487,57 @@ namespace TGC.Group.Model
             else return TGCVector3.Empty;
         }
 
+        //Debug -> Hay que borrar estas variables
+        TGCVector3 verticeMasAltoGlobal = new TGCVector3(0, 0, 0);
+        bool colisionRampa = false;
+        TGCVector3 vectorDiferenciaGlobal = new TGCVector3(0, 0, 0);
+        float YPorDesnivelGlobal = 0f;
+        float longitudRampaGlobal = 0f;
+        public float movimientoPorDesnivel()
+        {
+            TGCVector3 movimientoPorDesnivel = new TGCVector3(0, 0, 0);
+
+            TgcMesh rampa = escenario.obtenerColisionRampaPersonaje();
+
+            if (rampa == null)
+            {
+                colisionRampa = false;
+                ColisionadorEsferico.GravityEnabled = true;
+                return -1;
+            }
+
+            ColisionadorEsferico.GravityEnabled = false;
+
+            colisionRampa = true;
+
+            List<TGCVector3> listaVertices = new List<TGCVector3>();
+            var vertices = rampa.getVertexPositions().GetEnumerator();
+            
+            while(vertices.MoveNext())
+            {
+                listaVertices.Add((TGCVector3)(vertices.Current));
+            }
+
+            listaVertices.Sort(new ComparadorYTgcVector3());
+
+            TGCVector3 verticeMasAlto = listaVertices[0];
+            listaVertices.Reverse();
+            TGCVector3 verticeMasBajo = listaVertices[0];
+            verticeMasAltoGlobal = verticeMasAlto;
+
+            float longitudRampa = verticeMasAlto.X - verticeMasBajo.X;
+            
+            TGCVector3 diferencia = verticeMasAlto - personaje.position();
+            vectorDiferenciaGlobal = diferencia;
+
+          
+            float coeficienteDiferencial = (longitudRampa - diferencia.X) / longitudRampa;
+
+            float YPorDesnivel = coeficienteDiferencial * diferencia.Y;
+            YPorDesnivelGlobal = YPorDesnivel;
+
+            return YPorDesnivel + personaje.esferaPersonaje.Radius * coeficienteDiferencial;
+        }
         public void movimientoDeCajas(TGCVector3 movimientoOriginal)
         {
             if (!solicitudInteraccionConCaja)
@@ -685,11 +741,17 @@ namespace TGC.Group.Model
         private void renderizarDebug()
         {
             DrawText.drawText("Posicion Actual: " + personaje.position() + "\n"
-                               + "Vector Movimiento Real Personaje: " + movimientoRealPersonaje + "\n"
+                              // + "Vector Movimiento Real Personaje: " + movimientoRealPersonaje + "\n"
                                + "Colision con Caja: " + interaccionCaja + "\n"
                                + "Solicitud interaccion con caja: " + solicitudInteraccionConCaja + "\n"
                                + "Moving: " + moving + "\n"
                                + "Jumping: " + jumping + "\n"
+                               + "Colision Con Rampa: " + colisionRampa + "\n"
+                               + "Vertice mas alto: " + verticeMasAltoGlobal + "\n"
+                               + "Vector diferencia: " + vectorDiferenciaGlobal + "\n"
+                               + "Y Por desnivel: " + YPorDesnivelGlobal + "\n"
+                               + "Longitud Rampa: " + longitudRampaGlobal + "\n"
+                               + "Posicion bounding box: " + personaje.boundingBox().calculateBoxCenter() + "\n"
                                /*+ "Vector Movimiento Relativo Personaje" + movimientoRelativoPersonaje + "\n"
                                + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
                                + "Interaccion Con Caja: " + interaccionConCaja + "\n"

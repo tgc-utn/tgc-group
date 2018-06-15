@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="GUI\GUI.cs" />
     <Compile Include="GUI\GUIItem.cs" />
+    <Compile Include="Model\ComparadorTgcVector3.cs" />
     <Compile Include="Model\Plataformas\PlataformaZ.cs" />
     <Compile Include="Model\Personaje.cs" />
     <Compile Include="Model\PisoInercia.cs" />
