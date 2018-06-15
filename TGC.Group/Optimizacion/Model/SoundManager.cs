@@ -63,11 +63,13 @@ namespace TGC.Group.Model
         public void playSonidoFruta()
         {
             //mp3FruitPlayer.play(false);
+            SonidoMoneda.stop();
             SonidoMoneda.play(false);
         }
 
         public void playSonidoMoneda()
         {
+            SonidoMoneda.stop();
             SonidoMoneda.play(false);
         }
 
