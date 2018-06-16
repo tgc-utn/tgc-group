@@ -94,6 +94,8 @@ namespace TGC.Group.Modelo
         private bool moving = false;
         private bool jumping = false;
         private bool sliding = false;
+        private bool kicking = false;
+        private bool running = false;
         #endregion
 
         #region APIGUI
@@ -313,6 +315,11 @@ namespace TGC.Group.Modelo
                 if (Input.keyDown(Key.R)) solicitudInteraccionConCaja = true;
                 else solicitudInteraccionConCaja = false;
 
+                if (Input.keyDown(Key.Q))kicking = true;
+                else kicking = false;
+
+                if (personaje.VELOCIDAD_EXTRA > 0) running = true;
+                else running = false;
 
                 if (Input.keyUp(Key.E))
                 {
@@ -405,7 +412,7 @@ namespace TGC.Group.Modelo
                 float movY = saltoRealizado;
                 float movZ = 0;
 
-                if (moving )
+                if (moving)
                 {
                     animacion = "Caminando";
                     moveForward = personaje.Velocidad();
@@ -413,12 +420,15 @@ namespace TGC.Group.Modelo
                     movZ = FastMath.Cos(personaje.rotation().Y) * moveForward * ElapsedTime;
                     soundManager.playSonidoCaminar();
                 }
-                else
-                {
-                    animacion = "Parado";
-                    soundManager.stopSonidoCaminar();
-                }
+                else soundManager.stopSonidoCaminar();
+
+                if (kicking) animacion = "Pateando";
+                else if (running) animacion = "Corriendo";
+                else if (solicitudInteraccionConCaja && moving) animacion = "Empujando";
+                else if (!moving) animacion = "Parado";
+                   
                 
+               
                 movimientoOriginal = new TGCVector3(movX, movY, movZ);
 
                 moverMundo(movimientoOriginal);
@@ -558,6 +568,7 @@ namespace TGC.Group.Modelo
                 interaccionCaja = false;
                 return;
             }
+            
 
             if (cajaColisionante == objetoMovibleGlobal) cajaColisionante = null;
 
@@ -735,6 +746,7 @@ namespace TGC.Group.Modelo
                                + "Moving: " + moving + "\n"
                                + "Jumping: " + jumping + "\n"
                                + "Sliding: " + sliding + "\n"
+                               + "Kicking: " + kicking + "\n"
                                + "Elapsed Time: " + ElapsedTime +"\n"
                               /* + "Colision Con Rampa: " + colisionRampa + "\n"
                                + "Vertice mas alto: " + verticeMasAltoGlobal + "\n"

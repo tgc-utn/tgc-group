@@ -62,7 +62,11 @@ namespace TGC.Group.Modelo
 
             var skeletalLoader = new TgcSkeletalLoader();
 
-            var pathAnimacionesPersonaje = new[] { directorio.RobotCaminando, directorio.RobotParado, };
+            var pathAnimacionesPersonaje = new[] { directorio.RobotCaminando,
+                                                   directorio.RobotParado,
+                                                   directorio.RobotPateando,
+                                                   directorio.RobotCorriendo,
+                                                   directorio.RobotEmpujando};
             personajeMesh = skeletalLoader.
                             loadMeshAndAnimationsFromFile(directorio.RobotSkeletalMesh,
                                                       directorio.RobotDirectorio,

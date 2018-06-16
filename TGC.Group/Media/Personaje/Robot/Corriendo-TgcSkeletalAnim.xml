@@ -1,5 +1,5 @@
 <tgcSkeletalAnim>
-	<animation name='Correr' bonesCount='23' framesCount='21' frameRate='30' startFrame='0' endFrame='20'>
+	<animation name='Corriendo' bonesCount='23' framesCount='21' frameRate='30' startFrame='0' endFrame='20'>
 		<boundingBox min='[-22.9044,-1.6813,-51.9934]' max='[23.1025,140.942,61.0134]'/>
 		<bone id='0' name='Bip01 Pelvis' keyFramesCount='1'>
 			<frame n='0' pos='[0.077,43.1418,0.594]' rotQuat='[-0.707106,-0.707107,0.0,0.0]' />
