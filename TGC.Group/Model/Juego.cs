@@ -16,6 +16,7 @@ using TGC.Core.SkeletalAnimation;
 using TGC.Core.Collision;
 using TGC.Core.Shaders;
 using TGC.Core.Text;
+using TGC.Core.Particle;
 
 using TGC.Group.SphereCollisionUtils;
 using TGC.Group.Model.AI;
@@ -153,7 +154,9 @@ namespace TGC.Group.Model
 
         public TgcText2D textoFrutas;
         public TgcText2D textoMascaras;
-        
+
+        private List<Hoguera> Hogueras;
+        private TGCVector3 PosicionInicial = new TGCVector3(400, 20f, -900);
 
         public override void Init()
         {
@@ -164,7 +167,7 @@ namespace TGC.Group.Model
             velocidad =new TGCVector3(0,0,0);
             aceleracion = new TGCVector3(0,0,0);
 
-            
+            Hoguera.texturesPath = MediaDir + "Escenas\\Textures\\";
 
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
@@ -173,7 +176,6 @@ namespace TGC.Group.Model
 
             //Objeto que conoce todos los path de MediaDir
             directorio = new Directorio(MediaDir);
-
             personaje = new Personaje(directorio);
 
             //Cargo el SoundManager
@@ -187,7 +189,7 @@ namespace TGC.Group.Model
             personaje.playAnimation("Parado", true);
 
             //Posicion inicial
-            personaje.position(new TGCVector3(400, escenario.Ypiso, -900));
+            personaje.position(PosicionInicial);
            // personaje.position(new TGCVector3(-4133.616f, 20f, 5000f));
 
             //No es recomendado utilizar autotransform en casos mas complicados, se pierde el control.
@@ -241,6 +243,12 @@ namespace TGC.Group.Model
             inicializarHUDS(d3dDevice);
 
 
+            Hogueras = new List<Hoguera>();
+            foreach(TgcMesh mesh in escenario.Fuegos())
+            {
+                Hogueras.Add(new Hoguera(mesh, 1));
+            }
+
         }
 
 
@@ -290,6 +298,16 @@ namespace TGC.Group.Model
 
                 if (Input.keyDown(Key.R)) interaccionCaja = true;
                 else interaccionCaja = false;
+
+                if (Input.keyUp(Key.E))
+                {
+                    var h = escenario.getClosestFire(personaje.position(), 500f, Hogueras);
+                    if(h != null)
+                    {
+                        h.encender(personaje.frutas);
+                        PosicionInicial = personaje.position();
+                    }
+                }
 
                 // Para que no se pueda saltar cuando agarras algun objeto
                 //TODO: No debe saltar cuando ya esta saltando
@@ -644,7 +662,7 @@ namespace TGC.Group.Model
                     }
 
 
-                    TgcMesh closestLight = escenario.getClosestLight(personaje.position(), 0f);
+                    TgcMesh closestLight = escenario.getClosestLight(personaje.position(), 2500f);
                     if(closestLight != null)
                     {
                         personaje.effect().SetValue("lightColor", ColorValue.FromColor(Color.White));
@@ -666,7 +684,15 @@ namespace TGC.Group.Model
                         mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
                     }
 
-                    
+
+                    //EMIRSORES DE PARTICULAS
+                    D3DDevice.Instance.ParticlesEnabled = true;
+                    D3DDevice.Instance.EnableParticles();
+                    foreach(Hoguera s in Hogueras)
+                    {
+                        s.renderParticles(ElapsedTime);
+                    }
+
                 }
                 else
                 {

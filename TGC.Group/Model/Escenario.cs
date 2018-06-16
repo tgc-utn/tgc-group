@@ -49,6 +49,7 @@ namespace TGC.Group.Model
         public List<TgcMesh> Luces() => encontrarMeshes("Luces");
         public List<TgcMesh> Frutas() => encontrarMeshes("FRUTA");
         public List<TgcMesh> Mascaras() => encontrarMeshes("MASCARA");
+        public List<TgcMesh> Fuegos() => encontrarMeshes("FUEGO");
         #endregion
 
         #region Colisiones
@@ -275,6 +276,38 @@ namespace TGC.Group.Model
                 }
             }
             return minLight;
+        }
+
+        public Hoguera getClosestFire(TGCVector3 pos, float maxDistance, List<Hoguera> Hogueras)
+        {
+            var minDist = float.MaxValue;
+            TgcMesh minF = null;
+
+            foreach (var fuego in Fuegos())
+            {
+                var distSq = TGCVector3.LengthSq(pos - fuego.BoundingBox.calculateBoxCenter());
+                if (distSq < minDist)
+                {
+                    minDist = distSq;
+                    minF = fuego;
+                }
+            }
+
+            if (minF != null)
+            {
+                if (maxDistance != 0 && TGCVector3.LengthSq(pos - minF.BoundingBox.calculateBoxCenter()) > (maxDistance * maxDistance))
+                {
+                    return null;
+                }
+                foreach(Hoguera h in Hogueras)
+                {
+                    if(h.MeshFuego.GetHashCode() == minF.GetHashCode())
+                    {
+                        return h;
+                    }
+                }
+            }
+            return null;
         }
 
     }

@@ -87,6 +87,7 @@
     <Compile Include="GUI\GUI.cs" />
     <Compile Include="GUI\GUIItem.cs" />
     <Compile Include="Model\AI\PlataformaZ.cs" />
+    <Compile Include="Model\Hoguera.cs" />
     <Compile Include="Model\Personaje.cs" />
     <Compile Include="Model\PisoInercia.cs" />
     <Compile Include="Model\AI\Plataforma.cs" />
