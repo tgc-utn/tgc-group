@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Microsoft.DirectX.Direct3D;
+using Microsoft.DirectX.DirectInput;
 
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.BoundingVolumes;
@@ -12,6 +13,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.Textures;
 using TGC.Core.Collision;
 using TGC.Core.SceneLoader;
+using TGC.Core.Input;
 
 using TGC.Group.Modelo.Cajas;
 
@@ -39,7 +41,7 @@ namespace TGC.Group.Modelo
         private TGCVector3 posicionInicial = new TGCVector3(-452f,0.1f, -5161f);
         
         private TGCVector3 posicionDesarrollo = new TGCVector3(-4738.616f, 1379f, -7531f);
-
+        private DireccionPersonaje direccion = new DireccionPersonaje();
 
         public TGCVector3 PERSONAJE_SCALE = new TGCVector3(1f, 0.9f,1f);
        // public float PERSONAJE_ALTURA_PISO { get; set; }
@@ -142,13 +144,49 @@ namespace TGC.Group.Modelo
             }
             
         }
+
+        public bool rotar(TgcD3dInput Input,Key key)
+        {
+            bool moving = false;
+            //Adelante
+            if (Input.keyDown(Key.W)) moving = RotateMesh(Key.W);
+            //Atras
+            if (Input.keyDown(Key.S)) moving = RotateMesh(Key.S);
+            //Derecha
+            if (Input.keyDown(Key.D)) moving = RotateMesh(Key.D);
+            //Izquierda
+            if (Input.keyDown(Key.A)) moving = RotateMesh(Key.A);
+            //UpLeft
+            if (Input.keyDown(Key.W) && Input.keyDown(Key.A)) moving = RotateMesh(Key.W, Key.A);
+            //UpRight
+            if (Input.keyDown(Key.W) && Input.keyDown(Key.D)) moving = RotateMesh(Key.W, Key.D);
+            //DownLeft
+            if (Input.keyDown(Key.S) && Input.keyDown(Key.A)) moving = RotateMesh(Key.S, Key.A);
+            //DownRight
+            if (Input.keyDown(Key.S) && Input.keyDown(Key.D)) moving = RotateMesh(Key.S, Key.D);
+
+            return moving;
+        }
+
+        public bool RotateMesh(Key input)
+        {
+            
+            RotateY(direccion.RotationAngle(input));
+            return true;
+        }
+        public bool RotateMesh(Key i1, Key i2)
+        {
+            
+            RotateY(direccion.RotationAngle(i1, i2));
+            return true;
+        }
         #endregion
 
         #region MeshAdapter
         public TgcBoundingAxisAlignBox boundingBox() => personajeMesh.BoundingBox;
         public void playAnimation(string animation, bool playLoop) => personajeMesh.playAnimation(animation, playLoop);
-        public Effect effect() => personajeMesh.Effect;
-        public void effect(Effect newEffect) => personajeMesh.Effect = newEffect;
+        public Microsoft.DirectX.Direct3D.Effect effect() => personajeMesh.Effect;
+        public void effect(Microsoft.DirectX.Direct3D.Effect newEffect) => personajeMesh.Effect = newEffect;
         public void technique(string newTechnique) => personajeMesh.Technique = newTechnique;
         public void position(TGCVector3 newPosition) => esferaPersonaje = new TgcBoundingSphere(newPosition, RADIO_ESFERA);
         public TGCVector3 position() => esferaPersonaje.Position;

@@ -59,8 +59,10 @@ namespace TGC.Group.Modelo
 
         private SphereCollisionManager ColisionadorEsferico;
         private TgcBoundingSphere esferaCaja;
+        //Objeto Movible del escenario, utilizado para mantener la referencia a una caja cuando cae
+        Caja objetoEscenario;
+        SphereOBBCollider colliderOBB = new SphereOBBCollider();
 
-        
         private List<Plataforma> plataformas;
         private List<PlataformaRotante> plataformasRotantes;
         private bool boundingBoxActivate = false;
@@ -372,8 +374,8 @@ namespace TGC.Group.Modelo
                 #endregion
 
                 #region Movimientos
-                
-                RotarPersonaje();
+
+                moving = personaje.rotar(Input,new Key());
                 personaje.actualizarValores(ElapsedTime);
                 //Vector de movimiento
                 var movimientoOriginal = new TGCVector3(0,0,0);
@@ -411,44 +413,7 @@ namespace TGC.Group.Modelo
                 PostUpdate();
             }
         }
-        
-
-        public TGCVector3 movimientoPorSliding(TGCVector3 movimientoOriginal)
-        {
-            var vectorSlide = new TGCVector3(0, 0, 0);
-            foreach (TgcMesh mesh in escenario.ResbalososMesh())
-            {
-                if (pisoResbaloso == null)
-                {
-                    pisoResbaloso = new PisoInercia(mesh, 0.999f);
-                }
-
-                if (pisoResbaloso.aCollisionFound(personaje))
-                {
-                    var VectorSlideActual = pisoResbaloso.VectorEntrada;
-                    var versorMovimientoOriginal = movimientoOriginal * (1 / TGCVector3.Length(movimientoOriginal));
-
-                    if (VectorSlideActual == TGCVector3.Empty || ((versorMovimientoOriginal != pisoResbaloso.VersorEntrada) && TGCVector3.Length(movimientoOriginal) > 0))
-                    {
-                        pisoResbaloso.VectorEntrada = movimientoOriginal;
-                    }
-                    else
-                    {
-                        vectorSlide = VectorSlideActual;
-                    }
-                    break;
-                }
-                else
-                {
-                    pisoResbaloso = null;
-                    //pisoResb.VectorEntrada = TGCVector3.Empty;
-                }
-            }
-            return vectorSlide;
-        }
-        //Objeto Movible del escenario, utilizado para mantener la referencia a una caja cuando cae
-        Caja objetoEscenario;
-        SphereOBBCollider colliderOBB = new SphereOBBCollider();
+ 
         public void moverMundo(TGCVector3 movimientoOriginal)
         {
             TGCVector3 movimientoRealPersonaje = new TGCVector3(0, 0, 0);
@@ -490,10 +455,7 @@ namespace TGC.Group.Modelo
             personaje.transformar();
             //personaje.move(movimientoRealPersonaje);
         }
-        public void movimientoDePlataformas()
-        {
-            foreach (Plataforma plataforma in plataformas) plataforma.Update(tiempoAcumulado);
-        }
+       
         public TGCVector3 movimientoPorPlataformas()
         {
 
@@ -521,6 +483,45 @@ namespace TGC.Group.Modelo
 
             return rampa.obtenerAlturaInstantanea(personaje.position()) + personaje.esferaPersonaje.Radius;
 
+        }
+
+        public TGCVector3 movimientoPorSliding(TGCVector3 movimientoOriginal)
+        {
+            var vectorSlide = new TGCVector3(0, 0, 0);
+            foreach (TgcMesh mesh in escenario.ResbalososMesh())
+            {
+                if (pisoResbaloso == null)
+                {
+                    pisoResbaloso = new PisoInercia(mesh, 0.999f);
+                }
+
+                if (pisoResbaloso.aCollisionFound(personaje))
+                {
+                    var VectorSlideActual = pisoResbaloso.VectorEntrada;
+                    var versorMovimientoOriginal = movimientoOriginal * (1 / TGCVector3.Length(movimientoOriginal));
+
+                    if (VectorSlideActual == TGCVector3.Empty || ((versorMovimientoOriginal != pisoResbaloso.VersorEntrada) && TGCVector3.Length(movimientoOriginal) > 0))
+                    {
+                        pisoResbaloso.VectorEntrada = movimientoOriginal;
+                    }
+                    else
+                    {
+                        vectorSlide = VectorSlideActual;
+                    }
+                    break;
+                }
+                else
+                {
+                    pisoResbaloso = null;
+                    //pisoResb.VectorEntrada = TGCVector3.Empty;
+                }
+            }
+            return vectorSlide;
+        }
+
+        public void movimientoDePlataformas()
+        {
+            foreach (Plataforma plataforma in plataformas) plataforma.Update(tiempoAcumulado);
         }
         public void movimientoDeCajas(TGCVector3 movimientoOriginal)
         {
@@ -571,35 +572,7 @@ namespace TGC.Group.Modelo
 
         }
       
-        public void RotarPersonaje()
-        {
-            //Adelante
-            if (Input.keyDown(Key.W)) RotateMesh(Key.W);
-            //Atras
-            if (Input.keyDown(Key.S)) RotateMesh(Key.S);
-            //Derecha
-            if (Input.keyDown(Key.D)) RotateMesh(Key.D);
-            //Izquierda
-            if (Input.keyDown(Key.A)) RotateMesh(Key.A);
-            //UpLeft
-            if (Input.keyDown(Key.W) && Input.keyDown(Key.A)) RotateMesh(Key.W, Key.A);
-            //UpRight
-            if (Input.keyDown(Key.W) && Input.keyDown(Key.D)) RotateMesh(Key.W, Key.D);
-            //DownLeft
-            if (Input.keyDown(Key.S) && Input.keyDown(Key.A)) RotateMesh(Key.S, Key.A);
-            //DownRight
-            if (Input.keyDown(Key.S) && Input.keyDown(Key.D)) RotateMesh(Key.S, Key.D);
-        }
-        public void RotateMesh(Key input)
-        {
-            moving = true;
-            personaje.RotateY(direccionPersonaje.RotationAngle(input));
-        }
-        public void RotateMesh(Key i1, Key i2)
-        {
-            moving = true;
-            personaje.RotateY(direccionPersonaje.RotationAngle(i1,i2));
-        }
+       
         public void ajustarCamara()
         {
             //Actualizar valores de camara segun modifiers
