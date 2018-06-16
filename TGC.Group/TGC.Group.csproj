@@ -86,15 +86,15 @@
   <ItemGroup>
     <Compile Include="GUI\GUI.cs" />
     <Compile Include="GUI\GUIItem.cs" />
-    <Compile Include="Optimizacion\Model\ComparadorTgcVector3.cs" />
-    <Compile Include="Optimizacion\Model\Plataformas\PlataformaZ.cs" />
-    <Compile Include="Optimizacion\Model\Personaje.cs" />
-    <Compile Include="Optimizacion\Model\PisoInercia.cs" />
-    <Compile Include="Optimizacion\Model\Plataformas\Plataforma.cs" />
-    <Compile Include="Optimizacion\Model\Plataformas\PlataformaRotante.cs" />
-    <Compile Include="Optimizacion\Model\Plataformas\PlataformaX.cs" />
-    <Compile Include="Optimizacion\Model\Plataformas\PlataformaY.cs" />
-    <Compile Include="Optimizacion\Model\SoundManager.cs" />
+    <Compile Include="Media\Model\ComparadorTgcVector3.cs" />
+    <Compile Include="Media\Model\Plataformas\PlataformaZ.cs" />
+    <Compile Include="Media\Model\Personaje.cs" />
+    <Compile Include="Media\Model\PisoInercia.cs" />
+    <Compile Include="Media\Model\Plataformas\Plataforma.cs" />
+    <Compile Include="Media\Model\Plataformas\PlataformaRotante.cs" />
+    <Compile Include="Media\Model\Plataformas\PlataformaX.cs" />
+    <Compile Include="Media\Model\Plataformas\PlataformaY.cs" />
+    <Compile Include="Media\Model\SoundManager.cs" />
     <Compile Include="Optimizacion\Octree.cs" />
     <Compile Include="Optimizacion\OctreeBuilder.cs" />
     <Compile Include="Optimizacion\OctreeNode.cs" />
@@ -124,12 +124,12 @@
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
     <Compile Include="VectorMovement\LeftDirection.cs" />
-    <Compile Include="Optimizacion\Model\Camara.cs" />
-    <Compile Include="Optimizacion\Model\Calculos.cs" />
-    <Compile Include="Optimizacion\Model\Directorio.cs" />
-    <Compile Include="Optimizacion\Model\Escenario.cs" />
-    <Compile Include="Optimizacion\Model\DireccionPersonaje.cs" />
-    <Compile Include="Optimizacion\Model\Juego.cs" />
+    <Compile Include="Media\Model\Camara.cs" />
+    <Compile Include="Media\Model\Calculos.cs" />
+    <Compile Include="Media\Model\Directorio.cs" />
+    <Compile Include="Media\Model\Escenario.cs" />
+    <Compile Include="Media\Model\DireccionPersonaje.cs" />
+    <Compile Include="Media\Model\Juego.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VectorMovement\RightDirection.cs" />
