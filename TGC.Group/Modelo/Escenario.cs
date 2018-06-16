@@ -11,10 +11,10 @@ using TGC.Core.Textures;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.Collision;
 using TGC.Core.BoundingVolumes;
-using TGC.Group.Model.Plataformas;
+using TGC.Group.Modelo.Plataformas;
 using TGC.Group.SphereCollisionUtils;
 
-namespace TGC.Group.Model
+namespace TGC.Group.Modelo
 {
     class Escenario
     {

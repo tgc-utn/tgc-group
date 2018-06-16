@@ -15,7 +15,7 @@ using TGC.Core.Collision;
 using TGC.Group.SphereCollisionUtils;
 
 
-namespace TGC.Group.Model
+namespace TGC.Group.Modelo
 {
 
     public class PisoInercia

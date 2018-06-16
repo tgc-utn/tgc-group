@@ -8,7 +8,7 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Collision;
 using TGC.Core.BoundingVolumes;
 
-namespace TGC.Group.Model.Plataformas
+namespace TGC.Group.Modelo.Plataformas
 {
     class PlataformaX : Plataforma
     {

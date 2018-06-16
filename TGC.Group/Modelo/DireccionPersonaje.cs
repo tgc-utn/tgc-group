@@ -7,7 +7,7 @@ using Microsoft.DirectX.DirectInput;
 using TGC.Group.VectorMovement;
 
 
-namespace TGC.Group.Model
+namespace TGC.Group.Modelo
 {
     class DireccionPersonaje
     {

@@ -86,15 +86,30 @@
   <ItemGroup>
     <Compile Include="GUI\GUI.cs" />
     <Compile Include="GUI\GUIItem.cs" />
-    <Compile Include="Media\Model\ComparadorTgcVector3.cs" />
-    <Compile Include="Media\Model\Plataformas\PlataformaZ.cs" />
-    <Compile Include="Media\Model\Personaje.cs" />
-    <Compile Include="Media\Model\PisoInercia.cs" />
-    <Compile Include="Media\Model\Plataformas\Plataforma.cs" />
-    <Compile Include="Media\Model\Plataformas\PlataformaRotante.cs" />
-    <Compile Include="Media\Model\Plataformas\PlataformaX.cs" />
-    <Compile Include="Media\Model\Plataformas\PlataformaY.cs" />
-    <Compile Include="Media\Model\SoundManager.cs" />
+    <Compile Include="Modelo\Calculos.cs" />
+    <Compile Include="Modelo\Camara.cs" />
+    <Compile Include="Modelo\ComparadorTgcVector3.cs" />
+    <Compile Include="Modelo\DireccionPersonaje.cs" />
+    <Compile Include="Modelo\Direction Vectors\DirectionVector.cs" />
+    <Compile Include="Modelo\Direction Vectors\DownDirection.cs" />
+    <Compile Include="Modelo\Direction Vectors\DownLeftDirection.cs" />
+    <Compile Include="Modelo\Direction Vectors\DownRightDirection.cs" />
+    <Compile Include="Modelo\Direction Vectors\LeftDirection.cs" />
+    <Compile Include="Modelo\Direction Vectors\RightDirection.cs" />
+    <Compile Include="Modelo\Direction Vectors\UpDirection.cs" />
+    <Compile Include="Modelo\Direction Vectors\UpLeftDirection.cs" />
+    <Compile Include="Modelo\Direction Vectors\UpRightDirection.cs" />
+    <Compile Include="Modelo\Directorio.cs" />
+    <Compile Include="Modelo\Escenario.cs" />
+    <Compile Include="Modelo\Juego.cs" />
+    <Compile Include="Modelo\Personaje.cs" />
+    <Compile Include="Modelo\PisoInercia.cs" />
+    <Compile Include="Modelo\Plataformas\Plataforma.cs" />
+    <Compile Include="Modelo\Plataformas\PlataformaRotante.cs" />
+    <Compile Include="Modelo\Plataformas\PlataformaX.cs" />
+    <Compile Include="Modelo\Plataformas\PlataformaY.cs" />
+    <Compile Include="Modelo\Plataformas\PlataformaZ.cs" />
+    <Compile Include="Modelo\SoundManager.cs" />
     <Compile Include="Optimizacion\Octree.cs" />
     <Compile Include="Optimizacion\OctreeBuilder.cs" />
     <Compile Include="Optimizacion\OctreeNode.cs" />
@@ -124,12 +139,6 @@
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
     <Compile Include="VectorMovement\LeftDirection.cs" />
-    <Compile Include="Media\Model\Camara.cs" />
-    <Compile Include="Media\Model\Calculos.cs" />
-    <Compile Include="Media\Model\Directorio.cs" />
-    <Compile Include="Media\Model\Escenario.cs" />
-    <Compile Include="Media\Model\DireccionPersonaje.cs" />
-    <Compile Include="Media\Model\Juego.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VectorMovement\RightDirection.cs" />
@@ -204,10 +213,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Media\cajaMadera4.jpg" />
-    <Content Include="Media\LogoTGC-TgcScene.xml" />
-  </ItemGroup>
-  <ItemGroup>
+    <Folder Include="Media\" />
     <Folder Include="Text\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

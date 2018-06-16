@@ -9,7 +9,7 @@ using TGC.Group.VectorMovement;
 
 
 
-namespace TGC.Group.Model
+namespace TGC.Group.Modelo
 {
     class Calculos
     {

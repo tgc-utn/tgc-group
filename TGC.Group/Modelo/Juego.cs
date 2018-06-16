@@ -19,13 +19,13 @@ using TGC.Core.Shaders;
 using TGC.Core.Text;
 
 using TGC.Group.SphereCollisionUtils;
-using TGC.Group.Model.Plataformas;
+using TGC.Group.Modelo.Plataformas;
 using TGC.Group.GUI;
 using TGC.Group.Optimizacion;
 using TGC.Group.Sprites;
 
 
-namespace TGC.Group.Model
+namespace TGC.Group.Modelo
 {
     public class Juego : TgcExample
     {

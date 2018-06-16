@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 using TGC.Core.Mathematica;
 
-namespace TGC.Group.Model
+namespace TGC.Group.Modelo
 {
     class ComparadorYTgcVector3 : IComparer <TGCVector3>
     {

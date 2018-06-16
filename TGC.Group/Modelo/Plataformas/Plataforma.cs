@@ -9,7 +9,7 @@ using TGC.Core.Collision;
 using TGC.Core.SkeletalAnimation;
 using TGC.Core.BoundingVolumes;
 
-namespace TGC.Group.Model.Plataformas
+namespace TGC.Group.Modelo.Plataformas
 {
     class Plataforma 
     {

@@ -14,7 +14,7 @@ using TGC.Core.Collision;
 using TGC.Core.SceneLoader;
 
 
-namespace TGC.Group.Model
+namespace TGC.Group.Modelo
 {
     public class Personaje
     {

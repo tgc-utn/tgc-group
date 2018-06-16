@@ -2,7 +2,7 @@
 using TGC.Core.Camara;
 using TGC.Core.Mathematica;
 
-namespace TGC.Group.Model
+namespace TGC.Group.Modelo
 {
     public class TgcThirdPersonCamera : TgcCamera
     {

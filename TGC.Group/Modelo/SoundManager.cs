@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using TGC.Core.Sound;
 using TGC.Core.Text;
 
-namespace TGC.Group.Model
+namespace TGC.Group.Modelo
 {
     public class SoundManager
     {

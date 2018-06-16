@@ -15,7 +15,7 @@ using TGC.Core.SkeletalAnimation;
 using TGC.Core.Collision;
 
 
-namespace TGC.Group.Model
+namespace TGC.Group.Modelo
 {
     public class Directorio
     {
