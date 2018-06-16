@@ -7,7 +7,7 @@ using TGC.Core.Input;
 using TGC.Core.Shaders;
 using TGC.Core.Sound;
 using TGC.Core.Textures;
-using TGC.Group.Model;
+using TGC.Group.Modelo;
 namespace TGC.Group.Form
 {
     /// <summary>
