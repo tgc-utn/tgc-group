@@ -464,8 +464,7 @@ namespace TGC.Group.Model
                 movimientoRealPersonaje = colliderOBB.manageColisionEsferaOBB(personaje.esferaPersonaje, movimientoOriginal, plataformaRotante.OBB);
                 
                 personaje.matrizTransformacionPlataformaRotante = plataformaRotante.transform();
-
-                personaje.boundingBox().transform(TGCMatrix.Scaling(1000, 1000, 1000));
+                
             }
             else
             {
@@ -483,8 +482,8 @@ namespace TGC.Group.Model
                 personaje.esferaPersonaje.setCenter(new TGCVector3(xOriginal, YActualizado, zOriginal));
                 
             }
-            
-           // personaje.move(movimientoRealPersonaje);
+            personaje.transformar();
+            //personaje.move(movimientoRealPersonaje);
         }
         public void movimientoDePlataformas()
         {
@@ -647,7 +646,7 @@ namespace TGC.Group.Model
                  Frustum.render();
                 if (!perdiste)
                 {
-                    personaje.transformar();
+                    
                     renderizarSprites();
                     renderizarDebug();
                     

@@ -12,8 +12,8 @@ namespace TGC.Group.Model.Plataformas
         public float coeficienteRotacion;
 
         private TGCVector3 posicionInicialBB;
-        private TGCMatrix mTraslacionAlOrigen;
-        private TGCMatrix mTraslacionPosInicial;
+        private TGCMatrix matrizTranslacionOrigen;
+        private TGCMatrix matrizTranslacionPosicionInicial;
         public TgcBoundingOrientedBox OBB;
         public TGCVector3 vRotacionOBB;
 
@@ -34,8 +34,8 @@ namespace TGC.Group.Model.Plataformas
 
             //Defino Matrices para rotacion del mesh de la plataforma
             posicionInicialBB = this.plataformaMesh.BoundingBox.calculateBoxCenter(); 
-            mTraslacionPosInicial = TGCMatrix.Translation(posicionInicialBB);
-            mTraslacionAlOrigen = TGCMatrix.Translation(new TGCVector3(-posicionInicialBB.X, -posicionInicialBB.Y, -posicionInicialBB.Z));
+            matrizTranslacionPosicionInicial = TGCMatrix.Translation(posicionInicialBB);
+            matrizTranslacionOrigen = TGCMatrix.Translation(new TGCVector3(-posicionInicialBB.X, -posicionInicialBB.Y, -posicionInicialBB.Z));
 
             //Defino OrientedBoundingBox y hago el Dispose() de la AABB
             OBB = TgcBoundingOrientedBox.computeFromAABB(this.plataformaMesh.BoundingBox);
@@ -53,7 +53,7 @@ namespace TGC.Group.Model.Plataformas
         public override void Update(float tiempo)
         {
             //Traslado Mesh al origen --> Roto el Mesh --> Vuelve a la posicion inicial
-            plataformaMesh.Transform = mTraslacionAlOrigen * TGCMatrix.RotationY(anguloRotacion * tiempo) * mTraslacionPosInicial;
+            plataformaMesh.Transform = matrizTranslacionOrigen * TGCMatrix.RotationY(anguloRotacion * tiempo) * matrizTranslacionPosicionInicial;
         }
 
         public TGCMatrix transform() => plataformaMesh.Transform;
