@@ -4,7 +4,7 @@ using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Modelo.Plataformas
 {
-    class PlataformaRotante : Plataforma
+    public class PlataformaRotante : Plataforma
     {
         private TgcMesh plataformaMesh;
         private Escenario escenario;

@@ -21,6 +21,7 @@ using TGC.Core.Text;
 using TGC.Group.SphereCollisionUtils;
 using TGC.Group.Modelo.Rampas;
 using TGC.Group.Modelo.Plataformas;
+using TGC.Group.Modelo.Cajas;
 using TGC.Group.GUI;
 using TGC.Group.Optimizacion;
 using TGC.Group.Sprites;
@@ -48,7 +49,7 @@ namespace TGC.Group.Modelo
         public static SoundManager soundManager;
 
         //Define direccion del mesh del personaje dependiendo el movimiento
-        private TgcMesh objetoMovibleGlobal = null;
+        private Caja objetoMovibleGlobal = null;
         private bool solicitudInteraccionConCaja = false;
         private bool colisionPlataforma = false;
 
@@ -261,8 +262,7 @@ namespace TGC.Group.Modelo
             if (escenario.colisionDeSalto()) doubleJump = 2;
             else doubleJump = 0;
 
-
-            var velocidadCaminar = 1000f;
+            
             var coeficienteSalto = 30f;
             float saltoRealizado = 0;
             var moveForward = 0f;
@@ -374,6 +374,7 @@ namespace TGC.Group.Modelo
                 #region Movimientos
                 
                 RotarPersonaje();
+                personaje.actualizarValores(ElapsedTime);
                 //Vector de movimiento
                 var movimientoOriginal = new TGCVector3(0,0,0);
                 float movX = 0;
@@ -383,7 +384,7 @@ namespace TGC.Group.Modelo
                 if (moving)
                 {
                     animacion = "Caminando";
-                    moveForward = velocidadCaminar;
+                    moveForward = personaje.Velocidad();
                     movX = FastMath.Sin(personaje.rotation().Y) * moveForward * ElapsedTime;
                     movZ = FastMath.Cos(personaje.rotation().Y) * moveForward * ElapsedTime;
                     soundManager.playSonidoCaminar();
@@ -446,7 +447,7 @@ namespace TGC.Group.Modelo
             return vectorSlide;
         }
         //Objeto Movible del escenario, utilizado para mantener la referencia a una caja cuando cae
-        TgcMesh objetoEscenario;
+        Caja objetoEscenario;
         SphereOBBCollider colliderOBB = new SphereOBBCollider();
         public void moverMundo(TGCVector3 movimientoOriginal)
         {
@@ -523,16 +524,24 @@ namespace TGC.Group.Modelo
         }
         public void movimientoDeCajas(TGCVector3 movimientoOriginal)
         {
+            
+            Caja cajaColisionante = escenario.obtenerColisionCajaPersonaje();
+
+            if (cajaColisionante != null) interaccionCaja = true;
+            else
+            {
+                interaccionCaja = false;
+                return;
+            }
+
+            cajaColisionante.afectar(personaje);
+           
+            
             if (!solicitudInteraccionConCaja)
             {
                 interaccionCaja = false;
                 return;
             }
-            //Busca la caja con la cual se esta colisionando
-            var cajaColisionante = escenario.obtenerColisionCajaPersonaje();
-
-            if (cajaColisionante != null) interaccionCaja = true;
-            else interaccionCaja = false;
 
             if (cajaColisionante == objetoMovibleGlobal) cajaColisionante = null;
 
@@ -541,13 +550,13 @@ namespace TGC.Group.Modelo
 
             if (objetoEscenario != null) generarMovimiento(objetoEscenario, movimientoOriginal);
         }
-        public void generarMovimiento(TgcMesh objetoMovible, TGCVector3 movimiento)
+        public void generarMovimiento(Caja objetoMovible, TGCVector3 movimiento)
         {
             if (objetoMovibleGlobal == null || objetoMovibleGlobal != objetoMovible) objetoMovibleGlobal = objetoMovible;
 
-            esferaCaja = new TgcBoundingSphere(objetoMovible.BoundingBox.calculateBoxCenter() + new TGCVector3(0f, 15f, 0f), objetoMovible.BoundingBox.calculateBoxRadius() * 0.7f);
+            esferaCaja = new TgcBoundingSphere(objetoMovible.boundingBox().calculateBoxCenter() + new TGCVector3(0f, 15f, 0f), objetoMovible.boundingBox().calculateBoxRadius() * 0.7f);
 
-            movimientoRealCaja = ColisionadorEsferico.moveCharacter(esferaCaja, movimiento,  escenario.MeshesColisionablesBBSin(objetoMovible));
+            movimientoRealCaja = ColisionadorEsferico.moveCharacter(esferaCaja, movimiento,  escenario.MeshesColisionablesBBSin(objetoMovible.cajaMesh));
 
             var testCol =personaje.colisionaConCaja(objetoMovible);
             
@@ -729,7 +738,8 @@ namespace TGC.Group.Modelo
                                + "Solicitud interaccion con caja: " + solicitudInteraccionConCaja + "\n"
                                + "Moving: " + moving + "\n"
                                + "Jumping: " + jumping + "\n"
-                               + "Colision Con Rampa: " + colisionRampa + "\n"
+                               + "Elapsed Time: " + ElapsedTime +"\n"
+                              /* + "Colision Con Rampa: " + colisionRampa + "\n"
                                + "Vertice mas alto: " + verticeMasAltoGlobal + "\n"
                                + "Vector diferencia: " + vectorDiferenciaGlobal + "\n"
                                + "Y Por desnivel: " + YPorDesnivelGlobal + "\n"

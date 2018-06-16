@@ -14,10 +14,11 @@ using TGC.Core.BoundingVolumes;
 using TGC.Group.Modelo.Plataformas;
 using TGC.Group.SphereCollisionUtils;
 using TGC.Group.Modelo.Rampas;
+using TGC.Group.Modelo.Cajas;
 
 namespace TGC.Group.Modelo
 {
-    class Escenario
+    public class Escenario
     {
         public TgcScene scene { get; set; }
         public Personaje personaje { get; }
@@ -139,9 +140,9 @@ namespace TGC.Group.Modelo
             return colisionablesSalto.Exists(mesh => personaje.colisionaPorArribaDe(mesh));
         }
 
-        public TgcMesh obtenerColisionCajaPersonaje()
+        public Caja obtenerColisionCajaPersonaje()
         {
-            return this.CajasMesh().Find(caja=>personaje.colisionaConCaja(caja));
+            return this.Cajas().Find(caja=>personaje.colisionaConCaja(caja));
         }
 
         public Rampa obtenerColisionRampaPersonaje()
@@ -169,7 +170,7 @@ namespace TGC.Group.Modelo
             eliminarObjeto(mascaraColisionada);
         }
 
-        private void eliminarObjeto(TgcMesh mesh)
+        public void eliminarObjeto(TgcMesh mesh)
         {
             mesh.Enabled = false;
             scene.Meshes.Remove(mesh);
@@ -258,6 +259,21 @@ namespace TGC.Group.Modelo
             }
 
             return rampas;
+        }
+
+        public List<Caja> Cajas()
+        {
+            List<Caja> cajas = new List<Caja>();
+
+            foreach (TgcMesh cajaMesh in CajasMesh())
+            {
+
+                Caja caja = new Caja(cajaMesh, this);
+                cajas.Add(caja);
+
+            }
+
+            return cajas;
         }
         public List<PlataformaRotante> PlataformasRotantes()
         {

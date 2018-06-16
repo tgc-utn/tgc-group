@@ -8,7 +8,7 @@ using TGC.Core.Mathematica;
 
 namespace TGC.Group.Modelo.Rampas
 {
-    abstract class Rampa
+    public abstract class Rampa
     {
         public TgcMesh rampaMesh;
         public Escenario escenario;

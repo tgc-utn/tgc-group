@@ -13,6 +13,7 @@ using TGC.Core.Textures;
 using TGC.Core.Collision;
 using TGC.Core.SceneLoader;
 
+using TGC.Group.Modelo.Cajas;
 
 namespace TGC.Group.Modelo
 {
@@ -23,6 +24,10 @@ namespace TGC.Group.Modelo
         public int frutas { get; set; }
         public int mascaras { get; set; }
 
+        public float VELOCIDAD_PERSONAJE = 1000f;
+        public float VELOCIDAD_EXTRA = 0f;
+        public float TIEMPO_POWER_UP = 0f;
+
         public TgcSkeletalMesh personajeMesh { get; }
         private Directorio directorio;
 
@@ -31,7 +36,7 @@ namespace TGC.Group.Modelo
         private float COEFICIENTE_REDUCTIVO_ESFERA = 0.85f;
         private float RADIO_ESFERA;
 
-        private TGCVector3 posicionInicial = new TGCVector3(400,0.1f, -900);
+        private TGCVector3 posicionInicial = new TGCVector3(-452f,0.1f, -5161f);
         
         private TGCVector3 posicionDesarrollo = new TGCVector3(-4738.616f, 1379f, -7531f);
 
@@ -81,11 +86,11 @@ namespace TGC.Group.Modelo
         }
 
         public bool colisionaConBoundingBox(TgcMesh mesh) => TgcCollisionUtils.testSphereAABB(esferaPersonaje, mesh.BoundingBox);
-        public bool colisionaConCaja(TgcMesh box)
+        public bool colisionaConCaja(Caja box)
         {
             TgcBoundingAxisAlignBox boundingBoxColision = boundingBox();
             boundingBoxColision.scaleTranslate(position(), new TGCVector3(2.5f,2.5f,2.5f));
-            return TgcCollisionUtils.testAABBAABB(boundingBoxColision, box.BoundingBox);
+            return TgcCollisionUtils.testAABBAABB(boundingBoxColision, box.boundingBox());
         }
        public bool colisionaPorArribaDe(TgcMesh mesh)
         {
@@ -115,6 +120,29 @@ namespace TGC.Group.Modelo
             personajeMesh.BoundingBox.transform(TGCMatrix.Translation(posicionActual) * matrizTransformacionPlataformaRotante);
             
         }
+
+        #region Movimientos
+        public float Velocidad()
+        {
+            return VELOCIDAD_PERSONAJE + VELOCIDAD_EXTRA;
+        }
+
+        public void aumentarVelocidad(float velocidadExtra,float tiempo)
+        {
+            VELOCIDAD_EXTRA += velocidadExtra;
+            TIEMPO_POWER_UP += tiempo;
+        }
+
+        public void actualizarValores(float elapsedTime)
+        {
+            if(TIEMPO_POWER_UP > 0) TIEMPO_POWER_UP -= elapsedTime;
+            else
+            {
+                VELOCIDAD_EXTRA = 0;
+            }
+            
+        }
+        #endregion
 
         #region MeshAdapter
         public TgcBoundingAxisAlignBox boundingBox() => personajeMesh.BoundingBox;

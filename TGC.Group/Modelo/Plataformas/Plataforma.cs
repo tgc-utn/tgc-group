@@ -11,7 +11,7 @@ using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Modelo.Plataformas
 {
-    class Plataforma 
+    public class Plataforma 
     {
         public TgcMesh plataformaMesh;
         private Escenario escenario;

@@ -86,6 +86,7 @@
   <ItemGroup>
     <Compile Include="GUI\GUI.cs" />
     <Compile Include="GUI\GUIItem.cs" />
+    <Compile Include="Modelo\Cajas\Caja.cs" />
     <Compile Include="Modelo\Rampas\Rampa.cs" />
     <Compile Include="Modelo\Rampas\RampaX.cs" />
     <Compile Include="Modelo\Rampas\RampaZ.cs" />
