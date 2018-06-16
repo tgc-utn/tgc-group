@@ -87,7 +87,7 @@ namespace TGC.Group.Modelo
             
         }
 
-        public bool colisionaConBoundingBox(TgcMesh mesh) => TgcCollisionUtils.testSphereAABB(esferaPersonaje, mesh.BoundingBox);
+        public bool colisionaConMesh(TgcMesh mesh) => TgcCollisionUtils.testSphereAABB(esferaPersonaje, mesh.BoundingBox);
         public bool colisionaConCaja(Caja box)
         {
             TgcBoundingAxisAlignBox boundingBoxColision = boundingBox();

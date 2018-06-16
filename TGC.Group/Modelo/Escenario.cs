@@ -25,6 +25,8 @@ namespace TGC.Group.Modelo
         public float Ypiso { get; }
 
         private List<TgcMesh> frutas;
+        public List<PisoInercia> pisosInercia;
+
         private float danioLava;
 
         public Escenario(string pathEscenario,Personaje personaje)
@@ -35,6 +37,8 @@ namespace TGC.Group.Modelo
             Ypiso = 20f;
             danioLava = 0.001f;
             frutas = Frutas();
+
+            this.pisosInercia = PisosInercia();
         }
         
 
@@ -47,7 +51,7 @@ namespace TGC.Group.Modelo
         public List<TgcMesh> SarcofagosMesh() => encontrarMeshes("SARCOFAGOS");
         public List<TgcMesh> PilaresMesh() => encontrarMeshes("PILARES");
         public List<TgcMesh> PlataformasMesh() => encontrarMeshes("PLATAFORMA");
-        public List<TgcMesh> ResbalososMesh() => encontrarMeshes("RESBALOSOS");
+        public List<TgcMesh> PisosResbalososMesh() => encontrarMeshes("RESBALOSOS");
         public List<TgcMesh> LavaMesh() => encontrarMeshes("LAVA");
         public List<TgcMesh> Luces() => encontrarMeshes("Luces");
         public List<TgcMesh> Frutas() => encontrarMeshes("FRUTA");
@@ -64,7 +68,7 @@ namespace TGC.Group.Modelo
             meshesColisionables.AddRange(CajasMesh());
             meshesColisionables.AddRange(SarcofagosMesh());
             meshesColisionables.AddRange(PilaresMesh());
-            meshesColisionables.AddRange(ResbalososMesh());
+            meshesColisionables.AddRange(PisosResbalososMesh());
             meshesColisionables.AddRange(PlataformasMesh());
             meshesColisionables.AddRange(LavaMesh());
             meshesColisionables.AddRange(Escalones());
@@ -103,7 +107,7 @@ namespace TGC.Group.Modelo
         #region Colisiones
         public bool colisionConPilar()
         {
-            return this.PilaresMesh().Exists(mesh => personaje.colisionaConBoundingBox(mesh));
+            return this.PilaresMesh().Exists(mesh => personaje.colisionaConMesh(mesh));
         }
 
         public bool colisionaConPiso(TgcMesh mesh)
@@ -128,7 +132,7 @@ namespace TGC.Group.Modelo
         public bool colisionEscenario()
         {
             
-            return this.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => personaje.colisionaConBoundingBox(mesh)) != null;
+            return this.MeshesColisionables().FindAll(mesh => mesh.Layer != "CAJAS" && mesh.Layer != "PISOS").Find(mesh => personaje.colisionaConMesh(mesh)) != null;
         }
 
         public bool colisionDeSalto()
@@ -150,6 +154,11 @@ namespace TGC.Group.Modelo
             return this.Rampas().Find(rampa => personaje.colisionConPisoDesnivelado(rampa.rampaMesh));
         }
 
+        public PisoInercia obtenerColisionPisoInerciaPersonaje()
+        {
+            return this.pisosInercia.Find(piso => personaje.colisionaPorArribaDe(piso.pisoMesh));
+        }
+
         
 
         
@@ -161,12 +170,12 @@ namespace TGC.Group.Modelo
 
         public bool personajeSobreMascara()
         {
-            return Mascaras().Exists(mascara => personaje.colisionaConBoundingBox(mascara));
+            return Mascaras().Exists(mascara => personaje.colisionaConMesh(mascara));
         }
 
         public void eliminarMascaraColisionada()
         {
-            TgcMesh mascaraColisionada = Mascaras().Find(mascara => personaje.colisionaConBoundingBox(mascara));
+            TgcMesh mascaraColisionada = Mascaras().Find(mascara => personaje.colisionaConMesh(mascara));
             eliminarObjeto(mascaraColisionada);
         }
 
@@ -179,12 +188,12 @@ namespace TGC.Group.Modelo
 
         public bool personajeSobreFruta()
         {
-            return Frutas().Exists(fruta => personaje.colisionaConBoundingBox(fruta));
+            return Frutas().Exists(fruta => personaje.colisionaConMesh(fruta));
         }
 
         public void eliminarFrutaColisionada()
         {
-            TgcMesh frutaColisionada = Frutas().Find(fruta => personaje.colisionaConBoundingBox(fruta));
+            TgcMesh frutaColisionada = Frutas().Find(fruta => personaje.colisionaConMesh(fruta));
             eliminarObjeto(frutaColisionada);
         }
 
@@ -275,6 +284,22 @@ namespace TGC.Group.Modelo
 
             return cajas;
         }
+
+        public List<PisoInercia> PisosInercia()
+        {
+            List<PisoInercia> pisosInercia = new List<PisoInercia>();
+
+            foreach (TgcMesh pisoInercia in PisosResbalososMesh())
+            {
+
+                PisoInercia piso = new PisoInercia(pisoInercia);
+                pisosInercia.Add(piso);
+
+            }
+
+            return pisosInercia;
+        }
+
         public List<PlataformaRotante> PlataformasRotantes()
         {
             List<PlataformaRotante> plataformas = new List<PlataformaRotante>();

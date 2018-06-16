@@ -20,17 +20,55 @@ namespace TGC.Group.Modelo
 
     public class PisoInercia
     {
-        private TGCVector3 _vectorEntrada;
-        public float AceleracionFrenada { get; set; }
-        public TgcMesh RenderMesh { get; }
+        private TGCVector3 vectorEntrante = new TGCVector3(0,0,0);
+        public float aceleracionFrenada = 0.999f;
+
+        public TgcMesh pisoMesh { get; }
         private TgcBoundingAxisAlignBox SlidingBox { get; set; }
 
         private bool seMovioBB = false;
+
+        public PisoInercia(TgcMesh mesh)
+        {
+            this.pisoMesh = mesh;
+
+        }
+
+        public TGCVector3 vectorEntrada()
+        {
+            vectorEntrante *= aceleracionFrenada;
+            return vectorEntrante;
+        }
+
+        public void setVectorEntrante(TGCVector3 nuevoVectorEntrante)
+        {
+            if (TGCVector3.Length(this.vectorEntrante) == 0)
+            {
+                this.vectorEntrante = new TGCVector3(nuevoVectorEntrante.X, 0f, nuevoVectorEntrante.Z);
+            }
+            else
+            {
+                TGCVector3 versor = nuevoVectorEntrante * (1 / TGCVector3.Length(nuevoVectorEntrante));
+                this.vectorEntrante = versor * TGCVector3.Length(this.vectorEntrante);
+            }
+        }
+
+
+        public TGCVector3 versorEntrada()
+        {
+            return this.vectorEntrante * (1 / TGCVector3.Length(this.vectorEntrante));
+        }
+
+     
+
+       
+
+
         public TgcBoundingAxisAlignBox BoundingBox
         {
             get
             {
-                return RenderMesh.BoundingBox;
+                return pisoMesh.BoundingBox;
             }
         }
         public TgcBoundingAxisAlignBox SlidingBoundingBox
@@ -39,7 +77,7 @@ namespace TGC.Group.Modelo
             {
                 if (!seMovioBB)
                 {
-                    var SlidingMesh = RenderMesh.clone("Clon");
+                    var SlidingMesh = pisoMesh.clone("Clon");
 
                     SlidingMesh.BoundingBox.move(new TGCVector3(0, 20, 0));
                     SlidingBox = SlidingMesh.BoundingBox.clone();
@@ -48,59 +86,31 @@ namespace TGC.Group.Modelo
                 return SlidingBox;
             }
         }
+        
+
+      
+
+        #region MeshAdapter
         public TGCVector3 Position
         {
             get
             {
-                return RenderMesh.Position;
+                return pisoMesh.Position;
             }
             set
             {
-                RenderMesh.Position = value;
+                pisoMesh.Position = value;
             }
         }
-
-        public TGCVector3 VectorEntrada
-        {
-            get
-            {
-                _vectorEntrada = _vectorEntrada * AceleracionFrenada;
-                //if (Math.Abs(_vectorEntrada.X )< 0.00000001 || Math.Abs(_vectorEntrada.Z) < 0.00000001)
-                //{
-                //    return TGCVector3.Empty;
-                //}
-                return _vectorEntrada;
-            }
-            set
-            {
-                if(TGCVector3.Length(_vectorEntrada) == 0)
-                {
-                    _vectorEntrada = new TGCVector3(value.X, 0f, value.Z);
-                }
-                else
-                {
-                    TGCVector3 versor = value * (1/TGCVector3.Length(value));
-                    _vectorEntrada = versor * TGCVector3.Length(_vectorEntrada);
-                }
-            }
-        }
-
-
-        public TGCVector3 VersorEntrada
-        {
-            get { return _vectorEntrada * (1 / TGCVector3.Length(_vectorEntrada)); }
-        }
-
-
         public bool AutoTransform
         {
             get
             {
-                return RenderMesh.AutoTransform;
+                return pisoMesh.AutoTransform;
             }
             set
             {
-                RenderMesh.AutoTransform = value;
+                pisoMesh.AutoTransform = value;
             }
         }
 
@@ -108,46 +118,19 @@ namespace TGC.Group.Modelo
         {
             get
             {
-                return RenderMesh.Transform;
+                return pisoMesh.Transform;
             }
             set
             {
-                RenderMesh.Transform = value;
+                pisoMesh.Transform = value;
             }
         }
-        public PisoInercia(TgcMesh mesh)
-        {
-            this.RenderMesh = mesh;
-        }
 
-        public PisoInercia(TgcMesh mesh, float aceleracion)
-        {
-            this.RenderMesh = mesh;
-            this.AceleracionFrenada = aceleracion;
-        }
 
-        //public static PisoInercia fromSize(TGCVector3 size)
-        //{
-        //    return new PisoInercia(TGCBox.fromSize(size));
-        //}    
+        public void Render() => pisoMesh.Render();
+        #endregion
 
-        public void Render()
-        {
-            RenderMesh.Render();
-        }
 
-        //public void updateValues()
-        //{
-        //    RenderMesh.updateValues();
-        //}
-
-        public bool aCollisionFound(Personaje personaje)
-        {
-            var collisionResult = TgcCollisionUtils.classifyBoxBox(personaje.boundingBox(), this.SlidingBoundingBox);
-            return (collisionResult != TgcCollisionUtils.BoxBoxResult.Afuera);
-        }
 
     }
-
-
 }

@@ -66,7 +66,6 @@ namespace TGC.Group.Modelo
         private List<Plataforma> plataformas;
         private List<PlataformaRotante> plataformasRotantes;
         private bool boundingBoxActivate = false;
-        private PisoInercia pisoResbaloso = null; //Es null cuando no esta pisando ningun piso resbaloso
 
         
 
@@ -92,6 +91,7 @@ namespace TGC.Group.Modelo
         private bool menu = true;
         private bool moving = false;
         private bool jumping = false;
+        private bool sliding = false;
         #endregion
 
         #region APIGUI
@@ -181,7 +181,6 @@ namespace TGC.Group.Modelo
         {
             perdiste = false;
             paused = false;
-            pisoResbaloso = null;
             direccionPersonaje = new DireccionPersonaje();
             velocidad =new TGCVector3(0,0,0);
             aceleracion = new TGCVector3(0,0,0);
@@ -383,7 +382,7 @@ namespace TGC.Group.Modelo
                 float movY = saltoRealizado;
                 float movZ = 0;
 
-                if (moving)
+                if (moving )
                 {
                     animacion = "Caminando";
                     moveForward = personaje.Velocidad();
@@ -488,35 +487,28 @@ namespace TGC.Group.Modelo
         public TGCVector3 movimientoPorSliding(TGCVector3 movimientoOriginal)
         {
             var vectorSlide = new TGCVector3(0, 0, 0);
-            foreach (TgcMesh mesh in escenario.ResbalososMesh())
+
+            PisoInercia pisoInercia = escenario.obtenerColisionPisoInerciaPersonaje();
+            if (pisoInercia == null)
             {
-                if (pisoResbaloso == null)
-                {
-                    pisoResbaloso = new PisoInercia(mesh, 0.999f);
-                }
-
-                if (pisoResbaloso.aCollisionFound(personaje))
-                {
-                    var VectorSlideActual = pisoResbaloso.VectorEntrada;
-                    var versorMovimientoOriginal = movimientoOriginal * (1 / TGCVector3.Length(movimientoOriginal));
-
-                    if (VectorSlideActual == TGCVector3.Empty || ((versorMovimientoOriginal != pisoResbaloso.VersorEntrada) && TGCVector3.Length(movimientoOriginal) > 0))
-                    {
-                        pisoResbaloso.VectorEntrada = movimientoOriginal;
-                    }
-                    else
-                    {
-                        vectorSlide = VectorSlideActual;
-                    }
-                    break;
-                }
-                else
-                {
-                    pisoResbaloso = null;
-                    //pisoResb.VectorEntrada = TGCVector3.Empty;
-                }
+                sliding = false;
+                return new TGCVector3(0, 0, 0);
             }
+            
+            var vectorSlideActual = pisoInercia.vectorEntrada();
+
+            var versorMovimientoOriginal = movimientoOriginal * (1 / TGCVector3.Length(movimientoOriginal));
+
+           
+            if (vectorSlideActual == TGCVector3.Empty || ((versorMovimientoOriginal != pisoInercia.versorEntrada()) && TGCVector3.Length(movimientoOriginal) > 0))
+            {
+                pisoInercia.setVectorEntrante(movimientoOriginal);
+            }
+            else  vectorSlide = vectorSlideActual;
+            
+         
             return vectorSlide;
+            
         }
 
         public void movimientoDePlataformas()
@@ -711,6 +703,7 @@ namespace TGC.Group.Modelo
                                + "Solicitud interaccion con caja: " + solicitudInteraccionConCaja + "\n"
                                + "Moving: " + moving + "\n"
                                + "Jumping: " + jumping + "\n"
+                               + "Sliding: " + sliding + "\n"
                                + "Elapsed Time: " + ElapsedTime +"\n"
                               /* + "Colision Con Rampa: " + colisionRampa + "\n"
                                + "Vertice mas alto: " + verticeMasAltoGlobal + "\n"
