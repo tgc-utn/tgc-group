@@ -38,7 +38,7 @@ namespace TGC.Group.Model.Rampas
             float longitudRampa = FastMath.Abs(verticeMasAlto.X - verticeMasBajo.X);
             
 
-            float pendienteRampa = (verticeMasAlto.Y - verticeMasBajo.Y) / FastMath.Abs(verticeMasAlto.X - verticeMasBajo.Y);
+            float pendienteRampa = (verticeMasAlto.Y - verticeMasBajo.Y) / FastMath.Abs(verticeMasAlto.X - verticeMasBajo.X);
             float diferenciaPersonajeRampa = FastMath.Abs(verticeMasAlto.X - posicionPersonaje.X);
 
 
