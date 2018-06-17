@@ -64,10 +64,12 @@ namespace TGC.Group.Model.Niveles {
 
         public void setEffect(Effect e) {
             cajas.ForEach(c => c.setEffect(e));
+            pisosNormales.ForEach(p => p.Effect = e);
         }
 
         public void setTechnique(string s) {
             cajas.ForEach(c => c.setTechnique(s));
+            pisosNormales.ForEach(p => p.Technique = s);
         }
 
         /* TODO: puede traer problemas de performance

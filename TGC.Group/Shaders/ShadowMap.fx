@@ -145,6 +145,7 @@ float4 PixScene(float2 Tex : TEXCOORD0,
 
 	float4 color_base = tex2D(diffuseMap, Tex);
 	color_base.rgb *= 0.5 + 0.5 * K;
+
 	return color_base;
 }
 

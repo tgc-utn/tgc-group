@@ -20,7 +20,7 @@ namespace TGC.Group.Model {
         private TgcBoundingSphere boundingSphere;
         private TgcBoundingSphere pies;
 
-        private TGCVector3 POS_ORIGEN = new TGCVector3(0, 200, 9500);
+        private TGCVector3 POS_ORIGEN = new TGCVector3(0, 100, 0);
 
         private int vidas;
         private int stamina;
