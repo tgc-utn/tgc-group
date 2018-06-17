@@ -25,10 +25,15 @@ namespace TGC.Group.Modelo
 
         public string RobotDirectorio { get; set; }
         public string RobotSkeletalMesh { get; set; }
+        public string RobotTextura { get; set; }
+
         public string RobotCaminando { get; set; }
         public string RobotParado { get; set; }
+        public string RobotPateando { get; set; }
         public string RobotSaltando { get; set; }
-        public string RobotTextura { get; set; }
+        public string RobotEmpujando { get; set; }
+        public string RobotCorriendo { get; set; }
+        public string RobotPegando { get; set; }
 
         public string SonidoFondo { get; set; }
         public string SonidoCaminar { get; set; }
@@ -48,9 +53,13 @@ namespace TGC.Group.Modelo
 
             RobotDirectorio = mediaDir + "Personaje\\Robot\\";
             RobotSkeletalMesh = RobotDirectorio + "Robot-TgcSkeletalMesh.xml";
-            RobotCaminando = RobotDirectorio + "Caminando-TgcSkeletalAnim.xml";
-            RobotParado = RobotDirectorio + "Parado-TgcSkeletalAnim.xml";
             RobotTextura = RobotDirectorio + "Textures\\uvwGreen.jpg";
+
+            RobotCaminando = RobotDirectorio + "Caminando-TgcSkeletalAnim.xml";
+            RobotPateando = RobotDirectorio + "Pateando-TgcSkeletalAnim.xml";
+            RobotParado = RobotDirectorio + "Parado-TgcSkeletalAnim.xml";
+            RobotCorriendo = RobotDirectorio + "Corriendo-TgcSkeletalAnim.xml";
+            RobotEmpujando = RobotDirectorio + "Empujando-TgcSkeletalAnim.xml";
 
             SonidoFondo = mediaDir + "Sonidos\\background.mp3";
             SonidoCaminar = mediaDir + "Sonidos\\FootSteps.wav";

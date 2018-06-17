@@ -1,5 +1,5 @@
 <tgcSkeletalAnim>
-	<animation name='Patear' bonesCount='23' framesCount='31' frameRate='30' startFrame='0' endFrame='30'>
+	<animation name='Pateando' bonesCount='23' framesCount='31' frameRate='30' startFrame='0' endFrame='30'>
 		<boundingBox min='[-44.5598,-0.949104,-85.7483]' max='[49.5124,130.474,34.9928]'/>
 		<bone id='0' name='Bip01 Pelvis' keyFramesCount='5'>
 			<frame n='0' pos='[0.077358,41.0565,2.59532]' rotQuat='[-0.567845,-0.567845,-0.421369,-0.42137]' />
