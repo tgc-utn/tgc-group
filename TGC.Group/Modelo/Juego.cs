@@ -40,7 +40,6 @@ namespace TGC.Group.Modelo
             Description = Game.Default.Description;
             mediaDir = amediaDir;
         }
-                 
 
         static string mediaDir;
         private Directorio directorio;
@@ -71,7 +70,7 @@ namespace TGC.Group.Modelo
 
         
 
-        private List<TgcMesh> meshesConLuz;
+        public static List<TgcMesh> meshesConLuz;
         private Microsoft.DirectX.Direct3D.Effect effectLuzComun;
         private Microsoft.DirectX.Direct3D.Effect effectLuzLava;
         private Microsoft.DirectX.Direct3D.Effect personajeLightShader;
@@ -188,7 +187,9 @@ namespace TGC.Group.Modelo
 
         //Para diferenciar las cosas que solo tiene que hacer al inciar juego y no al perder
         private bool inicio = true;
+
         private List<Hoguera> Hogueras;
+        private List<FuegoLuz> FuegosLuz;
         private TGCVector3 PosicionInicial = new TGCVector3(400, 20f, -900);
 
         Random rnd = new Random(); //Generador de numeros aleatorios;
@@ -205,6 +206,9 @@ namespace TGC.Group.Modelo
             if (inicio)
             {
                 Hoguera.texturesPath = MediaDir + "Escenas\\Textures\\";
+                FuegoLuz.texturesPath = MediaDir + "Escenas\\Textures\\";
+                Personaje.texturesPath = MediaDir + "Escenas\\Textures\\";
+
 
                 //Device de DirectX para crear primitivas.
                 var d3dDevice = D3DDevice.Instance.Device;
@@ -264,9 +268,15 @@ namespace TGC.Group.Modelo
                 ScreenRes_Y = d3dDevice.PresentationParameters.BackBufferHeight;
 
                 Hogueras = new List<Hoguera>();
-                foreach (TgcMesh mesh in escenario.Fuegos())
+                foreach (TgcMesh mesh in escenario.MeshesHogueras())
                 {
                     Hogueras.Add(new Hoguera(mesh, 1));
+                }
+
+                FuegosLuz = new List<FuegoLuz>();
+                foreach (TgcMesh mesh in escenario.Fuegos())
+                {
+                    FuegosLuz.Add(new FuegoLuz(mesh));
                 }
 
                 string compilationErrors;
@@ -277,10 +287,10 @@ namespace TGC.Group.Modelo
                     throw new Exception("Error al cargar shader OlasLava. Errores: " + compilationErrors);
                 }
 
-                foreach (TgcMesh lava in escenario.LavaMesh())
+                foreach (TgcMesh mesh in escenario.MeshesParaEfectoLava())
                 {
-                    lava.Effect = olasLava;
-                    lava.Technique = "Olas";
+                    mesh.Effect = olasLava;
+                    mesh.Technique = "Olas";
                 }
 
                 olasLava.SetValue("screen_dx", ScreenRes_X);
@@ -357,11 +367,13 @@ namespace TGC.Group.Modelo
 
                 if (Input.keyUp(Key.E))
                 {
-                    var h = escenario.getClosestFire(personaje.position(), 500f, Hogueras);
+                    var h = escenario.getClosestBonfire(personaje.position(), 500f, Hogueras);
                     if(h != null)
                     {
                         h.encender(personaje.frutas);
                         PosicionInicial = personaje.position();
+                        PosicionInicial.Y = escenario.Ypiso;
+                        personaje.frutas -= h.ManzanasNecesarias;
                     }
                 }
 
@@ -507,7 +519,7 @@ namespace TGC.Group.Modelo
                 movimientoRealPersonaje = ColisionadorEsferico.moveCharacter(personaje.esferaPersonaje, movimientoOriginal, escenario.MeshesColisionablesBB());
                 personaje.matrizTransformacionPlataformaRotante = TGCMatrix.Identity;
             }
-
+            personaje.MovimientoRealActual = movimientoRealPersonaje;
             float alturaPorDesnivel = 0f;
             if ((alturaPorDesnivel = movimientoPorDesnivel()) >= 0)
             {
@@ -715,6 +727,12 @@ namespace TGC.Group.Modelo
                         octree.render(Frustum, boundingBoxActivate);
                         renderizarRestantes();
                         personaje.animateAndRender(ElapsedTime);
+                        if (personaje.emisorParticulas != null)
+                        {
+                            personaje.emisorParticulas.Position = personaje.position();
+                            personaje.emisorParticulas.Speed= new TGCVector3(65, 20, 15);
+                            personaje.emisorParticulas.render(ElapsedTime);
+                        }
                         escenario.RenderAll();
 
                     }
@@ -756,6 +774,10 @@ namespace TGC.Group.Modelo
                     D3DDevice.Instance.ParticlesEnabled = true;
                     D3DDevice.Instance.EnableParticles();
                     foreach(Hoguera s in Hogueras)
+                    {
+                        s.renderParticles(ElapsedTime);
+                    }
+                    foreach (FuegoLuz s in FuegosLuz)
                     {
                         s.renderParticles(ElapsedTime);
                     }
@@ -963,7 +985,7 @@ namespace TGC.Group.Modelo
             meshesConLuz = new List<TgcMesh>();
             effectLuzComun = TgcShaders.Instance.TgcMeshPhongShader;
             effectLuzLava = effectLuzComun.Clone(effectLuzComun.Device);
-            foreach (TgcMesh mesh in escenario.MeshesColisionables())
+            foreach (TgcMesh mesh in escenario.scene.Meshes)
             {
                 Microsoft.DirectX.Direct3D.Effect defaultEffect = mesh.Effect;
 
@@ -975,30 +997,37 @@ namespace TGC.Group.Modelo
                 }
                 else
                 {
-                    if (luz.Layer == "Luces")
+                    if(mesh.Layer != "LAVA" && mesh.Layer != "FUEGO" && mesh.Layer != "HOGUERA")
                     {
-                        mesh.Effect = effectLuzComun;
-                        mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
-                        mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
-                        mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
-                        mesh.Effect.SetValue("ambientColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
-                        mesh.Effect.SetValue("diffuseColor", ColorValue.FromColor(Color.White));
-                        mesh.Effect.SetValue("specularColor", ColorValue.FromColor(Color.DimGray));
-                        mesh.Effect.SetValue("specularExp", 500f);
-                    }
-                    else
-                    {
-                        mesh.Effect = effectLuzLava;
-                        mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
-                        mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
-                        mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
-                        mesh.Effect.SetValue("ambientColor", ColorValue.FromColor(Color.Red));
-                        mesh.Effect.SetValue("diffuseColor", ColorValue.FromColor(Color.Red));
-                        mesh.Effect.SetValue("specularColor", ColorValue.FromColor(Color.Orange));
-                        mesh.Effect.SetValue("specularExp", 10000f);
-                    }
-                    if(mesh.Layer != "LAVA")
-                    {
+                        if (luz.Layer == "LAVA")
+                        {
+                            mesh.Effect = effectLuzLava;
+                            mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
+                            mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
+                            mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+                            //mesh.Effect.SetValue("lightIntensity", 20f);
+                            //mesh.Effect.SetValue("lightAttenuation", 0.3f);
+                            mesh.Effect.SetValue("ambientColor", ColorValue.FromColor(Color.Red));
+                            mesh.Effect.SetValue("diffuseColor", ColorValue.FromColor(Color.Red));
+                            mesh.Effect.SetValue("specularColor", ColorValue.FromColor(Color.Orange));
+                            mesh.Effect.SetValue("specularExp", 10000f);
+                        }
+                        else
+                        {
+                            if (mesh.Layer != "LAVA" && mesh.Layer != "FUEGO" && mesh.Layer != "HOGUERA")
+                            {
+                                mesh.Effect = effectLuzComun;
+                                mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
+                                mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
+                                mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+                                //mesh.Effect.SetValue("lightIntensity", 20f);
+                                //mesh.Effect.SetValue("lightAttenuation", 0.3f);
+                                mesh.Effect.SetValue("ambientColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
+                                mesh.Effect.SetValue("diffuseColor", ColorValue.FromColor(Color.White));
+                                mesh.Effect.SetValue("specularColor", ColorValue.FromColor(Color.DimGray));
+                                mesh.Effect.SetValue("specularExp", 500f);
+                            }
+                        }
                         meshesConLuz.Add(mesh);
                     }
                 }

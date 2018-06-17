@@ -59,6 +59,17 @@ namespace TGC.Group.Modelo
         public List<TgcMesh> Escalones() => encontrarMeshes("ESCALON");
         public List<TgcMesh> RampasMesh() => encontrarMeshes("RAMPA");
         public List<TgcMesh> Fuegos() => encontrarMeshes("FUEGO");
+        public List<TgcMesh> MeshesHogueras() => encontrarMeshes("HOGUERA");
+
+        public List<TgcMesh> MeshesParaEfectoLava()
+        {
+            List<TgcMesh> meshesParaEfectoLava = new List<TgcMesh>();
+            meshesParaEfectoLava.AddRange(LavaMesh());
+            meshesParaEfectoLava.AddRange(Fuegos());
+            meshesParaEfectoLava.AddRange(MeshesHogueras());
+
+            return meshesParaEfectoLava;
+        }
 
         public List<TgcMesh> MeshesColisionables()
         {
@@ -223,6 +234,9 @@ namespace TGC.Group.Modelo
             List<TgcMesh> fuentesDeLuz = new List<TgcMesh>();
             fuentesDeLuz.AddRange(Luces());
             fuentesDeLuz.AddRange(LavaMesh());
+            fuentesDeLuz.AddRange(Fuegos());
+            fuentesDeLuz.AddRange(MeshesHogueras());
+
 
             return fuentesDeLuz;
         }
@@ -383,12 +397,12 @@ namespace TGC.Group.Modelo
             return minLight;
         }
 
-        public Hoguera getClosestFire(TGCVector3 pos, float maxDistance, List<Hoguera> Hogueras)
+        public Hoguera getClosestBonfire(TGCVector3 pos, float maxDistance, List<Hoguera> Hogueras)
         {
             var minDist = float.MaxValue;
             TgcMesh minF = null;
 
-            foreach (var fuego in Fuegos())
+            foreach (var fuego in MeshesHogueras())
             {
                 var distSq = TGCVector3.LengthSq(pos - fuego.BoundingBox.calculateBoxCenter());
                 if (distSq < minDist)
@@ -406,7 +420,7 @@ namespace TGC.Group.Modelo
                 }
                 foreach(Hoguera h in Hogueras)
                 {
-                    if(h.MeshFuego.GetHashCode() == minF.GetHashCode())
+                    if(h.MeshHoguera.GetHashCode() == minF.GetHashCode())
                     {
                         return h;
                     }
