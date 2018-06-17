@@ -106,11 +106,12 @@ VS_OUTPUT vs_main2(VS_INPUT Input)
 
 float frecuencia = 10;
 //Pixel Shader
-float4 ps_main(VS_OUTPUT Input) : COLOR0
-{
+float4 ps_main(VS_OUTPUT Input) : COLOR0 {
     float y = Input.Texcoord.y * screen_dy + cos(time * frecuencia);
     Input.Texcoord.y = y / screen_dy;
-    return tex2D(diffuseMap, Input.Texcoord);
+
+    // return tex2D(diffuseMap, Input.Texcoord);
+	return float4(0, 0, 1, 1);
 }
 
 //Pixel Shader

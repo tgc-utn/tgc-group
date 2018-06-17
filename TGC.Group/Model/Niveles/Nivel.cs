@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.DirectX.Direct3D;
+using System.Collections.Generic;
 using System.Linq;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Core.Shaders;
 using TGC.Core.Textures;
 
 namespace TGC.Group.Model.Niveles {
@@ -59,6 +61,14 @@ namespace TGC.Group.Model.Niveles {
         }
 
         public abstract void dispose();
+
+        public void setEffect(Effect e) {
+            cajas.ForEach(c => c.setEffect(e));
+        }
+
+        public void setTechnique(string s) {
+            cajas.ForEach(c => c.setTechnique(s));
+        }
 
         /* TODO: puede traer problemas de performance
          * tener una lista con todos los renderizables aparte?

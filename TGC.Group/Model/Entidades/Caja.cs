@@ -9,10 +9,6 @@ using TGC.Core.Shaders;
 using TGC.Core.Textures;
 
 namespace TGC.Group.Model {
-    // TODO: deberian patinar tambien las cajas?
-    // si se patinan, entonces deberiamos refactorizar esta clase y la clase personaje
-    // en una sola clase "entidad fisica" o algo asi    
-
     public class Caja : IRenderObject {
         private TgcBoundingAxisAlignBox cuerpo;
         private TgcBoundingAxisAlignBox superior;
@@ -21,23 +17,10 @@ namespace TGC.Group.Model {
         private TGCVector3 vel;
 
         bool alpha = true;
-
         public bool AlphaBlendEnable { get => alpha; set { alpha = value; } }
 
         public Caja(string mediaDir, TGCVector3 pos) :
             this(mediaDir, pos, new TGCVector3(80, 80, 80)) { }
-
-        private static Effect effect;
-
-        public static Effect getEffect() 
-        {
-            if(effect==null) 
-            {
-                effect = TgcShaders.loadEffect("C:/Users/fulcano/Desktop/2018_1C_3011_LosPalmeras/TGC.Group/Shaders/BasicShader.fx");
-            }
-
-            return effect;
-        }
 
         public Caja(string mediaDir, TGCVector3 pos, TGCVector3 size) {
             // TODO: tengo que hacer dispose de esta textura? la hago global?
@@ -66,13 +49,16 @@ namespace TGC.Group.Model {
 
             move(pos);
             vel = TGCVector3.Empty;
+        }
 
-            
-            box.Effect = getEffect();
+        public void setEffect(Effect e) {
+            box.Effect = e;
             box.Technique = "RenderScene";
+            // effect.SetValue("time", 0);
+        }
 
-            effect.SetValue("time", 0);
-
+        public void setTechnique(string t) {
+            box.Technique = t;
         }
 
         public void Render() {

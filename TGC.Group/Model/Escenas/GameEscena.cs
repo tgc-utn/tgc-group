@@ -7,6 +7,7 @@ using TGC.Core.Collision;
 using TGC.Core.Direct3D;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
+using TGC.Core.Shaders;
 using TGC.Core.Textures;
 using TGC.Group.Model.Niveles;
 
@@ -25,13 +26,18 @@ namespace TGC.Group.Model.Scenes {
 
         public void init(string mediaDir, string shaderDir) {
             cameraOffset = new TGCVector3(0, 200, 400);
-            setNivel(new Nivel1(mediaDir));
+            setNivel(new NivelDemo(mediaDir));
             personaje = new Personaje(mediaDir, shaderDir);
 
             hud = new Sprite(D3DDevice.Instance.Device);
             barraStamina = TgcTexture.createTexture(mediaDir + "stamina.png");
             unidadStamina = TgcTexture.createTexture(mediaDir + "staminaUnidad.png");
             vida = TgcTexture.createTexture(mediaDir + "vida.png");
+
+            var effect = TgcShaders.loadEffect(shaderDir + "BasicShader.fx");
+
+            nivel.setEffect(effect);
+            nivel.setTechnique("RenderScene2");
         }
 
         public void setNivel(Nivel nuevoNivel) {
