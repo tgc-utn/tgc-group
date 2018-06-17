@@ -76,6 +76,7 @@ namespace TGC.Group.Modelo
         private Microsoft.DirectX.Direct3D.Effect effectLuzLava;
         private Microsoft.DirectX.Direct3D.Effect personajeLightShader;
 
+        private Microsoft.DirectX.Direct3D.Effect olasLava;
        
 
         #region Personaje
@@ -179,6 +180,8 @@ namespace TGC.Group.Modelo
         float alturaRampaGlobal = 0f;
         #endregion
 
+        //Para diferenciar las cosas que solo tiene que hacer al inciar juego y no al perder
+        private bool inicio = true;
         private List<Hoguera> Hogueras;
         private TGCVector3 PosicionInicial = new TGCVector3(400, 20f, -900);
 
@@ -190,79 +193,80 @@ namespace TGC.Group.Modelo
             velocidad =new TGCVector3(0,0,0);
             aceleracion = new TGCVector3(0,0,0);
 
-            Hoguera.texturesPath = MediaDir + "Escenas\\Textures\\";
+            if (inicio)
+            {
+                Hoguera.texturesPath = MediaDir + "Escenas\\Textures\\";
 
-            //Device de DirectX para crear primitivas.
-            var d3dDevice = D3DDevice.Instance.Device;
+                //Device de DirectX para crear primitivas.
+                var d3dDevice = D3DDevice.Instance.Device;
+
+                //Objeto que conoce todos los path de MediaDir
+                directorio = new Directorio(MediaDir);
+                personaje = new Personaje(directorio);
+
+                //Cargo el SoundManager
+                soundManager = new SoundManager(directorio,this.DirectSound.DsDevice);
+                soundManager.playSonidoFondo();
 
 
+                //Cagar escenario especifico para el juego.
+                escenario = new Escenario(directorio.EscenaCrash,personaje);
 
-            //Objeto que conoce todos los path de MediaDir
-            directorio = new Directorio(MediaDir);
-            personaje = new Personaje(directorio);
+                personaje.autoTransform(false);
+                
+                //Le cambiamos la textura para diferenciarlo un poco
+                personaje.changeDiffuseMaps(new[]
+                {
+                    TgcTexture.createTexture(D3DDevice.Instance.Device, directorio.RobotTextura)
+                });
 
-            //Cargo el SoundManager
-            soundManager = new SoundManager(directorio,this.DirectSound.DsDevice);
-            soundManager.playSonidoFondo();
+                //Inicializamos el collisionManager.
+                ColisionadorEsferico = new SphereCollisionManager();
+                ColisionadorEsferico.GravityEnabled = true;
+                ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
+                ColisionadorEsferico.SlideFactor = 1.3f;
+
+                //Obtenemos las plataformas segun su tipo de movimiento.
+                plataformas = escenario.Plataformas();
+                plataformasRotantes = escenario.PlataformasRotantes();
+
+                //Posición de la camara.
+                camaraInterna = new TgcThirdPersonCamera(personaje.esferaPersonaje.Center, 600, -1200);
+
+                //Configuro donde esta la posicion de la camara y hacia donde mira.
+                Camara = camaraInterna;
 
 
-            //Cagar escenario especifico para el juego.
-            escenario = new Escenario(directorio.EscenaCrash,personaje);
+                var meshesSinPlatXZ = escenario.scene.Meshes.FindAll(mesh => mesh.Name != "PlataformaX" && mesh.Name != "PlataformaZ");
+
+                octree = new Octree();
+                octree.create(meshesSinPlatXZ, escenario.BoundingBox());
+                octree.createDebugOctreeMeshes();// --> Para renderizar las "cajas" que genera
+
+                Frustum.Color = Color.Black;
+
+
+                inicializarGUIPrincipal();
+                inicializarGUISecundaria();
+                inicializarIluminacion();
+                inicializarHUDS(d3dDevice);
+
+
+                Hogueras = new List<Hoguera>();
+                foreach (TgcMesh mesh in escenario.Fuegos())
+                {
+                    Hogueras.Add(new Hoguera(mesh, 1));
+                }
+            }
 
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
 
             //Posicion inicial
             personaje.position(PosicionInicial);
-           // personaje.position(new TGCVector3(-4133.616f, 20f, 5000f));
 
-            personaje.autoTransform(false);
-                
-            //Le cambiamos la textura para diferenciarlo un poco
-            personaje.changeDiffuseMaps(new[]
-            {
-                TgcTexture.createTexture(D3DDevice.Instance.Device, directorio.RobotTextura)
-            });
-            
-
-            //Inicializamos el collisionManager.
-            ColisionadorEsferico = new SphereCollisionManager();
-            ColisionadorEsferico.GravityEnabled = true;
-            ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
-            ColisionadorEsferico.SlideFactor = 1.3f;
-
-            //Obtenemos las plataformas segun su tipo de movimiento.
-            plataformas = escenario.Plataformas();
-            plataformasRotantes = escenario.PlataformasRotantes();
-
-           //Posición de la camara.
-            camaraInterna = new TgcThirdPersonCamera(personaje.esferaPersonaje.Center, 600, -1200);
-           
-            //Configuro donde esta la posicion de la camara y hacia donde mira.
-            Camara = camaraInterna;
-
-            
-            var meshesSinPlatXZ = escenario.scene.Meshes.FindAll(mesh => mesh.Name != "PlataformaX" && mesh.Name != "PlataformaZ");
-
-            octree = new Octree();
-            octree.create(meshesSinPlatXZ, escenario.BoundingBox());
-            octree.createDebugOctreeMeshes();// --> Para renderizar las "cajas" que genera
-
-            Frustum.Color = Color.Black;
-
-           
-            inicializarGUIPrincipal();
-            inicializarGUISecundaria();
-            inicializarIluminacion();
-            inicializarHUDS(d3dDevice);
-
-
-            Hogueras = new List<Hoguera>();
-            foreach(TgcMesh mesh in escenario.Fuegos())
-            {
-                Hogueras.Add(new Hoguera(mesh, 1));
-            }
-
+            //Cambia a false para que no entre al if la proxima vez
+            inicio = false;
         }
 
 
