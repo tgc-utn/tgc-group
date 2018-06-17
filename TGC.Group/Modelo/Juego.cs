@@ -95,6 +95,7 @@ namespace TGC.Group.Modelo
         private bool moving = false;
         private bool jumping = false;
         private bool sliding = false;
+        private bool godMode = false;
         #endregion
 
         #region APIGUI
@@ -150,6 +151,9 @@ namespace TGC.Group.Modelo
         }
         #endregion
 
+        float ScreenRes_X;
+        float ScreenRes_Y;
+
         #region Sprites
         public CustomSprite barraDeVida;
         public CustomSprite fruta;
@@ -184,6 +188,9 @@ namespace TGC.Group.Modelo
         private bool inicio = true;
         private List<Hoguera> Hogueras;
         private TGCVector3 PosicionInicial = new TGCVector3(400, 20f, -900);
+
+        Random rnd = new Random(); //Generador de numeros aleatorios;
+
 
         public override void Init()
         {
@@ -251,12 +258,31 @@ namespace TGC.Group.Modelo
                 inicializarIluminacion();
                 inicializarHUDS(d3dDevice);
 
+                ScreenRes_X = d3dDevice.PresentationParameters.BackBufferWidth;
+                ScreenRes_Y = d3dDevice.PresentationParameters.BackBufferHeight;
 
                 Hogueras = new List<Hoguera>();
                 foreach (TgcMesh mesh in escenario.Fuegos())
                 {
                     Hogueras.Add(new Hoguera(mesh, 1));
                 }
+
+                string compilationErrors;
+                olasLava = Microsoft.DirectX.Direct3D.Effect.FromFile(d3dDevice, MediaDir + "OlasLava.fx",
+                    null, null, ShaderFlags.PreferFlowControl, null, out compilationErrors);
+                if (olasLava == null)
+                {
+                    throw new Exception("Error al cargar shader OlasLava. Errores: " + compilationErrors);
+                }
+
+                foreach (TgcMesh lava in escenario.LavaMesh())
+                {
+                    lava.Effect = olasLava;
+                    lava.Technique = "Olas";
+                }
+
+                olasLava.SetValue("screen_dx", ScreenRes_X);
+                olasLava.SetValue("screen_dy", ScreenRes_Y);
             }
 
             //Configurar animacion inicial
@@ -287,7 +313,8 @@ namespace TGC.Group.Modelo
             moving = false;
             var animacion = "";
 
-            while (ElapsedTime > 1) ElapsedTime = ElapsedTime / 10;
+            while (ElapsedTime > 1) ElapsedTime = ElapsedTime / 10; //Para evitar el error de que ElapsedTime es muy alto al inicio
+
             tiempoAcumulado += ElapsedTime;
             
             //Corroboramos si el jugador perdio la partida.
@@ -305,7 +332,10 @@ namespace TGC.Group.Modelo
              
             //Bounding Box activos.
             if (Input.keyPressed(Key.F))boundingBoxActivate = !boundingBoxActivate;
-            
+
+            //Activo y desactivo Modo Dios
+            if (Input.keyPressed(Key.I)) godMode = !godMode;
+
             //Si el personaje se mantiene en caida, se pierda la partida.
             if (personaje.position().Y < -200)perdiste = true;
             
@@ -316,7 +346,6 @@ namespace TGC.Group.Modelo
                
                 if (Input.keyDown(Key.R)) solicitudInteraccionConCaja = true;
                 else solicitudInteraccionConCaja = false;
-
 
                 if (Input.keyUp(Key.E))
                 {
@@ -332,7 +361,7 @@ namespace TGC.Group.Modelo
                 // Para que no se pueda saltar cuando agarras algun objeto
                 if (!solicitudInteraccionConCaja)
                 {
-                    if (Input.keyUp(Key.Space) && saltoActual < coeficienteSalto && doubleJump > 0)
+                    if (Input.keyUp(Key.Space) && saltoActual < coeficienteSalto && (doubleJump > 0 || godMode))
                     {
                         saltoActual = coeficienteSalto;
                         doubleJump -= 1;
@@ -350,7 +379,7 @@ namespace TGC.Group.Modelo
                 #endregion
 
                 #region Danio
-                if (escenario.personajeSobreLava()) escenario.quemarPersonaje();
+                if (escenario.personajeSobreLava() && !godMode) escenario.quemarPersonaje();
                 #endregion
 
                 #region BarraVida
@@ -646,15 +675,26 @@ namespace TGC.Group.Modelo
             PreRender();
             if (menu)gui_render(ElapsedTime);
             else
-            
             {
-                 Frustum.render();
+                Frustum.render();
+                olasLava.SetValue("time", tiempoAcumulado);
+
+                //int factorY = rnd.Next(-6, 6);
+                //int factorX = rnd.Next(-6, 6);
+                //int frecuencia = rnd.Next(1, 11);
+
+                //olasLava.SetValue("factorY", factorY);
+                //olasLava.SetValue("factorX", factorX);
+                //olasLava.SetValue("frecuencia", frecuencia);
+
+
                 if (!perdiste)
                 {
                     
                     renderizarSprites();
                     renderizarDebug();
-                    
+                    DrawText.drawText((godMode ? "GOD MODE: ON" : ""), (int)(ScreenRes_X - 140f), 50, Color.Red);
+
                     //Renderizo OBB de las plataformas rotantes
                     plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
                     
@@ -944,7 +984,10 @@ namespace TGC.Group.Modelo
                         mesh.Effect.SetValue("specularColor", ColorValue.FromColor(Color.Orange));
                         mesh.Effect.SetValue("specularExp", 10000f);
                     }
-                meshesConLuz.Add(mesh);
+                    if(mesh.Layer != "LAVA")
+                    {
+                        meshesConLuz.Add(mesh);
+                    }
                 }
                 //mesh.Technique = "RenderScene2";
             }
