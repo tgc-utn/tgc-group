@@ -189,6 +189,7 @@ namespace TGC.Group.Modelo
         //Para diferenciar las cosas que solo tiene que hacer al inciar juego y no al perder
         private bool inicio = true;
         private List<Hoguera> Hogueras;
+        private List<Hoguera> Fuegos;
         private TGCVector3 PosicionInicial = new TGCVector3(400, 20f, -900);
 
         Random rnd = new Random(); //Generador de numeros aleatorios;
@@ -264,9 +265,15 @@ namespace TGC.Group.Modelo
                 ScreenRes_Y = d3dDevice.PresentationParameters.BackBufferHeight;
 
                 Hogueras = new List<Hoguera>();
-                foreach (TgcMesh mesh in escenario.Fuegos())
+                foreach (TgcMesh mesh in escenario.Hogueras())
                 {
                     Hogueras.Add(new Hoguera(mesh, 1));
+                }
+
+                Fuegos = new List<Hoguera>();
+                foreach (TgcMesh mesh in escenario.Fuegos())
+                {
+                    Fuegos.Add(new Hoguera(mesh, 1));
                 }
 
                 string compilationErrors;
@@ -756,6 +763,11 @@ namespace TGC.Group.Modelo
                     D3DDevice.Instance.ParticlesEnabled = true;
                     D3DDevice.Instance.EnableParticles();
                     foreach(Hoguera s in Hogueras)
+                    {
+                        s.renderParticles(ElapsedTime);
+                    }
+
+                    foreach (Hoguera s in Fuegos)
                     {
                         s.renderParticles(ElapsedTime);
                     }
