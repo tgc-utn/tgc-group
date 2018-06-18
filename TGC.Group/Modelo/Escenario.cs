@@ -58,6 +58,18 @@ namespace TGC.Group.Modelo
         public List<TgcMesh> Mascaras() => encontrarMeshes("MASCARA");
         public List<TgcMesh> Escalones() => encontrarMeshes("ESCALON");
         public List<TgcMesh> RampasMesh() => encontrarMeshes("RAMPA");
+        public List<TgcMesh> Fuegos() => encontrarMeshes("FUEGO");
+        public List<TgcMesh> MeshesHogueras() => encontrarMeshes("HOGUERA");
+
+        public List<TgcMesh> MeshesParaEfectoLava()
+        {
+            List<TgcMesh> meshesParaEfectoLava = new List<TgcMesh>();
+            meshesParaEfectoLava.AddRange(LavaMesh());
+            meshesParaEfectoLava.AddRange(Fuegos());
+            meshesParaEfectoLava.AddRange(MeshesHogueras());
+
+            return meshesParaEfectoLava;
+        }
 
         public List<TgcMesh> MeshesColisionables()
         {
@@ -100,6 +112,7 @@ namespace TGC.Group.Modelo
             if (indice != -1) obstaculos.RemoveAt(indice);
             return obstaculos.Select(mesh => mesh.BoundingBox).ToList();
         }
+
 
 
         #endregion
@@ -221,6 +234,9 @@ namespace TGC.Group.Modelo
             List<TgcMesh> fuentesDeLuz = new List<TgcMesh>();
             fuentesDeLuz.AddRange(Luces());
             fuentesDeLuz.AddRange(LavaMesh());
+            fuentesDeLuz.AddRange(Fuegos());
+            fuentesDeLuz.AddRange(MeshesHogueras());
+
 
             return fuentesDeLuz;
         }
@@ -379,6 +395,38 @@ namespace TGC.Group.Modelo
                 }
             }
             return minLight;
+        }
+
+        public Hoguera getClosestBonfire(TGCVector3 pos, float maxDistance, List<Hoguera> Hogueras)
+        {
+            var minDist = float.MaxValue;
+            TgcMesh minF = null;
+
+            foreach (var fuego in MeshesHogueras())
+            {
+                var distSq = TGCVector3.LengthSq(pos - fuego.BoundingBox.calculateBoxCenter());
+                if (distSq < minDist)
+                {
+                    minDist = distSq;
+                    minF = fuego;
+                }
+            }
+
+            if (minF != null)
+            {
+                if (maxDistance != 0 && TGCVector3.LengthSq(pos - minF.BoundingBox.calculateBoxCenter()) > (maxDistance * maxDistance))
+                {
+                    return null;
+                }
+                foreach(Hoguera h in Hogueras)
+                {
+                    if(h.MeshHoguera.GetHashCode() == minF.GetHashCode())
+                    {
+                        return h;
+                    }
+                }
+            }
+            return null;
         }
 
     }

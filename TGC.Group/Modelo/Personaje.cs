@@ -14,6 +14,8 @@ using TGC.Core.Textures;
 using TGC.Core.Collision;
 using TGC.Core.SceneLoader;
 using TGC.Core.Input;
+using TGC.Core.Particle;
+
 
 using TGC.Group.Modelo.Cajas;
 
@@ -50,7 +52,14 @@ namespace TGC.Group.Modelo
         public TGCVector3 ultimoDesplazamiento { get; set; }
 
         public TGCMatrix matrizTransformacionPlataformaRotante { get; set; }
-       
+
+        public ParticleEmitter emisorParticulas { get; set; }
+
+        public static string texturesPath;
+        private string nitroTex = "hojaparticula.png";
+
+        public TGCVector3 MovimientoRealActual { get; set; }
+
 
         public Personaje(Directorio directorio)
         {
@@ -137,6 +146,14 @@ namespace TGC.Group.Modelo
         {
             VELOCIDAD_EXTRA += velocidadExtra;
             TIEMPO_POWER_UP += tiempo;
+            emisorParticulas = new ParticleEmitter(texturesPath + nitroTex, 15);
+            emisorParticulas.Position = position();
+            emisorParticulas.MinSizeParticle = 1f;
+            emisorParticulas.MaxSizeParticle = 2;
+            emisorParticulas.ParticleTimeToLive = 1f;
+            emisorParticulas.CreationFrecuency = 0.01f;
+            emisorParticulas.Dispersion = 50;
+            emisorParticulas.Speed = new TGCVector3(65, 20, 15);
         }
 
         public void actualizarValores(float elapsedTime)
@@ -145,6 +162,7 @@ namespace TGC.Group.Modelo
             else
             {
                 VELOCIDAD_EXTRA = 0;
+                emisorParticulas = null;
             }
             
         }
@@ -209,7 +227,15 @@ namespace TGC.Group.Modelo
         public void changeDiffuseMaps(TgcTexture[] newDiffuseMap) => personajeMesh.changeDiffuseMaps(newDiffuseMap);
         public void animateAndRender(float elapsedTime) => personajeMesh.animateAndRender(elapsedTime);
         public TgcSkeletalMesh.MeshRenderType renderType() => personajeMesh.RenderType;
-        public void render() => personajeMesh.Render();
+
+        public void render(float ElapsedTime)
+        {
+            personajeMesh.Render();
+            if(emisorParticulas != null)
+            {
+                emisorParticulas.render(ElapsedTime);
+            }
+        }
         public void dispose() => personajeMesh.Dispose();
         #endregion
 

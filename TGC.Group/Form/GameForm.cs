@@ -166,7 +166,7 @@ namespace TGC.Group.Form
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Error en Init() del juego", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(e.Message, "Error en Init() del juego " + Juego.meshesConLuz.Count, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
