@@ -189,6 +189,7 @@ namespace TGC.Group.Modelo
         private List<FuegoLuz> FuegosLuz;
         //private TGCVector3 PosicionInicial = new TGCVector3(400, 20f, -900);
 
+
         Random rnd = new Random(); //Generador de numeros aleatorios;
 
 
@@ -779,7 +780,6 @@ namespace TGC.Group.Modelo
                     {
                         s.renderParticles(ElapsedTime);
                     }
-
                 }
                 else
                 {
