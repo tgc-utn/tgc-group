@@ -22,23 +22,21 @@ namespace TGC.Group.Modelo
     {
         public TgcScene scene { get; set; }
         public Personaje personaje { get; }
-        public float Ypiso { get; }
+        public float Ypiso { get; } = 20f;
 
         private List<TgcMesh> frutas;
         public List<PisoInercia> pisosInercia;
 
-        private float danioLava;
+        private float danioLava = 0.009f;
 
         public Escenario(string pathEscenario,Personaje personaje)
         {
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(pathEscenario);
             this.personaje = personaje;
-            Ypiso = 20f;
-            danioLava = 0.001f;
+            
             frutas = Frutas();
-
-            this.pisosInercia = PisosInercia();
+            pisosInercia = PisosInercia();
         }
         
 
@@ -229,18 +227,6 @@ namespace TGC.Group.Modelo
         }
         #endregion
 
-        public List<TgcMesh> FuentesDeLuz()
-        {
-            List<TgcMesh> fuentesDeLuz = new List<TgcMesh>();
-            fuentesDeLuz.AddRange(Luces());
-            fuentesDeLuz.AddRange(LavaMesh());
-            fuentesDeLuz.AddRange(Fuegos());
-            fuentesDeLuz.AddRange(MeshesHogueras());
-
-
-            return fuentesDeLuz;
-        }
-
         #region MeshToClassAdapters
 
         private int coeficienteRotacion = 1;
@@ -332,6 +318,19 @@ namespace TGC.Group.Modelo
             return plataformas;
         }
         #endregion
+
+        public List<TgcMesh> FuentesDeLuz()
+        {
+            List<TgcMesh> fuentesDeLuz = new List<TgcMesh>();
+            fuentesDeLuz.AddRange(Luces());
+            fuentesDeLuz.AddRange(LavaMesh());
+            fuentesDeLuz.AddRange(Fuegos());
+            fuentesDeLuz.AddRange(MeshesHogueras());
+
+
+            return fuentesDeLuz;
+        }
+
 
         public List<TgcMesh> ObjetosColisionablesConCajas()
         {

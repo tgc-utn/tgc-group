@@ -28,8 +28,7 @@ namespace TGC.Group.Modelo.Cajas
 
         public virtual void afectar(Personaje personaje)
         {
-            
-             
+            if (personaje.kicking) escenario.eliminarObjeto(cajaMesh);
         }
 
         public void influirDanio(Personaje personaje)

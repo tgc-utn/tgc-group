@@ -92,12 +92,6 @@ namespace TGC.Group.Modelo
         private bool perdiste = false;
         private bool menu = true;
         private bool godMode = false;
-
-        /*private bool moving = false;
-        private bool jumping = false;
-        private bool sliding = false;
-        private bool kicking = false;
-        private bool running = false;*/
         #endregion
 
         #region APIGUI
@@ -160,9 +154,11 @@ namespace TGC.Group.Modelo
         public CustomSprite barraDeVida;
         public CustomSprite fruta;
         public CustomSprite mascara;
+        //public CustomSprite sonido;
         public Drawer2D drawer2D;
         public TgcText2D textoFrutas;
         public TgcText2D textoMascaras;
+        public TgcText2D textoSonido;
         #endregion
 
         #region Camara
@@ -349,6 +345,8 @@ namespace TGC.Group.Modelo
             //Activo y desactivo Modo Dios
             if (Input.keyPressed(Key.I)) godMode = !godMode;
 
+            if (Input.keyPressed(Key.Z)) soundManager.actualizarEstado();
+
             //Si el personaje se mantiene en caida, se pierda la partida.
             if (personaje.position().Y < -200)perdiste = true;
             
@@ -448,6 +446,11 @@ namespace TGC.Group.Modelo
 
                 textoMascaras.Text = personaje.mascaras.ToString();
 
+                #endregion
+
+                #region Sonido
+                if (soundManager.sonido) textoSonido.Text = "Sound: on";
+                else textoSonido.Text = "Sound: off";
                 #endregion
 
                 #region Movimientos
@@ -720,7 +723,6 @@ namespace TGC.Group.Modelo
                     renderizarSprites();
                     renderizarDebug();
                     DrawText.drawText((godMode ? "GOD MODE: ON" : ""), (int)(ScreenRes_X - 140f), 50, Color.Red);
-
                     //Renderizo OBB de las plataformas rotantes
                     plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
                     
@@ -801,10 +803,12 @@ namespace TGC.Group.Modelo
             drawer2D.DrawSprite(barraDeVida);
             drawer2D.DrawSprite(fruta);
             drawer2D.DrawSprite(mascara);
+            
             drawer2D.EndDrawSprite();
 
             textoFrutas.render();
             textoMascaras.render();
+            textoSonido.render();
         }
         private void renderizarDebug()
         {
@@ -1072,6 +1076,13 @@ namespace TGC.Group.Modelo
             textoMascaras.Size = new Size(350, 140);
             textoMascaras.changeFont(new System.Drawing.Font("TimesNewRoman", 30, FontStyle.Bold));
 
+            textoSonido = new TgcText2D();
+            textoSonido.Text = "Sound: on";
+            textoSonido.Color = Color.Green;
+            textoSonido.Align = TgcText2D.TextAlign.LEFT;
+            textoSonido.Position = new Point(1400, 20);
+            textoSonido.Size = new Size(200, 20);
+            textoSonido.changeFont(new System.Drawing.Font("TimesNewRoman", 15, FontStyle.Bold));
 
         }
 
