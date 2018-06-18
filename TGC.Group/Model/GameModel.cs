@@ -48,7 +48,8 @@ namespace TGC.Group.Model {
             skyBox.Init();
 
             Musica.getInstance().setMusica(MediaDir + "\\NsanityBeach.mp3");
-            Musica.getInstance().play();
+            Musica.getInstance().setDeathSound(MediaDir + "\\deathSound.mp3");
+            Musica.getInstance().playDeFondo();
 
         }
 

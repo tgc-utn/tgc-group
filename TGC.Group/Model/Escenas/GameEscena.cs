@@ -26,8 +26,8 @@ namespace TGC.Group.Model.Scenes {
 
         public void init(string mediaDir, string shaderDir) {
             cameraOffset = new TGCVector3(0, 200, 400);
-            setNivel(new NivelDemo(mediaDir));
-            //setNivel(new Nivel1(mediaDir));
+            //setNivel(new NivelDemo(mediaDir));
+            setNivel(new Nivel1(mediaDir));
             personaje = new Personaje(mediaDir, shaderDir);
 
             hud = new Sprite(D3DDevice.Instance.Device);
@@ -174,6 +174,7 @@ namespace TGC.Group.Model.Scenes {
             foreach (var box in nivel.getDeathPlanes()) {
                 if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), box)) {
                     personaje.morir();
+                    Musica.getInstance().playDeath();
                 }
             }
         }
