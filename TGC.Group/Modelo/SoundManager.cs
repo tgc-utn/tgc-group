@@ -21,6 +21,8 @@ namespace TGC.Group.Modelo
         private TgcMp3Player mp3SaltosPlayer = new TgcMp3Player();
         private TgcMp3Player mp3FruitPlayer = new TgcMp3Player();
 
+        public bool sonido { get; set; }  = true;
+
         public SoundManager(Directorio directorio,Microsoft.DirectX.DirectSound.Device dsDevice)
         {
             Directorio = directorio;
@@ -38,39 +40,50 @@ namespace TGC.Group.Modelo
             //mp3SaltosPlayer.closeFile();
             //mp3SaltosPlayer.FileName = directorio.SonidoSalto;
         }
+        public void actualizarEstado()
+        {
+            sonido = !sonido;
+            if (sonido) mp3BackgroundPlayer.resume();
+            else mp3BackgroundPlayer.pause();
+        }
 
         public void playSonidoCaminar()
         {
-            
-            SonidoCaminar.play();
+           if(sonido) SonidoCaminar.play();
         }
 
         public void stopSonidoCaminar()
         {
-            SonidoCaminar.stop();
+            if(sonido)SonidoCaminar.stop();
         }
 
         public void playSonidoSaltar()
         {
-            SonidoSalto.play(false);
+            if(sonido)SonidoSalto.play(false);
         }
 
         public void playSonidoFondo()
         {
-           mp3BackgroundPlayer.play(true);
+          if(sonido)mp3BackgroundPlayer.play(true);
         }
 
         public void playSonidoFruta()
         {
-            //mp3FruitPlayer.play(false);
-            SonidoMoneda.stop();
-            SonidoMoneda.play(false);
+            if (sonido)
+            {
+                //mp3FruitPlayer.play(false);
+                SonidoMoneda.stop();
+                SonidoMoneda.play(false);
+            }
         }
 
         public void playSonidoMoneda()
         {
+            if (sonido)
+            {
             SonidoMoneda.stop();
             SonidoMoneda.play(false);
+            }
         }
 
         public void dispose()

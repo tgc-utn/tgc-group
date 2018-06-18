@@ -22,23 +22,21 @@ namespace TGC.Group.Modelo
     {
         public TgcScene scene { get; set; }
         public Personaje personaje { get; }
-        public float Ypiso { get; }
+        public float Ypiso { get; } = 20f;
 
         private List<TgcMesh> frutas;
         public List<PisoInercia> pisosInercia;
 
-        private float danioLava;
+        private float danioLava = 0.009f;
 
         public Escenario(string pathEscenario,Personaje personaje)
         {
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(pathEscenario);
             this.personaje = personaje;
-            Ypiso = 20f;
-            danioLava = 0.001f;
+            
             frutas = Frutas();
-
-            this.pisosInercia = PisosInercia();
+            pisosInercia = PisosInercia();
         }
         
 
@@ -59,7 +57,17 @@ namespace TGC.Group.Modelo
         public List<TgcMesh> Escalones() => encontrarMeshes("ESCALON");
         public List<TgcMesh> RampasMesh() => encontrarMeshes("RAMPA");
         public List<TgcMesh> Fuegos() => encontrarMeshes("FUEGO");
-        public List<TgcMesh> Hogueras() => encontrarMeshes("HOGUERA");
+        public List<TgcMesh> MeshesHogueras() => encontrarMeshes("HOGUERA");
+
+        public List<TgcMesh> MeshesParaEfectoLava()
+        {
+            List<TgcMesh> meshesParaEfectoLava = new List<TgcMesh>();
+            meshesParaEfectoLava.AddRange(LavaMesh());
+            meshesParaEfectoLava.AddRange(Fuegos());
+            meshesParaEfectoLava.AddRange(MeshesHogueras());
+
+            return meshesParaEfectoLava;
+        }
 
         public List<TgcMesh> MeshesColisionables()
         {
@@ -219,14 +227,7 @@ namespace TGC.Group.Modelo
         }
         #endregion
 
-        public List<TgcMesh> FuentesDeLuz()
-        {
-            List<TgcMesh> fuentesDeLuz = new List<TgcMesh>();
-            fuentesDeLuz.AddRange(Luces());
-            fuentesDeLuz.AddRange(LavaMesh());
-
-            return fuentesDeLuz;
-        }
+        #region MeshToClassAdapters
 
         private int coeficienteRotacion = 1;
         public List<Plataforma> Plataformas()
@@ -280,7 +281,11 @@ namespace TGC.Group.Modelo
             foreach (TgcMesh cajaMesh in CajasMesh())
             {
 
-                Caja caja = new Caja(cajaMesh, this);
+                Caja caja;
+
+                if(cajaMesh.Name == "TNT") caja = new CajaTnt(cajaMesh, this);
+                else if(cajaMesh.Name == "NITRO") caja = new CajaNitro(cajaMesh, this);
+                else caja = new Caja(cajaMesh, this);
                 cajas.Add(caja);
 
             }
@@ -312,6 +317,20 @@ namespace TGC.Group.Modelo
             }
             return plataformas;
         }
+        #endregion
+
+        public List<TgcMesh> FuentesDeLuz()
+        {
+            List<TgcMesh> fuentesDeLuz = new List<TgcMesh>();
+            fuentesDeLuz.AddRange(Luces());
+            fuentesDeLuz.AddRange(LavaMesh());
+            fuentesDeLuz.AddRange(Fuegos());
+            fuentesDeLuz.AddRange(MeshesHogueras());
+
+
+            return fuentesDeLuz;
+        }
+
 
         public List<TgcMesh> ObjetosColisionablesConCajas()
         {
@@ -384,12 +403,12 @@ namespace TGC.Group.Modelo
             return minLight;
         }
 
-        public Hoguera getClosestFire(TGCVector3 pos, float maxDistance, List<Hoguera> Hogueras)
+        public Hoguera getClosestBonfire(TGCVector3 pos, float maxDistance, List<Hoguera> Hogueras)
         {
             var minDist = float.MaxValue;
             TgcMesh minF = null;
 
-            foreach (var fuego in Fuegos())
+            foreach (var fuego in MeshesHogueras())
             {
                 var distSq = TGCVector3.LengthSq(pos - fuego.BoundingBox.calculateBoxCenter());
                 if (distSq < minDist)
@@ -407,7 +426,7 @@ namespace TGC.Group.Modelo
                 }
                 foreach(Hoguera h in Hogueras)
                 {
-                    if(h.MeshFuego.GetHashCode() == minF.GetHashCode())
+                    if(h.MeshHoguera.GetHashCode() == minF.GetHashCode())
                     {
                         return h;
                     }

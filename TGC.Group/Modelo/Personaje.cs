@@ -14,6 +14,8 @@ using TGC.Core.Textures;
 using TGC.Core.Collision;
 using TGC.Core.SceneLoader;
 using TGC.Core.Input;
+using TGC.Core.Particle;
+
 
 using TGC.Group.Modelo.Cajas;
 
@@ -25,6 +27,12 @@ namespace TGC.Group.Modelo
         public float vida { get; set; }
         public int frutas { get; set; }
         public int mascaras { get; set; }
+
+        public bool moving { get; set; } = false;
+        public bool jumping { get; set; } = false;
+        public bool sliding { get; set; } = false;
+        public bool kicking { get; set; } = false;
+        public bool running { get; set; }  = false;
 
         public float VELOCIDAD_PERSONAJE = 1000f;
         public float VELOCIDAD_EXTRA = 0f;
@@ -38,9 +46,10 @@ namespace TGC.Group.Modelo
         private float COEFICIENTE_REDUCTIVO_ESFERA = 0.85f;
         private float RADIO_ESFERA;
 
-        private TGCVector3 posicionInicial = new TGCVector3(-452f,0.1f, -5161f);
-        
-        private TGCVector3 posicionDesarrollo = new TGCVector3(-4738.616f, 1379f, -7531f);
+        public TGCVector3 POSICION_INICIAL_PERSONAJE { get; set; } = new TGCVector3(-452f, 0.1f, -5161f);
+        public TGCVector3 posicionDesarrollo = new TGCVector3(-15000f, 60f, 635f);
+
+
         private DireccionPersonaje direccion = new DireccionPersonaje();
 
         public TGCVector3 PERSONAJE_SCALE = new TGCVector3(1f, 0.9f,1f);
@@ -50,7 +59,14 @@ namespace TGC.Group.Modelo
         public TGCVector3 ultimoDesplazamiento { get; set; }
 
         public TGCMatrix matrizTransformacionPlataformaRotante { get; set; }
-       
+
+        public ParticleEmitter emisorParticulas { get; set; }
+
+        public static string texturesPath;
+        private string nitroTex = "hojaparticula.png";
+
+        public TGCVector3 MovimientoRealActual { get; set; }
+
 
         public Personaje(Directorio directorio)
         {
@@ -73,19 +89,19 @@ namespace TGC.Group.Modelo
                                                       pathAnimacionesPersonaje);
 
             //Descomentar para ubicarlo donde se este desarrollando
-            // posicionInicial = posicionDesarrollo;
+             //POSICION_INICIAL_PERSONAJE = posicionDesarrollo;
 
             personajeMesh.AutoUpdateBoundingBox = false;
-            personajeMesh.BoundingBox.transform(TGCMatrix.Translation(posicionInicial));
+            personajeMesh.BoundingBox.transform(TGCMatrix.Translation(POSICION_INICIAL_PERSONAJE));
             //personajeMesh.Move(posicionInicial);
 
             RADIO_ESFERA = boundingBox().calculateBoxRadius() * COEFICIENTE_REDUCTIVO_ESFERA;
-            POSICION_INICIAL_ESFERA = new TGCVector3(posicionInicial.X,posicionInicial.Y + RADIO_ESFERA,posicionInicial.Z);
+            POSICION_INICIAL_ESFERA = new TGCVector3(POSICION_INICIAL_PERSONAJE.X,POSICION_INICIAL_PERSONAJE.Y + RADIO_ESFERA,POSICION_INICIAL_PERSONAJE.Z);
             esferaPersonaje = new TgcBoundingSphere(POSICION_INICIAL_ESFERA, RADIO_ESFERA);
             //Ubica al mesh en la posicion inicial.
             personajeMesh.Transform = TGCMatrix.Scaling(PERSONAJE_SCALE) 
                                       *TGCMatrix.RotationY(FastMath.ToRad(180f))
-                                      *TGCMatrix.Translation(posicionInicial);
+                                      *TGCMatrix.Translation(POSICION_INICIAL_PERSONAJE);
 
             matrizTransformacionPlataformaRotante = TGCMatrix.Identity;
             
@@ -137,6 +153,14 @@ namespace TGC.Group.Modelo
         {
             VELOCIDAD_EXTRA += velocidadExtra;
             TIEMPO_POWER_UP += tiempo;
+            emisorParticulas = new ParticleEmitter(texturesPath + nitroTex, 15);
+            emisorParticulas.Position = position();
+            emisorParticulas.MinSizeParticle = 1f;
+            emisorParticulas.MaxSizeParticle = 2;
+            emisorParticulas.ParticleTimeToLive = 1f;
+            emisorParticulas.CreationFrecuency = 0.01f;
+            emisorParticulas.Dispersion = 50;
+            emisorParticulas.Speed = new TGCVector3(65, 20, 15);
         }
 
         public void actualizarValores(float elapsedTime)
@@ -145,6 +169,7 @@ namespace TGC.Group.Modelo
             else
             {
                 VELOCIDAD_EXTRA = 0;
+                emisorParticulas = null;
             }
             
         }
@@ -209,7 +234,15 @@ namespace TGC.Group.Modelo
         public void changeDiffuseMaps(TgcTexture[] newDiffuseMap) => personajeMesh.changeDiffuseMaps(newDiffuseMap);
         public void animateAndRender(float elapsedTime) => personajeMesh.animateAndRender(elapsedTime);
         public TgcSkeletalMesh.MeshRenderType renderType() => personajeMesh.RenderType;
-        public void render() => personajeMesh.Render();
+
+        public void render(float ElapsedTime)
+        {
+            personajeMesh.Render();
+            if(emisorParticulas != null)
+            {
+                emisorParticulas.render(ElapsedTime);
+            }
+        }
         public void dispose() => personajeMesh.Dispose();
         #endregion
 

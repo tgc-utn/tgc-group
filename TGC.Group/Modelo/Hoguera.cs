@@ -12,7 +12,7 @@ namespace TGC.Group.Modelo
 {
     public class Hoguera
     {
-        public TgcMesh MeshFuego { get; set; }
+        public TgcMesh MeshHoguera { get; set; }
         public bool Encendida { get; set; }
         public int ManzanasNecesarias { get; set; }
         private List<ParticleEmitter> emitters;
@@ -24,13 +24,13 @@ namespace TGC.Group.Modelo
 
         public Hoguera(TgcMesh mesh, int necesarios)
         {
-            MeshFuego = mesh;
+            MeshHoguera = mesh;
             Encendida = false;
             ManzanasNecesarias = necesarios;
             emitters = new List<ParticleEmitter>();
 
             var e1 = new ParticleEmitter(texturesPath + smokeTex, selectedParticleCount);
-            e1.Position = MeshFuego.BoundingBox.Position;
+            e1.Position = MeshHoguera.BoundingBox.Position;
             e1.MinSizeParticle = 3f;
             e1.MaxSizeParticle = 3;
             e1.ParticleTimeToLive = 1.75f;
@@ -40,7 +40,7 @@ namespace TGC.Group.Modelo
             emitters.Add(e1);
 
             var e2 = new ParticleEmitter(texturesPath + smokeTex, selectedParticleCount);
-            e2.Position = MeshFuego.BoundingBox.Position;
+            e2.Position = MeshHoguera.BoundingBox.Position;
             e2.MinSizeParticle = 2.5f;
             e2.MaxSizeParticle = 2.5f;
             e2.ParticleTimeToLive = 2.5f;
@@ -50,7 +50,7 @@ namespace TGC.Group.Modelo
             emitters.Add(e2);
 
             var e3 = new ParticleEmitter(texturesPath + smokeTex, selectedParticleCount);
-            e3.Position = MeshFuego.BoundingBox.Position;
+            e3.Position = MeshHoguera.BoundingBox.Position;
             e3.MinSizeParticle = 3;
             e3.MaxSizeParticle = 3;
             e3.ParticleTimeToLive = 2f;
@@ -62,7 +62,7 @@ namespace TGC.Group.Modelo
 
         public void render(float ElapsedTime)
         {
-            MeshFuego.Render();
+            MeshHoguera.Render();
             renderParticles(ElapsedTime);
         }
 
@@ -83,7 +83,7 @@ namespace TGC.Group.Modelo
                 emitters = new List<ParticleEmitter>();
                 Encendida = true;
                 var e4 = new ParticleEmitter(texturesPath + smokeTex, selectedParticleCount);
-                e4.Position = MeshFuego.BoundingBox.Position;
+                e4.Position = MeshHoguera.BoundingBox.Position;
                 e4.MinSizeParticle = 1f;
                 e4.MaxSizeParticle = 3;
                 e4.ParticleTimeToLive = 3f;
@@ -93,7 +93,7 @@ namespace TGC.Group.Modelo
                 emitters.Add(e4);
 
                 var e1 = new ParticleEmitter(texturesPath + fireTex, selectedParticleCount);
-                e1.Position = MeshFuego.BoundingBox.Position;
+                e1.Position = MeshHoguera.BoundingBox.Position;
                 e1.MinSizeParticle = 3f;
                 e1.MaxSizeParticle = 3;
                 e1.ParticleTimeToLive = 1.75f;
@@ -103,7 +103,7 @@ namespace TGC.Group.Modelo
                 emitters.Add(e1);
 
                 var e2 = new ParticleEmitter(texturesPath + fireTex, selectedParticleCount);
-                e2.Position = MeshFuego.BoundingBox.Position;
+                e2.Position = MeshHoguera.BoundingBox.Position;
                 e2.MinSizeParticle = 2.5f;
                 e2.MaxSizeParticle = 2.5f;
                 e2.ParticleTimeToLive = 2.5f;
@@ -113,7 +113,7 @@ namespace TGC.Group.Modelo
                 emitters.Add(e2);
 
                 var e3 = new ParticleEmitter(texturesPath + fireTex, selectedParticleCount);
-                e3.Position = MeshFuego.BoundingBox.Position;
+                e3.Position = MeshHoguera.BoundingBox.Position;
                 e3.MinSizeParticle = 3;
                 e3.MaxSizeParticle = 3;
                 e3.ParticleTimeToLive = 2f;
