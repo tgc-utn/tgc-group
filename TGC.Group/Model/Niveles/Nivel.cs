@@ -196,5 +196,23 @@ namespace TGC.Group.Model.Niveles {
             aabbDeDecorativos.Add(unDecorativo.BoundingBox);
         }
 
+        public void agregarEscalera(TGCVector3 origen, int cantidadEscalones, TGCVector3 tamanioEscalon, TgcTexture textura)
+        {
+            //NOTA: origen debe ser el CENTRO del primer escalon
+            var alto = tamanioEscalon.Y;
+            var largo = tamanioEscalon.Z; //profundidad
+            var centroEscalon = origen;
+            var escalon = new Plataforma(centroEscalon, tamanioEscalon, textura);
+            pEstaticas.Add(escalon);
+            int i;
+            for(i = 2; i <= cantidadEscalones; i++)
+            {
+                centroEscalon.Y += alto;
+                centroEscalon.Z -= largo;
+                escalon = new Plataforma(centroEscalon, tamanioEscalon, textura);
+                pEstaticas.Add(escalon);
+            }
+        }
+
 }
 }
