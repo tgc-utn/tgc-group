@@ -23,7 +23,9 @@ namespace TGC.Group.Model.Niveles {
         protected List<PlataformaRotante> pRotantes;
         protected List<PlataformaAscensor> pAscensor;
         protected List<TgcMesh> decorativos;
+        protected List<TgcMesh> rampas;
         protected List<TgcBoundingAxisAlignBox> aabbDeDecorativos;
+        protected List<TgcBoundingAxisAlignBox> aabbSegmentoRampa;
         protected TgcSceneLoader loaderDeco;
         protected TGCBox lfBox;
         public Nivel siguienteNivel;
@@ -38,7 +40,9 @@ namespace TGC.Group.Model.Niveles {
             pRotantes = new List<PlataformaRotante>();
             pAscensor = new List<PlataformaAscensor>();
             decorativos = new List<TgcMesh>();
+            rampas = new List<TgcMesh>();
             aabbDeDecorativos = new List<TgcBoundingAxisAlignBox>();
+            aabbSegmentoRampa = new List<TgcBoundingAxisAlignBox>();
             loaderDeco = new TgcSceneLoader();
 
             // TODO: ver si estos son necesarios
@@ -83,6 +87,7 @@ namespace TGC.Group.Model.Niveles {
                 .Concat(pRotantes)
                 .Concat(pAscensor)
                 .Concat(decorativos)
+                .Concat(rampas)
                 .ToList();
         }
 
@@ -104,6 +109,7 @@ namespace TGC.Group.Model.Niveles {
             list.AddRange(pRotantes.Select(rotante => rotante.getAABB()).ToArray());
             list.AddRange(pAscensor.Select(ascensor => ascensor.getAABB()).ToArray());
             list.AddRange(aabbDeDecorativos);
+            list.AddRange(aabbSegmentoRampa);
 
             return list;
         }
@@ -221,6 +227,31 @@ namespace TGC.Group.Model.Niveles {
             var rampa = new Plataforma(centro, tamanio, textura, FastMath.QUARTER_PI);
             pEstaticas.Add(rampa);
         }*/
+
+        //NOTA: Abstraccion para crear rampas de tamaño unico
+        //NO ANDA BIEN. Mejorar
+        public void agregarRampa(TGCVector3 inicio, TgcTexture textura)
+        {
+            var centroEscalon = inicio;
+            var escalon = new Plataforma(inicio, new TGCVector3(100, 5.773f, 10), textura); //5.773 para hacer plano a 30º
+            aabbSegmentoRampa.Add(escalon.getAABB());
+            int i;
+            for (i = 2; i <= 14; i++) //15 escalones en total, rampa de 86.595f de alto y 150 de profundidad
+            {
+                centroEscalon.Y += 5.773f;
+                centroEscalon.Z -= 10;
+                escalon = new Plataforma(inicio, new TGCVector3(100, 5.773f, 10), textura);
+                aabbSegmentoRampa.Add(escalon.getAABB());
+            }
+            var centroUltimo = centroEscalon;
+            //Plano se dibuja desde una esquina, lo ajusto
+            centroUltimo.X -= 50;
+            centroUltimo.Y += 2.8865f;
+            centroUltimo.Z -= 5;
+            var superficieRampa = new TgcPlane(centroUltimo, new TGCVector3(100, 0,173.2013f), TgcPlane.Orientations.XZplane, textura);
+            superficieRampa.toMesh("superficieRampa").Transform = TGCMatrix.RotationX((FastMath.PI) / 6);
+            rampas.Add(superficieRampa.toMesh("superficieRampa"));
+        }
 
 }
 }

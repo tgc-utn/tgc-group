@@ -45,8 +45,8 @@ namespace TGC.Group.Model.Niveles {
             agregarPared(new TGCVector3(-710, 40, 5000), new TGCVector3(20, 80, 10000), limites); // limite derecho
             agregarPared(new TGCVector3(0, 40, 9990), new TGCVector3(1400, 80, 20), limites);     // frente
             agregarPared(new TGCVector3(0, 40, 10), new TGCVector3(1400, 80, 20), limites);       // fondo
-            agregarEscalera(new TGCVector3(0, 5, 6800), 40, new TGCVector3(150, 10, 20), caja);
-            //agregarRampa(new TGCVector3(0, 120, 6800), 150, 300, caja);
+            //agregarEscalera(new TGCVector3(0, 5, 6800), 40, new TGCVector3(150, 10, 20), caja);
+            agregarRampa(new TGCVector3(0, 5, 6800), caja);
 
             // Cajas empujables
             cajas.Add(new Caja(mediaDir, new TGCVector3(300, 40, 9000)));
