@@ -57,7 +57,8 @@ void VertShadow(float4 Pos : POSITION,
 }
 
 void PixShadow(float2 Depth : TEXCOORD0, out float4 Color : COLOR) {
-	Color = Depth.x / Depth.y;
+	float c = Depth.x / Depth.y;
+	Color = float4(c, c, c, 1);
 }
 
 technique RenderShadow {
@@ -145,7 +146,6 @@ float4 PixScene(float2 Tex : TEXCOORD0,
 
 	float4 color_base = tex2D(diffuseMap, Tex);
 	color_base.rgb *= 0.5 + 0.5 * K;
-
 	return color_base;
 }
 

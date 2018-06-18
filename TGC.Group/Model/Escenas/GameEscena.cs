@@ -146,6 +146,7 @@ namespace TGC.Group.Model.Scenes {
 
             var oldDS = D3DDevice.Instance.Device.DepthStencilSurface;
             D3DDevice.Instance.Device.DepthStencilSurface = g_pDDSShadow;
+            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
 
             smEffect.SetValue("g_txShadow", g_pShadowMap);
 
@@ -153,10 +154,10 @@ namespace TGC.Group.Model.Scenes {
 
             nivel.render();
             // cuando el personaje tenga shadowmap
-            // personaje.render(deltaTime);
+            personaje.render(deltaTime);
 
             if (auxInput.keyDown(Key.F5))
-                TextureLoader.Save("shadowmap.png", ImageFileFormat.Png, g_pShadowMap);
+                TextureLoader.Save("shadowmap.jpg", ImageFileFormat.Jpg, g_pShadowMap);
 
             D3DDevice.Instance.Device.EndScene();
             D3DDevice.Instance.Device.DepthStencilSurface = oldDS;
@@ -169,6 +170,7 @@ namespace TGC.Group.Model.Scenes {
             nivel.render();
             personaje.render(deltaTime);
 
+            /*
             var flecha = new TgcArrow();
             flecha.Thickness = 2f;
             flecha.HeadSize = new TGCVector2(20f, 20f);
@@ -178,6 +180,7 @@ namespace TGC.Group.Model.Scenes {
             flecha.PEnd = lightPos + lightDir * 20f;
             flecha.updateValues();
             flecha.Render();
+            */
         }
 
         public void dispose() {
