@@ -121,8 +121,8 @@ namespace TGC.Group.Model.Scenes {
             g_pShadowMap = new Texture(D3DDevice.Instance.Device, SM_SIZE, SM_SIZE, 1, Usage.RenderTarget, Format.R32F, Pool.Default);
             g_pDDSShadow = D3DDevice.Instance.Device.CreateDepthStencilSurface(SM_SIZE, SM_SIZE, DepthFormat.D24S8, MultiSampleType.None, 0, true);
 
-            // g_mShadowProj = TGCMatrix.PerspectiveFovLH(Geometry.DegreeToRadian(90), D3DDevice.Instance.AspectRatio, NEAR_PLANE, FAR_PLANE);
-            g_mShadowProj = new TGCMatrix(D3DDevice.Instance.Device.Transform.Projection);
+            g_mShadowProj = TGCMatrix.PerspectiveFovLH(Geometry.DegreeToRadian(90), D3DDevice.Instance.AspectRatio, 50, 5000);
+            // g_mShadowProj = new TGCMatrix(D3DDevice.Instance.Device.Transform.Projection);
             /*
             D3DDevice.Instance.Device.Transform.Projection =
                 TGCMatrix.PerspectiveFovLH(Geometry.DegreeToRadian(45.0f), D3DDevice.Instance.AspectRatio, NEAR_PLANE, FAR_PLANE).ToMatrix();
@@ -132,13 +132,14 @@ namespace TGC.Group.Model.Scenes {
 
         private void renderShadowMap(float deltaTime) {
             var lightPos = new TGCVector3(0, 100, 0);
-            var lightDir = new TGCVector3(100, 0, 0) - lightPos;
+            var lightDir = new TGCVector3(100, 0, 0);
             lightDir.Normalize();
 
             smEffect.SetValue("g_vLightPos", new Vector4(lightPos.X, lightPos.Y, lightPos.Z, 1));
             smEffect.SetValue("g_vLightDir", new Vector4(lightDir.X, lightDir.Y, lightDir.Z, 1));
             var g_lightView = TGCMatrix.LookAtLH(lightPos, lightPos + lightDir, new TGCVector3(0, 0, 1));
 
+            smEffect.SetValue("g_mProjLight", g_mShadowProj.ToMatrix());
             smEffect.SetValue("g_mViewLightProj", (g_lightView * g_mShadowProj).ToMatrix());
 
             var oldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
@@ -155,7 +156,7 @@ namespace TGC.Group.Model.Scenes {
 
             nivel.render();
             // cuando el personaje tenga shadowmap
-            // personaje.render(deltaTime);
+            personaje.render(deltaTime);
 
             if (auxInput.keyDown(Key.F5))
                 TextureLoader.Save("shadowmap.jpg", ImageFileFormat.Jpg, g_pShadowMap);
