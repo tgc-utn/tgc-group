@@ -214,5 +214,13 @@ namespace TGC.Group.Model.Niveles {
             }
         }
 
+        /* VER: Para agregar una rampa al escenario
+        public void agregarRampa(TGCVector3 centro, float ancho, float largo, TgcTexture textura)
+        {
+            var tamanio = new TGCVector3(ancho, 50, largo);
+            var rampa = new Plataforma(centro, tamanio, textura, FastMath.QUARTER_PI);
+            pEstaticas.Add(rampa);
+        }*/
+
 }
 }
