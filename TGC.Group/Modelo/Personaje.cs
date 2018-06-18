@@ -28,6 +28,12 @@ namespace TGC.Group.Modelo
         public int frutas { get; set; }
         public int mascaras { get; set; }
 
+        public bool moving { get; set; } = false;
+        public bool jumping { get; set; } = false;
+        public bool sliding { get; set; } = false;
+        public bool kicking { get; set; } = false;
+        public bool running { get; set; }  = false;
+
         public float VELOCIDAD_PERSONAJE = 1000f;
         public float VELOCIDAD_EXTRA = 0f;
         public float TIEMPO_POWER_UP = 0f;

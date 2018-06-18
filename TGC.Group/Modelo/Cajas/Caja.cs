@@ -26,19 +26,10 @@ namespace TGC.Group.Modelo.Cajas
 
         }
 
-        public void afectar(Personaje personaje)
+        public virtual void afectar(Personaje personaje)
         {
-            if (cajaMesh.Name == "TNT")
-            {
-                influirDanio(personaje);
-                escenario.eliminarObjeto(cajaMesh);
-            }
-
-            if (cajaMesh.Name == "NITRO")
-            {
-                aumentarVelocidad(personaje);
-                escenario.eliminarObjeto(cajaMesh);
-            }
+            
+             
         }
 
         public void influirDanio(Personaje personaje)

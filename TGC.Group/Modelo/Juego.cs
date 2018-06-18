@@ -91,12 +91,13 @@ namespace TGC.Group.Modelo
         private bool paused = true;
         private bool perdiste = false;
         private bool menu = true;
-        private bool moving = false;
+        private bool godMode = false;
+
+        /*private bool moving = false;
         private bool jumping = false;
         private bool sliding = false;
-        private bool godMode = false;
         private bool kicking = false;
-        private bool running = false;
+        private bool running = false;*/
         #endregion
 
         #region APIGUI
@@ -322,7 +323,7 @@ namespace TGC.Group.Modelo
             var coeficienteSalto = 30f;
             float saltoRealizado = 0;
             var moveForward = 0f;
-            moving = false;
+            personaje.moving = false;
             var animacion = "";
 
             while (ElapsedTime > 1) ElapsedTime = ElapsedTime / 10; //Para evitar el error de que ElapsedTime es muy alto al inicio
@@ -359,11 +360,11 @@ namespace TGC.Group.Modelo
                 if (Input.keyDown(Key.R)) solicitudInteraccionConCaja = true;
                 else solicitudInteraccionConCaja = false;
 
-                if (Input.keyDown(Key.Q))kicking = true;
-                else kicking = false;
+                if (Input.keyDown(Key.Q))personaje.kicking = true;
+                else personaje.kicking = false;
 
-                if (personaje.VELOCIDAD_EXTRA > 0) running = true;
-                else running = false;
+                if (personaje.VELOCIDAD_EXTRA > 0) personaje.running = true;
+                else personaje.running = false;
 
 
                 if (Input.keyUp(Key.E))
@@ -386,7 +387,7 @@ namespace TGC.Group.Modelo
                     {
                         saltoActual = coeficienteSalto;
                         doubleJump -= 1;
-                        jumping = true;
+                        personaje.jumping = true;
                         soundManager.playSonidoSaltar();
                     }
                     if (Input.keyUp(Key.Space) || saltoActual > 0 )
@@ -394,7 +395,7 @@ namespace TGC.Group.Modelo
                         saltoActual -= coeficienteSalto * ElapsedTime;
                         saltoRealizado = saltoActual;
                     }
-                    if (saltoRealizado == 0) jumping = false;
+                    if (saltoRealizado == 0) personaje.jumping = false;
                    
                 }
                 #endregion
@@ -451,7 +452,7 @@ namespace TGC.Group.Modelo
 
                 #region Movimientos
 
-                moving = personaje.rotar(Input,new Key());
+                personaje.moving = personaje.rotar(Input,new Key());
                 personaje.actualizarValores(ElapsedTime);
                 //Vector de movimiento
                 var movimientoOriginal = new TGCVector3(0,0,0);
@@ -459,7 +460,7 @@ namespace TGC.Group.Modelo
                 float movY = saltoRealizado;
                 float movZ = 0;
 
-                if (moving)
+                if (personaje.moving)
                 {
                     animacion = "Caminando";
                     moveForward = personaje.Velocidad();
@@ -469,10 +470,10 @@ namespace TGC.Group.Modelo
                 }
                 else soundManager.stopSonidoCaminar();
 
-                if (kicking) animacion = "Pateando";
-                else if (running) animacion = "Corriendo";
-                else if (solicitudInteraccionConCaja && moving) animacion = "Empujando";
-                else if (!moving) animacion = "Parado";
+                if (personaje.kicking) animacion = "Pateando";
+                else if (personaje.running) animacion = "Corriendo";
+                else if (solicitudInteraccionConCaja && personaje.moving) animacion = "Empujando";
+                else if (!personaje.moving) animacion = "Parado";
                    
                 
                
@@ -550,7 +551,7 @@ namespace TGC.Group.Modelo
         {
             Rampa rampa = escenario.obtenerColisionRampaPersonaje();
 
-            if (rampa == null || jumping)
+            if (rampa == null || personaje.jumping)
             {
                 colisionRampa = false;
                 ColisionadorEsferico.GravityEnabled = true;
@@ -571,7 +572,7 @@ namespace TGC.Group.Modelo
             PisoInercia pisoInercia = escenario.obtenerColisionPisoInerciaPersonaje();
             if (pisoInercia == null)
             {
-                sliding = false;
+                personaje.sliding = false;
                 return new TGCVector3(0, 0, 0);
             }
             
@@ -811,10 +812,10 @@ namespace TGC.Group.Modelo
                               // + "Vector Movimiento Real Personaje: " + movimientoRealPersonaje + "\n"
                                + "Colision con Caja: " + interaccionCaja + "\n"
                                + "Solicitud interaccion con caja: " + solicitudInteraccionConCaja + "\n"
-                               + "Moving: " + moving + "\n"
-                               + "Jumping: " + jumping + "\n"
-                               + "Sliding: " + sliding + "\n"
-                               + "Kicking: " + kicking + "\n"
+                               + "Moving: " + personaje.moving + "\n"
+                               + "Jumping: " + personaje.jumping + "\n"
+                               + "Sliding: " + personaje.sliding + "\n"
+                               + "Kicking: " + personaje.kicking + "\n"
                                + "Elapsed Time: " + ElapsedTime +"\n"
                               /* + "Colision Con Rampa: " + colisionRampa + "\n"
                                + "Vertice mas alto: " + verticeMasAltoGlobal + "\n"

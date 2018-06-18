@@ -241,6 +241,8 @@ namespace TGC.Group.Modelo
             return fuentesDeLuz;
         }
 
+        #region MeshToClassAdapters
+
         private int coeficienteRotacion = 1;
         public List<Plataforma> Plataformas()
         {
@@ -293,7 +295,11 @@ namespace TGC.Group.Modelo
             foreach (TgcMesh cajaMesh in CajasMesh())
             {
 
-                Caja caja = new Caja(cajaMesh, this);
+                Caja caja;
+
+                if(cajaMesh.Name == "TNT") caja = new CajaTnt(cajaMesh, this);
+                else if(cajaMesh.Name == "NITRO") caja = new CajaNitro(cajaMesh, this);
+                else caja = new Caja(cajaMesh, this);
                 cajas.Add(caja);
 
             }
@@ -325,6 +331,7 @@ namespace TGC.Group.Modelo
             }
             return plataformas;
         }
+        #endregion
 
         public List<TgcMesh> ObjetosColisionablesConCajas()
         {

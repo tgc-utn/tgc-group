@@ -87,6 +87,8 @@
     <Compile Include="GUI\GUI.cs" />
     <Compile Include="GUI\GUIItem.cs" />
     <Compile Include="Modelo\Cajas\Caja.cs" />
+    <Compile Include="Modelo\Cajas\CajaNitro.cs" />
+    <Compile Include="Modelo\Cajas\CajaTnt.cs" />
     <Compile Include="Modelo\FuegoLuz.cs" />
     <Compile Include="Modelo\Hoguera.cs" />
     <Compile Include="Modelo\Rampas\Rampa.cs" />
