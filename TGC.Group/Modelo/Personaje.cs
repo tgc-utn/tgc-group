@@ -46,9 +46,10 @@ namespace TGC.Group.Modelo
         private float COEFICIENTE_REDUCTIVO_ESFERA = 0.85f;
         private float RADIO_ESFERA;
 
-        private TGCVector3 posicionInicial = new TGCVector3(-452f,0.1f, -5161f);
-        
-        private TGCVector3 posicionDesarrollo = new TGCVector3(-4738.616f, 1379f, -7531f);
+        public TGCVector3 POSICION_INICIAL_PERSONAJE { get; set; } = new TGCVector3(-452f, 0.1f, -5161f);
+        public TGCVector3 posicionDesarrollo = new TGCVector3(-15000f, 60f, 635f);
+
+
         private DireccionPersonaje direccion = new DireccionPersonaje();
 
         public TGCVector3 PERSONAJE_SCALE = new TGCVector3(1f, 0.9f,1f);
@@ -88,19 +89,19 @@ namespace TGC.Group.Modelo
                                                       pathAnimacionesPersonaje);
 
             //Descomentar para ubicarlo donde se este desarrollando
-            // posicionInicial = posicionDesarrollo;
+             //POSICION_INICIAL_PERSONAJE = posicionDesarrollo;
 
             personajeMesh.AutoUpdateBoundingBox = false;
-            personajeMesh.BoundingBox.transform(TGCMatrix.Translation(posicionInicial));
+            personajeMesh.BoundingBox.transform(TGCMatrix.Translation(POSICION_INICIAL_PERSONAJE));
             //personajeMesh.Move(posicionInicial);
 
             RADIO_ESFERA = boundingBox().calculateBoxRadius() * COEFICIENTE_REDUCTIVO_ESFERA;
-            POSICION_INICIAL_ESFERA = new TGCVector3(posicionInicial.X,posicionInicial.Y + RADIO_ESFERA,posicionInicial.Z);
+            POSICION_INICIAL_ESFERA = new TGCVector3(POSICION_INICIAL_PERSONAJE.X,POSICION_INICIAL_PERSONAJE.Y + RADIO_ESFERA,POSICION_INICIAL_PERSONAJE.Z);
             esferaPersonaje = new TgcBoundingSphere(POSICION_INICIAL_ESFERA, RADIO_ESFERA);
             //Ubica al mesh en la posicion inicial.
             personajeMesh.Transform = TGCMatrix.Scaling(PERSONAJE_SCALE) 
                                       *TGCMatrix.RotationY(FastMath.ToRad(180f))
-                                      *TGCMatrix.Translation(posicionInicial);
+                                      *TGCMatrix.Translation(POSICION_INICIAL_PERSONAJE);
 
             matrizTransformacionPlataformaRotante = TGCMatrix.Identity;
             

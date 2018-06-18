@@ -68,7 +68,7 @@ namespace TGC.Group.Modelo
         private List<PlataformaRotante> plataformasRotantes;
         private bool boundingBoxActivate = false;
 
-        
+
 
         public static List<TgcMesh> meshesConLuz;
         private Microsoft.DirectX.Direct3D.Effect effectLuzComun;
@@ -76,7 +76,7 @@ namespace TGC.Group.Modelo
         private Microsoft.DirectX.Direct3D.Effect personajeLightShader;
 
         private Microsoft.DirectX.Direct3D.Effect olasLava;
-       
+
 
         #region Personaje
         private Personaje personaje;
@@ -98,7 +98,7 @@ namespace TGC.Group.Modelo
         //Api gui
         private DXGui gui_primaria = new DXGui();
         private DXGui gui_secundaria = new DXGui();
-        
+
         public const int IDOK = 0;
 
         public const int IDCANCEL = 1;
@@ -187,7 +187,7 @@ namespace TGC.Group.Modelo
 
         private List<Hoguera> Hogueras;
         private List<FuegoLuz> FuegosLuz;
-        private TGCVector3 PosicionInicial = new TGCVector3(400, 20f, -900);
+        //private TGCVector3 PosicionInicial = new TGCVector3(400, 20f, -900);
 
         Random rnd = new Random(); //Generador de numeros aleatorios;
 
@@ -197,112 +197,106 @@ namespace TGC.Group.Modelo
             perdiste = false;
             paused = false;
             direccionPersonaje = new DireccionPersonaje();
-            velocidad =new TGCVector3(0,0,0);
-            aceleracion = new TGCVector3(0,0,0);
+            velocidad = new TGCVector3(0, 0, 0);
+            aceleracion = new TGCVector3(0, 0, 0);
 
-            if (inicio)
+            Hoguera.texturesPath = MediaDir + "Escenas\\Textures\\";
+            FuegoLuz.texturesPath = MediaDir + "Escenas\\Textures\\";
+            Personaje.texturesPath = MediaDir + "Escenas\\Textures\\";
+
+
+            //Device de DirectX para crear primitivas.
+            var d3dDevice = D3DDevice.Instance.Device;
+
+            //Objeto que conoce todos los path de MediaDir
+            directorio = new Directorio(MediaDir);
+            personaje = new Personaje(directorio);
+
+            //Cargo el SoundManager
+            soundManager = new SoundManager(directorio, this.DirectSound.DsDevice);
+            soundManager.playSonidoFondo();
+
+
+            //Cagar escenario especifico para el juego.
+            escenario = new Escenario(directorio.EscenaCrash, personaje);
+
+            personaje.autoTransform(false);
+
+            //Le cambiamos la textura para diferenciarlo un poco
+            personaje.changeDiffuseMaps(new[]
             {
-                Hoguera.texturesPath = MediaDir + "Escenas\\Textures\\";
-                FuegoLuz.texturesPath = MediaDir + "Escenas\\Textures\\";
-                Personaje.texturesPath = MediaDir + "Escenas\\Textures\\";
-
-
-                //Device de DirectX para crear primitivas.
-                var d3dDevice = D3DDevice.Instance.Device;
-
-                //Objeto que conoce todos los path de MediaDir
-                directorio = new Directorio(MediaDir);
-                personaje = new Personaje(directorio);
-
-                //Cargo el SoundManager
-                soundManager = new SoundManager(directorio,this.DirectSound.DsDevice);
-                soundManager.playSonidoFondo();
-
-
-                //Cagar escenario especifico para el juego.
-                escenario = new Escenario(directorio.EscenaCrash,personaje);
-
-                personaje.autoTransform(false);
-                
-                //Le cambiamos la textura para diferenciarlo un poco
-                personaje.changeDiffuseMaps(new[]
-                {
                     TgcTexture.createTexture(D3DDevice.Instance.Device, directorio.RobotTextura)
                 });
 
-                //Inicializamos el collisionManager.
-                ColisionadorEsferico = new SphereCollisionManager();
-                ColisionadorEsferico.GravityEnabled = true;
-                ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
-                ColisionadorEsferico.SlideFactor = 1.3f;
+            //Inicializamos el collisionManager.
+            ColisionadorEsferico = new SphereCollisionManager();
+            ColisionadorEsferico.GravityEnabled = true;
+            ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
+            ColisionadorEsferico.SlideFactor = 1.3f;
 
-                //Obtenemos las plataformas segun su tipo de movimiento.
-                plataformas = escenario.Plataformas();
-                plataformasRotantes = escenario.PlataformasRotantes();
+            //Obtenemos las plataformas segun su tipo de movimiento.
+            plataformas = escenario.Plataformas();
+            plataformasRotantes = escenario.PlataformasRotantes();
 
-                //Posición de la camara.
-                camaraInterna = new TgcThirdPersonCamera(personaje.esferaPersonaje.Center, 600, -1200);
+            //Posición de la camara.
+            camaraInterna = new TgcThirdPersonCamera(personaje.esferaPersonaje.Center, 600, -1200);
 
-                //Configuro donde esta la posicion de la camara y hacia donde mira.
-                Camara = camaraInterna;
-
-
-                var meshesSinPlatXZ = escenario.scene.Meshes.FindAll(mesh => mesh.Name != "PlataformaX" && mesh.Name != "PlataformaZ");
-
-                octree = new Octree();
-                octree.create(meshesSinPlatXZ, escenario.BoundingBox());
-                octree.createDebugOctreeMeshes();// --> Para renderizar las "cajas" que genera
-
-                Frustum.Color = Color.Black;
+            //Configuro donde esta la posicion de la camara y hacia donde mira.
+            Camara = camaraInterna;
 
 
-                inicializarGUIPrincipal();
-                inicializarGUISecundaria();
-                inicializarIluminacion();
-                inicializarHUDS(d3dDevice);
+            var meshesSinPlatXZ = escenario.scene.Meshes.FindAll(mesh => mesh.Name != "PlataformaX" && mesh.Name != "PlataformaZ");
 
-                ScreenRes_X = d3dDevice.PresentationParameters.BackBufferWidth;
-                ScreenRes_Y = d3dDevice.PresentationParameters.BackBufferHeight;
+            octree = new Octree();
+            octree.create(meshesSinPlatXZ, escenario.BoundingBox());
+            octree.createDebugOctreeMeshes();// --> Para renderizar las "cajas" que genera
 
-                Hogueras = new List<Hoguera>();
-                foreach (TgcMesh mesh in escenario.MeshesHogueras())
-                {
-                    Hogueras.Add(new Hoguera(mesh, 1));
-                }
+            Frustum.Color = Color.Black;
 
-                FuegosLuz = new List<FuegoLuz>();
-                foreach (TgcMesh mesh in escenario.Fuegos())
-                {
-                    FuegosLuz.Add(new FuegoLuz(mesh));
-                }
 
-                string compilationErrors;
-                olasLava = Microsoft.DirectX.Direct3D.Effect.FromFile(d3dDevice, MediaDir + "OlasLava.fx",
-                    null, null, ShaderFlags.PreferFlowControl, null, out compilationErrors);
-                if (olasLava == null)
-                {
-                    throw new Exception("Error al cargar shader OlasLava. Errores: " + compilationErrors);
-                }
+            inicializarGUIPrincipal();
+            inicializarGUISecundaria();
+            inicializarIluminacion();
+            inicializarHUDS(d3dDevice);
 
-                foreach (TgcMesh mesh in escenario.MeshesParaEfectoLava())
-                {
-                    mesh.Effect = olasLava;
-                    mesh.Technique = "Olas";
-                }
+            ScreenRes_X = d3dDevice.PresentationParameters.BackBufferWidth;
+            ScreenRes_Y = d3dDevice.PresentationParameters.BackBufferHeight;
 
-                olasLava.SetValue("screen_dx", ScreenRes_X);
-                olasLava.SetValue("screen_dy", ScreenRes_Y);
+            Hogueras = new List<Hoguera>();
+            foreach (TgcMesh mesh in escenario.MeshesHogueras())
+            {
+                Hogueras.Add(new Hoguera(mesh, 1));
             }
 
+            FuegosLuz = new List<FuegoLuz>();
+            foreach (TgcMesh mesh in escenario.Fuegos())
+            {
+                FuegosLuz.Add(new FuegoLuz(mesh));
+            }
+
+            string compilationErrors;
+            olasLava = Microsoft.DirectX.Direct3D.Effect.FromFile(d3dDevice, MediaDir + "OlasLava.fx",
+                null, null, ShaderFlags.PreferFlowControl, null, out compilationErrors);
+            if (olasLava == null)
+            {
+                throw new Exception("Error al cargar shader OlasLava. Errores: " + compilationErrors);
+            }
+
+            foreach (TgcMesh mesh in escenario.MeshesParaEfectoLava())
+            {
+                mesh.Effect = olasLava;
+                mesh.Technique = "Olas";
+            }
+
+            olasLava.SetValue("screen_dx", ScreenRes_X);
+            olasLava.SetValue("screen_dy", ScreenRes_Y);
+           
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
-
-            //Posicion inicial
-            personaje.position(PosicionInicial);
-
-            //Cambia a false para que no entre al if la proxima vez
-            inicio = false;
         }
+
+
+           
 
 
         public override void Update()
@@ -371,8 +365,8 @@ namespace TGC.Group.Modelo
                     if(h != null)
                     {
                         h.encender(personaje.frutas);
-                        PosicionInicial = personaje.position();
-                        PosicionInicial.Y = escenario.Ypiso;
+                        personaje.POSICION_INICIAL_PERSONAJE = personaje.position();
+                       // personaje.POSICION_INICIAL_PERSONAJE = escenario.Ypiso;
                         personaje.frutas -= h.ManzanasNecesarias;
                     }
                 }
