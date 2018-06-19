@@ -122,12 +122,6 @@ namespace TGC.Group.Model.Niveles {
 
         }
 
-        /*public override void dispose() {
-            piso.dispose();
-            caja.dispose();
-            limites.dispose();
-            getRenderizables().ForEach(r => r.Dispose());
-        }*/
     }
 
 }

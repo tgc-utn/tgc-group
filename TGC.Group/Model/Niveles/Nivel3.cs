@@ -36,7 +36,7 @@ namespace TGC.Group.Model.Niveles
             // Texturas empleadas
             arena = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "arena.jpg");
             texturasUsadas.Add(arena);
-            piedra = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "piedra.png");
+            piedra = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "piedra.jpg");
             texturasUsadas.Add(piedra);
             caja = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "caja.jpg");
             texturasUsadas.Add(caja);
@@ -147,14 +147,5 @@ namespace TGC.Group.Model.Niveles
 
         }
 
-        /*public override void dispose()
-        {
-
-            arena.dispose();
-            caja.dispose();
-            piedra.dispose();
-            getRenderizables().ForEach(r => r.Dispose());
-
-        }*/
     }
 }

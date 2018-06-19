@@ -105,16 +105,6 @@ namespace TGC.Group.Model.Niveles {
 
         }
 
-        /*public override void dispose()
-        {
-
-            hielo.dispose();
-            caja.dispose();
-            nieve.dispose();
-            getRenderizables().ForEach(r => r.Dispose());
-
-        }*/
-
     }
 
 }

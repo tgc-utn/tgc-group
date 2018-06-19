@@ -229,8 +229,8 @@ namespace TGC.Group.Model.Niveles {
         public void inicializarSkyBox(string pathCaras)
         {
             skyBox = new TgcSkyBox();
-            skyBox.Center = new TGCVector3(0, 200, 0);
-            skyBox.Size = new TGCVector3(2500, 900, 28000);
+            skyBox.Center = new TGCVector3(0, 0, 4000);
+            skyBox.Size = new TGCVector3(18000, 1800, 18000);
             skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, pathCaras + "arriba.jpg");
             skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, pathCaras + "abajo.jpg");
             skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, pathCaras + "derecha.jpg");
