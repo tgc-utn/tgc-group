@@ -5,13 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Collision;
-using TGC.Core.Direct3D;
-using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
+using TGC.Core.Particle;
 using TGC.Core.Shaders;
 using TGC.Core.SkeletalAnimation;
-using TGC.Core.Textures;
 using TGC.Group.Model.Escenas;
 using TGC.Group.Model.Niveles;
 using TGC.Group.Model.Scenes;
@@ -33,9 +31,12 @@ namespace TGC.Group.Model {
         private float meshAngle;
         private float meshAngleAnterior;
         private bool moving = false;
-        private TGCBox sombra;
-        private TgcTexture sombraTexture;
         private float pisoHeight;
+        private bool enElAire = false;
+
+        private ParticleEmitter emmiter;
+        private float timerEmitter = 0;
+        private const float TIMER_CORTO = 1f;
 
         private Microsoft.DirectX.Direct3D.Effect effect;
 
@@ -54,7 +55,6 @@ namespace TGC.Group.Model {
         private int saltosRestantes = 0;
         private const int SALTOS_TOTALES = 2;
         private const float JUMP_SPEED = 10f; // PC Cristian
-        private bool enElAire = false;
 
         public Personaje(string MediaDir, string shaderDir) {
             vidas = 3;
@@ -91,15 +91,20 @@ namespace TGC.Group.Model {
 
             pies = new TgcBoundingSphere(posicionPies, SIZE_PIES);
 
-            sombraTexture = TgcTexture.createTexture(MediaDir + "sombra.png");
-            sombra = TGCBox.fromSize(posicionPies, new TGCVector3(100, 1, 100), sombraTexture);
-            sombra.Position = posicionPies;
-            sombra.AlphaBlendEnable = true;
-
             effect = TgcShaders.loadEffect(shaderDir + "TgcSkeletalMeshShader.fx");
             effect.SetValue("g_shadowMapping", 0);
             mesh.Effect = effect;
             mesh.Technique = "DIFFUSE_MAP";
+
+
+            emmiter = new ParticleEmitter(MediaDir + "pisada.png", 10);
+            emmiter.MinSizeParticle = 10;
+            emmiter.MaxSizeParticle = 20;
+            emmiter.ParticleTimeToLive = 1;
+            emmiter.CreationFrecuency = 0.5f;
+            emmiter.Dispersion = 400;
+            emmiter.Speed = new TGCVector3(30, 30, 30);
+            emmiter.Position = pies.Position;
         }
 
         public void update(float deltaTime, TgcD3dInput Input) {
@@ -110,13 +115,11 @@ namespace TGC.Group.Model {
         public void render(float deltaTime) {
             mesh.UpdateMeshTransform();
             mesh.animateAndRender(deltaTime);
-            // sombra.Render();
 
-            // para debug
-            /*
-            boundingSphere.Render();
-            pies.Render();
-            */
+            if (timerEmitter > 0.0f) {
+                emmiter.render(deltaTime);
+                timerEmitter -= deltaTime;
+            }
 
             // seria un post-update
             resetUpdateVariables();
@@ -178,6 +181,7 @@ namespace TGC.Group.Model {
                 dir.Z = dir.Z * MULT_CORRER;
                 stamina--;
                 if (stamina == 0) agotado = true;
+                timerEmitter = TIMER_CORTO;
             } else if (Input.keyDown(Key.LeftAlt)) {
                 dir.X = dir.X * MULT_CAMINAR;
                 dir.Z = dir.Z * MULT_CAMINAR;
@@ -194,6 +198,7 @@ namespace TGC.Group.Model {
             // saltar
             if (Input.keyPressed(Key.Space) && saltosRestantes > 0) {
                 dir.Y = JUMP_SPEED;
+
                 saltosRestantes--;
             }
         }
@@ -271,6 +276,7 @@ namespace TGC.Group.Model {
             movimientoVertical(vertical, nivel, deltaTime, 0);
 
             resetearMovimientoSegunPiso(piso, nivel);
+            emmiter.Position = pies.Position;
         }
 
         private void modificarMovimientoSegunPiso(TgcBoundingAxisAlignBox piso, Nivel nivel, float deltaTime) {
@@ -358,10 +364,6 @@ namespace TGC.Group.Model {
                 .First();
 
             if (pisoCercano == null) {
-                // solo para sombra
-                pisoCercano = nivel.getBoundingBoxes().Find(b => TgcCollisionUtils.testSphereAABB(pies, b));
-                if (pisoCercano != null) pisoHeight = pisoCercano.PMax.Y;
-                // fin sombra
                 translate(movement);
             } else {
                 pisoHeight = pisoCercano.PMax.Y;
@@ -392,24 +394,13 @@ namespace TGC.Group.Model {
             pies.moveCenter(movement);
             boundingSphere.moveCenter(movement);
 
-            TGCVector3 sombraMovement = new TGCVector3 {
-                X = pies.Position.X,
-                Y = pisoHeight,
-                Z = pies.Position.Z
-            };
-
-            float distancePisoPersonaje = pies.Position.Y - pisoHeight;
-            float scalingSombra = 2 / FastMath.Sqrt(distancePisoPersonaje);
-            scalingSombra = FastMath.Min(scalingSombra, 0.5f);
-
-            sombra.Transform = TGCMatrix.Scaling(TGCVector3.One * scalingSombra) * TGCMatrix.Translation(sombraMovement);
         }
 
         private void resetUpdateVariables() {
         }
 
         public void aterrizar() {
-             saltosRestantes = SALTOS_TOTALES;
+            saltosRestantes = SALTOS_TOTALES;
         }
 
         public TGCVector3 getPosition() {

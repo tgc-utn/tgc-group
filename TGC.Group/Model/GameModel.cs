@@ -51,6 +51,9 @@ namespace TGC.Group.Model {
             Musica.getInstance().setMusica(MediaDir + "\\NsanityBeach.mp3");
             Musica.getInstance().play();
 
+            D3DDevice.Instance.ParticlesEnabled = true;
+            D3DDevice.Instance.EnableParticles();
+
         }
 
         public override void Update() {
