@@ -125,7 +125,7 @@ namespace TGC.Group.Model.Scenes {
         }
 
         private void renderShadowMap(float deltaTime) {
-            var offset = new TGCVector3(0, 150, 300);
+            var offset = new TGCVector3(50, 150, 300);
             var lightPos = personaje.getPosition() + offset;
             var lightDir = -offset;
             lightDir.Normalize();

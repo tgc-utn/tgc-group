@@ -34,14 +34,6 @@ sampler2D g_samShadow = sampler_state {
 	AddressV = Clamp;
 };
 
-//Output del Vertex Shader
-struct VS_OUTPUT {
-	float4 Position : POSITION0;
-	float2 Texcoord : TEXCOORD0;
-	float3 Norm : TEXCOORD1; // Normales
-	float3 Pos : TEXCOORD2; // Posicion real 3d
-};
-
 void VertShadow(float4 Pos : POSITION,
 	float3 Normal : NORMAL,
 	out float4 oPos : POSITION,
