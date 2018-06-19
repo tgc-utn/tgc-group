@@ -35,7 +35,7 @@ namespace TGC.Group.Model {
             var pathSkyBoxCaras = MediaDir + "\\SkyBoxFaces\\";
 
             Musica.getInstance().setMusica(MediaDir + "\\NsanityBeach.mp3");
-            Musica.getInstance().setDeathSound(MediaDir + "\\deathSound.mp3");
+            //Musica.getInstance().setDeathSound(MediaDir + "\\deathSound.mp3");
             Musica.getInstance().playDeFondo();
 
             D3DDevice.Instance.ParticlesEnabled = true;

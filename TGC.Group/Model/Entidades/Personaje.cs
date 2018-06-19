@@ -1,6 +1,8 @@
 ﻿using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
+using Microsoft.DirectX.DirectSound;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TGC.Core.BoundingVolumes;
@@ -10,12 +12,32 @@ using TGC.Core.Mathematica;
 using TGC.Core.Particle;
 using TGC.Core.Shaders;
 using TGC.Core.SkeletalAnimation;
+using TGC.Core.Sound;
 using TGC.Group.Model.Escenas;
 using TGC.Group.Model.Niveles;
 using TGC.Group.Model.Scenes;
 
-namespace TGC.Group.Model {
-    class Personaje {
+namespace TGC.Group.Model
+{
+
+    class Personaje
+    {
+
+        // paths de los distintos sonidos
+        private string pathSonidoCaida;
+        private string pathSonidoSalto;
+        private string pathSonidoChoque;
+
+        // path del sonido actualmente en el player
+        private string pathSonidoActual;
+
+        // player estatico del sonido a reproducir
+        private TgcStaticSound sonido;
+
+        private TgcMp3Player playerCaida;
+        private TgcMp3Player playerSalto;
+        private TgcMp3Player playerChoque;
+
         private TgcBoundingSphere boundingSphere;
         private TgcBoundingSphere pies;
 
@@ -56,7 +78,9 @@ namespace TGC.Group.Model {
         private const int SALTOS_TOTALES = 2;
         private const float JUMP_SPEED = 10f; // PC Cristian
 
-        public Personaje(string MediaDir, string shaderDir) {
+        public Personaje(string MediaDir, string shaderDir)
+        {
+
             vidas = 3;
             stamina = MAX_STAMINA;
 
@@ -73,6 +97,20 @@ namespace TGC.Group.Model {
                      MediaDir + "Robot\\Correr-TgcSkeletalAnim.xml"
                 }
             );
+
+            //ALTERNATIVA CON MP3 PLAYERS, descartar/revisar
+            /*playerCaida = new TgcMp3Player();
+            playerCaida.FileName = MediaDir + "\\Sonidos\\sonidoCaida.mp3";
+            playerChoque = new TgcMp3Player();
+            playerChoque.FileName = MediaDir + "Sonidos\\sonidoChoque.mp3";
+            playerSalto = new TgcMp3Player();
+            playerSalto.FileName = MediaDir + "Sonidos\\sonidoSalto.mp3";*/
+
+            // Seteo los paths para los sonidos
+            //pathSonidoCaida = MediaDir + "Sonidos\\sonidoCaida.wav";
+            //pathSonidoChoque = MediaDir + "Sonidos\\sonidoChoque.wav";
+            //pathSonidoSalto = MediaDir + "Sonidos\\sonidoSalto.wav";
+            //pathSonidoActual = MediaDir + "Sonidos\\";
 
             mesh.buildSkletonMesh();
             mesh.playAnimation("Parado", true);
@@ -107,16 +145,19 @@ namespace TGC.Group.Model {
             emmiter.Position = pies.Position;
         }
 
-        public void update(float deltaTime, TgcD3dInput Input) {
+        public void update(float deltaTime, TgcD3dInput Input)
+        {
             checkInputs(Input);
             updateAnimations();
         }
 
-        public void render(float deltaTime) {
+        public void render(float deltaTime)
+        {
             mesh.UpdateMeshTransform();
             mesh.animateAndRender(deltaTime);
 
-            if (timerEmitter > 0.0f) {
+            if (timerEmitter > 0.0f)
+            {
                 emmiter.render(deltaTime);
                 timerEmitter -= deltaTime;
             }
@@ -126,8 +167,9 @@ namespace TGC.Group.Model {
             if (dir.Length() == 0) moving = false;
         }
 
-        public void prepareForShadowMapping(TGCVector3 lightPos, TGCVector3 lightDir, 
-            TGCMatrix g_mShadowProj, TGCMatrix g_lightView, Texture g_pShadowMap) {
+        public void prepareForShadowMapping(TGCVector3 lightPos, TGCVector3 lightDir,
+            TGCMatrix g_mShadowProj, TGCMatrix g_lightView, Texture g_pShadowMap)
+        {
             effect.SetValue("g_vLightPos", new Vector4(lightPos.X, lightPos.Y, lightPos.Z, 1));
             effect.SetValue("g_vLightDir", new Vector4(lightDir.X, lightDir.Y, lightDir.Z, 1));
             effect.SetValue("g_mProjLight", g_mShadowProj.ToMatrix());
@@ -138,78 +180,102 @@ namespace TGC.Group.Model {
             effect.SetValue("g_shadowMapping", 1);
         }
 
-        public void prepareForNormalRender() {
+        public void prepareForNormalRender()
+        {
             effect.SetValue("g_shadowMapping", 0);
         }
 
-        public void dispose() {
+        public void dispose()
+        {
             mesh.Dispose();
+            sonido.dispose();
         }
 
-        private void checkInputs(TgcD3dInput Input) {
+        private void checkInputs(TgcD3dInput Input)
+        {
             float FRAME_WALK_SPEED = WALK_SPEED;
             dir = TGCVector3.Empty;
 
             // caminar
-            if (Input.keyDown(Key.W) || Input.keyDown(Key.UpArrow)) {
+            if (Input.keyDown(Key.W) || Input.keyDown(Key.UpArrow))
+            {
                 dir.Z = -FRAME_WALK_SPEED;
                 moving = true;
                 meshAngle = 0;
             }
 
-            if (Input.keyDown(Key.S) || Input.keyDown(Key.DownArrow)) {
+            if (Input.keyDown(Key.S) || Input.keyDown(Key.DownArrow))
+            {
                 dir.Z = FRAME_WALK_SPEED;
                 moving = true;
                 meshAngle = 2;
             }
 
-            if (Input.keyDown(Key.D) || Input.keyDown(Key.RightArrow)) {
+            if (Input.keyDown(Key.D) || Input.keyDown(Key.RightArrow))
+            {
                 dir.X = -FRAME_WALK_SPEED;
                 moving = true;
                 meshAngle = 1;
             }
 
-            if (Input.keyDown(Key.A) || Input.keyDown(Key.LeftArrow)) {
+            if (Input.keyDown(Key.A) || Input.keyDown(Key.LeftArrow))
+            {
                 dir.X = FRAME_WALK_SPEED;
                 moving = true;
                 meshAngle = 3;
             }
 
             // correr
-            if (Input.keyDown(Key.LeftShift) && !agotado && dir.Length() != 0) {
+            if (Input.keyDown(Key.LeftShift) && !agotado && dir.Length() != 0)
+            {
                 dir.X = dir.X * MULT_CORRER;
                 dir.Z = dir.Z * MULT_CORRER;
                 stamina--;
                 if (stamina == 0) agotado = true;
                 timerEmitter = TIMER_CORTO;
-            } else if (Input.keyDown(Key.LeftAlt)) {
+            }
+            else if (Input.keyDown(Key.LeftAlt))
+            {
                 dir.X = dir.X * MULT_CAMINAR;
                 dir.Z = dir.Z * MULT_CAMINAR;
                 stamina += 2;
-            } else {
+            }
+            else
+            {
                 stamina++;
             }
 
-            if (stamina > MAX_STAMINA) {
+            if (stamina > MAX_STAMINA)
+            {
                 stamina = MAX_STAMINA;
                 agotado = false;
             }
-            
+
             // saltar
-            if (Input.keyPressed(Key.Space) && saltosRestantes > 0) {
+            if (Input.keyPressed(Key.Space) && saltosRestantes > 0)
+            {
                 dir.Y = JUMP_SPEED;
+
+                //loadSound(pathSonidoSalto);
+                //sonido.play(false);
 
                 saltosRestantes--;
             }
         }
 
-        private void updateAnimations() {
-            if (enElAire) {
+        private void updateAnimations()
+        {
+            if (enElAire)
+            {
                 // no hay una animacion para "caer"
                 mesh.playAnimation("Correr", true);
-            } else if (moving) {
+            }
+            else if (moving)
+            {
                 mesh.playAnimation("Caminando", true);
-            } else {
+            }
+            else
+            {
                 mesh.playAnimation("Parado", true);
             }
 
@@ -220,19 +286,24 @@ namespace TGC.Group.Model {
             mesh.RotateY(meshAngle * FastMath.PI / 2);
             meshAngleAnterior = meshAngle;
         }
-        
-        public void move(float deltaTime, Nivel nivel, TGCVector3 gravedad) {
+
+        public void move(float deltaTime, Nivel nivel, TGCVector3 gravedad)
+        {
             float velX = 0, velY = 0, velZ = 0;
 
-            if (vel.X != 0) {
+            if (vel.X != 0)
+            {
                 if (dir.X != 0) velX = dir.X * deltaTime;
                 else velX = vel.X;
-            } else velX = dir.X * deltaTime;
+            }
+            else velX = dir.X * deltaTime;
 
-            if (vel.Z != 0) {
+            if (vel.Z != 0)
+            {
                 if (dir.Z != 0) velZ = dir.Z * deltaTime;
                 else velZ = vel.Z;
-            } else velZ = dir.Z * deltaTime;
+            }
+            else velZ = dir.Z * deltaTime;
 
             vel = new TGCVector3(velX, vel.Y + dir.Y * deltaTime, velZ);
 
@@ -242,30 +313,37 @@ namespace TGC.Group.Model {
             // actualizo para las animaciones
             enElAire = (piso == null);
 
-            if (piso == null) {
+            if (piso == null)
+            {
                 // si estoy en el aire
-                if (vel.Y > VEL_TERMINAL) {
+                if (vel.Y > VEL_TERMINAL)
+                {
                     vel += gravedad * deltaTime;
                 }
-            } else {
+            }
+            else
+            {
                 // si estoy en algun piso
                 vel.Y = 0;
                 aterrizar();
                 modificarMovimientoSegunPiso(piso, nivel, deltaTime);
-                if (nivel.esPisoRotante(piso)) {
+                if (nivel.esPisoRotante(piso))
+                {
                     int i = 1;
                 };
             }
 
             if (dir.Y != 0) vel.Y = dir.Y;
 
-            TGCVector3 horizontal = new TGCVector3 {
+            TGCVector3 horizontal = new TGCVector3
+            {
                 X = vel.X,
                 Y = 0,
                 Z = vel.Z
             };
 
-            TGCVector3 vertical = new TGCVector3 {
+            TGCVector3 vertical = new TGCVector3
+            {
                 X = 0,
                 Y = vel.Y,
                 Z = 0
@@ -279,27 +357,38 @@ namespace TGC.Group.Model {
             emmiter.Position = pies.Position;
         }
 
-        private void modificarMovimientoSegunPiso(TgcBoundingAxisAlignBox piso, Nivel nivel, float deltaTime) {
-            if (nivel.esPisoDesplazante(piso)) {
+        private void modificarMovimientoSegunPiso(TgcBoundingAxisAlignBox piso, Nivel nivel, float deltaTime)
+        {
+            if (nivel.esPisoDesplazante(piso))
+            {
                 vel += nivel.getPlataformaDesplazante(piso).getVelocity() * deltaTime;
-            } else if (nivel.esPisoAscensor(piso)) {
+            }
+            else if (nivel.esPisoAscensor(piso))
+            {
                 vel += nivel.getPlataformaAscensor(piso).getVel() * deltaTime;
-            } else if (nivel.esPisoRotante(piso)) {
+            }
+            else if (nivel.esPisoRotante(piso))
+            {
                 setRotation(nivel.getPlataformaRotante(piso).getAngle());
             }
         }
 
-        private void resetearMovimientoSegunPiso(TgcBoundingAxisAlignBox piso, Nivel nivel) {
-            if (nivel.esPisoResbaladizo(piso)) {
+        private void resetearMovimientoSegunPiso(TgcBoundingAxisAlignBox piso, Nivel nivel)
+        {
+            if (nivel.esPisoResbaladizo(piso))
+            {
                 vel.X = vel.X * MODIFICADOR_HIELO;
                 vel.Z = vel.Z * MODIFICADOR_HIELO;
-            } else {
+            }
+            else
+            {
                 vel.X = 0;
                 vel.Z = 0;
             }
         }
 
-        private void movimientoHorizontal(TGCVector3 movement, List<TgcBoundingAxisAlignBox> colliders, float deltaTime, int count) {
+        private void movimientoHorizontal(TGCVector3 movement, List<TgcBoundingAxisAlignBox> colliders, float deltaTime, int count)
+        {
             if (count > 5) return;
 
             rayoVelocidad.Origin = this.getBoundingSphere().Center;
@@ -311,7 +400,8 @@ namespace TGC.Group.Model {
                 // tomo las aabb que colisionan
                 .Where(b => TgcCollisionUtils.intersectRayAABB(rayoVelocidad, b, out aux))
                 // ordeno por distancia
-                .OrderBy(b => {
+                .OrderBy(b =>
+                {
                     TgcCollisionUtils.intersectRayAABB(rayoVelocidad, b, out aux);
                     return aux.LengthSq();
                 })
@@ -319,13 +409,16 @@ namespace TGC.Group.Model {
                 .DefaultIfEmpty(null)
                 .First();
 
-            if (paredCercana == null) {
+            if (paredCercana == null)
+            {
                 this.translate(movement);
-            } else {
+            }
+            else
+            {
                 // llamo a la función una vez mas para obtener la intersección en aux
                 TgcCollisionUtils.intersectRayAABB(rayoVelocidad, paredCercana, out aux);
 
-                TGCVector3 radius = 
+                TGCVector3 radius =
                     TGCVector3.Normalize(movement) * this.getBoundingSphere().Radius;
 
                 TGCVector3 distance =
@@ -333,9 +426,12 @@ namespace TGC.Group.Model {
 
                 if ((distance - radius).Length() < 1) return;
 
-                if ((radius + movement).Length() < distance.Length()) {
+                if ((radius + movement).Length() < distance.Length())
+                {
                     this.translate(movement);
-                } else {
+                }
+                else
+                {
                     var foo = TGCVector3.Normalize(movement) * distance.Length();
                     movement = TGCVector3.Normalize(foo - distance) * WALK_SPEED * deltaTime;
 
@@ -344,7 +440,8 @@ namespace TGC.Group.Model {
             }
         }
 
-        private void movimientoVertical(TGCVector3 movement, Nivel nivel, float deltaTime, int count) {
+        private void movimientoVertical(TGCVector3 movement, Nivel nivel, float deltaTime, int count)
+        {
             if (count > 5) return;
 
             rayoVelocidad.Origin = this.getPies().Center;
@@ -356,31 +453,38 @@ namespace TGC.Group.Model {
 
             TgcBoundingAxisAlignBox pisoCercano = colliders
                 .Where(b => TgcCollisionUtils.intersectRayAABB(rayoVelocidad, b, out aux))
-                .OrderBy(b => {
+                .OrderBy(b =>
+                {
                     TgcCollisionUtils.intersectRayAABB(rayoVelocidad, b, out aux);
                     return aux.Length();
                 })
                 .DefaultIfEmpty(null)
                 .First();
 
-            if (pisoCercano == null) {
+            if (pisoCercano == null)
+            {
                 translate(movement);
-            } else {
+            }
+            else
+            {
                 pisoHeight = pisoCercano.PMax.Y;
 
                 TgcCollisionUtils.intersectRayAABB(rayoVelocidad, pisoCercano, out aux);
 
-                TGCVector3 radius = 
+                TGCVector3 radius =
                     TGCVector3.Normalize(movement) * this.getBoundingSphere().Radius;
 
                 TGCVector3 distance =
                     TgcCollisionUtils.closestPointAABB(this.getBoundingSphere().Center, pisoCercano) - this.getBoundingSphere().Center;
 
                 if ((distance - radius).Length() < 0.1f) return;
-                
-                if ((radius + movement).Length() < distance.Length()) {
+
+                if ((radius + movement).Length() < distance.Length())
+                {
                     this.translate(movement);
-                } else {
+                }
+                else
+                {
                     var foo = TGCVector3.Normalize(movement) * distance.Length();
                     movement = TGCVector3.Normalize(foo - distance) * WALK_SPEED * deltaTime;
 
@@ -389,48 +493,67 @@ namespace TGC.Group.Model {
             }
         }
 
-        private void translate(TGCVector3 movement) {
+        private void translate(TGCVector3 movement)
+        {
             mesh.Move(movement);
             pies.moveCenter(movement);
             boundingSphere.moveCenter(movement);
 
         }
 
-        private void resetUpdateVariables() {
+        private void resetUpdateVariables()
+        {
         }
 
-        public void aterrizar() {
+        public void aterrizar()
+        {
             saltosRestantes = SALTOS_TOTALES;
         }
 
-        public TGCVector3 getPosition() {
+        public TGCVector3 getPosition()
+        {
             return mesh.Position;
         }
 
-        public TgcBoundingSphere getBoundingSphere() {
+        public TgcBoundingSphere getBoundingSphere()
+        {
             return boundingSphere;
         }
 
-        public TgcBoundingSphere getPies() {
+        public TgcBoundingSphere getPies()
+        {
             return pies;
         }
 
-        public void setRotation(float angle) {
+        public void setRotation(float angle)
+        {
             meshAngle = angle;
         }
 
-        public void morir() {
-            if (vidas == 0) {
+        public void morir()
+        {
+
+            //loadSound(pathSonidoCaida);
+
+            if (vidas == 0)
+            {
                 EscenaManager.getInstance().goBack();
                 EscenaManager.getInstance().addScene(new GameOverEscena());
             }
 
+            //playerCaida.play(false);
+
+            //sonido.play(false);
+
             resetear();
 
             vidas--;
+
+
         }
 
-        public void resetear() {
+        public void resetear()
+        {
             mesh.Position = POS_ORIGEN;
             boundingSphere.setValues(mesh.BoundingBox.calculateBoxCenter(), mesh.BoundingBox.calculateBoxRadius());
 
@@ -444,5 +567,33 @@ namespace TGC.Group.Model {
 
         public int getStamina() => stamina;
         public int getVidas() => vidas;
+
+        private void loadSound(string pathAReproducir)
+        {
+            var ptr = new IntPtr(Int64.MaxValue);
+
+            if (pathSonidoActual == null || pathSonidoActual != pathAReproducir)
+            {
+                pathSonidoActual = pathAReproducir;
+
+                //Borrar sonido anterior
+                if (sonido != null)
+                {
+                    sonido.dispose();
+                    sonido = null;
+                }
+
+                TgcDirectSound directSound = new TgcDirectSound();
+                directSound.DsDevice = new Microsoft.DirectX.DirectSound.Device();
+                directSound.DsDevice.SetCooperativeLevel(ptr, CooperativeLevel.Normal);
+
+                //Cargar sonido
+                sonido = new TgcStaticSound();
+                //sonido.loadSound(pathSonidoActual, Microsoft.DirectX.DirectSound.Device);
+                sonido.loadSound(pathSonidoActual, directSound.DsDevice);
+
+            }
+        }
+
     }
 }
