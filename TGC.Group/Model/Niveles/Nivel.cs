@@ -57,17 +57,31 @@ namespace TGC.Group.Model.Niveles {
             getRenderizables().ForEach(r => r.Render());
             if (lfBox != null) lfBox.BoundingBox.Render();
 
-            aabbDeDecorativos.ForEach(r => r.Render());
+            // aabbDeDecorativos.ForEach(r => r.Render());
         }
 
         public abstract void dispose();
 
         public void setEffect(Effect e) {
+            pisosNormales.ForEach(p => p.Effect = e);
+            pisosResbaladizos.ForEach(p => p.Effect = e);
             cajas.ForEach(c => c.setEffect(e));
+            pEstaticas.ForEach(c => c.setEffect(e));
+            pDesplazan.ForEach(c => c.setEffect(e));
+            pRotantes.ForEach(c => c.setEffect(e));
+            pAscensor.ForEach(c => c.setEffect(e));
+            decorativos.ForEach(d => d.Effect = e);
         }
 
         public void setTechnique(string s) {
+            pisosNormales.ForEach(p => p.Technique = s);
+            pisosResbaladizos.ForEach(p => p.Technique = s);
             cajas.ForEach(c => c.setTechnique(s));
+            pEstaticas.ForEach(c => c.setTechnique(s));
+            pDesplazan.ForEach(c => c.setTechnique(s));
+            pRotantes.ForEach(c => c.setTechnique(s));
+            pAscensor.ForEach(c => c.setTechnique(s));
+            decorativos.ForEach(d => d.Technique = s);
         }
 
         /* TODO: puede traer problemas de performance

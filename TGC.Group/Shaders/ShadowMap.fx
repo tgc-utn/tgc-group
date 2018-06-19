@@ -16,9 +16,7 @@ sampler2D diffuseMap = sampler_state {
 };
 
 #define SMAP_SIZE 1024
-#define EPSILON 0.05f
-
-float time = 0;
+#define EPSILON 0.01f
 
 float4x4 g_mViewLightProj;
 float4x4 g_mProjLight;
@@ -26,6 +24,7 @@ float3 g_vLightPos; // posicion de la luz (en World Space) = pto que representa 
 float3 g_vLightDir; // Direcion de la luz (en World Space) = normal al patch Bj
 
 texture g_txShadow; // textura para el shadow map
+
 sampler2D g_samShadow = sampler_state {
 	Texture = <g_txShadow>;
 	MinFilter = Point;
@@ -33,14 +32,6 @@ sampler2D g_samShadow = sampler_state {
 	MipFilter = Point;
 	AddressU = Clamp;
 	AddressV = Clamp;
-};
-
-//Output del Vertex Shader
-struct VS_OUTPUT {
-	float4 Position : POSITION0;
-	float2 Texcoord : TEXCOORD0;
-	float3 Norm : TEXCOORD1; // Normales
-	float3 Pos : TEXCOORD2; // Posicion real 3d
 };
 
 void VertShadow(float4 Pos : POSITION,
@@ -57,7 +48,8 @@ void VertShadow(float4 Pos : POSITION,
 }
 
 void PixShadow(float2 Depth : TEXCOORD0, out float4 Color : COLOR) {
-	Color = Depth.x / Depth.y;
+	float c = Depth.x / Depth.y;
+	Color = float4(c, c, c, 1);
 }
 
 technique RenderShadow {
@@ -108,14 +100,14 @@ float4 PixScene(float2 Tex : TEXCOORD0,
 		CT.y = 1.0f - CT.y;
 
 		// sin ningun aa. conviene con smap size >= 512
-		float I = (tex2D(g_samShadow, CT) + EPSILON < vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
+		// float I = (tex2D(g_samShadow, CT) + EPSILON < vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
 
 		// interpolacion standard bi-lineal del shadow map
 		// CT va de 0 a 1, lo multiplico x el tamaño de la textura
 		// la parte fraccionaria indica cuanto tengo que tomar del vecino
 		// conviene cuando el smap size = 256
 		// leo 4 valores
-		/*float2 vecino = frac( CT*SMAP_SIZE);
+		float2 vecino = frac( CT*SMAP_SIZE);
 		float prof = vPosLight.z / vPosLight.w;
 		float s0 = (tex2D( g_samShadow, float2(CT)) + EPSILON < prof)? 0.0f: 1.0f;
 		float s1 = (tex2D( g_samShadow, float2(CT) + float2(1.0/SMAP_SIZE,0))
@@ -125,7 +117,6 @@ float4 PixScene(float2 Tex : TEXCOORD0,
 		float s3 = (tex2D( g_samShadow, float2(CT) + float2(1.0/SMAP_SIZE,1.0/SMAP_SIZE))
 		+ EPSILON < prof)? 0.0f: 1.0f;
 		float I = lerp( lerp( s0, s1, vecino.x ),lerp( s2, s3, vecino.x ),vecino.y);
-		*/
 
 		/*
 		// anti-aliasing del shadow map
