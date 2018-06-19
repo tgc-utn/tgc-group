@@ -87,6 +87,7 @@ void VertScene(float4 iPos : POSITION,
 }
 
 float4 g_vPosEye;
+float k_ls = 0.3;
 
 float4 PixScene(float2 Tex : TEXCOORD0,
 	float4 vPos : TEXCOORD1,
@@ -123,7 +124,6 @@ float4 PixScene(float2 Tex : TEXCOORD0,
 	float3 ld = 0;
 	float3 le = 0;
 	float k_ld = 0.9;
-	float k_ls = 0.2;
 	float k_la = 0.8;
 	float fSpecularPower = 16.84;
 

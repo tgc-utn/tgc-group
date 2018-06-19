@@ -465,6 +465,9 @@ namespace TGC.Group.Model {
                 case 2:
                     file = "sonidoCaida.wav";
                     break;
+                case 3:
+                    file = "sonidoChoque.wav";
+                    break;
                 default:
                     return;
             }

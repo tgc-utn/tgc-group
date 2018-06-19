@@ -34,6 +34,8 @@ namespace TGC.Group.Model.Niveles {
         protected string pathSkyBox;
         public Nivel siguienteNivel;
 
+        protected Effect smEffect;
+
         public Nivel(string mediaDir) {
 
             texturasUsadas = new List<TgcTexture>();
@@ -63,21 +65,22 @@ namespace TGC.Group.Model.Niveles {
         }
 
         public void render() {
-          
+            smEffect.SetValue("k_ls", 0.2f);
             getRenderizables().ForEach(r => r.Render());
+
+            smEffect.SetValue("k_ls", 0.5f);
+            getRenderizablesBrillantes().ForEach(r => r.Render());
+
             if (lfBox != null) lfBox.BoundingBox.Render();
             aabbDeDecorativos.ForEach(r => r.Render());
 
-            if(skyBox != null)
-            {
+            if (skyBox != null) {
                 skyBox.Render();
             }
         }
 
-        public void dispose()
-        {
-            foreach (var textura in texturasUsadas)
-            {
+        public void dispose() {
+            foreach (var textura in texturasUsadas) {
                 textura.dispose();
             }
 
@@ -87,6 +90,7 @@ namespace TGC.Group.Model.Niveles {
         }
 
         public void setEffect(Effect e) {
+            this.smEffect = e;
             pisosNormales.ForEach(p => p.Effect = e);
             pisosResbaladizos.ForEach(p => p.Effect = e);
             cajas.ForEach(c => c.setEffect(e));
@@ -113,15 +117,20 @@ namespace TGC.Group.Model.Niveles {
          * agrega mas estado... pero mucho mas performante */
         protected List<IRenderObject> getRenderizables() {
             return new List<IRenderObject>().Concat(pisosNormales)
-                .Concat(pisosResbaladizos)
                 .Concat(pMuerte)
                 .Concat(cajas)
                 .Concat(pEstaticas)
                 .Concat(pDesplazan)
                 .Concat(pRotantes)
                 .Concat(pAscensor)
-                .Concat(decorativos)
                 .Concat(rampas)
+                .ToList();
+        }
+
+        protected List<IRenderObject> getRenderizablesBrillantes() {
+            return new List<IRenderObject>()
+                .Concat(pisosResbaladizos)
+                .Concat(decorativos)
                 .ToList();
         }
 
@@ -160,8 +169,7 @@ namespace TGC.Group.Model.Niveles {
             return list;
         }
 
-        public List<TgcBoundingAxisAlignBox> getEstaticos()
-        {
+        public List<TgcBoundingAxisAlignBox> getEstaticos() {
             var list = new List<TgcBoundingAxisAlignBox>();
             list.AddRange(pEstaticas.Select(caja => caja.getAABB()).ToArray());
 
@@ -214,20 +222,17 @@ namespace TGC.Group.Model.Niveles {
             pisosNormales.Add(piso);
         }
 
-        public void agregarPisoResbaladizo(TGCVector3 origen, TGCVector3 tamanio, TgcTexture textura)
-        {
+        public void agregarPisoResbaladizo(TGCVector3 origen, TGCVector3 tamanio, TgcTexture textura) {
             var piso = new TgcPlane(origen, tamanio, TgcPlane.Orientations.XZplane, textura);
             pisosResbaladizos.Add(piso);
         }
 
-        public void agregarPared(TGCVector3 centro, TGCVector3 tamanio, TgcTexture textura)
-        {
+        public void agregarPared(TGCVector3 centro, TGCVector3 tamanio, TgcTexture textura) {
             var pared = new Plataforma(centro, tamanio, textura);
             pEstaticas.Add(pared);
         }
 
-        public void inicializarSkyBox(string pathCaras)
-        {
+        public void inicializarSkyBox(string pathCaras) {
             skyBox = new TgcSkyBox();
             skyBox.Center = new TGCVector3(0, 0, 4000);
             skyBox.Size = new TGCVector3(18000, 1800, 18000);
@@ -241,8 +246,7 @@ namespace TGC.Group.Model.Niveles {
             skyBox.Init();
         }
 
-        public void cargarDecorativo(TgcMesh unDecorativo, TgcScene unaEscena, TGCVector3 posicion, TGCVector3 escala, float rotacion)
-        {
+        public void cargarDecorativo(TgcMesh unDecorativo, TgcScene unaEscena, TGCVector3 posicion, TGCVector3 escala, float rotacion) {
             unDecorativo = unaEscena.Meshes[0];
             unDecorativo.Position = posicion;
             unDecorativo.Scale = escala;
@@ -251,8 +255,7 @@ namespace TGC.Group.Model.Niveles {
             aabbDeDecorativos.Add(unDecorativo.BoundingBox);
         }
 
-        public void agregarEscalera(TGCVector3 origen, int cantidadEscalones, TGCVector3 tamanioEscalon, TgcTexture textura)
-        {
+        public void agregarEscalera(TGCVector3 origen, int cantidadEscalones, TGCVector3 tamanioEscalon, TgcTexture textura) {
             //NOTA: origen debe ser el CENTRO del primer escalon
             var alto = tamanioEscalon.Y;
             var largo = tamanioEscalon.Z; //profundidad
@@ -260,8 +263,7 @@ namespace TGC.Group.Model.Niveles {
             var escalon = new Plataforma(centroEscalon, tamanioEscalon, textura);
             pEstaticas.Add(escalon);
             int i;
-            for(i = 2; i <= cantidadEscalones; i++)
-            {
+            for (i = 2; i <= cantidadEscalones; i++) {
                 centroEscalon.Y += alto;
                 centroEscalon.Z -= largo;
                 escalon = new Plataforma(centroEscalon, tamanioEscalon, textura);
@@ -279,8 +281,7 @@ namespace TGC.Group.Model.Niveles {
 
         //NOTA: Abstraccion para crear rampas de tamaño unico
         //NO ANDA BIEN. Mejorar
-        public void agregarRampa(TGCVector3 inicio, TgcTexture textura)
-        {
+        public void agregarRampa(TGCVector3 inicio, TgcTexture textura) {
             var centroEscalon = inicio;
             var escalon = new Plataforma(inicio, new TGCVector3(100, 5.773f, 10), textura); //5.773 para hacer plano a 30º
             aabbSegmentoRampa.Add(escalon.getAABB());
@@ -297,10 +298,10 @@ namespace TGC.Group.Model.Niveles {
             centroUltimo.X -= 50;
             centroUltimo.Y += 2.8865f;
             centroUltimo.Z -= 5;
-            var superficieRampa = new TgcPlane(centroUltimo, new TGCVector3(100, 0,173.2013f), TgcPlane.Orientations.XZplane, textura);
+            var superficieRampa = new TgcPlane(centroUltimo, new TGCVector3(100, 0, 173.2013f), TgcPlane.Orientations.XZplane, textura);
             superficieRampa.toMesh("superficieRampa").Transform = TGCMatrix.RotationX((FastMath.PI) / 6);
             rampas.Add(superficieRampa.toMesh("superficieRampa"));
-     }
+        }
 
-}
+    }
 }
