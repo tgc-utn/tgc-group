@@ -22,6 +22,7 @@ namespace TGC.Group.Modelo
 
         public string EscenaCrash {get;set;}
         
+        public string TexturasPath { get; set; }
 
         public string RobotDirectorio { get; set; }
         public string RobotSkeletalMesh { get; set; }
@@ -72,7 +73,7 @@ namespace TGC.Group.Modelo
             SonidoFruta = mediaDir + "Sonidos\\fruit.mp3";
             SonidoDanio = mediaDir + "Sonidos\\woah.wav";
 
-
+            TexturasPath = mediaDir + "Escenas\\Textures\\";
             Menu = mediaDir + "Menu\\";
 
             BarraVida = mediaDir + "Imagenes\\barra_vida.png";

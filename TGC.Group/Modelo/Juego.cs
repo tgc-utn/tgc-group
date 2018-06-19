@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
 
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Direct3D;
@@ -83,13 +82,13 @@ namespace TGC.Group.Modelo
         private DireccionPersonaje direccionPersonaje = new DireccionPersonaje();
         private int doubleJump = 0;
         private float saltoActual = 0;
-        private TGCVector3 velocidad = TGCVector3.Empty;
-        private TGCVector3 aceleracion = TGCVector3.Empty;
+        //private TGCVector3 ultimoCheckpoint = new TGCVector3(0f, 0.1f, 0f);
         #endregion
 
         #region Estados
-        private bool paused = true;
-        private bool perdiste = false;
+        private bool partidaPausada = true;
+        private bool partidaPerdida = false;
+        private bool partidaReiniciada = false;
         private bool menu = true;
         private bool godMode = false;
         #endregion
@@ -184,53 +183,44 @@ namespace TGC.Group.Modelo
         float alturaRampaGlobal = 0f;
         #endregion
 
-        //Para diferenciar las cosas que solo tiene que hacer al inciar juego y no al perder
-        private bool inicio = true;
 
         private List<Hoguera> Hogueras;
         private List<FuegoLuz> FuegosLuz;
-        //private TGCVector3 PosicionInicial = new TGCVector3(400, 20f, -900);
 
-
-        Random rnd = new Random(); //Generador de numeros aleatorios;
+        Random generadorRandom = new Random(); //Generador de numeros aleatorios;
 
 
         public override void Init()
         {
-            perdiste = false;
-            paused = false;
-            direccionPersonaje = new DireccionPersonaje();
-            velocidad = new TGCVector3(0, 0, 0);
-            aceleracion = new TGCVector3(0, 0, 0);
-
-            Hoguera.texturesPath = MediaDir + "Escenas\\Textures\\";
-            FuegoLuz.texturesPath = MediaDir + "Escenas\\Textures\\";
-            Personaje.texturesPath = MediaDir + "Escenas\\Textures\\";
-
-
+            partidaPerdida = false;
+            partidaPausada = false;
+            
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
-
-            //Objeto que conoce todos los path de MediaDir
             directorio = new Directorio(MediaDir);
-            personaje = new Personaje(directorio);
-
             //Cargo el SoundManager
             soundManager = new SoundManager(directorio, this.DirectSound.DsDevice);
             soundManager.playSonidoFondo();
 
+            //Objeto que conoce todos los path de MediaDir
+            if (!partidaReiniciada)
+            {
+                personaje = new Personaje(directorio);
+                //Cagar escenario especifico para el juego.
+                escenario = new Escenario(directorio.EscenaCrash, personaje);
 
-            //Cagar escenario especifico para el juego.
-            escenario = new Escenario(directorio.EscenaCrash, personaje);
-
-            personaje.autoTransform(false);
-
+            }
+            else
+            {
+                personaje.reiniciar();
+            }
+            
             //Le cambiamos la textura para diferenciarlo un poco
             personaje.changeDiffuseMaps(new[]
             {
                     TgcTexture.createTexture(D3DDevice.Instance.Device, directorio.RobotTextura)
-                });
-
+                }); 
+                
             //Inicializamos el collisionManager.
             ColisionadorEsferico = new SphereCollisionManager();
             ColisionadorEsferico.GravityEnabled = true;
@@ -247,6 +237,9 @@ namespace TGC.Group.Modelo
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara = camaraInterna;
 
+            Hoguera.texturesPath = directorio.TexturasPath;
+            FuegoLuz.texturesPath = directorio.TexturasPath; ;
+            Personaje.texturesPath = directorio.TexturasPath; ;
 
             var meshesSinPlatXZ = escenario.scene.Meshes.FindAll(mesh => mesh.Name != "PlataformaX" && mesh.Name != "PlataformaZ");
 
@@ -306,6 +299,7 @@ namespace TGC.Group.Modelo
         {
             PreUpdate();
 
+           
             //TODO: Reificar estos valores.
             //Obtenemos los valores default
 
@@ -324,16 +318,16 @@ namespace TGC.Group.Modelo
             tiempoAcumulado += ElapsedTime;
             
             //Corroboramos si el jugador perdio la partida.
-            if (perdiste && Input.keyPressed(Key.Y)) Init();
+            if (partidaPerdida && Input.keyPressed(Key.Y)) Init();
             
             //Pausa
-            if (Input.keyPressed(Key.P)) paused = !paused;
+            if (Input.keyPressed(Key.P)) partidaPausada = !partidaPausada;
 
             //Menu
             if (Input.keyPressed(Key.M))
             {
                 menu = true;
-                paused = true;
+                partidaPausada = true;
             }
              
             //Bounding Box activos.
@@ -345,11 +339,11 @@ namespace TGC.Group.Modelo
             if (Input.keyPressed(Key.Z)) soundManager.actualizarEstado();
 
             //Si el personaje se mantiene en caida, se pierda la partida.
-            if (personaje.position().Y < -200)perdiste = true;
+            if (personaje.position().Y < -200)partidaPerdida = true;
             
 
             //Si se sigue en juego, se continua con la logica del juego.
-            if (!paused && !perdiste)
+            if (!partidaPausada && !partidaPerdida)
             {
                
                 if (Input.keyDown(Key.R)) solicitudInteraccionConCaja = true;
@@ -409,7 +403,7 @@ namespace TGC.Group.Modelo
                 }
                 else
                 {
-                    perdiste = true;
+                    partidaPerdida = true;
                 }
                 #endregion
 
@@ -419,8 +413,8 @@ namespace TGC.Group.Modelo
                     personaje.aumentarFrutas();
                     soundManager.playSonidoFruta();
                     escenario.eliminarFrutaColisionada();
-                 }//Afuera del if para que actualize siempre por si se enciende una hoguera
-                    textoFrutas.Text = personaje.frutas.ToString();
+                 }
+                 textoFrutas.Text = personaje.frutas.ToString();
 
 
                 #endregion
@@ -431,8 +425,8 @@ namespace TGC.Group.Modelo
                     personaje.aumentarMascaras();
                     soundManager.playSonidoMoneda();
                     escenario.eliminarMascaraColisionada();
-                    textoMascaras.Text = personaje.mascaras.ToString();
                 }
+                textoMascaras.Text = personaje.mascaras.ToString();
 
 
                 #endregion
@@ -441,12 +435,10 @@ namespace TGC.Group.Modelo
                 if (Input.keyUp(Key.E))
                 {
                     var hoguera = escenario.getClosestBonfire(personaje.position(), 500f, Hogueras);
-                    if (hoguera != null)
-                    {
-                        hoguera.afectar(personaje);
-                        textoHoguera.Text = personaje.hogueras.ToString();
-                    }
+                    if (hoguera != null) hoguera.afectar(personaje);
+                    
                 }
+                textoHoguera.Text = personaje.hogueras.ToString();
 
                 #endregion
 
@@ -720,7 +712,7 @@ namespace TGC.Group.Modelo
                 //olasLava.SetValue("frecuencia", frecuencia);
 
 
-                if (!perdiste)
+                if (!partidaPerdida)
                 {
                     
                     renderizarSprites();
@@ -729,7 +721,7 @@ namespace TGC.Group.Modelo
                     //Renderizo OBB de las plataformas rotantes
                     plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
                     
-                    if (!paused)
+                    if (!partidaPausada)
                     {
                         octree.render(Frustum, boundingBoxActivate);
                         renderizarRestantes();
@@ -907,7 +899,7 @@ namespace TGC.Group.Modelo
         public void gui_partida_perdida_render(float elapsedTime)
         {
             GuiMessage mensaje_gui = gui_secundaria.Update(elapsedTime, Input);
-
+            soundManager.pauseSonidos();
 
             // proceso el msg
             switch (mensaje_gui.message)
@@ -916,6 +908,7 @@ namespace TGC.Group.Modelo
                     switch (mensaje_gui.id)
                     {
                         case IDOK:
+                            partidaReiniciada = true;
                             Init();
                             break;
                         case IDCANCEL:
@@ -965,7 +958,7 @@ namespace TGC.Group.Modelo
 
                         case ID_JUGAR:
                             menu=false;
-                            paused = false;
+                            partidaPausada = false;
                             break;
 
                             

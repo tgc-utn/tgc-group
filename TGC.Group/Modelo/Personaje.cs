@@ -49,7 +49,7 @@ namespace TGC.Group.Modelo
 
         public TGCVector3 POSICION_INICIAL_PERSONAJE { get; set; } = new TGCVector3(0f,0.1f,0f);
         public TGCVector3 posicionDesarrollo = new TGCVector3(-15000f, 60f, 635f);
-
+        private TGCVector3 CHECKPOINT = new TGCVector3(0f, 0f, 0f);
 
         private DireccionPersonaje direccion = new DireccionPersonaje();
 
@@ -84,26 +84,56 @@ namespace TGC.Group.Modelo
                             loadMeshAndAnimationsFromFile(directorio.RobotSkeletalMesh,
                                                       directorio.RobotDirectorio,
                                                       pathAnimacionesPersonaje);
+            
 
             //Descomentar para ubicarlo donde se este desarrollando
-             //POSICION_INICIAL_PERSONAJE = posicionDesarrollo;
+            //POSICION_INICIAL_PERSONAJE = posicionDesarrollo;
 
+            inicializarPosicion();
+            
+        }
+
+        public void inicializarPosicion()
+        {
+            autoTransform(false);
             personajeMesh.AutoUpdateBoundingBox = false;
             personajeMesh.BoundingBox.transform(TGCMatrix.Translation(POSICION_INICIAL_PERSONAJE));
             //personajeMesh.Move(posicionInicial);
 
             RADIO_ESFERA = boundingBox().calculateBoxRadius() * COEFICIENTE_REDUCTIVO_ESFERA;
-            POSICION_INICIAL_ESFERA = new TGCVector3(POSICION_INICIAL_PERSONAJE.X,POSICION_INICIAL_PERSONAJE.Y + RADIO_ESFERA,POSICION_INICIAL_PERSONAJE.Z);
+            POSICION_INICIAL_ESFERA = new TGCVector3(POSICION_INICIAL_PERSONAJE.X, POSICION_INICIAL_PERSONAJE.Y + RADIO_ESFERA, POSICION_INICIAL_PERSONAJE.Z);
             esferaPersonaje = new TgcBoundingSphere(POSICION_INICIAL_ESFERA, RADIO_ESFERA);
             //Ubica al mesh en la posicion inicial.
-            personajeMesh.Transform = TGCMatrix.Scaling(PERSONAJE_SCALE) 
-                                      *TGCMatrix.RotationY(FastMath.ToRad(180f))
-                                      *TGCMatrix.Translation(POSICION_INICIAL_PERSONAJE);
+            personajeMesh.Transform = TGCMatrix.Scaling(PERSONAJE_SCALE)
+                                      * TGCMatrix.RotationY(FastMath.ToRad(180f))
+                                      * TGCMatrix.Translation(POSICION_INICIAL_PERSONAJE);
 
             matrizTransformacionPlataformaRotante = TGCMatrix.Identity;
-            
+
+            CHECKPOINT = center();
         }
 
+        public void reiniciar()
+        {
+            vida = vidaMaxima;
+            esferaPersonaje.setCenter (CHECKPOINT);
+            //inicializarPosicion();
+        }
+
+        public void transformar()
+        {
+            //Es la posicion del centro de la esfera, pero restandole el radio de la esfera en el eje Y
+            TGCVector3 posicionActual = new TGCVector3(esferaPersonaje.Center.X, esferaPersonaje.Center.Y-RADIO_ESFERA, esferaPersonaje.Center.Z);
+            
+            float anguloRotado = (personajeMesh.Rotation.Y + FastMath.ToRad(180f));
+            personajeMesh.Transform =  TGCMatrix.Scaling(PERSONAJE_SCALE)
+                                      *TGCMatrix.RotationY(anguloRotado)
+                                      *TGCMatrix.Translation(posicionActual)
+                                      *matrizTransformacionPlataformaRotante;
+            personajeMesh.BoundingBox.transform(TGCMatrix.Translation(posicionActual) * matrizTransformacionPlataformaRotante);
+            
+        }
+        #region Colisiones
         public bool colisionaConMesh(TgcMesh mesh) => TgcCollisionUtils.testSphereAABB(esferaPersonaje, mesh.BoundingBox);
         public bool colisionaConCaja(Caja box)
         {
@@ -125,26 +155,21 @@ namespace TGC.Group.Modelo
             esferaAuxiliar.moveCenter(new TGCVector3(0f, -RADIO_ESFERA, 0f));
             return TgcCollisionUtils.testSphereAABB(esferaAuxiliar, pisoDesnivelado.BoundingBox);
         }
-
-        public void transformar()
-        {
-            //Es la posicion del centro de la esfera, pero restandole el radio de la esfera en el eje Y
-            TGCVector3 posicionActual = new TGCVector3(esferaPersonaje.Center.X, esferaPersonaje.Center.Y-RADIO_ESFERA, esferaPersonaje.Center.Z);
-            
-            float anguloRotado = (personajeMesh.Rotation.Y + FastMath.ToRad(180f));
-            personajeMesh.Transform =  TGCMatrix.Scaling(PERSONAJE_SCALE)
-                                      *TGCMatrix.RotationY(anguloRotado)
-                                      *TGCMatrix.Translation(posicionActual)
-                                      *matrizTransformacionPlataformaRotante;
-            personajeMesh.BoundingBox.transform(TGCMatrix.Translation(posicionActual) * matrizTransformacionPlataformaRotante);
-            
-        }
+        #endregion
 
         #region Movimientos
-        public float Velocidad()
+
+        public void toCheckpoint()
         {
-            return VELOCIDAD_PERSONAJE + VELOCIDAD_EXTRA;
+            position(CHECKPOINT);
         }
+
+        public void actualizarCheckpoint()
+        {
+            CHECKPOINT = center();
+        }
+
+        public float Velocidad() =>  VELOCIDAD_PERSONAJE + VELOCIDAD_EXTRA;
 
         public void aumentarVelocidad(float velocidadExtra,float tiempo)
         {
@@ -216,6 +241,7 @@ namespace TGC.Group.Modelo
         public void technique(string newTechnique) => personajeMesh.Technique = newTechnique;
         public void position(TGCVector3 newPosition) => esferaPersonaje = new TgcBoundingSphere(newPosition, RADIO_ESFERA);
         public TGCVector3 position() => esferaPersonaje.Position;
+        public TGCVector3 center() => esferaPersonaje.Center;
         public TGCVector3 rotation() =>  personajeMesh.Rotation;
         public void RotateY(float angle) => personajeMesh.RotateY(angle);
         public void move(TGCVector3 desplazamiento)

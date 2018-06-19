@@ -49,7 +49,14 @@ namespace TGC.Group.Modelo
         {
             sonido = !sonido;
             if (sonido) mp3BackgroundPlayer.resume();
-            else mp3BackgroundPlayer.pause();
+            else pauseSonidos();
+            
+        }
+
+        public void pauseSonidos()
+        {
+            mp3BackgroundPlayer.pause();
+            stopSonidoCaminar();
         }
 
         public void playSonidoCaminar()
@@ -59,7 +66,7 @@ namespace TGC.Group.Modelo
 
         public void stopSonidoCaminar()
         {
-            if(sonido)SonidoCaminar.stop();
+            SonidoCaminar.stop();
         }
 
         public void playSonidoSaltar()

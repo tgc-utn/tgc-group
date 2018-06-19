@@ -62,10 +62,13 @@ namespace TGC.Group.Modelo
 
         public void afectar(Personaje personaje)
         {
-            encender(personaje.frutas);
-            personaje.POSICION_INICIAL_PERSONAJE = personaje.position();
-            personaje.frutas -= ManzanasNecesarias;
-            personaje.aumentarHogueras();
+            if (!Encendida && personaje.frutas >= ManzanasNecesarias)
+            {
+                encender();
+                personaje.actualizarCheckpoint();
+                personaje.frutas -= ManzanasNecesarias;
+                personaje.aumentarHogueras();
+            }
         }
 
         public void render(float ElapsedTime)
@@ -84,10 +87,9 @@ namespace TGC.Group.Modelo
             }
         }
 
-        public void encender(int manzanas)
+        public void encender()
         {
-            if (!Encendida && manzanas >= ManzanasNecesarias)
-            {
+           
                 emitters = new List<ParticleEmitter>();
                 Encendida = true;
                 var e4 = new ParticleEmitter(texturesPath + smokeTex, selectedParticleCount);
@@ -129,9 +131,7 @@ namespace TGC.Group.Modelo
                 e3.Dispersion = 10;
                 e3.Speed = new TGCVector3(65, 60, 15);
                 emitters.Add(e1);
-
-
-            }
+            
         }
     }
 }
