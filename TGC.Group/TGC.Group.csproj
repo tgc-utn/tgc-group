@@ -398,8 +398,11 @@
     <Content Include="Media\SkyBoxFaces\frente.jpg" />
     <Content Include="Media\SkyBoxFaces\izquierda.jpg" />
     <Content Include="Media\sombra.png" />
+    <Content Include="Media\Sonidos\sonidoCaida.mp3" />
     <Content Include="Media\Sonidos\sonidoCaida.wav" />
+    <Content Include="Media\Sonidos\sonidoChoque.mp3" />
     <Content Include="Media\Sonidos\sonidoChoque.wav" />
+    <Content Include="Media\Sonidos\sonidoSalto.mp3" />
     <Content Include="Media\Sonidos\sonidoSalto.wav" />
     <Content Include="Media\stamina.png" />
     <Content Include="Media\staminaUnidad.png" />

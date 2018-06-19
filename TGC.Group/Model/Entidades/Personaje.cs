@@ -1,6 +1,8 @@
 ﻿using Microsoft.DirectX;
 using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
+using Microsoft.DirectX.DirectSound;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TGC.Core.BoundingVolumes;
@@ -31,6 +33,10 @@ namespace TGC.Group.Model
 
         // player estatico del sonido a reproducir
         private TgcStaticSound sonido;
+
+        private TgcMp3Player playerCaida;
+        private TgcMp3Player playerSalto;
+        private TgcMp3Player playerChoque;
 
         private TgcBoundingSphere boundingSphere;
         private TgcBoundingSphere pies;
@@ -92,10 +98,19 @@ namespace TGC.Group.Model
                 }
             );
 
+            //ALTERNATIVA CON MP3 PLAYERS, descartar/revisar
+            /*playerCaida = new TgcMp3Player();
+            playerCaida.FileName = MediaDir + "\\Sonidos\\sonidoCaida.mp3";
+            playerChoque = new TgcMp3Player();
+            playerChoque.FileName = MediaDir + "Sonidos\\sonidoChoque.mp3";
+            playerSalto = new TgcMp3Player();
+            playerSalto.FileName = MediaDir + "Sonidos\\sonidoSalto.mp3";*/
+
             // Seteo los paths para los sonidos
-            pathSonidoCaida = MediaDir + "Sonidos\\sonidoCaida.wav";
-            pathSonidoChoque = MediaDir + "Sonidos\\sonidoChoque.wav";
-            pathSonidoSalto = MediaDir + "Sonidos\\sonidoSalto.wav";
+            //pathSonidoCaida = MediaDir + "Sonidos\\sonidoCaida.wav";
+            //pathSonidoChoque = MediaDir + "Sonidos\\sonidoChoque.wav";
+            //pathSonidoSalto = MediaDir + "Sonidos\\sonidoSalto.wav";
+            //pathSonidoActual = MediaDir + "Sonidos\\";
 
             mesh.buildSkletonMesh();
             mesh.playAnimation("Parado", true);
@@ -241,8 +256,8 @@ namespace TGC.Group.Model
             {
                 dir.Y = JUMP_SPEED;
 
-                loadSound(pathSonidoSalto);
-                sonido.play(false);
+                //loadSound(pathSonidoSalto);
+                //sonido.play(false);
 
                 saltosRestantes--;
             }
@@ -518,7 +533,7 @@ namespace TGC.Group.Model
         public void morir()
         {
 
-            loadSound(pathSonidoCaida);
+            //loadSound(pathSonidoCaida);
 
             if (vidas == 0)
             {
@@ -526,7 +541,9 @@ namespace TGC.Group.Model
                 EscenaManager.getInstance().addScene(new GameOverEscena());
             }
 
-            sonido.play(false);
+            //playerCaida.play(false);
+
+            //sonido.play(false);
 
             resetear();
 
@@ -553,6 +570,8 @@ namespace TGC.Group.Model
 
         private void loadSound(string pathAReproducir)
         {
+            var ptr = new IntPtr(Int64.MaxValue);
+
             if (pathSonidoActual == null || pathSonidoActual != pathAReproducir)
             {
                 pathSonidoActual = pathAReproducir;
@@ -565,6 +584,8 @@ namespace TGC.Group.Model
                 }
 
                 TgcDirectSound directSound = new TgcDirectSound();
+                directSound.DsDevice = new Microsoft.DirectX.DirectSound.Device();
+                directSound.DsDevice.SetCooperativeLevel(ptr, CooperativeLevel.Normal);
 
                 //Cargar sonido
                 sonido = new TgcStaticSound();
