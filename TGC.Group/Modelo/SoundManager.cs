@@ -48,7 +48,7 @@ namespace TGC.Group.Modelo
         public void actualizarEstado()
         {
             sonido = !sonido;
-            if (sonido) mp3BackgroundPlayer.resume();
+            if (sonido) reanudarSonidos();
             else pauseSonidos();
             
         }
@@ -57,6 +57,11 @@ namespace TGC.Group.Modelo
         {
             mp3BackgroundPlayer.pause();
             stopSonidoCaminar();
+        }
+
+        public void reanudarSonidos()
+        {
+            mp3BackgroundPlayer.resume();
         }
 
         public void playSonidoCaminar()

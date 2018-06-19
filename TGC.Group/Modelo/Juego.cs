@@ -303,12 +303,11 @@ namespace TGC.Group.Modelo
             while (ElapsedTime > 1) ElapsedTime = ElapsedTime / 10; //Para evitar el error de que ElapsedTime es muy alto al inicio
 
             tiempoAcumulado += ElapsedTime;
-            
-            //Corroboramos si el jugador perdio la partida.
-            if (partidaPerdida && Input.keyPressed(Key.Y)) Init();
+
             
             //Pausa
-            if (Input.keyPressed(Key.P)) partidaPausada = !partidaPausada;
+            if (Input.keyPressed(Key.P))partidaPausada = !partidaPausada;
+            
 
             //Menu
             if (Input.keyPressed(Key.M))
@@ -328,6 +327,8 @@ namespace TGC.Group.Modelo
             //Si el personaje se mantiene en caida, se pierda la partida.
             if (personaje.position().Y < -200)partidaPerdida = true;
             
+
+           
 
             //Si se sigue en juego, se continua con la logica del juego.
             if (!partidaPausada && !partidaPerdida)
@@ -476,6 +477,7 @@ namespace TGC.Group.Modelo
                 Frustum.updateMesh(camaraInterna.Position + traslacionFrustum, camaraInterna.LookAt);
                 PostUpdate();
             }
+            
         }
  
         public void moverMundo(TGCVector3 movimientoOriginal)
@@ -594,7 +596,7 @@ namespace TGC.Group.Modelo
 
             cajaColisionante.afectar(personaje);
             if (cajaColisionante.esTNT()) soundManager.playSonidoDanio();
-           
+            
             
             if (!solicitudInteraccionConCaja)
             {
@@ -704,6 +706,7 @@ namespace TGC.Group.Modelo
                     
                     renderizarSprites();
                     renderizarDebug();
+                    renderizarControles();
                     DrawText.drawText((godMode ? "GOD MODE: ON" : ""), (int)(ScreenRes_X - 140f), 50, Color.Red);
                     //Renderizo OBB de las plataformas rotantes
                     plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
@@ -816,7 +819,21 @@ namespace TGC.Group.Modelo
                                + "Vector Movimiento Real Caja" + movimientoRealCaja + "\n"
                                + "Interaccion Con Caja: " + interaccionConCaja + "\n"
                                + "Colision Plataforma: " + colisionPlataforma + "\n"
-                               /*+ "Movimiento por plataforma: " + movimientoPorPlataforma*/, 500, 0, Color.GhostWhite);
+                               /*+ "Movimiento por plataforma: " + movimientoPorPlataforma*/, 0, 600, Color.GhostWhite);
+        }
+        public void renderizarControles()
+        {
+            DrawText.drawText("Mover Hacia Adelante: W"  + "\n"
+                               + "Mover Hacia Atras: S"  + "\n"
+                               + "Mover Hacia Derecha: D" + "\n"
+                               + "Mover Hacia Izquierda: A" + "\n"
+                               + "Saltar: Barra Espaciadora" + "\n"
+                               + "Patear: Q" + "\n"
+                               + "Empujar: R" + "\n"
+                               + "Prender Hoguera: E" + "\n"
+                               + "Pausar/Reanudar Sonido: Z" + "\n"
+                               + "Menu: M" + "\n"
+                                , 500, 0, Color.Green);
         }
 
         /// <summary>
