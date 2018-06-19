@@ -60,6 +60,14 @@ namespace TGC.Group.Modelo
             emitters.Add(e1);
         }
 
+        public void afectar(Personaje personaje)
+        {
+            encender(personaje.frutas);
+            personaje.POSICION_INICIAL_PERSONAJE = personaje.position();
+            personaje.frutas -= ManzanasNecesarias;
+            personaje.aumentarHogueras();
+        }
+
         public void render(float ElapsedTime)
         {
             MeshHoguera.Render();

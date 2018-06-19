@@ -25,8 +25,9 @@ namespace TGC.Group.Modelo
     {
         private static float vidaMaxima = 1;
         public float vida { get; set; }
-        public int frutas { get; set; }
-        public int mascaras { get; set; }
+        public int frutas { get; set; } = 0;
+        public int mascaras { get; set; } = 0;
+        public int hogueras { get; set; } = 0;
 
         public bool moving { get; set; } = false;
         public bool jumping { get; set; } = false;
@@ -46,7 +47,7 @@ namespace TGC.Group.Modelo
         private float COEFICIENTE_REDUCTIVO_ESFERA = 0.85f;
         private float RADIO_ESFERA;
 
-        public TGCVector3 POSICION_INICIAL_PERSONAJE { get; set; } = new TGCVector3(-452f, 0.1f, -5161f);
+        public TGCVector3 POSICION_INICIAL_PERSONAJE { get; set; } = new TGCVector3(0f,0.1f,0f);
         public TGCVector3 posicionDesarrollo = new TGCVector3(-15000f, 60f, 635f);
 
 
@@ -55,7 +56,6 @@ namespace TGC.Group.Modelo
         public TGCVector3 PERSONAJE_SCALE = new TGCVector3(1f, 0.9f,1f);
        // public float PERSONAJE_ALTURA_PISO { get; set; }
 
-        public float ultimaRotacion { get; set; }
         public TGCVector3 ultimoDesplazamiento { get; set; }
 
         public TGCMatrix matrizTransformacionPlataformaRotante { get; set; }
@@ -72,9 +72,6 @@ namespace TGC.Group.Modelo
         {
             this.directorio = directorio;
             vida = vidaMaxima;
-            frutas = 0;
-            mascaras = 0;
-            ultimaRotacion = 0;
 
             var skeletalLoader = new TgcSkeletalLoader();
 
@@ -249,19 +246,13 @@ namespace TGC.Group.Modelo
         #region Estado
         public bool vidaCompleta() => vida == vidaMaxima;
         public bool vivo() => vida > 0;
-        public void aumentarVida(float aumento)
-        {
-            vida += aumento;
-        }
-
-        public void aumentarFrutas()
-        {
-            frutas++;
-        }
-        public void aumentarMascaras()
-        {
-            mascaras++;
-        }
+        public void aumentarVida(float aumento)=>vida += aumento;
+       
+        public void aumentarFrutas() => frutas++;
+        
+        public void aumentarMascaras() => mascaras++;
+        
+        public void aumentarHogueras() => hogueras++;
         #endregion
     }
 }

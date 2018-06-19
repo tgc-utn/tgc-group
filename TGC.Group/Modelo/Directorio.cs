@@ -49,6 +49,7 @@ namespace TGC.Group.Modelo
         public string Fruta { get; set; }
         public string Mascara { get; set; }
         public string Sonido { get; set; }
+        public string Hoguera { get; set; }
 
         public Directorio(string mediaDir)
         {
@@ -78,6 +79,7 @@ namespace TGC.Group.Modelo
             Fruta = mediaDir + "Imagenes\\fruta.png";
             Mascara = mediaDir + "Imagenes\\mascara.png";
             Sonido = mediaDir + "Imagenes\\sound.png";
+            Hoguera = mediaDir + "Imagenes\\hoguera.png";
         }
 
     }

@@ -154,11 +154,13 @@ namespace TGC.Group.Modelo
         public CustomSprite barraDeVida;
         public CustomSprite fruta;
         public CustomSprite mascara;
+        public CustomSprite hoguera;
         //public CustomSprite sonido;
         public Drawer2D drawer2D;
         public TgcText2D textoFrutas;
         public TgcText2D textoMascaras;
         public TgcText2D textoSonido;
+        public TgcText2D textoHoguera;
         #endregion
 
         #region Camara
@@ -360,18 +362,6 @@ namespace TGC.Group.Modelo
                 else personaje.running = false;
 
 
-                if (Input.keyUp(Key.E))
-                {
-                    var h = escenario.getClosestBonfire(personaje.position(), 500f, Hogueras);
-                    if(h != null)
-                    {
-                        h.encender(personaje.frutas);
-                        personaje.POSICION_INICIAL_PERSONAJE = personaje.position();
-                       // personaje.POSICION_INICIAL_PERSONAJE = escenario.Ypiso;
-                        personaje.frutas -= h.ManzanasNecesarias;
-                    }
-                }
-
                 #region Salto
                 // Para que no se pueda saltar cuando agarras algun objeto
                 if (!solicitudInteraccionConCaja)
@@ -429,9 +419,9 @@ namespace TGC.Group.Modelo
                     personaje.aumentarFrutas();
                     soundManager.playSonidoFruta();
                     escenario.eliminarFrutaColisionada();
-                 }
+                 }//Afuera del if para que actualize siempre por si se enciende una hoguera
+                    textoFrutas.Text = personaje.frutas.ToString();
 
-                textoFrutas.Text = personaje.frutas.ToString();
 
                 #endregion
 
@@ -441,9 +431,22 @@ namespace TGC.Group.Modelo
                     personaje.aumentarMascaras();
                     soundManager.playSonidoMoneda();
                     escenario.eliminarMascaraColisionada();
+                    textoMascaras.Text = personaje.mascaras.ToString();
                 }
 
-                textoMascaras.Text = personaje.mascaras.ToString();
+
+                #endregion
+
+                #region Hogueras
+                if (Input.keyUp(Key.E))
+                {
+                    var hoguera = escenario.getClosestBonfire(personaje.position(), 500f, Hogueras);
+                    if (hoguera != null)
+                    {
+                        hoguera.afectar(personaje);
+                        textoHoguera.Text = personaje.hogueras.ToString();
+                    }
+                }
 
                 #endregion
 
@@ -802,12 +805,14 @@ namespace TGC.Group.Modelo
             drawer2D.DrawSprite(barraDeVida);
             drawer2D.DrawSprite(fruta);
             drawer2D.DrawSprite(mascara);
-            
+            drawer2D.DrawSprite(hoguera);
             drawer2D.EndDrawSprite();
 
             textoFrutas.render();
             textoMascaras.render();
             textoSonido.render();
+            textoHoguera.render();
+
         }
         private void renderizarDebug()
         {
@@ -1074,6 +1079,18 @@ namespace TGC.Group.Modelo
             textoMascaras.Position = new Point(100, 200);
             textoMascaras.Size = new Size(350, 140);
             textoMascaras.changeFont(new System.Drawing.Font("TimesNewRoman", 30, FontStyle.Bold));
+
+            hoguera = new CustomSprite();
+            hoguera.Bitmap = new CustomBitmap(directorio.Hoguera, d3dDevice);
+            hoguera.Position = new TGCVector2(22, 290);
+
+            textoHoguera = new TgcText2D();
+            textoHoguera.Text = "0";
+            textoHoguera.Color = Color.White;
+            textoHoguera.Align = TgcText2D.TextAlign.LEFT;
+            textoHoguera.Position = new Point(100, 330);
+            textoHoguera.Size = new Size(350, 140);
+            textoHoguera.changeFont(new System.Drawing.Font("TimesNewRoman", 30, FontStyle.Bold));
 
             textoSonido = new TgcText2D();
             textoSonido.Text = "Sound: on";
