@@ -18,7 +18,7 @@ namespace TGC.Group.Model {
 
         public void cambiarVolumenMaestro(int cantidad) {
             volumenMaestro = FastMath.Clamp(volumenMaestro + cantidad, 0, 10);
-            Musica.getInstance().setVolume(volumenMaestro);
+            // Musica.getInstance().setVolume(volumenMaestro);
         }
     }
 }

@@ -255,7 +255,7 @@ namespace TGC.Group.Model.Scenes {
             foreach (var box in nivel.getDeathPlanes()) {
                 if (TgcCollisionUtils.testSphereAABB(personaje.getBoundingSphere(), box)) {
                     personaje.morir();
-                    Musica.getInstance().playDeath();
+                    // TODO: death
                 }
             }
         }

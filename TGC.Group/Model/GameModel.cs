@@ -26,6 +26,10 @@ namespace TGC.Group.Model {
 
         public override void Init() {
 
+            Musica.getInstance().setMusica(MediaDir + "\\NsanityBeach.mp3");
+            Musica.getInstance().playDeFondo();
+            Musica.getInstance().setDsDevice(DirectSound.DsDevice);
+
             // Escena escenaInicial = new InicioEscena();
             var escenaInicial = new GameEscena();
             EscenaManager.getInstance().setMediaDir(MediaDir);
@@ -33,10 +37,6 @@ namespace TGC.Group.Model {
             EscenaManager.getInstance().addScene(escenaInicial);
 
             var pathSkyBoxCaras = MediaDir + "\\SkyBoxFaces\\";
-
-            Musica.getInstance().setMusica(MediaDir + "\\NsanityBeach.mp3");
-            //Musica.getInstance().setDeathSound(MediaDir + "\\deathSound.mp3");
-            Musica.getInstance().playDeFondo();
 
             D3DDevice.Instance.ParticlesEnabled = true;
             D3DDevice.Instance.EnableParticles();
