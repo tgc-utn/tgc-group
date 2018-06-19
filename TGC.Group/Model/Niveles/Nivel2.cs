@@ -24,10 +24,17 @@ namespace TGC.Group.Model.Niveles {
 
         public override void init(string mediaDir) {
 
+            //SkyBox a inicializar
+            pathSkyBox = mediaDir + "\\SkyBoxes\\SkyBoxNieve\\";
+            inicializarSkyBox(pathSkyBox);
+
             // Texturas empleadas
             nieve = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "nieve.jpg");
+            texturasUsadas.Add(nieve);
             hielo = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "hielo.jpg");
+            texturasUsadas.Add(hielo);
             caja = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "caja.jpg");
+            texturasUsadas.Add(caja);
 
             // Bloques de piso (no precipicios); nieve no patina, hielo si
             agregarPisoNormal(new TGCVector3(-700, 0, 4500), new TGCVector3(1400, 0, 5500), nieve);
@@ -98,7 +105,7 @@ namespace TGC.Group.Model.Niveles {
 
         }
 
-        public override void dispose()
+        /*public override void dispose()
         {
 
             hielo.dispose();
@@ -106,7 +113,7 @@ namespace TGC.Group.Model.Niveles {
             nieve.dispose();
             getRenderizables().ForEach(r => r.Dispose());
 
-        }
+        }*/
 
     }
 

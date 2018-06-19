@@ -34,22 +34,9 @@ namespace TGC.Group.Model {
 
             var pathSkyBoxCaras = MediaDir + "\\SkyBoxFaces\\";
 
-            // Inicializar SkyBox
-            skyBox = new TgcSkyBox();
-            skyBox.Center = new TGCVector3(0, 200, 0);
-            skyBox.Size = new TGCVector3(2500, 900, 28000);
-            skyBox.Color = Color.Azure;
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, pathSkyBoxCaras + "arriba.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, pathSkyBoxCaras + "abajo.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, pathSkyBoxCaras + "derecha.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left, pathSkyBoxCaras + "izquierda.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, pathSkyBoxCaras + "frente.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, pathSkyBoxCaras + "atras.jpg");
-            skyBox.SkyEpsilon = 25f;
-            skyBox.Init();
-
             Musica.getInstance().setMusica(MediaDir + "\\NsanityBeach.mp3");
-            Musica.getInstance().play();
+            Musica.getInstance().setDeathSound(MediaDir + "\\deathSound.mp3");
+            Musica.getInstance().playDeFondo();
 
         }
 
@@ -74,8 +61,6 @@ namespace TGC.Group.Model {
 
             EscenaManager.getInstance().render(ElapsedTime);
 
-            skyBox.Render();
-
             PostRender();
             /*
             RenderAxis();
@@ -88,7 +73,6 @@ namespace TGC.Group.Model {
         public override void Dispose() {
 
             EscenaManager.getInstance().dispose();
-            skyBox.Dispose();
 
         }
     }

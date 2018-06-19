@@ -18,6 +18,16 @@ namespace TGC.Group.Model {
             box.Transform = TGCMatrix.Translation(pos);
         }
 
+        /*
+        public Plataforma(TGCVector3 pos, TGCVector3 size, TgcTexture textura, float rotacion)
+        {
+            box = TGCBox.fromSize(size, textura);
+
+            box.Move(pos);
+            box.Transform = TGCMatrix.Translation(pos);
+            box.Transform = TGCMatrix.RotationZ(rotacion);
+        }*/
+
         public virtual void Render() {
             box.Render();
         }

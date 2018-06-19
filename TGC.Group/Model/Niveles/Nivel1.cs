@@ -26,10 +26,17 @@ namespace TGC.Group.Model.Niveles {
 
         public override void init(string mediaDir) {
 
+            //SkyBox a inicializar
+            pathSkyBox = mediaDir + "\\SkyBoxes\\SkyBoxSelva\\";
+            inicializarSkyBox(pathSkyBox);
+
             // Texturas empleadas
             piso = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "pisoJungla.jpg");
+            texturasUsadas.Add(piso);
             limites = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "paredJungla.jpg");
+            texturasUsadas.Add(limites);
             caja = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "caja.jpg");
+            texturasUsadas.Add(caja);
 
             agregarPared(new TGCVector3(0, 125, 9000), new TGCVector3(200, 200, 200), piso);
             // Bloques de piso (no precipicios)
@@ -45,6 +52,8 @@ namespace TGC.Group.Model.Niveles {
             agregarPared(new TGCVector3(-710, 40, 5000), new TGCVector3(20, 80, 10000), limites); // limite derecho
             agregarPared(new TGCVector3(0, 40, 9990), new TGCVector3(1400, 80, 20), limites);     // frente
             agregarPared(new TGCVector3(0, 40, 10), new TGCVector3(1400, 80, 20), limites);       // fondo
+            //agregarEscalera(new TGCVector3(0, 5, 6800), 40, new TGCVector3(150, 10, 20), caja);
+            agregarRampa(new TGCVector3(0, 5, 6800), caja);
 
             // Cajas empujables
             cajas.Add(new Caja(mediaDir, new TGCVector3(300, 40, 9000)));
@@ -113,12 +122,12 @@ namespace TGC.Group.Model.Niveles {
 
         }
 
-        public override void dispose() {
+        /*public override void dispose() {
             piso.dispose();
             caja.dispose();
             limites.dispose();
             getRenderizables().ForEach(r => r.Dispose());
-        }
+        }*/
     }
 
 }
