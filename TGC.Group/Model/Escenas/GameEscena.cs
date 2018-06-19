@@ -75,6 +75,7 @@ namespace TGC.Group.Model.Scenes {
                 if (nivel.siguienteNivel == null) {
                     EscenaManager.getInstance().goBack();
                 } else {
+                    nivel.siguienteNivel.setEffect(smEffect);
                     setNivel(nivel.siguienteNivel);
                 }
             }
