@@ -31,7 +31,7 @@ namespace TGC.Group.Model.Escenas {
             reiniciar = new Boton("REINICIAR", 0.5f, 0.5f, () => EscenaManager.getInstance().goBack());
             s = new Sprite(D3DDevice.Instance.Device);
             //crashDead = TextureLoader.FromFile(D3DDevice.Instance.Device, mediaDir + "gameOverCrash.jpg");
-            fondo = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "fondoInicio.jpg");
+            fondo = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "gameOverFondo.jpg");
 
         }
 
