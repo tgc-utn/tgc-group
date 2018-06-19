@@ -29,10 +29,17 @@ namespace TGC.Group.Model.Niveles
         public override void init(string mediaDir)
         {
 
+            //SkyBox a inicializar
+            pathSkyBox = mediaDir + "\\SkyBoxes\\SkyBoxDesierto\\";
+            inicializarSkyBox(pathSkyBox);
+
             // Texturas empleadas
             arena = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "arena.jpg");
+            texturasUsadas.Add(arena);
             piedra = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "piedra.png");
+            texturasUsadas.Add(piedra);
             caja = TgcTexture.createTexture(D3DDevice.Instance.Device, mediaDir + "caja.jpg");
+            texturasUsadas.Add(caja);
 
             /// Bloques de piso (no precipicios)
             // Pisos inferiores, en Y = 0
@@ -140,7 +147,7 @@ namespace TGC.Group.Model.Niveles
 
         }
 
-        public override void dispose()
+        /*public override void dispose()
         {
 
             arena.dispose();
@@ -148,6 +155,6 @@ namespace TGC.Group.Model.Niveles
             piedra.dispose();
             getRenderizables().ForEach(r => r.Dispose());
 
-        }
+        }*/
     }
 }

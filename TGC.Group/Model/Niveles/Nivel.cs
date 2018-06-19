@@ -6,6 +6,7 @@ using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Shaders;
+using TGC.Core.Terrain;
 using TGC.Core.Textures;
 
 namespace TGC.Group.Model.Niveles {
@@ -14,6 +15,7 @@ namespace TGC.Group.Model.Niveles {
 
         protected const float VELPEPE = 200f;
 
+        protected List<TgcTexture> texturasUsadas;
         protected List<TgcPlane> pisosNormales;
         protected List<TgcPlane> pisosResbaladizos;
         protected List<TgcPlane> pMuerte;
@@ -28,10 +30,13 @@ namespace TGC.Group.Model.Niveles {
         protected List<TgcBoundingAxisAlignBox> aabbSegmentoRampa;
         protected TgcSceneLoader loaderDeco;
         protected TGCBox lfBox;
+        protected TgcSkyBox skyBox;
+        protected string pathSkyBox;
         public Nivel siguienteNivel;
 
         public Nivel(string mediaDir) {
 
+            texturasUsadas = new List<TgcTexture>();
             pisosNormales = new List<TgcPlane>();
             pisosResbaladizos = new List<TgcPlane>();
             cajas = new List<Caja>();
@@ -62,9 +67,24 @@ namespace TGC.Group.Model.Niveles {
             if (lfBox != null) lfBox.BoundingBox.Render();
 
             aabbDeDecorativos.ForEach(r => r.Render());
+
+            if(skyBox != null)
+            {
+                skyBox.Render();
+            }
         }
 
-        public abstract void dispose();
+        public void dispose()
+        {
+            foreach (var textura in texturasUsadas)
+            {
+                textura.dispose();
+            }
+
+            getRenderizables().ForEach(r => r.Dispose());
+
+            skyBox.Dispose();
+        }
 
         public void setEffect(Effect e) {
             cajas.ForEach(c => c.setEffect(e));
@@ -192,6 +212,21 @@ namespace TGC.Group.Model.Niveles {
             pEstaticas.Add(pared);
         }
 
+        public void inicializarSkyBox(string pathCaras)
+        {
+            skyBox = new TgcSkyBox();
+            skyBox.Center = new TGCVector3(0, 200, 0);
+            skyBox.Size = new TGCVector3(2500, 900, 28000);
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, pathCaras + "arriba.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, pathCaras + "abajo.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, pathCaras + "derecha.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left, pathCaras + "izquierda.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, pathCaras + "frente.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, pathCaras + "atras.jpg");
+            skyBox.SkyEpsilon = 25f;
+            skyBox.Init();
+        }
+
         public void cargarDecorativo(TgcMesh unDecorativo, TgcScene unaEscena, TGCVector3 posicion, TGCVector3 escala, float rotacion)
         {
             unDecorativo = unaEscena.Meshes[0];
@@ -251,7 +286,7 @@ namespace TGC.Group.Model.Niveles {
             var superficieRampa = new TgcPlane(centroUltimo, new TGCVector3(100, 0,173.2013f), TgcPlane.Orientations.XZplane, textura);
             superficieRampa.toMesh("superficieRampa").Transform = TGCMatrix.RotationX((FastMath.PI) / 6);
             rampas.Add(superficieRampa.toMesh("superficieRampa"));
-        }
+     }
 
 }
 }
