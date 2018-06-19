@@ -300,7 +300,10 @@ namespace TGC.Group.Model.Niveles {
             centroUltimo.Y += 2.8865f;
             centroUltimo.Z -= 5;
             var superficieRampa = new TgcPlane(centroUltimo, new TGCVector3(100, 0, 173.2013f), TgcPlane.Orientations.XZplane, textura);
+            //TODO: Arreglar inclinacion del plano
+            //superficieRampa.toMesh("superficieRampa").RotateX(FastMath.PI_HALF);
             superficieRampa.toMesh("superficieRampa").Transform = TGCMatrix.RotationX((FastMath.PI) / 6);
+            superficieRampa.toMesh("superficieRampa").Transform = TGCMatrix.Translation(superficieRampa.Position);
             rampas.Add(superficieRampa.toMesh("superficieRampa"));
         }
 
