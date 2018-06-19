@@ -41,6 +41,11 @@ namespace TGC.Group.Modelo.Cajas
             personaje.aumentarVelocidad(velocidadNITRO, tiempoPowerUp);
         }
 
+        public virtual bool esTNT()
+        {
+            return false;
+        }
+
         #region MeshAdapter
         public TgcBoundingAxisAlignBox boundingBox() => cajaMesh.BoundingBox;
         public void Move(TGCVector3 desplazamiento) => cajaMesh.Move(desplazamiento);

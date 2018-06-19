@@ -40,6 +40,8 @@ namespace TGC.Group.Modelo
         public string SonidoSalto { get; set; }
         public string SonidoFruta { get; set; }
         public string SonidoMoneda { get; set; }
+        public string SonidoDanio { get; set; }
+
 
         public string Menu { get; set; }
         
@@ -67,6 +69,8 @@ namespace TGC.Group.Modelo
             SonidoSalto = mediaDir + "Sonidos\\jump.wav";
             SonidoMoneda = mediaDir + "Sonidos\\coin.wav";
             SonidoFruta = mediaDir + "Sonidos\\fruit.mp3";
+            SonidoDanio = mediaDir + "Sonidos\\woah.wav";
+
 
             Menu = mediaDir + "Menu\\";
 

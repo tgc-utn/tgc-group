@@ -394,7 +394,11 @@ namespace TGC.Group.Modelo
                 #endregion
 
                 #region Danio
-                if (escenario.personajeSobreLava() && !godMode) escenario.quemarPersonaje();
+                if (escenario.personajeSobreLava() && !godMode)
+                {
+                    soundManager.playSonidoDanio();
+                    escenario.quemarPersonaje();
+                }
                 #endregion
 
                 #region BarraVida
@@ -607,6 +611,7 @@ namespace TGC.Group.Modelo
             }
 
             cajaColisionante.afectar(personaje);
+            if (cajaColisionante.esTNT()) soundManager.playSonidoDanio();
            
             
             if (!solicitudInteraccionConCaja)

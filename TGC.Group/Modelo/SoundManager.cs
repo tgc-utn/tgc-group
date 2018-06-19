@@ -16,6 +16,8 @@ namespace TGC.Group.Modelo
         private static TgcStaticSound SonidoCaminar = new TgcStaticSound();
         private static TgcStaticSound SonidoSalto = new TgcStaticSound();
         private static TgcStaticSound SonidoMoneda = new TgcStaticSound();
+        private static TgcStaticSound SonidoDanio = new TgcStaticSound();
+
 
         private TgcMp3Player mp3BackgroundPlayer = new TgcMp3Player();
         private TgcMp3Player mp3SaltosPlayer = new TgcMp3Player();
@@ -30,11 +32,14 @@ namespace TGC.Group.Modelo
             //Cargo archivo de sonido background mp3.
             mp3BackgroundPlayer.closeFile();
             mp3BackgroundPlayer.FileName = directorio.SonidoFondo;
+
+            mp3FruitPlayer.closeFile();
             mp3FruitPlayer.FileName = directorio.SonidoFruta;
 
             //Cargo sonidos estaticos.
             SonidoSalto.loadSound(directorio.SonidoSalto, dsDevice);
             SonidoMoneda.loadSound(directorio.SonidoMoneda, dsDevice);
+            SonidoDanio.loadSound(directorio.SonidoDanio, dsDevice);
             SonidoCaminar.loadSound(directorio.SonidoCaminar, dsDevice);
 
             //mp3SaltosPlayer.closeFile();
@@ -65,6 +70,11 @@ namespace TGC.Group.Modelo
         public void playSonidoFondo()
         {
           if(sonido)mp3BackgroundPlayer.play(true);
+        }
+
+        public void playSonidoDanio()
+        {
+            if (sonido) SonidoDanio.play();
         }
 
         public void playSonidoFruta()

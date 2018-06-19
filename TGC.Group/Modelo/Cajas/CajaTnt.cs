@@ -23,5 +23,10 @@ namespace TGC.Group.Modelo.Cajas
             influirDanio(personaje);
             escenario.eliminarObjeto(cajaMesh);
         }
+
+        public override bool esTNT()
+        {
+            return true;
+        }
     }
 }
