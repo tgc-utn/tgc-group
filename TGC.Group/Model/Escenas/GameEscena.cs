@@ -5,6 +5,7 @@ using System.Drawing;
 using TGC.Core.Camara;
 using TGC.Core.Collision;
 using TGC.Core.Direct3D;
+using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.Shaders;
@@ -24,9 +25,18 @@ namespace TGC.Group.Model.Scenes {
         private TgcTexture unidadStamina;
         private TgcTexture vida;
 
+        private Microsoft.DirectX.Direct3D.Effect smEffect;
+        private readonly int SM_SIZE = 1024;
+        private readonly float NEAR_PLANE = 2;
+        private readonly float FAR_PLANE = 1500;
+        private Texture g_pShadowMap;
+        private Surface g_pDDSShadow;
+        private TGCMatrix g_mShadowProj;
+
+        private TgcD3dInput auxInput;
+
         public void init(string mediaDir, string shaderDir) {
             cameraOffset = new TGCVector3(0, 200, 400);
-            //setNivel(new NivelDemo(mediaDir));
             setNivel(new Nivel1(mediaDir));
             personaje = new Personaje(mediaDir, shaderDir);
 
@@ -35,10 +45,7 @@ namespace TGC.Group.Model.Scenes {
             unidadStamina = TgcTexture.createTexture(mediaDir + "staminaUnidad.png");
             vida = TgcTexture.createTexture(mediaDir + "vida.png");
 
-            var effect = TgcShaders.loadEffect(shaderDir + "BasicShader.fx");
-
-            nivel.setEffect(effect);
-            nivel.setTechnique("RenderScene2");
+            setupShadowMap(shaderDir);
         }
 
         public void setNivel(Nivel nuevoNivel) {
@@ -48,6 +55,10 @@ namespace TGC.Group.Model.Scenes {
         }
 
         public void update(float deltaTime, TgcD3dInput input, TgcCamera camara) {
+
+            if (deltaTime > 1) return;
+
+            auxInput = input;
 
             // calculo nueva velocidad
             personaje.update(deltaTime, input);
@@ -64,6 +75,7 @@ namespace TGC.Group.Model.Scenes {
                 if (nivel.siguienteNivel == null) {
                     EscenaManager.getInstance().goBack();
                 } else {
+                    nivel.siguienteNivel.setEffect(smEffect);
                     setNivel(nivel.siguienteNivel);
                 }
             }
@@ -79,7 +91,10 @@ namespace TGC.Group.Model.Scenes {
         }
 
         public void render(float deltaTime) {
-            nivel.render();
+
+            if (deltaTime > 1) return;
+
+            renderShadowMap(deltaTime);
 
             hud.Begin(SpriteFlags.AlphaBlend | SpriteFlags.SortDepthFrontToBack);
             hud.Transform = TGCMatrix.Scaling(TGCVector3.One);
@@ -97,8 +112,73 @@ namespace TGC.Group.Model.Scenes {
 
 
             hud.End();
+        }
 
+        private void setupShadowMap(string shaderDir) {
+            smEffect = TgcShaders.loadEffect(shaderDir + "ShadowMap.fx");
+            nivel.setEffect(smEffect);
+
+            g_pShadowMap = new Texture(D3DDevice.Instance.Device, SM_SIZE, SM_SIZE, 1, Usage.RenderTarget, Format.R32F, Pool.Default);
+            g_pDDSShadow = D3DDevice.Instance.Device.CreateDepthStencilSurface(SM_SIZE, SM_SIZE, DepthFormat.D24S8, MultiSampleType.None, 0, true);
+
+
+             g_mShadowProj = TGCMatrix.PerspectiveFovLH(Geometry.DegreeToRadian(80), D3DDevice.Instance.AspectRatio, 50, 5000); 
+        }
+
+        private void renderShadowMap(float deltaTime) {
+            var offset = new TGCVector3(50, 150, 300);
+            var lightPos = personaje.getPosition() + offset;
+            var lightDir = -offset;
+            lightDir.Normalize();
+
+            smEffect.SetValue("g_vLightPos", new Vector4(lightPos.X, lightPos.Y, lightPos.Z, 1));
+            smEffect.SetValue("g_vLightDir", new Vector4(lightDir.X, lightDir.Y, lightDir.Z, 1));
+            var g_lightView = TGCMatrix.LookAtLH(lightPos, lightPos + lightDir, new TGCVector3(0, 0, 1));
+
+            smEffect.SetValue("g_mProjLight", g_mShadowProj.ToMatrix());
+            smEffect.SetValue("g_mViewLightProj", (g_lightView * g_mShadowProj).ToMatrix());
+
+            var oldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
+            var shadowSurf = g_pShadowMap.GetSurfaceLevel(0);
+            D3DDevice.Instance.Device.SetRenderTarget(0, shadowSurf);
+
+            var oldDS = D3DDevice.Instance.Device.DepthStencilSurface;
+            D3DDevice.Instance.Device.DepthStencilSurface = g_pDDSShadow;
+            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+
+            smEffect.SetValue("g_txShadow", g_pShadowMap);
+
+            nivel.setTechnique("RenderShadow");
+
+            nivel.render();
+            personaje.prepareForShadowMapping(lightPos, lightDir, g_mShadowProj, g_lightView, g_pShadowMap);
             personaje.render(deltaTime);
+
+            if (auxInput.keyDown(Key.F5))
+                TextureLoader.Save("shadowmap.jpg", ImageFileFormat.Jpg, g_pShadowMap);
+
+            D3DDevice.Instance.Device.EndScene();
+            D3DDevice.Instance.Device.DepthStencilSurface = oldDS;
+            D3DDevice.Instance.Device.SetRenderTarget(0, oldRT);
+
+            D3DDevice.Instance.Device.BeginScene();
+            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+
+            nivel.setTechnique("RenderScene");
+            nivel.render();
+
+            personaje.prepareForNormalRender();
+            personaje.render(deltaTime);
+
+            var flecha = new TgcArrow();
+            flecha.Thickness = 2f;
+            flecha.HeadSize = new TGCVector2(20f, 20f);
+            flecha.HeadColor = Color.DarkRed;
+            flecha.BodyColor = Color.Red;
+            flecha.PStart = lightPos;
+            flecha.PEnd = lightPos + lightDir * 20f;
+            flecha.updateValues();
+            // flecha.Render();
         }
 
         public void dispose() {

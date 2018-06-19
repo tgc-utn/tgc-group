@@ -1,4 +1,5 @@
-﻿using TGC.Core.BoundingVolumes;
+﻿using Microsoft.DirectX.Direct3D;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
@@ -37,6 +38,14 @@ namespace TGC.Group.Model {
 
         public TgcBoundingAxisAlignBox getAABB() {
             return box.BoundingBox;
+        }
+
+        public void setEffect(Effect e) {
+            box.Effect = e;
+        }
+
+        public void setTechnique(string s) {
+            box.Technique = s;
         }
 
     }
