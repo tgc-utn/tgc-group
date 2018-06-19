@@ -88,6 +88,7 @@ namespace TGC.Group.Model.Scenes {
             if (input.keyPressed(Key.F9)) personaje.morir();
 
             camara.SetCamera(personaje.getPosition() + cameraOffset, personaje.getPosition());
+            smEffect.SetValue("g_vPosEye", new Vector4(camara.Position.X, camara.Position.Y, camara.Position.Z, 1));
         }
 
         public void render(float deltaTime) {

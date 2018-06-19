@@ -86,11 +86,14 @@ void VertScene(float4 iPos : POSITION,
 	vPosLight = mul(vPos, g_mViewLightProj);
 }
 
+float4 g_vPosEye;
+
 float4 PixScene(float2 Tex : TEXCOORD0,
 	float4 vPos : TEXCOORD1,
 	float3 vNormal : TEXCOORD2,
 	float4 vPosLight : TEXCOORD3) : COLOR {
 
+	// shadowmap
 	float3 vLight = normalize(float3(vPos - g_vLightPos));
 	float cono = dot(vLight, g_vLightDir);
 	float4 K = 0.0;
@@ -99,14 +102,6 @@ float4 PixScene(float2 Tex : TEXCOORD0,
 		float2 CT = 0.5 * vPosLight.xy / vPosLight.w + float2(0.5, 0.5);
 		CT.y = 1.0f - CT.y;
 
-		// sin ningun aa. conviene con smap size >= 512
-		// float I = (tex2D(g_samShadow, CT) + EPSILON < vPosLight.z / vPosLight.w) ? 0.0f : 1.0f;
-
-		// interpolacion standard bi-lineal del shadow map
-		// CT va de 0 a 1, lo multiplico x el tamaño de la textura
-		// la parte fraccionaria indica cuanto tengo que tomar del vecino
-		// conviene cuando el smap size = 256
-		// leo 4 valores
 		float2 vecino = frac( CT*SMAP_SIZE);
 		float prof = vPosLight.z / vPosLight.w;
 		float s0 = (tex2D( g_samShadow, float2(CT)) + EPSILON < prof)? 0.0f: 1.0f;
@@ -118,23 +113,30 @@ float4 PixScene(float2 Tex : TEXCOORD0,
 		+ EPSILON < prof)? 0.0f: 1.0f;
 		float I = lerp( lerp( s0, s1, vecino.x ),lerp( s2, s3, vecino.x ),vecino.y);
 
-		/*
-		// anti-aliasing del shadow map
-		float I = 0;
-		float r = 2;
-		for(int i=-r;i<=r;++i)
-		for(int j=-r;j<=r;++j)
-		I += (tex2D( g_samShadow, CT + float2((float)i/SMAP_SIZE, (float)j/SMAP_SIZE) ) + EPSILON < vPosLight.z / vPosLight.w)? 0.0f: 1.0f;
-		I /= (2*r+1)*(2*r+1);
-		*/
-
 		if (cono < 0.8)
 			I *= 1 - (0.8 - cono) * 10;
 
 		K = I;
 	}
 
+	// phong
+	float3 ld = 0;
+	float3 le = 0;
+	float k_ld = 0.9;
+	float k_ls = 0.2;
+	float k_la = 0.8;
+	float fSpecularPower = 16.84;
+
+	float3 LD = normalize(vPosLight - float3(vPos.x, vPos.y, vPos.z));
+	ld = saturate(dot(vNormal, LD)) * k_ld;
+
+	float3 D = normalize(float3(vPos.x, vPos.y, vPos.z) - g_vPosEye);
+	float ks = saturate(dot(reflect(LD, vNormal), D));
+	ks = pow(ks, fSpecularPower);
+	le += ks * k_ls;
+
 	float4 color_base = tex2D(diffuseMap, Tex);
+	color_base.rgb = saturate(color_base.rgb * saturate(k_la + ld) + le);
 	color_base.rgb *= 0.5 + 0.5 * K;
 	return color_base;
 }

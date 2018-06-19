@@ -48,7 +48,7 @@ namespace TGC.Group.Model {
         private const float MULT_CAMINAR = 0.5f;
         private const float VEL_TERMINAL = -10;
         private const float MODIFICADOR_HIELO = 0.99f;
-        private const int SIZE_PIES = 10;
+        private const int SIZE_PIES = 20;
         private TgcRay rayoVelocidad = new TgcRay();
 
         // saltos
