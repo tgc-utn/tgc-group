@@ -42,8 +42,9 @@ namespace TGC.Group.Modelo
 
         static string mediaDir;
         private Directorio directorio;
-
+        private Informador informador;
         private Escenario escenario;
+        private EstadoJuego estadoJuego;
 
         public static Octree octree;
         public static SoundManager soundManager;
@@ -85,13 +86,11 @@ namespace TGC.Group.Modelo
         //private TGCVector3 ultimoCheckpoint = new TGCVector3(0f, 0.1f, 0f);
         #endregion
 
-        #region Estados
-        private bool partidaPausada = true;
-        private bool partidaPerdida = false;
-        private bool partidaReiniciada = false;
-        private bool menu = true;
-        private bool godMode = false;
+        #region Estado
+
+        private bool partidaReiniciada= false;
         #endregion
+
 
         #region APIGUI
         //Api gui
@@ -190,11 +189,14 @@ namespace TGC.Group.Modelo
 
         public override void Init()
         {
-            partidaPerdida = false;
-            partidaPausada = false;
-            
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
+            
+            
+            
+            ScreenRes_X = d3dDevice.PresentationParameters.BackBufferWidth;
+            ScreenRes_Y = d3dDevice.PresentationParameters.BackBufferHeight;
+            
             directorio = new Directorio(MediaDir);
             Hoguera.texturesPath = directorio.TexturasPath;
             FuegoLuz.texturesPath = directorio.TexturasPath; ;
@@ -206,12 +208,18 @@ namespace TGC.Group.Modelo
             //Objeto que conoce todos los path de MediaDir
             if (!partidaReiniciada)
             {
+                informador = new Informador(DrawText, ScreenRes_X, ScreenRes_Y);
                 personaje = new Personaje(directorio);
+                estadoJuego = new EstadoJuego();
                 //Cagar escenario especifico para el juego.
                 escenario = new Escenario(directorio.EscenaCrash, personaje);
 
             }
-            else personaje.reiniciar();
+            else
+            {
+                personaje.reiniciar();
+                estadoJuego.reiniciar();
+            }
             
             
             //Le cambiamos la textura para diferenciarlo un poco
@@ -252,8 +260,6 @@ namespace TGC.Group.Modelo
             inicializarIluminacion();
             inicializarHUDS(d3dDevice);
 
-            ScreenRes_X = d3dDevice.PresentationParameters.BackBufferWidth;
-            ScreenRes_Y = d3dDevice.PresentationParameters.BackBufferHeight;
 
             
 
@@ -306,32 +312,32 @@ namespace TGC.Group.Modelo
 
             
             //Pausa
-            if (Input.keyPressed(Key.P))partidaPausada = !partidaPausada;
+            if (Input.keyPressed(Key.P)) estadoJuego.partidaPausada = !estadoJuego.partidaPausada;
             
 
             //Menu
             if (Input.keyPressed(Key.M))
             {
-                menu = true;
-                partidaPausada = true;
+                estadoJuego.menu = true;
+                estadoJuego.partidaPausada = true;
             }
              
             //Bounding Box activos.
             if (Input.keyPressed(Key.F))boundingBoxActivate = !boundingBoxActivate;
 
             //Activo y desactivo Modo Dios
-            if (Input.keyPressed(Key.I)) godMode = !godMode;
+            if (Input.keyPressed(Key.I)) estadoJuego.godMode = !estadoJuego.godMode;
 
             if (Input.keyPressed(Key.Z)) soundManager.actualizarEstado();
 
             //Si el personaje se mantiene en caida, se pierda la partida.
-            if (personaje.position().Y < -200)partidaPerdida = true;
+            if (personaje.position().Y < -200)estadoJuego.partidaPerdida = true;
             
 
            
 
             //Si se sigue en juego, se continua con la logica del juego.
-            if (!partidaPausada && !partidaPerdida)
+            if (!estadoJuego.partidaPausada && !estadoJuego.partidaPerdida)
             {
                
                 if (Input.keyDown(Key.R)) solicitudInteraccionConCaja = true;
@@ -348,7 +354,7 @@ namespace TGC.Group.Modelo
                 // Para que no se pueda saltar cuando agarras algun objeto
                 if (!solicitudInteraccionConCaja)
                 {
-                    if (Input.keyUp(Key.Space) && saltoActual < coeficienteSalto && (doubleJump > 0 || godMode))
+                    if (Input.keyUp(Key.Space) && saltoActual < coeficienteSalto && (doubleJump > 0 || estadoJuego.godMode))
                     {
                         saltoActual = coeficienteSalto;
                         doubleJump -= 1;
@@ -366,7 +372,7 @@ namespace TGC.Group.Modelo
                 #endregion
 
                 #region Danio
-                if (escenario.personajeSobreLava() && !godMode)
+                if (escenario.personajeSobreLava() && !estadoJuego.godMode)
                 {
                     soundManager.playSonidoDanio();
                     escenario.quemarPersonaje();
@@ -391,7 +397,7 @@ namespace TGC.Group.Modelo
                 }
                 else
                 {
-                    partidaPerdida = true;
+                    estadoJuego.partidaPerdida = true;
                 }
                 #endregion
 
@@ -420,14 +426,13 @@ namespace TGC.Group.Modelo
                 #endregion
 
                 #region Hogueras
-                if (Input.keyUp(Key.E))
+                var hoguera = escenario.getClosestBonfire(personaje.position(), 500f);
+                if (hoguera != null)
                 {
-                    var hoguera = escenario.getClosestBonfire(personaje.position(), 500f);
-                    if (hoguera != null) hoguera.afectar(personaje);
-                    
+                    if (Input.keyUp(Key.E) && hoguera.afectar(personaje)) informador.nuevoCheckpoint();
+                    else if(!hoguera.Encendida) informador.hogueraCerca();
                 }
                 textoHoguera.Text = personaje.hogueras.ToString();
-
                 #endregion
 
                 #region Sonido
@@ -686,7 +691,7 @@ namespace TGC.Group.Modelo
         public override void Render()
         {
             PreRender();
-            if (menu)gui_render(ElapsedTime);
+            if (estadoJuego.menu)gui_render(ElapsedTime);
             else
             {
                 Frustum.render();
@@ -701,17 +706,17 @@ namespace TGC.Group.Modelo
                 //olasLava.SetValue("frecuencia", frecuencia);
 
 
-                if (!partidaPerdida)
+                if (!estadoJuego.partidaPerdida)
                 {
-                    
                     renderizarSprites();
+
+                    informador.informar(estadoJuego,personaje,ElapsedTime);
+
                     renderizarDebug();
-                    renderizarControles();
-                    DrawText.drawText((godMode ? "GOD MODE: ON" : ""), (int)(ScreenRes_X - 140f), 50, Color.Red);
                     //Renderizo OBB de las plataformas rotantes
                     plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
                     
-                    if (!partidaPausada)
+                    if (!estadoJuego.partidaPausada)
                     {
                         octree.render(Frustum, boundingBoxActivate);
                         renderizarRestantes();
@@ -821,20 +826,7 @@ namespace TGC.Group.Modelo
                                + "Colision Plataforma: " + colisionPlataforma + "\n"
                                /*+ "Movimiento por plataforma: " + movimientoPorPlataforma*/, 0, 600, Color.GhostWhite);
         }
-        public void renderizarControles()
-        {
-            DrawText.drawText("Mover Hacia Adelante: W"  + "\n"
-                               + "Mover Hacia Atras: S"  + "\n"
-                               + "Mover Hacia Derecha: D" + "\n"
-                               + "Mover Hacia Izquierda: A" + "\n"
-                               + "Saltar: Barra Espaciadora" + "\n"
-                               + "Patear: Q" + "\n"
-                               + "Empujar: R" + "\n"
-                               + "Prender Hoguera: E" + "\n"
-                               + "Pausar/Reanudar Sonido: Z" + "\n"
-                               + "Menu: M" + "\n"
-                                , 500, 0, Color.Green);
-        }
+        
 
         /// <summary>
         ///     Se llama cuando termina la ejecución del ejemplo.
@@ -961,8 +953,8 @@ namespace TGC.Group.Modelo
                             break;
 
                         case ID_JUGAR:
-                            menu=false;
-                            partidaPausada = false;
+                            estadoJuego.menu=false;
+                            estadoJuego.partidaPausada = false;
                             break;
 
                             

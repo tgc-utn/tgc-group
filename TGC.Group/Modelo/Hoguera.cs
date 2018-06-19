@@ -60,7 +60,7 @@ namespace TGC.Group.Modelo
             emitters.Add(e1);
         }
 
-        public void afectar(Personaje personaje)
+        public bool afectar(Personaje personaje)
         {
             if (!Encendida && personaje.frutas >= ManzanasNecesarias)
             {
@@ -68,7 +68,9 @@ namespace TGC.Group.Modelo
                 personaje.actualizarCheckpoint();
                 personaje.frutas -= ManzanasNecesarias;
                 personaje.aumentarHogueras();
+                return true;
             }
+            return false;
         }
 
         public void render(float ElapsedTime)
