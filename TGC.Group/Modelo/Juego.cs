@@ -216,8 +216,10 @@ namespace TGC.Group.Modelo
             }
             else
             {
+               
                 personaje.reiniciar();
                 estadoJuego.reiniciar();
+                
             }
             
             
