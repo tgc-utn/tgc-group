@@ -38,6 +38,9 @@ namespace TGC.Group.Model {
             Musica.getInstance().setDeathSound(MediaDir + "\\deathSound.mp3");
             Musica.getInstance().playDeFondo();
 
+            D3DDevice.Instance.ParticlesEnabled = true;
+            D3DDevice.Instance.EnableParticles();
+
         }
 
         public override void Update() {
