@@ -1,11 +1,6 @@
-﻿using Microsoft.DirectX.Direct3D;
-using TGC.Core.Direct3D;
-using TGC.Core.Geometry;
+﻿using TGC.Core.Direct3D;
 using TGC.Core.Mathematica;
-using TGC.Core.SceneLoader;
-using TGC.Core.Shaders;
 using TGC.Core.Textures;
-using TGC.Group.Model.Niveles;
 
 namespace TGC.Group.Model.Niveles {
 

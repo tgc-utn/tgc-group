@@ -1,14 +1,3 @@
-/*
-* Shader generico para TgcSkeletalMesh
-* Hay 2 Techniques, una para cada MeshRenderType:
-*	- VERTEX_COLOR
-*	- DIFFUSE_MAP
-*/
-
-/**************************************************************************************/
-/* Variables comunes */
-/**************************************************************************************/
-
 //Matrices de transformacion
 float4x4 matWorld; //Matriz de transformacion World
 float4x4 matWorldView; //Matriz World * View
@@ -17,8 +6,7 @@ float4x4 matInverseTransposeWorld; //Matriz Transpose(Invert(World))
 
 //Textura para DiffuseMap
 texture texDiffuseMap;
-sampler2D diffuseMap = sampler_state
-{
+sampler2D diffuseMap = sampler_state {
 	Texture = (texDiffuseMap);
 	ADDRESSU = WRAP;
 	ADDRESSV = WRAP;
@@ -26,6 +14,11 @@ sampler2D diffuseMap = sampler_state
 	MAGFILTER = LINEAR;
 	MIPFILTER = LINEAR;
 };
+
+#define SMAP_SIZE 1024
+#define EPSILON 0.05f
+
+float g_shadowMapping;
 
 //Matrix Pallette para skinning
 static const int MAX_MATRICES = 26;
@@ -36,8 +29,7 @@ float4x3 bonesMatWorldArray[MAX_MATRICES];
 /**************************************************************************************/
 
 //Input del Vertex Shader
-struct VS_INPUT_VERTEX_COLOR
-{
+struct VS_INPUT_VERTEX_COLOR {
 	float4 Position : POSITION0;
 	float4 Color : COLOR;
 	float3 Normal :   NORMAL0;
@@ -153,9 +145,24 @@ struct VS_OUTPUT_DIFFUSE_MAP
 	float3 WorldBinormal : TEXCOORD3;
 };
 
+float4x4 g_mViewLightProj;
+float4x4 g_mProjLight;
+float3 g_vLightPos; // posicion de la luz (en World Space) = pto que representa patch emisor Bj
+float3 g_vLightDir; // Direcion de la luz (en World Space) = normal al patch Bj
+
+texture g_txShadow; // textura para el shadow map
+
+sampler2D g_samShadow = sampler_state {
+	Texture = <g_txShadow>;
+	MinFilter = Point;
+	MagFilter = Point;
+	MipFilter = Point;
+	AddressU = Clamp;
+	AddressV = Clamp;
+};
+
 //Vertex Shader
-VS_OUTPUT_DIFFUSE_MAP vs_DiffuseMap(VS_INPUT_DIFFUSE_MAP input)
-{
+VS_OUTPUT_DIFFUSE_MAP vs_DiffuseMap(VS_INPUT_DIFFUSE_MAP input) {
 	VS_OUTPUT_DIFFUSE_MAP output;
 
 	//Pasar indices de float4 a array de int
@@ -188,8 +195,12 @@ VS_OUTPUT_DIFFUSE_MAP vs_DiffuseMap(VS_INPUT_DIFFUSE_MAP input)
 	skinBinormal += mul(input.Binormal, (float3x3)bonesMatWorldArray[BlendIndicesArray[3]]) * input.BlendWeights.w;
 	output.WorldBinormal = normalize(skinBinormal);
 
-	//Proyectar posicion (teniendo en cuenta lo que se hizo por skinning)
-	output.Position = mul(float4(skinPosition.xyz, 1.0), matWorldViewProj);
+	if (g_shadowMapping < 1) {
+		output.Position = mul(float4(skinPosition.xyz, 1.0), matWorldViewProj);
+	} else {
+		output.Position = mul(float4(skinPosition.xyz, 1.0), matWorld);
+		output.Position = mul(output.Position, g_mViewLightProj);
+	}
 
 	//Enviar color directamente
 	output.Color = input.Color;
@@ -211,6 +222,7 @@ struct PS_DIFFUSE_MAP
 float4 ps_DiffuseMap(PS_DIFFUSE_MAP input) : COLOR0
 {
 	//Modular color de la textura por color del mesh
+	// return float4(1, 0, 0, 1);
 	return tex2D(diffuseMap, input.Texcoord) * input.Color;
 }
 

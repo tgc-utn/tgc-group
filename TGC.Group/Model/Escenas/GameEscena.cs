@@ -37,7 +37,7 @@ namespace TGC.Group.Model.Scenes {
 
         public void init(string mediaDir, string shaderDir) {
             cameraOffset = new TGCVector3(0, 200, 400);
-            setNivel(new NivelDemo(mediaDir));
+            setNivel(new Nivel1(mediaDir));
             personaje = new Personaje(mediaDir, shaderDir);
 
             hud = new Sprite(D3DDevice.Instance.Device);
@@ -116,23 +116,18 @@ namespace TGC.Group.Model.Scenes {
         private void setupShadowMap(string shaderDir) {
             smEffect = TgcShaders.loadEffect(shaderDir + "ShadowMap.fx");
             nivel.setEffect(smEffect);
-            nivel.setTechnique("RenderScene");
 
             g_pShadowMap = new Texture(D3DDevice.Instance.Device, SM_SIZE, SM_SIZE, 1, Usage.RenderTarget, Format.R32F, Pool.Default);
             g_pDDSShadow = D3DDevice.Instance.Device.CreateDepthStencilSurface(SM_SIZE, SM_SIZE, DepthFormat.D24S8, MultiSampleType.None, 0, true);
 
-            g_mShadowProj = TGCMatrix.PerspectiveFovLH(Geometry.DegreeToRadian(90), D3DDevice.Instance.AspectRatio, 50, 5000);
-            // g_mShadowProj = new TGCMatrix(D3DDevice.Instance.Device.Transform.Projection);
-            /*
-            D3DDevice.Instance.Device.Transform.Projection =
-                TGCMatrix.PerspectiveFovLH(Geometry.DegreeToRadian(45.0f), D3DDevice.Instance.AspectRatio, NEAR_PLANE, FAR_PLANE).ToMatrix();
-                */
 
+             g_mShadowProj = TGCMatrix.PerspectiveFovLH(Geometry.DegreeToRadian(80), D3DDevice.Instance.AspectRatio, 50, 5000); 
         }
 
         private void renderShadowMap(float deltaTime) {
-            var lightPos = new TGCVector3(0, 100, 0);
-            var lightDir = new TGCVector3(100, 0, 0);
+            var offset = new TGCVector3(0, 150, 300);
+            var lightPos = personaje.getPosition() + offset;
+            var lightDir = -offset;
             lightDir.Normalize();
 
             smEffect.SetValue("g_vLightPos", new Vector4(lightPos.X, lightPos.Y, lightPos.Z, 1));
@@ -155,7 +150,7 @@ namespace TGC.Group.Model.Scenes {
             nivel.setTechnique("RenderShadow");
 
             nivel.render();
-            // cuando el personaje tenga shadowmap
+            personaje.prepareForShadowMapping(lightPos, lightDir, g_mShadowProj, g_lightView, g_pShadowMap);
             personaje.render(deltaTime);
 
             if (auxInput.keyDown(Key.F5))
@@ -170,6 +165,8 @@ namespace TGC.Group.Model.Scenes {
 
             nivel.setTechnique("RenderScene");
             nivel.render();
+
+            personaje.prepareForNormalRender();
             personaje.render(deltaTime);
 
             var flecha = new TgcArrow();
@@ -180,7 +177,7 @@ namespace TGC.Group.Model.Scenes {
             flecha.PStart = lightPos;
             flecha.PEnd = lightPos + lightDir * 20f;
             flecha.updateValues();
-            flecha.Render();
+            // flecha.Render();
         }
 
         public void dispose() {

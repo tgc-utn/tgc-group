@@ -1,15 +1,16 @@
-﻿using Microsoft.DirectX.DirectInput;
+﻿using Microsoft.DirectX;
+using Microsoft.DirectX.Direct3D;
+using Microsoft.DirectX.DirectInput;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Collision;
+using TGC.Core.Direct3D;
 using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.Shaders;
 using TGC.Core.SkeletalAnimation;
-using TGC.Core.Text;
 using TGC.Core.Textures;
 using TGC.Group.Model.Escenas;
 using TGC.Group.Model.Niveles;
@@ -20,15 +21,12 @@ namespace TGC.Group.Model {
         private TgcBoundingSphere boundingSphere;
         private TgcBoundingSphere pies;
 
-        private TGCVector3 POS_ORIGEN = new TGCVector3(0, 100, 0);
+        private TGCVector3 POS_ORIGEN = new TGCVector3(0, 100, 9500);
 
         private int vidas;
         private int stamina;
         private bool agotado;
         private const int MAX_STAMINA = 200;
-
-
-        private Microsoft.DirectX.Direct3D.Effect effect;
 
         // animaciones
         private TgcSkeletalMesh mesh;
@@ -38,6 +36,8 @@ namespace TGC.Group.Model {
         private TGCBox sombra;
         private TgcTexture sombraTexture;
         private float pisoHeight;
+
+        private Microsoft.DirectX.Direct3D.Effect effect;
 
         // movimiento
         private TGCVector3 dir;
@@ -95,9 +95,11 @@ namespace TGC.Group.Model {
             sombra.Position = posicionPies;
             sombra.AlphaBlendEnable = true;
 
-            var effect = TgcShaders.loadEffect(shaderDir + "TgcSkeletalMeshShader.fx");
+            effect = TgcShaders.loadEffect(shaderDir + "TgcSkeletalMeshShader.fx");
+            effect.SetValue("g_shadowMapping", 0);
             mesh.Effect = effect;
             mesh.Technique = "DIFFUSE_MAP";
+
 
         }
 
@@ -109,15 +111,33 @@ namespace TGC.Group.Model {
         public void render(float deltaTime) {
             mesh.UpdateMeshTransform();
             mesh.animateAndRender(deltaTime);
-            sombra.Render();
+            // sombra.Render();
 
             // para debug
+            /*
             boundingSphere.Render();
             pies.Render();
+            */
 
             // seria un post-update
             resetUpdateVariables();
             if (dir.Length() == 0) moving = false;
+        }
+
+        public void prepareForShadowMapping(TGCVector3 lightPos, TGCVector3 lightDir, 
+            TGCMatrix g_mShadowProj, TGCMatrix g_lightView, Texture g_pShadowMap) {
+            effect.SetValue("g_vLightPos", new Vector4(lightPos.X, lightPos.Y, lightPos.Z, 1));
+            effect.SetValue("g_vLightDir", new Vector4(lightDir.X, lightDir.Y, lightDir.Z, 1));
+            effect.SetValue("g_mProjLight", g_mShadowProj.ToMatrix());
+            effect.SetValue("g_mViewLightProj", (g_lightView * g_mShadowProj).ToMatrix());
+
+            effect.SetValue("g_txShadow", g_pShadowMap);
+
+            effect.SetValue("g_shadowMapping", 1);
+        }
+
+        public void prepareForNormalRender() {
+            effect.SetValue("g_shadowMapping", 0);
         }
 
         public void dispose() {
