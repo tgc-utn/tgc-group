@@ -26,6 +26,8 @@ namespace TGC.Group.Modelo
 
         private List<TgcMesh> frutas;
         public List<PisoInercia> pisosInercia;
+        public List<Hoguera> hogueras { get; set;}
+        public List<FuegoLuz> fuegosLuz { get; set;}
 
         private float danioLava = 0.009f;
 
@@ -37,6 +39,8 @@ namespace TGC.Group.Modelo
             
             frutas = Frutas();
             pisosInercia = PisosInercia();
+            hogueras = Hogueras();
+            fuegosLuz = FuegosLuz();
         }
         
 
@@ -56,15 +60,15 @@ namespace TGC.Group.Modelo
         public List<TgcMesh> Mascaras() => encontrarMeshes("MASCARA");
         public List<TgcMesh> Escalones() => encontrarMeshes("ESCALON");
         public List<TgcMesh> RampasMesh() => encontrarMeshes("RAMPA");
-        public List<TgcMesh> Fuegos() => encontrarMeshes("FUEGO");
-        public List<TgcMesh> MeshesHogueras() => encontrarMeshes("HOGUERA");
+        public List<TgcMesh> FuegosMesh() => encontrarMeshes("FUEGO");
+        public List<TgcMesh> HoguerasMesh() => encontrarMeshes("HOGUERA");
 
         public List<TgcMesh> MeshesParaEfectoLava()
         {
             List<TgcMesh> meshesParaEfectoLava = new List<TgcMesh>();
             meshesParaEfectoLava.AddRange(LavaMesh());
-            meshesParaEfectoLava.AddRange(Fuegos());
-            meshesParaEfectoLava.AddRange(MeshesHogueras());
+            meshesParaEfectoLava.AddRange(FuegosMesh());
+            meshesParaEfectoLava.AddRange(HoguerasMesh());
 
             return meshesParaEfectoLava;
         }
@@ -317,6 +321,28 @@ namespace TGC.Group.Modelo
             }
             return plataformas;
         }
+
+        public List<Hoguera> Hogueras()
+        {
+            List<Hoguera> hogueras = new List<Hoguera>();
+            foreach (TgcMesh mesh in HoguerasMesh())
+            {
+                hogueras.Add(new Hoguera(mesh, 1));
+            }
+            return hogueras;
+
+           
+        }
+        public List<FuegoLuz> FuegosLuz()
+        {
+            List<FuegoLuz> fuegosLuz = new List<FuegoLuz>();
+            foreach (TgcMesh mesh in FuegosMesh())
+            {
+                fuegosLuz.Add(new FuegoLuz(mesh));
+            }
+            return fuegosLuz;
+        }
+
         #endregion
 
         public List<TgcMesh> FuentesDeLuz()
@@ -324,8 +350,8 @@ namespace TGC.Group.Modelo
             List<TgcMesh> fuentesDeLuz = new List<TgcMesh>();
             fuentesDeLuz.AddRange(Luces());
             fuentesDeLuz.AddRange(LavaMesh());
-            fuentesDeLuz.AddRange(Fuegos());
-            fuentesDeLuz.AddRange(MeshesHogueras());
+            fuentesDeLuz.AddRange(FuegosMesh());
+            fuentesDeLuz.AddRange(HoguerasMesh());
 
 
             return fuentesDeLuz;
@@ -403,12 +429,12 @@ namespace TGC.Group.Modelo
             return minLight;
         }
 
-        public Hoguera getClosestBonfire(TGCVector3 pos, float maxDistance, List<Hoguera> Hogueras)
+        public Hoguera getClosestBonfire(TGCVector3 pos, float maxDistance)
         {
             var minDist = float.MaxValue;
             TgcMesh minF = null;
 
-            foreach (var fuego in MeshesHogueras())
+            foreach (var fuego in HoguerasMesh())
             {
                 var distSq = TGCVector3.LengthSq(pos - fuego.BoundingBox.calculateBoxCenter());
                 if (distSq < minDist)
@@ -424,7 +450,7 @@ namespace TGC.Group.Modelo
                 {
                     return null;
                 }
-                foreach(Hoguera h in Hogueras)
+                foreach(Hoguera h in hogueras)
                 {
                     if(h.MeshHoguera.GetHashCode() == minF.GetHashCode())
                     {

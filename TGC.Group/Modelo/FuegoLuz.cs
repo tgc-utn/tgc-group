@@ -10,7 +10,7 @@ using TGC.Core.Direct3D;
 
 namespace TGC.Group.Modelo
 {
-    class FuegoLuz
+    public class FuegoLuz
     {
         public TgcMesh MeshFuego { get; set; }
         private List<ParticleEmitter> emitters;

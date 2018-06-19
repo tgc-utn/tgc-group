@@ -183,9 +183,7 @@ namespace TGC.Group.Modelo
         float alturaRampaGlobal = 0f;
         #endregion
 
-
-        private List<Hoguera> Hogueras;
-        private List<FuegoLuz> FuegosLuz;
+        
 
         Random generadorRandom = new Random(); //Generador de numeros aleatorios;
 
@@ -198,6 +196,9 @@ namespace TGC.Group.Modelo
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
             directorio = new Directorio(MediaDir);
+            Hoguera.texturesPath = directorio.TexturasPath;
+            FuegoLuz.texturesPath = directorio.TexturasPath; ;
+            Personaje.texturesPath = directorio.TexturasPath; ;
             //Cargo el SoundManager
             soundManager = new SoundManager(directorio, this.DirectSound.DsDevice);
             soundManager.playSonidoFondo();
@@ -210,10 +211,8 @@ namespace TGC.Group.Modelo
                 escenario = new Escenario(directorio.EscenaCrash, personaje);
 
             }
-            else
-            {
-                personaje.reiniciar();
-            }
+            else personaje.reiniciar();
+            
             
             //Le cambiamos la textura para diferenciarlo un poco
             personaje.changeDiffuseMaps(new[]
@@ -237,9 +236,7 @@ namespace TGC.Group.Modelo
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara = camaraInterna;
 
-            Hoguera.texturesPath = directorio.TexturasPath;
-            FuegoLuz.texturesPath = directorio.TexturasPath; ;
-            Personaje.texturesPath = directorio.TexturasPath; ;
+            
 
             var meshesSinPlatXZ = escenario.scene.Meshes.FindAll(mesh => mesh.Name != "PlataformaX" && mesh.Name != "PlataformaZ");
 
@@ -258,17 +255,7 @@ namespace TGC.Group.Modelo
             ScreenRes_X = d3dDevice.PresentationParameters.BackBufferWidth;
             ScreenRes_Y = d3dDevice.PresentationParameters.BackBufferHeight;
 
-            Hogueras = new List<Hoguera>();
-            foreach (TgcMesh mesh in escenario.MeshesHogueras())
-            {
-                Hogueras.Add(new Hoguera(mesh, 1));
-            }
-
-            FuegosLuz = new List<FuegoLuz>();
-            foreach (TgcMesh mesh in escenario.Fuegos())
-            {
-                FuegosLuz.Add(new FuegoLuz(mesh));
-            }
+            
 
             string compilationErrors;
             olasLava = Microsoft.DirectX.Direct3D.Effect.FromFile(d3dDevice, MediaDir + "OlasLava.fx",
@@ -434,7 +421,7 @@ namespace TGC.Group.Modelo
                 #region Hogueras
                 if (Input.keyUp(Key.E))
                 {
-                    var hoguera = escenario.getClosestBonfire(personaje.position(), 500f, Hogueras);
+                    var hoguera = escenario.getClosestBonfire(personaje.position(), 500f);
                     if (hoguera != null) hoguera.afectar(personaje);
                     
                 }
@@ -772,11 +759,11 @@ namespace TGC.Group.Modelo
                     //EMIRSORES DE PARTICULAS
                     D3DDevice.Instance.ParticlesEnabled = true;
                     D3DDevice.Instance.EnableParticles();
-                    foreach(Hoguera s in Hogueras)
+                    foreach(Hoguera s in escenario.hogueras)
                     {
                         s.renderParticles(ElapsedTime);
                     }
-                    foreach (FuegoLuz s in FuegosLuz)
+                    foreach (FuegoLuz s in escenario.fuegosLuz)
                     {
                         s.renderParticles(ElapsedTime);
                     }
