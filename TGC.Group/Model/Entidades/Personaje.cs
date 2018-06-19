@@ -54,7 +54,7 @@ namespace TGC.Group.Model {
         private int saltosRestantes = 0;
         private const int SALTOS_TOTALES = 2;
         private const float JUMP_SPEED = 10f; // PC Cristian
-        //private const float JUMP_SPEED = 5f; // PC Pepe
+        private bool enElAire = false;
 
         public Personaje(string MediaDir, string shaderDir) {
             vidas = 3;
@@ -69,7 +69,8 @@ namespace TGC.Group.Model {
                 MediaDir + "Robot\\",
                 new[] {
                      MediaDir + "Robot\\Caminando-TgcSkeletalAnim.xml",
-                     MediaDir + "Robot\\Parado-TgcSkeletalAnim.xml"
+                     MediaDir + "Robot\\Parado-TgcSkeletalAnim.xml",
+                     MediaDir + "Robot\\Correr-TgcSkeletalAnim.xml"
                 }
             );
 
@@ -99,8 +100,6 @@ namespace TGC.Group.Model {
             effect.SetValue("g_shadowMapping", 0);
             mesh.Effect = effect;
             mesh.Technique = "DIFFUSE_MAP";
-
-
         }
 
         public void update(float deltaTime, TgcD3dInput Input) {
@@ -200,7 +199,10 @@ namespace TGC.Group.Model {
         }
 
         private void updateAnimations() {
-            if (moving) {
+            if (enElAire) {
+                // no hay una animacion para "caer"
+                mesh.playAnimation("Correr", true);
+            } else if (moving) {
                 mesh.playAnimation("Caminando", true);
             } else {
                 mesh.playAnimation("Parado", true);
@@ -231,6 +233,9 @@ namespace TGC.Group.Model {
 
             // movimiento por entorno
             TgcBoundingAxisAlignBox piso = nivel.getBoundingBoxes().Find(b => TgcCollisionUtils.testSphereAABB(pies, b));
+
+            // actualizo para las animaciones
+            enElAire = (piso == null);
 
             if (piso == null) {
                 // si estoy en el aire
