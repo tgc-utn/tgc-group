@@ -323,6 +323,7 @@
     <Content Include="Media\Decorativos\Roca\Textures\Piedra3.jpg" />
     <Content Include="Media\fondoInicio.jpg" />
     <Content Include="Media\gameOverCrash.jpg" />
+    <Content Include="Media\gameOverFondo.jpg" />
     <Content Include="Media\hielo.jpg" />
     <Content Include="Media\Jungla\Agua-TgcScene.xml" />
     <Content Include="Media\Jungla\Jungla -TgcScene.xml" />
@@ -356,6 +357,7 @@
     <Content Include="Media\NsanityBeach.mp3" />
     <Content Include="Media\paredJungla.jpg" />
     <Content Include="Media\piedra.png" />
+    <Content Include="Media\pisada.png" />
     <Content Include="Media\piso.jpg" />
     <Content Include="Media\pisoJungla.jpg" />
     <Content Include="Media\precipicio.jpg" />

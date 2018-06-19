@@ -16,6 +16,9 @@ using TGC.Group.Model.Scenes;
 
 namespace TGC.Group.Model {
     class Personaje {
+
+        //private TGCFileModifier wavFile;
+
         private TgcBoundingSphere boundingSphere;
         private TgcBoundingSphere pies;
 
