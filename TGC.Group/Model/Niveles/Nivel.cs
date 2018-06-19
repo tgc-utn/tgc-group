@@ -290,7 +290,8 @@ namespace TGC.Group.Model.Niveles {
             {
                 centroEscalon.Y += 5.773f;
                 centroEscalon.Z -= 10;
-                escalon = new Plataforma(inicio, new TGCVector3(100, 5.773f, 10), textura);
+                escalon = new Plataforma(centroEscalon, new TGCVector3(100, 5.773f, 10), textura);
+                //pEstaticas.Add(escalon);
                 aabbSegmentoRampa.Add(escalon.getAABB());
             }
             var centroUltimo = centroEscalon;
