@@ -15,7 +15,10 @@ namespace TGC.Group.Modelo
         private TgcText2D drawer;
         private float ScreenRes_X = 0f;
         private float ScreenRes_Y = 0f;
-        private float tiempoInforme =3f;
+        private float tiempoInformeMaximo = 3f;
+        private float tiempoInforme;
+
+        
 
         private TGCVector2 posicionInforme = new TGCVector2(500, 500);
 
@@ -29,18 +32,18 @@ namespace TGC.Group.Modelo
             this.ScreenRes_Y = ScreenRes_Y;
 
             this.drawer = drawer;
+            tiempoInforme = tiempoInformeMaximo;
         }
         public void informar(EstadoJuego estado,Personaje personaje, float ElapsedTime)
         {
             var mensaje = "";
 
             renderizarControles();
-            renderizarDebug();
+            //renderizarDebug();
             drawer.drawText((estado.godMode ? "GOD MODE: ON" : ""), (int)(ScreenRes_X - 140f), 50, Color.Red);
 
             if(checkpoint)
             {
-                checkpoint = false;
                 mensaje = "Nuevo Checkpoint";
             }
             if(hogueraCercana)
@@ -50,6 +53,9 @@ namespace TGC.Group.Modelo
             }
 
             drawer.drawText(mensaje, (int)posicionInforme.X, (int)posicionInforme.Y, Color.Orange);
+
+            actualizarTiempoInforme(ElapsedTime);
+            desactivarInformeEventos(ElapsedTime);
         }
 
         public void renderizarControles()
@@ -77,11 +83,32 @@ namespace TGC.Group.Modelo
         public void nuevoCheckpoint()
         {
             checkpoint = true;
+            reiniciarTiempoInforme();
         }
 
         public void hogueraCerca()
         {
             hogueraCercana = true;
+        }
+
+        public void actualizarTiempoInforme(float ElapsedTime)
+        {
+            if (tiempoInforme > 0) tiempoInforme -= ElapsedTime;
+            else tiempoInforme = 0;
+
+        }
+        
+        public void reiniciarTiempoInforme()
+        {
+            tiempoInforme = tiempoInformeMaximo; 
+        }
+
+        public void desactivarInformeEventos(float ElapsedTime)
+        {
+            if (tiempoInforme == 0)
+            {
+                checkpoint = false;
+             }
         }
     }
 }

@@ -211,7 +211,6 @@ namespace TGC.Group.Modelo
                 informador = new Informador(DrawText, ScreenRes_X, ScreenRes_Y);
                 personaje = new Personaje(directorio);
                 estadoJuego = new EstadoJuego();
-                //Cagar escenario especifico para el juego.
                 escenario = new Escenario(directorio.EscenaCrash, personaje);
 
             }
