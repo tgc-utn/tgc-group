@@ -69,6 +69,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2910.0\Microsoft.DirectX.Direct3DX.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DirectX.DirectSound, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="Microsoft.VisualC" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -292,7 +293,6 @@
     <Content Include="Media\Ciudad\Textures\Traffic Light.jpg" />
     <Content Include="Media\Ciudad\Textures\White Wall.JPG" />
     <Content Include="Media\Ciudad\Textures\Yellow Painted.jpg" />
-    <Content Include="Media\deathSound.mp3" />
     <Content Include="Media\Decorativos\ArbolBananas\ArbolBananas-TgcScene.xml" />
     <Content Include="Media\Decorativos\ArbolBananas\preview.jpg" />
     <Content Include="Media\Decorativos\ArbolBananas\Textures\banana.jpg" />
@@ -398,6 +398,9 @@
     <Content Include="Media\SkyBoxFaces\frente.jpg" />
     <Content Include="Media\SkyBoxFaces\izquierda.jpg" />
     <Content Include="Media\sombra.png" />
+    <Content Include="Media\Sonidos\sonidoCaida.wav" />
+    <Content Include="Media\Sonidos\sonidoChoque.wav" />
+    <Content Include="Media\Sonidos\sonidoSalto.wav" />
     <Content Include="Media\stamina.png" />
     <Content Include="Media\staminaUnidad.png" />
     <Content Include="Media\tronco.jpg" />
