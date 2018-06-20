@@ -28,6 +28,8 @@ namespace TGC.Group.Modelo
         public List<PisoInercia> pisosInercia;
         public List<Hoguera> hogueras { get; set;}
         public List<FuegoLuz> fuegosLuz { get; set;}
+        public List<Plataforma> plataformas { get; set; }
+        public List<PlataformaRotante> plataformasRotantes { get; set; }
 
         private float danioLava = 0.009f;
 
@@ -41,6 +43,10 @@ namespace TGC.Group.Modelo
             pisosInercia = PisosInercia();
             hogueras = Hogueras();
             fuegosLuz = FuegosLuz();
+
+            //Obtenemos las plataformas segun su tipo de movimiento.
+            plataformas = Plataformas();
+            plataformasRotantes = PlataformasRotantes();
         }
         
 

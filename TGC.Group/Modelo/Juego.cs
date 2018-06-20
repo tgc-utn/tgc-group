@@ -64,8 +64,6 @@ namespace TGC.Group.Modelo
         Caja objetoEscenario;
         SphereOBBCollider colliderOBB = new SphereOBBCollider();
 
-        private List<Plataforma> plataformas;
-        private List<PlataformaRotante> plataformasRotantes;
         private bool boundingBoxActivate = false;
 
 
@@ -235,9 +233,7 @@ namespace TGC.Group.Modelo
             ColisionadorEsferico.GravityForce = new TGCVector3(0, -10, 0);
             ColisionadorEsferico.SlideFactor = 1.3f;
 
-            //Obtenemos las plataformas segun su tipo de movimiento.
-            plataformas = escenario.Plataformas();
-            plataformasRotantes = escenario.PlataformasRotantes();
+           
 
             //Posición de la camara.
             camaraInterna = new TgcThirdPersonCamera(personaje.esferaPersonaje.Center, 600, -1200);
@@ -499,7 +495,7 @@ namespace TGC.Group.Modelo
            
             //Busca una plataforma rotante con la que se este colisionando
             //NOTA: para estas plataformas se colisiona Esfera -> OBB y no Esfera -> AABB como las demás colisiones
-            var plataformaRotante = plataformasRotantes.Find(plat => colliderOBB.colisionaEsferaOBB(personaje.esferaPersonaje,plat.OBB));
+            var plataformaRotante = escenario.plataformasRotantes.Find(plat => colliderOBB.colisionaEsferaOBB(personaje.esferaPersonaje,plat.OBB));
             //Si colisiona con una maneja la colision para las rotantes sino usa el metodo general
             if (plataformaRotante != null)
             {
@@ -531,7 +527,7 @@ namespace TGC.Group.Modelo
         public TGCVector3 movimientoPorPlataformas()
         {
 
-            Plataforma plataformaColisionante = plataformas.Find(plataforma => plataforma.colisionaConPersonaje(personaje.esferaPersonaje));
+            Plataforma plataformaColisionante = escenario.plataformas.Find(plataforma => plataforma.colisionaConPersonaje(personaje.esferaPersonaje));
             if (plataformaColisionante != null) colisionPlataforma = true;
             else colisionPlataforma = false;
 
@@ -586,7 +582,7 @@ namespace TGC.Group.Modelo
 
         public void movimientoDePlataformas()
         {
-            foreach (Plataforma plataforma in plataformas) plataforma.Update(tiempoAcumulado);
+            foreach (Plataforma plataforma in escenario.plataformas) plataforma.Update(tiempoAcumulado);
         }
         public void movimientoDeCajas(TGCVector3 movimientoOriginal)
         {
@@ -714,8 +710,8 @@ namespace TGC.Group.Modelo
                     informador.informar(estadoJuego,personaje,ElapsedTime);
 
                     renderizarDebug();
-                    //Renderizo OBB de las plataformas rotantes
-                    plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
+                  //Renderizo OBB de las plataformas rotantes
+                    escenario.plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
                     
                     if (!estadoJuego.partidaPausada)
                     {
@@ -786,7 +782,7 @@ namespace TGC.Group.Modelo
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
-        private void renderizarRestantes() => plataformas.ForEach(plat => { if (plat.plataformaMesh.Name == "PlataformaX" || plat.plataformaMesh.Name == "PlataformaZ") plat.plataformaMesh.Render(); });
+        private void renderizarRestantes() => escenario.plataformas.ForEach(plat => { if (plat.plataformaMesh.Name == "PlataformaX" || plat.plataformaMesh.Name == "PlataformaZ") plat.plataformaMesh.Render(); });
         private void renderizarSprites()
         {
             drawer2D.BeginDrawSprite();
