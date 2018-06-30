@@ -73,7 +73,9 @@ namespace TGC.Group.Modelo
         private Microsoft.DirectX.Direct3D.Effect effectLuzLava;
         private Microsoft.DirectX.Direct3D.Effect personajeLightShader;
 
-        private Microsoft.DirectX.Direct3D.Effect olasLava;
+        private Microsoft.DirectX.Direct3D.Effect olasLavaEffect;
+        private Microsoft.DirectX.Direct3D.Effect rojo;
+        private Microsoft.DirectX.Direct3D.Effect postProcessBloom;
 
 
         #region Personaje
@@ -180,15 +182,22 @@ namespace TGC.Group.Modelo
         float alturaRampaGlobal = 0f;
         #endregion
 
-        
+        private List<Hoguera> Hogueras;
+        private List<FuegoLuz> FuegosLuz;
 
         Random generadorRandom = new Random(); //Generador de numeros aleatorios;
 
+        private int cant_pasadas = 1;
+
+        private Surface g_pDepthStencil; // Depth-stencil buffer
+        private Texture g_pRenderTarget, g_pGlowMap, g_pRenderTarget4, g_pRenderTarget4Aux;
+        private VertexBuffer g_pVBV3D;
+        Microsoft.DirectX.Direct3D.Device d3dDevice;
 
         public override void Init()
         {
             //Device de DirectX para crear primitivas.
-            var d3dDevice = D3DDevice.Instance.Device;
+            d3dDevice = D3DDevice.Instance.Device;
             
             
             
@@ -197,8 +206,8 @@ namespace TGC.Group.Modelo
             
             directorio = new Directorio(MediaDir);
             Hoguera.texturesPath = directorio.TexturasPath;
-            FuegoLuz.texturesPath = directorio.TexturasPath; ;
-            Personaje.texturesPath = directorio.TexturasPath; ;
+            FuegoLuz.texturesPath = directorio.TexturasPath; 
+            Personaje.texturesPath = directorio.TexturasPath; 
             //Cargo el SoundManager
             soundManager = new SoundManager(directorio, this.DirectSound.DsDevice);
             soundManager.playSonidoFondo();
@@ -258,25 +267,93 @@ namespace TGC.Group.Modelo
             inicializarHUDS(d3dDevice);
 
 
-            
+
+
+            Hogueras = new List<Hoguera>();
+            foreach (TgcMesh mesh in escenario.HoguerasMesh())
+            {
+                Hogueras.Add(new Hoguera(mesh, 1));
+            }
+
+            FuegosLuz = new List<FuegoLuz>();
+            foreach (TgcMesh mesh in escenario.FuegosMesh())
+            {
+                FuegosLuz.Add(new FuegoLuz(mesh));
+            }
 
             string compilationErrors;
-            olasLava = Microsoft.DirectX.Direct3D.Effect.FromFile(d3dDevice, MediaDir + "OlasLava.fx",
+            olasLavaEffect = Microsoft.DirectX.Direct3D.Effect.FromFile(d3dDevice, MediaDir + "OlasLava.fx",
                 null, null, ShaderFlags.PreferFlowControl, null, out compilationErrors);
-            if (olasLava == null)
+            if (olasLavaEffect == null)
             {
                 throw new Exception("Error al cargar shader OlasLava. Errores: " + compilationErrors);
             }
 
-            foreach (TgcMesh mesh in escenario.MeshesParaEfectoLava())
+            rojo = Microsoft.DirectX.Direct3D.Effect.FromFile(d3dDevice, MediaDir + "MiShader.fx",
+                null, null, ShaderFlags.PreferFlowControl, null, out compilationErrors);
+            if (rojo == null)
             {
-                mesh.Effect = olasLava;
+                throw new Exception("Error al cargar shader Rojo. Errores: " + compilationErrors);
+            }
+
+            postProcessBloom = Microsoft.DirectX.Direct3D.Effect.FromFile(D3DDevice.Instance.Device, MediaDir + "GaussianBlur.fx", null, null, ShaderFlags.PreferFlowControl, null, out compilationErrors);
+            if (postProcessBloom == null)
+            {
+                throw new Exception("Error al cargar shader postProcessBloom. Errores: " + compilationErrors);
+            }
+
+            foreach (TgcMesh mesh in escenario.LavaMesh())
+            {
+                mesh.Effect = olasLavaEffect;
                 mesh.Technique = "Olas";
             }
 
-            olasLava.SetValue("screen_dx", ScreenRes_X);
-            olasLava.SetValue("screen_dy", ScreenRes_Y);
-           
+            foreach (TgcMesh mesh in escenario.FuegosMesh())
+            {
+                mesh.Effect = rojo;
+                mesh.Technique = "Rojo";
+            }
+
+            postProcessBloom.Technique = "DefaultTechnique";
+
+            g_pDepthStencil = d3dDevice.CreateDepthStencilSurface(d3dDevice.PresentationParameters.BackBufferWidth, d3dDevice.PresentationParameters.BackBufferHeight,
+                DepthFormat.D24S8, MultiSampleType.None, 0, true);
+
+            // inicializo el render target
+            g_pRenderTarget = new Texture(d3dDevice, d3dDevice.PresentationParameters.BackBufferWidth, d3dDevice.PresentationParameters.BackBufferHeight, 1, Usage.RenderTarget,
+                Format.X8R8G8B8, Pool.Default);
+
+            g_pGlowMap = new Texture(d3dDevice, d3dDevice.PresentationParameters.BackBufferWidth, d3dDevice.PresentationParameters.BackBufferHeight, 1, Usage.RenderTarget,
+                Format.X8R8G8B8, Pool.Default);
+
+            g_pRenderTarget4 = new Texture(d3dDevice, d3dDevice.PresentationParameters.BackBufferWidth / 4, d3dDevice.PresentationParameters.BackBufferHeight / 4, 1, Usage.RenderTarget,
+                Format.X8R8G8B8, Pool.Default);
+
+            g_pRenderTarget4Aux = new Texture(d3dDevice, d3dDevice.PresentationParameters.BackBufferWidth / 4, d3dDevice.PresentationParameters.BackBufferHeight / 4, 1, Usage.RenderTarget,
+                Format.X8R8G8B8, Pool.Default);
+
+            postProcessBloom.SetValue("g_RenderTarget", g_pRenderTarget);
+
+            // Resolucion de pantalla
+            postProcessBloom.SetValue("screen_dx", ScreenRes_X);
+            postProcessBloom.SetValue("screen_dy", ScreenRes_Y);
+            rojo.SetValue("screen_dx", ScreenRes_X);
+            rojo.SetValue("screen_dy", ScreenRes_Y);
+            olasLavaEffect.SetValue("screen_dx", ScreenRes_X);
+            olasLavaEffect.SetValue("screen_dy", ScreenRes_Y);
+
+            CustomVertex.PositionTextured[] vertices =
+            {
+                new CustomVertex.PositionTextured(-1, 1, 1, 0, 0),
+                new CustomVertex.PositionTextured(1, 1, 1, 1, 0),
+                new CustomVertex.PositionTextured(-1, -1, 1, 0, 1),
+                new CustomVertex.PositionTextured(1, -1, 1, 1, 1)
+            };
+            //vertex buffer de los triangulos
+            g_pVBV3D = new VertexBuffer(typeof(CustomVertex.PositionTextured), 4, d3dDevice, Usage.Dynamic | Usage.WriteOnly, CustomVertex.PositionTextured.Format, Pool.Default);
+            g_pVBV3D.SetData(vertices, 0, LockFlags.None);
+
+
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
         }
@@ -687,12 +764,36 @@ namespace TGC.Group.Modelo
 
         public override void Render()
         {
-            PreRender();
-            if (estadoJuego.menu)gui_render(ElapsedTime);
+
+            var device = D3DDevice.Instance.Device;
+            Surface pSurf, pOldRT, pOldDS;
+            estadoJuego.menu = false;
+            if (estadoJuego.menu)
+            {
+                device.BeginScene();
+                gui_render(ElapsedTime);
+                device.EndScene();
+                return;
+            }
             else
             {
+                // dibujo la escena una textura
+                postProcessBloom.Technique = "DefaultTechnique";
+                // guardo el Render target anterior y seteo la textura como render target
+                pOldRT = device.GetRenderTarget(0);
+                pSurf = g_pRenderTarget.GetSurfaceLevel(0);
+                device.SetRenderTarget(0, pSurf);
+                // hago lo mismo con el depthbuffer, necesito el que no tiene multisampling
+                pOldDS = device.DepthStencilSurface;
+                device.DepthStencilSurface = g_pDepthStencil;
+                device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+
+                device.BeginScene();
+
+
                 Frustum.render();
-                olasLava.SetValue("time", tiempoAcumulado);
+                olasLavaEffect.SetValue("time", tiempoAcumulado);
+                rojo.SetValue("time", tiempoAcumulado);
 
                 //int factorY = rnd.Next(-6, 6);
                 //int factorX = rnd.Next(-6, 6);
@@ -707,12 +808,12 @@ namespace TGC.Group.Modelo
                 {
                     renderizarSprites();
 
-                    informador.informar(estadoJuego,personaje,ElapsedTime);
+                    informador.informar(estadoJuego, personaje, ElapsedTime);
 
                     renderizarDebug();
-                  //Renderizo OBB de las plataformas rotantes
+                    //Renderizo OBB de las plataformas rotantes
                     escenario.plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
-                    
+
                     if (!estadoJuego.partidaPausada)
                     {
                         octree.render(Frustum, boundingBoxActivate);
@@ -721,7 +822,7 @@ namespace TGC.Group.Modelo
                         if (personaje.emisorParticulas != null)
                         {
                             personaje.emisorParticulas.Position = personaje.position();
-                            personaje.emisorParticulas.Speed= new TGCVector3(65, 20, 15);
+                            personaje.emisorParticulas.Speed = new TGCVector3(65, 20, 15);
                             personaje.emisorParticulas.render(ElapsedTime);
                         }
                         escenario.RenderAll();
@@ -739,7 +840,7 @@ namespace TGC.Group.Modelo
 
 
                     TgcMesh closestLight = escenario.getClosestLight(personaje.position(), 2500f);
-                    if(closestLight != null)
+                    if (closestLight != null)
                     {
                         personaje.effect().SetValue("lightColor", ColorValue.FromColor(Color.White));
                         personaje.effect().SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(closestLight.Position));
@@ -754,7 +855,7 @@ namespace TGC.Group.Modelo
                     personaje.effect().SetValue("lightIntensity", 20);
                     personaje.effect().SetValue("lightAttenuation", 25);
 
-                    foreach(TgcMesh mesh in meshesConLuz)
+                    foreach (TgcMesh mesh in meshesConLuz)
                     {
                         //mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
                         mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
@@ -764,7 +865,7 @@ namespace TGC.Group.Modelo
                     //EMIRSORES DE PARTICULAS
                     D3DDevice.Instance.ParticlesEnabled = true;
                     D3DDevice.Instance.EnableParticles();
-                    foreach(Hoguera s in escenario.hogueras)
+                    foreach (Hoguera s in escenario.hogueras)
                     {
                         s.renderParticles(ElapsedTime);
                     }
@@ -778,10 +879,141 @@ namespace TGC.Group.Modelo
                     gui_partida_perdida_render(ElapsedTime);
                 }
             }
-           
-            //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
-            PostRender();
+
+            device.EndScene();
+
+            pSurf.Dispose();
+
+            // dibujo el glow map
+            postProcessBloom.Technique = "DefaultTechnique";
+            pSurf = g_pGlowMap.GetSurfaceLevel(0);
+            device.SetRenderTarget(0, pSurf);
+            device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+
+            device.BeginScene();
+
+            //Dibujamos SOLO los meshes que tienen glow brillantes
+            //Render personaje brillante
+            //Render personames enemigos
+            foreach (var m in escenario.MeshesLuminosos())
+            {
+                m.UpdateMeshTransform();
+                m.Render();
+            }
+
+            // El resto opacos
+            foreach(TgcMesh mesh in escenario.MeshesOpacos())
+            {
+                mesh.UpdateMeshTransform();
+                mesh.Render();
+            }
+
+            device.EndScene();
+
+            pSurf.Dispose();
+
+            // Hago un blur sobre el glow map
+            // 1er pasada: downfilter x 4
+            // -----------------------------------------------------
+            pSurf = g_pRenderTarget4.GetSurfaceLevel(0);
+            device.SetRenderTarget(0, pSurf);
+
+            device.BeginScene();
+            postProcessBloom.Technique = "DownFilter4";
+            device.VertexFormat = CustomVertex.PositionTextured.Format;
+            device.SetStreamSource(0, g_pVBV3D, 0);
+            postProcessBloom.SetValue("g_RenderTarget", g_pGlowMap);
+
+            device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+            postProcessBloom.Begin(FX.None);
+            postProcessBloom.BeginPass(0);
+            device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
+            postProcessBloom.EndPass();
+            postProcessBloom.End();
+            pSurf.Dispose();
+
+            device.EndScene();
+
+            device.DepthStencilSurface = pOldDS;
+
+            // Pasadas de blur
+            for (var P = 0; P < cant_pasadas; ++P)
+            {
+                // Gaussian blur Horizontal
+                // -----------------------------------------------------
+                pSurf = g_pRenderTarget4Aux.GetSurfaceLevel(0);
+                device.SetRenderTarget(0, pSurf);
+                // dibujo el quad pp dicho :
+
+                device.BeginScene();
+                postProcessBloom.Technique = "GaussianBlurSeparable";
+                device.VertexFormat = CustomVertex.PositionTextured.Format;
+                device.SetStreamSource(0, g_pVBV3D, 0);
+                postProcessBloom.SetValue("g_RenderTarget", g_pRenderTarget4);
+
+                device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+                postProcessBloom.Begin(FX.None);
+                postProcessBloom.BeginPass(0);
+                device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
+                postProcessBloom.EndPass();
+                postProcessBloom.End();
+                pSurf.Dispose();
+
+                device.EndScene();
+
+                pSurf = g_pRenderTarget4.GetSurfaceLevel(0);
+                device.SetRenderTarget(0, pSurf);
+                pSurf.Dispose();
+
+                //  Gaussian blur Vertical
+                // -----------------------------------------------------
+
+                device.BeginScene();
+                postProcessBloom.Technique = "GaussianBlurSeparable";
+                device.VertexFormat = CustomVertex.PositionTextured.Format;
+                device.SetStreamSource(0, g_pVBV3D, 0);
+                postProcessBloom.SetValue("g_RenderTarget", g_pRenderTarget4Aux);
+
+                device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+                postProcessBloom.Begin(FX.None);
+                postProcessBloom.BeginPass(1);
+                device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
+                postProcessBloom.EndPass();
+                postProcessBloom.End();
+
+                device.EndScene();
+            }
+
+            //  To Gray Scale
+            // -----------------------------------------------------
+            // Ultima pasada vertical va sobre la pantalla pp dicha
+            device.SetRenderTarget(0, pOldRT);
+            //pSurf = g_pRenderTarget4Aux.GetSurfaceLevel(0);
+            //device.SetRenderTarget(0, pSurf);
+
+            device.BeginScene();
+
+            postProcessBloom.Technique = "GrayScale";
+            device.VertexFormat = CustomVertex.PositionTextured.Format;
+            device.SetStreamSource(0, g_pVBV3D, 0);
+            postProcessBloom.SetValue("g_RenderTarget", g_pRenderTarget);
+            postProcessBloom.SetValue("g_GlowMap", g_pRenderTarget4Aux);
+            device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+            postProcessBloom.Begin(FX.None);
+            postProcessBloom.BeginPass(0);
+            device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
+            postProcessBloom.EndPass();
+            postProcessBloom.End();
+
+            device.EndScene();
+
+            D3DDevice.Instance.Device.BeginScene();
+            RenderFPS();
+            RenderAxis();
+            D3DDevice.Instance.Device.EndScene();
+            D3DDevice.Instance.Device.Present();
         }
+
         private void renderizarRestantes() => escenario.plataformas.ForEach(plat => { if (plat.plataformaMesh.Name == "PlataformaX" || plat.plataformaMesh.Name == "PlataformaZ") plat.plataformaMesh.Render(); });
         private void renderizarSprites()
         {

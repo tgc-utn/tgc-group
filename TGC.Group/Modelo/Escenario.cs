@@ -96,6 +96,34 @@ namespace TGC.Group.Modelo
             return meshesColisionables;
         }
 
+        public List<TgcMesh> MeshesOpacos()
+        {
+            List<TgcMesh> meshesOpacos = new List<TgcMesh>();
+            meshesOpacos.AddRange(ParedesMesh());
+            meshesOpacos.AddRange(RocasMesh());
+            meshesOpacos.AddRange(PisosMesh());
+            meshesOpacos.AddRange(CajasMesh());
+            meshesOpacos.AddRange(SarcofagosMesh());
+            meshesOpacos.AddRange(PilaresMesh());
+            meshesOpacos.AddRange(PlataformasMesh());
+            meshesOpacos.AddRange(PisosResbalososMesh());
+            meshesOpacos.AddRange(LavaMesh());
+            meshesOpacos.AddRange(Frutas());
+            meshesOpacos.AddRange(Mascaras());
+            meshesOpacos.AddRange(Escalones());
+            meshesOpacos.AddRange(RampasMesh());
+            return meshesOpacos;
+        }
+
+        public List<TgcMesh> MeshesLuminosos()
+        {
+            List<TgcMesh> meshesLuminosos = new List<TgcMesh>();
+            meshesLuminosos.AddRange(Luces());
+            meshesLuminosos.AddRange(FuegosMesh());
+            meshesLuminosos.AddRange(HoguerasMesh());
+            return meshesLuminosos;
+        }
+
         public List<TgcBoundingAxisAlignBox> MeshesColisionablesBB()
         {
             return MeshesColisionables().FindAll(mesh => mesh.Name != "PlataformaRotante").Select(mesh => mesh.BoundingBox).ToList();
