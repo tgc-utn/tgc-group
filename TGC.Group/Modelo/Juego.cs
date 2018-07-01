@@ -872,30 +872,42 @@ namespace TGC.Group.Modelo
 
             device.BeginScene();
 
+
             //Dibujamos SOLO los meshes que tienen glow brillantes
-            foreach (var m in escenario.MeshesLuminosos())
+            var modelosAnterior = octree.modelos;
+            octree.modelos = escenario.MeshesLuminosos();
+            octree.render(Frustum, boundingBoxActivate);
+
+            Dictionary<int, Microsoft.DirectX.Direct3D.Effect> meshEffect = new Dictionary<int, Microsoft.DirectX.Direct3D.Effect>();
+            Dictionary<int, string> meshTechnique = new Dictionary<int,string>();
+
+            List<TgcMesh> opacos = escenario.MeshesOpacos();
+            // El resto opacos
+            foreach (var m in opacos)
             {
-                m.UpdateMeshTransform();
-                m.Render();
+                meshEffect.Add(m.GetHashCode(), m.Effect);
+                meshTechnique.Add(m.GetHashCode(), m.Technique);
+                m.Effect = postProcessBloom;
+                m.Technique = "DibujarObjetosOscuros";
             }
 
-            // El resto opacos
-            //foreach(TgcMesh mesh in escenario.MeshesOpacos())
-            //{
-            //    //mesh.Effect = postProcessBloom;
-            //    //mesh.Technique = "DibujarObjetosOscuros";
-            //    mesh.UpdateMeshTransform();
-            //    mesh.Render();
-            //}
-
-            var modelosAnterior = octree.modelos;
-            octree.modelos = escenario.MeshesParaBloom();
+            octree.modelos = opacos;
             octree.render(Frustum, boundingBoxActivate);
 
             octree.modelos = modelosAnterior;
 
+            foreach (var m in opacos)
+            {
+                Microsoft.DirectX.Direct3D.Effect e = null;
+                string tec = "";
+                meshEffect.TryGetValue(m.GetHashCode(), out e);
+                meshTechnique.TryGetValue(m.GetHashCode(), out tec);
+                m.Effect = e;
+                m.Technique = tec;
+            }
 
-            device.EndScene();
+
+           device.EndScene();
 
             pSurf.Dispose();
 

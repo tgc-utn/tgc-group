@@ -96,7 +96,7 @@ namespace TGC.Group.Modelo
             return meshesColisionables;
         }
 
-        public List<TgcMesh> MeshesParaBloom()
+        public List<TgcMesh> MeshesLuminosos()
         {
             List<TgcMesh> meshesBloom = new List<TgcMesh>();
             meshesBloom.AddRange(Luces());
@@ -106,14 +106,25 @@ namespace TGC.Group.Modelo
             return meshesBloom;
         }
 
-        public List<TgcMesh> MeshesLuminosos()
+        public List<TgcMesh> MeshesOpacos()
         {
-            List<TgcMesh> meshesLuminosos = new List<TgcMesh>();
-            meshesLuminosos.AddRange(Luces());
-            meshesLuminosos.AddRange(FuegosMesh());
-            meshesLuminosos.AddRange(HoguerasMesh());
-            return meshesLuminosos;
+            List<TgcMesh> opacos = new List<TgcMesh>();
+            opacos.AddRange(ParedesMesh());
+            opacos.AddRange(RocasMesh());
+            //opacos.AddRange(PisosMesh());
+            opacos.AddRange(CajasMesh());
+            opacos.AddRange(SarcofagosMesh());
+            opacos.AddRange(PilaresMesh());
+            opacos.AddRange(PlataformasMesh());
+            //opacos.AddRange(PisosResbalososMesh());
+            opacos.AddRange(Frutas());
+            opacos.AddRange(Mascaras());
+            opacos.AddRange(Escalones());
+            opacos.AddRange(RampasMesh());
+
+            return opacos;
         }
+
 
         public List<TgcBoundingAxisAlignBox> MeshesColisionablesBB()
         {
