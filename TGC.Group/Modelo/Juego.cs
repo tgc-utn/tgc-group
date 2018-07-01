@@ -74,7 +74,6 @@ namespace TGC.Group.Modelo
         private Microsoft.DirectX.Direct3D.Effect personajeLightShader;
 
         private Microsoft.DirectX.Direct3D.Effect olasLavaEffect;
-        private Microsoft.DirectX.Direct3D.Effect rojo;
         private Microsoft.DirectX.Direct3D.Effect postProcessBloom;
 
 
@@ -187,7 +186,7 @@ namespace TGC.Group.Modelo
 
         Random generadorRandom = new Random(); //Generador de numeros aleatorios;
 
-        private int cant_pasadas = 1;
+        private int cant_pasadas = 2;
 
         private Surface g_pDepthStencil; // Depth-stencil buffer
         private Texture g_pRenderTarget, g_pGlowMap, g_pRenderTarget4, g_pRenderTarget4Aux;
@@ -289,13 +288,6 @@ namespace TGC.Group.Modelo
                 throw new Exception("Error al cargar shader OlasLava. Errores: " + compilationErrors);
             }
 
-            rojo = Microsoft.DirectX.Direct3D.Effect.FromFile(d3dDevice, MediaDir + "MiShader.fx",
-                null, null, ShaderFlags.PreferFlowControl, null, out compilationErrors);
-            if (rojo == null)
-            {
-                throw new Exception("Error al cargar shader Rojo. Errores: " + compilationErrors);
-            }
-
             postProcessBloom = Microsoft.DirectX.Direct3D.Effect.FromFile(D3DDevice.Instance.Device, MediaDir + "GaussianBlur.fx", null, null, ShaderFlags.PreferFlowControl, null, out compilationErrors);
             if (postProcessBloom == null)
             {
@@ -310,8 +302,8 @@ namespace TGC.Group.Modelo
 
             foreach (TgcMesh mesh in escenario.FuegosMesh())
             {
-                mesh.Effect = rojo;
-                mesh.Technique = "Rojo";
+                mesh.Effect = olasLavaEffect;
+                mesh.Technique = "Olas";
             }
 
             postProcessBloom.Technique = "DefaultTechnique";
@@ -337,8 +329,6 @@ namespace TGC.Group.Modelo
             // Resolucion de pantalla
             postProcessBloom.SetValue("screen_dx", ScreenRes_X);
             postProcessBloom.SetValue("screen_dy", ScreenRes_Y);
-            rojo.SetValue("screen_dx", ScreenRes_X);
-            rojo.SetValue("screen_dy", ScreenRes_Y);
             olasLavaEffect.SetValue("screen_dx", ScreenRes_X);
             olasLavaEffect.SetValue("screen_dy", ScreenRes_Y);
 
@@ -777,7 +767,7 @@ namespace TGC.Group.Modelo
             }
             else
             {
-                // dibujo la escena una textura
+                // DefaultTechnique no cambia nada de lo visible (Mientras KLum = 1)
                 postProcessBloom.Technique = "DefaultTechnique";
                 // guardo el Render target anterior y seteo la textura como render target
                 pOldRT = device.GetRenderTarget(0);
@@ -788,21 +778,11 @@ namespace TGC.Group.Modelo
                 device.DepthStencilSurface = g_pDepthStencil;
                 device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
 
+                //inicio del primer render
                 device.BeginScene();
-
 
                 Frustum.render();
                 olasLavaEffect.SetValue("time", tiempoAcumulado);
-                rojo.SetValue("time", tiempoAcumulado);
-
-                //int factorY = rnd.Next(-6, 6);
-                //int factorX = rnd.Next(-6, 6);
-                //int frecuencia = rnd.Next(1, 11);
-
-                //olasLava.SetValue("factorY", factorY);
-                //olasLava.SetValue("factorX", factorX);
-                //olasLava.SetValue("frecuencia", frecuencia);
-
 
                 if (!estadoJuego.partidaPerdida)
                 {
@@ -816,8 +796,8 @@ namespace TGC.Group.Modelo
 
                     if (!estadoJuego.partidaPausada)
                     {
-                        octree.render(Frustum, boundingBoxActivate);
                         renderizarRestantes();
+                        octree.render(Frustum, boundingBoxActivate);
                         personaje.animateAndRender(ElapsedTime);
                         if (personaje.emisorParticulas != null)
                         {
@@ -857,12 +837,11 @@ namespace TGC.Group.Modelo
 
                     foreach (TgcMesh mesh in meshesConLuz)
                     {
-                        //mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
                         mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
                     }
 
 
-                    //EMIRSORES DE PARTICULAS
+                    //EMISORES DE PARTICULAS
                     D3DDevice.Instance.ParticlesEnabled = true;
                     D3DDevice.Instance.EnableParticles();
                     foreach (Hoguera s in escenario.hogueras)
@@ -880,6 +859,7 @@ namespace TGC.Group.Modelo
                 }
             }
 
+            //Fin del primer render
             device.EndScene();
 
             pSurf.Dispose();
@@ -893,8 +873,6 @@ namespace TGC.Group.Modelo
             device.BeginScene();
 
             //Dibujamos SOLO los meshes que tienen glow brillantes
-            //Render personaje brillante
-            //Render personames enemigos
             foreach (var m in escenario.MeshesLuminosos())
             {
                 m.UpdateMeshTransform();
@@ -902,11 +880,20 @@ namespace TGC.Group.Modelo
             }
 
             // El resto opacos
-            foreach(TgcMesh mesh in escenario.MeshesOpacos())
-            {
-                mesh.UpdateMeshTransform();
-                mesh.Render();
-            }
+            //foreach(TgcMesh mesh in escenario.MeshesOpacos())
+            //{
+            //    //mesh.Effect = postProcessBloom;
+            //    //mesh.Technique = "DibujarObjetosOscuros";
+            //    mesh.UpdateMeshTransform();
+            //    mesh.Render();
+            //}
+
+            var modelosAnterior = octree.modelos;
+            octree.modelos = escenario.MeshesParaBloom();
+            octree.render(Frustum, boundingBoxActivate);
+
+            octree.modelos = modelosAnterior;
+
 
             device.EndScene();
 

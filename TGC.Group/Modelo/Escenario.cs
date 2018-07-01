@@ -96,23 +96,14 @@ namespace TGC.Group.Modelo
             return meshesColisionables;
         }
 
-        public List<TgcMesh> MeshesOpacos()
+        public List<TgcMesh> MeshesParaBloom()
         {
-            List<TgcMesh> meshesOpacos = new List<TgcMesh>();
-            meshesOpacos.AddRange(ParedesMesh());
-            meshesOpacos.AddRange(RocasMesh());
-            meshesOpacos.AddRange(PisosMesh());
-            meshesOpacos.AddRange(CajasMesh());
-            meshesOpacos.AddRange(SarcofagosMesh());
-            meshesOpacos.AddRange(PilaresMesh());
-            meshesOpacos.AddRange(PlataformasMesh());
-            meshesOpacos.AddRange(PisosResbalososMesh());
-            meshesOpacos.AddRange(LavaMesh());
-            meshesOpacos.AddRange(Frutas());
-            meshesOpacos.AddRange(Mascaras());
-            meshesOpacos.AddRange(Escalones());
-            meshesOpacos.AddRange(RampasMesh());
-            return meshesOpacos;
+            List<TgcMesh> meshesBloom = new List<TgcMesh>();
+            meshesBloom.AddRange(Luces());
+            meshesBloom.AddRange(FuegosMesh());
+            meshesBloom.AddRange(HoguerasMesh());
+            meshesBloom.AddRange(LavaMesh());
+            return meshesBloom;
         }
 
         public List<TgcMesh> MeshesLuminosos()

@@ -257,8 +257,8 @@ float4 PSGrayScale(in float2 Tex : TEXCOORD0, in float2 vpos : VPOS) : COLOR0
 {
     float4 ColorBase = tex2D(RenderTarget, Tex);
     float4 ColorBrillante = tex2D(GlowMap, Tex + float2((float) 16 / screen_dx, (float) 16 / screen_dy));
-	// Y = 0.2126 R + 0.7152 G + 0.0722 B
-    float Yb = 0.2126 * ColorBase.r + 0.7152 * ColorBase.g + 0.0722 * ColorBase.b;
+
+    /*float Yb = 0.2126 * ColorBase.r + 0.7152 * ColorBase.g + 0.0722 * ColorBase.b;
     float Yk = 0.2126 * ColorBrillante.r + 0.7152 * ColorBrillante.g + 0.0722 * ColorBrillante.b;
     if (round(vpos.y / 2) % 2 == 0)
     {
@@ -266,7 +266,9 @@ float4 PSGrayScale(in float2 Tex : TEXCOORD0, in float2 vpos : VPOS) : COLOR0
         Yk *= 0.85;
     }
 
-    return float4(Yk * 0.75, Yb * 0.6 + Yk * 4, Yk * 0.75, 1);
+	return float4(Yk * 0.75, Yb * 0.6 + Yk * 4, Yk * 0.75, 1);*/
+
+	return float4(ColorBase.x + ColorBrillante.x, ColorBase.y + ColorBrillante.y, ColorBase.z + ColorBrillante.z, 1);
 }
 
 technique GrayScale
