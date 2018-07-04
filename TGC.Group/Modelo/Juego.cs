@@ -67,7 +67,6 @@ namespace TGC.Group.Modelo
         private bool boundingBoxActivate = false;
 
 
-
         public static List<TgcMesh> meshesConLuz;
         private Microsoft.DirectX.Direct3D.Effect effectLuzComun;
         private Microsoft.DirectX.Direct3D.Effect effectLuzLava;
@@ -89,7 +88,6 @@ namespace TGC.Group.Modelo
 
         private bool partidaReiniciada= false;
         #endregion
-
 
         #region APIGUI
         //Api gui
@@ -263,7 +261,7 @@ namespace TGC.Group.Modelo
             inicializarGUIPrincipal();
             inicializarGUISecundaria();
             inicializarIluminacion();
-            inicializarHUDS(d3dDevice);
+            inicializarSprites(d3dDevice);
 
 
 
@@ -348,8 +346,6 @@ namespace TGC.Group.Modelo
             personaje.playAnimation("Parado", true);
         }
 
-
-           
 
 
         public override void Update()
@@ -548,7 +544,7 @@ namespace TGC.Group.Modelo
             }
             
         }
- 
+        #region MovimientosMundo
         public void moverMundo(TGCVector3 movimientoOriginal)
         {
             TGCVector3 movimientoRealPersonaje = new TGCVector3(0, 0, 0);
@@ -701,8 +697,9 @@ namespace TGC.Group.Modelo
             else if (movimientoRealCaja.Y < 0) objetoMovible.Move(movimientoRealCaja);
 
         }
-      
-       
+
+        #endregion
+
         public void ajustarCamara()
         {
             //Actualizar valores de camara segun modifiers
@@ -754,42 +751,33 @@ namespace TGC.Group.Modelo
 
         public override void Render()
         {
-
-            var device = D3DDevice.Instance.Device;
-            Surface pSurf, pOldRT, pOldDS;
-            estadoJuego.menu = false;
-            if (estadoJuego.menu)
-            {
-                device.BeginScene();
-                gui_render(ElapsedTime);
-                device.EndScene();
-                return;
-            }
+            if (estadoJuego.menu) gui_principal_render(ElapsedTime);
             else
             {
+
+                Surface pSurf, pOldRT, pOldDS;
+           
                 // DefaultTechnique no cambia nada de lo visible (Mientras KLum = 1)
                 postProcessBloom.Technique = "DefaultTechnique";
                 // guardo el Render target anterior y seteo la textura como render target
-                pOldRT = device.GetRenderTarget(0);
+                pOldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
                 pSurf = g_pRenderTarget.GetSurfaceLevel(0);
-                device.SetRenderTarget(0, pSurf);
+                D3DDevice.Instance.Device.SetRenderTarget(0, pSurf);
                 // hago lo mismo con el depthbuffer, necesito el que no tiene multisampling
-                pOldDS = device.DepthStencilSurface;
-                device.DepthStencilSurface = g_pDepthStencil;
-                device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+                pOldDS = D3DDevice.Instance.Device.DepthStencilSurface;
+                D3DDevice.Instance.Device.DepthStencilSurface = g_pDepthStencil;
+                D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
 
+                #region PrimerRender
                 //inicio del primer render
-                device.BeginScene();
-
+                D3DDevice.Instance.Device.BeginScene();
                 Frustum.render();
                 olasLavaEffect.SetValue("time", tiempoAcumulado);
 
                 if (!estadoJuego.partidaPerdida)
                 {
                     renderizarSprites();
-
-                    informador.informar(estadoJuego, personaje, ElapsedTime);
-
+                    informador.renderizarInforme(estadoJuego, personaje, ElapsedTime);
                     renderizarDebug();
                     //Renderizo OBB de las plataformas rotantes
                     escenario.plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
@@ -853,164 +841,161 @@ namespace TGC.Group.Modelo
                         s.renderParticles(ElapsedTime);
                     }
                 }
-                else
+                else gui_partida_perdida_render(ElapsedTime);
+                
+                //Fin del primer render
+                D3DDevice.Instance.Device.EndScene();
+                pSurf.Dispose();
+                #endregion
+
+
+                // dibujo el glow map
+                postProcessBloom.Technique = "DefaultTechnique";
+                pSurf = g_pGlowMap.GetSurfaceLevel(0);
+                D3DDevice.Instance.Device.SetRenderTarget(0, pSurf);
+                D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+                D3DDevice.Instance.Device.BeginScene();
+
+
+                //Dibujamos SOLO los meshes que tienen glow brillantes
+                var modelosAnterior = octree.modelos;
+                octree.modelos = escenario.MeshesLuminosos();
+                octree.render(Frustum, boundingBoxActivate);
+
+                Dictionary<int, Microsoft.DirectX.Direct3D.Effect> meshEffect = new Dictionary<int, Microsoft.DirectX.Direct3D.Effect>();
+                Dictionary<int, string> meshTechnique = new Dictionary<int, string>();
+
+                List<TgcMesh> opacos = escenario.MeshesOpacos();
+                // El resto opacos
+                foreach (var m in opacos)
                 {
-                    gui_partida_perdida_render(ElapsedTime);
+                    meshEffect.Add(m.GetHashCode(), m.Effect);
+                    meshTechnique.Add(m.GetHashCode(), m.Technique);
+                    m.Effect = postProcessBloom;
+                    m.Technique = "DibujarObjetosOscuros";
                 }
-            }
 
-            //Fin del primer render
-            device.EndScene();
+                octree.modelos = opacos;
+                octree.render(Frustum, boundingBoxActivate);
 
-            pSurf.Dispose();
+                octree.modelos = modelosAnterior;
 
-            // dibujo el glow map
-            postProcessBloom.Technique = "DefaultTechnique";
-            pSurf = g_pGlowMap.GetSurfaceLevel(0);
-            device.SetRenderTarget(0, pSurf);
-            device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
-
-            device.BeginScene();
-
-
-            //Dibujamos SOLO los meshes que tienen glow brillantes
-            var modelosAnterior = octree.modelos;
-            octree.modelos = escenario.MeshesLuminosos();
-            octree.render(Frustum, boundingBoxActivate);
-
-            Dictionary<int, Microsoft.DirectX.Direct3D.Effect> meshEffect = new Dictionary<int, Microsoft.DirectX.Direct3D.Effect>();
-            Dictionary<int, string> meshTechnique = new Dictionary<int,string>();
-
-            List<TgcMesh> opacos = escenario.MeshesOpacos();
-            // El resto opacos
-            foreach (var m in opacos)
-            {
-                meshEffect.Add(m.GetHashCode(), m.Effect);
-                meshTechnique.Add(m.GetHashCode(), m.Technique);
-                m.Effect = postProcessBloom;
-                m.Technique = "DibujarObjetosOscuros";
-            }
-
-            octree.modelos = opacos;
-            octree.render(Frustum, boundingBoxActivate);
-
-            octree.modelos = modelosAnterior;
-
-            foreach (var m in opacos)
-            {
-                Microsoft.DirectX.Direct3D.Effect e = null;
-                string tec = "";
-                meshEffect.TryGetValue(m.GetHashCode(), out e);
-                meshTechnique.TryGetValue(m.GetHashCode(), out tec);
-                m.Effect = e;
-                m.Technique = tec;
-            }
+                foreach (var m in opacos)
+                {
+                    Microsoft.DirectX.Direct3D.Effect e = null;
+                    string tec = "";
+                    meshEffect.TryGetValue(m.GetHashCode(), out e);
+                    meshTechnique.TryGetValue(m.GetHashCode(), out tec);
+                    m.Effect = e;
+                    m.Technique = tec;
+                }
 
 
-           device.EndScene();
+                D3DDevice.Instance.Device.EndScene();
 
-            pSurf.Dispose();
+                pSurf.Dispose();
 
-            // Hago un blur sobre el glow map
-            // 1er pasada: downfilter x 4
-            // -----------------------------------------------------
-            pSurf = g_pRenderTarget4.GetSurfaceLevel(0);
-            device.SetRenderTarget(0, pSurf);
-
-            device.BeginScene();
-            postProcessBloom.Technique = "DownFilter4";
-            device.VertexFormat = CustomVertex.PositionTextured.Format;
-            device.SetStreamSource(0, g_pVBV3D, 0);
-            postProcessBloom.SetValue("g_RenderTarget", g_pGlowMap);
-
-            device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
-            postProcessBloom.Begin(FX.None);
-            postProcessBloom.BeginPass(0);
-            device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
-            postProcessBloom.EndPass();
-            postProcessBloom.End();
-            pSurf.Dispose();
-
-            device.EndScene();
-
-            device.DepthStencilSurface = pOldDS;
-
-            // Pasadas de blur
-            for (var P = 0; P < cant_pasadas; ++P)
-            {
-                // Gaussian blur Horizontal
+                // Hago un blur sobre el glow map
+                // 1er pasada: downfilter x 4
                 // -----------------------------------------------------
-                pSurf = g_pRenderTarget4Aux.GetSurfaceLevel(0);
-                device.SetRenderTarget(0, pSurf);
-                // dibujo el quad pp dicho :
+                pSurf = g_pRenderTarget4.GetSurfaceLevel(0);
+                D3DDevice.Instance.Device.SetRenderTarget(0, pSurf);
 
-                device.BeginScene();
-                postProcessBloom.Technique = "GaussianBlurSeparable";
-                device.VertexFormat = CustomVertex.PositionTextured.Format;
-                device.SetStreamSource(0, g_pVBV3D, 0);
-                postProcessBloom.SetValue("g_RenderTarget", g_pRenderTarget4);
+                D3DDevice.Instance.Device.BeginScene();
+                postProcessBloom.Technique = "DownFilter4";
+                D3DDevice.Instance.Device.VertexFormat = CustomVertex.PositionTextured.Format;
+                D3DDevice.Instance.Device.SetStreamSource(0, g_pVBV3D, 0);
+                postProcessBloom.SetValue("g_RenderTarget", g_pGlowMap);
 
-                device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+                D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
                 postProcessBloom.Begin(FX.None);
                 postProcessBloom.BeginPass(0);
-                device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
+                D3DDevice.Instance.Device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
                 postProcessBloom.EndPass();
                 postProcessBloom.End();
                 pSurf.Dispose();
 
-                device.EndScene();
+                D3DDevice.Instance.Device.EndScene();
 
-                pSurf = g_pRenderTarget4.GetSurfaceLevel(0);
-                device.SetRenderTarget(0, pSurf);
-                pSurf.Dispose();
+                D3DDevice.Instance.Device.DepthStencilSurface = pOldDS;
 
-                //  Gaussian blur Vertical
+                // Pasadas de blur
+                for (var P = 0; P < cant_pasadas; ++P)
+                {
+                    // Gaussian blur Horizontal
+                    // -----------------------------------------------------
+                    pSurf = g_pRenderTarget4Aux.GetSurfaceLevel(0);
+                    D3DDevice.Instance.Device.SetRenderTarget(0, pSurf);
+                    // dibujo el quad pp dicho :
+
+                    D3DDevice.Instance.Device.BeginScene();
+                    postProcessBloom.Technique = "GaussianBlurSeparable";
+                    D3DDevice.Instance.Device.VertexFormat = CustomVertex.PositionTextured.Format;
+                    D3DDevice.Instance.Device.SetStreamSource(0, g_pVBV3D, 0);
+                    postProcessBloom.SetValue("g_RenderTarget", g_pRenderTarget4);
+
+                    D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+                    postProcessBloom.Begin(FX.None);
+                    postProcessBloom.BeginPass(0);
+                    D3DDevice.Instance.Device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
+                    postProcessBloom.EndPass();
+                    postProcessBloom.End();
+                    pSurf.Dispose();
+
+                    D3DDevice.Instance.Device.EndScene();
+
+                    pSurf = g_pRenderTarget4.GetSurfaceLevel(0);
+                    D3DDevice.Instance.Device.SetRenderTarget(0, pSurf);
+                    pSurf.Dispose();
+
+                    //  Gaussian blur Vertical
+                    // -----------------------------------------------------
+
+                    D3DDevice.Instance.Device.BeginScene();
+                    postProcessBloom.Technique = "GaussianBlurSeparable";
+                    D3DDevice.Instance.Device.VertexFormat = CustomVertex.PositionTextured.Format;
+                    D3DDevice.Instance.Device.SetStreamSource(0, g_pVBV3D, 0);
+                    postProcessBloom.SetValue("g_RenderTarget", g_pRenderTarget4Aux);
+
+                    D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+                    postProcessBloom.Begin(FX.None);
+                    postProcessBloom.BeginPass(1);
+                    D3DDevice.Instance.Device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
+                    postProcessBloom.EndPass();
+                    postProcessBloom.End();
+
+                    D3DDevice.Instance.Device.EndScene();
+                }
+
+                //  To Gray Scale
                 // -----------------------------------------------------
+                // Ultima pasada vertical va sobre la pantalla pp dicha
+                D3DDevice.Instance.Device.SetRenderTarget(0, pOldRT);
+                //pSurf = g_pRenderTarget4Aux.GetSurfaceLevel(0);
+                //device.SetRenderTarget(0, pSurf);
 
-                device.BeginScene();
-                postProcessBloom.Technique = "GaussianBlurSeparable";
-                device.VertexFormat = CustomVertex.PositionTextured.Format;
-                device.SetStreamSource(0, g_pVBV3D, 0);
-                postProcessBloom.SetValue("g_RenderTarget", g_pRenderTarget4Aux);
+                D3DDevice.Instance.Device.BeginScene();
 
-                device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+                postProcessBloom.Technique = "GrayScale";
+                D3DDevice.Instance.Device.VertexFormat = CustomVertex.PositionTextured.Format;
+                D3DDevice.Instance.Device.SetStreamSource(0, g_pVBV3D, 0);
+                postProcessBloom.SetValue("g_RenderTarget", g_pRenderTarget);
+                postProcessBloom.SetValue("g_GlowMap", g_pRenderTarget4Aux);
+                D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
                 postProcessBloom.Begin(FX.None);
-                postProcessBloom.BeginPass(1);
-                device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
+                postProcessBloom.BeginPass(0);
+                D3DDevice.Instance.Device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
                 postProcessBloom.EndPass();
                 postProcessBloom.End();
 
-                device.EndScene();
+                D3DDevice.Instance.Device.EndScene();
+
+                D3DDevice.Instance.Device.BeginScene();
+                RenderFPS();
+                RenderAxis();
+                D3DDevice.Instance.Device.EndScene();
+                D3DDevice.Instance.Device.Present();
             }
-
-            //  To Gray Scale
-            // -----------------------------------------------------
-            // Ultima pasada vertical va sobre la pantalla pp dicha
-            device.SetRenderTarget(0, pOldRT);
-            //pSurf = g_pRenderTarget4Aux.GetSurfaceLevel(0);
-            //device.SetRenderTarget(0, pSurf);
-
-            device.BeginScene();
-
-            postProcessBloom.Technique = "GrayScale";
-            device.VertexFormat = CustomVertex.PositionTextured.Format;
-            device.SetStreamSource(0, g_pVBV3D, 0);
-            postProcessBloom.SetValue("g_RenderTarget", g_pRenderTarget);
-            postProcessBloom.SetValue("g_GlowMap", g_pRenderTarget4Aux);
-            device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
-            postProcessBloom.Begin(FX.None);
-            postProcessBloom.BeginPass(0);
-            device.DrawPrimitives(PrimitiveType.TriangleStrip, 0, 2);
-            postProcessBloom.EndPass();
-            postProcessBloom.End();
-
-            device.EndScene();
-
-            D3DDevice.Instance.Device.BeginScene();
-            RenderFPS();
-            RenderAxis();
-            D3DDevice.Instance.Device.EndScene();
-            D3DDevice.Instance.Device.Present();
         }
 
         private void renderizarRestantes() => escenario.plataformas.ForEach(plat => { if (plat.plataformaMesh.Name == "PlataformaX" || plat.plataformaMesh.Name == "PlataformaZ") plat.plataformaMesh.Render(); });
@@ -1150,9 +1135,9 @@ namespace TGC.Group.Modelo
             gui_secundaria.Render();
         }
 
-        public void gui_render(float elapsedTime)
+        public void gui_principal_render(float elapsedTime)
         {
-            // ------------------------------------------------
+            PreRender();
             GuiMessage mensaje_gui = gui_primaria.Update(elapsedTime, Input);
             
             
@@ -1204,6 +1189,7 @@ namespace TGC.Group.Modelo
                     break;
             }
             gui_primaria.Render();
+            PostRender();
         }
         #endregion
 
@@ -1265,12 +1251,13 @@ namespace TGC.Group.Modelo
             personaje.technique(TgcShaders.Instance.getTgcSkeletalMeshTechnique(personaje.renderType()));
         }
 
-        public void inicializarHUDS(Microsoft.DirectX.Direct3D.Device d3dDevice)
+        public void inicializarSprites(Microsoft.DirectX.Direct3D.Device d3dDevice)
         {
             drawer2D = new Drawer2D();
             barraDeVida = new CustomSprite();
             barraDeVida.Bitmap = new CustomBitmap(directorio.BarraVida, d3dDevice);
             barraDeVida.Position = new TGCVector2(10, 20);
+            
 
             fruta = new CustomSprite();
             fruta.Bitmap = new CustomBitmap(directorio.Fruta, d3dDevice);

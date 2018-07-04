@@ -103,6 +103,7 @@ namespace TGC.Group.Modelo
             meshesBloom.AddRange(FuegosMesh());
             meshesBloom.AddRange(HoguerasMesh());
             meshesBloom.AddRange(LavaMesh());
+            meshesBloom.AddRange(PisosResbalososMesh());
             return meshesBloom;
         }
 

@@ -34,7 +34,7 @@ namespace TGC.Group.Modelo
             this.drawer = drawer;
             tiempoInforme = tiempoInformeMaximo;
         }
-        public void informar(EstadoJuego estado,Personaje personaje, float ElapsedTime)
+        public void renderizarInforme(EstadoJuego estado,Personaje personaje, float ElapsedTime)
         {
             var mensaje = "";
 
