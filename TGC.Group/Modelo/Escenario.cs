@@ -68,6 +68,7 @@ namespace TGC.Group.Modelo
         public List<TgcMesh> RampasMesh() => encontrarMeshes("RAMPA");
         public List<TgcMesh> FuegosMesh() => encontrarMeshes("FUEGO");
         public List<TgcMesh> HoguerasMesh() => encontrarMeshes("HOGUERA");
+        public List<TgcMesh> MetasMesh() => encontrarMeshes("META");
 
         public List<TgcMesh> MeshesParaEfectoLava()
         {
@@ -211,7 +212,10 @@ namespace TGC.Group.Modelo
             return this.pisosInercia.Find(piso => personaje.colisionaPorArribaDe(piso.pisoMesh));
         }
 
-        
+        public bool colisionaConMeta()
+        {
+            return this.MetasMesh().Exists(meta => personaje.colisionaConMesh(meta));
+        }
 
         
 

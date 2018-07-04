@@ -91,8 +91,9 @@ namespace TGC.Group.Modelo
 
         #region APIGUI
         //Api gui
-        private DXGui gui_primaria = new DXGui();
-        private DXGui gui_secundaria = new DXGui();
+        private DXGui gui_menu_principal = new DXGui();
+        private DXGui gui_partida_perdida = new DXGui();
+        private DXGui gui_partida_ganada = new DXGui();
 
         public const int IDOK = 0;
 
@@ -260,6 +261,7 @@ namespace TGC.Group.Modelo
 
             inicializarGUIPrincipal();
             inicializarGUISecundaria();
+            inicializarGUITerciaria();
             inicializarIluminacion();
             inicializarSprites(d3dDevice);
 
@@ -493,6 +495,10 @@ namespace TGC.Group.Modelo
                     else if(!hoguera.Encendida) informador.hogueraCerca();
                 }
                 textoHoguera.Text = personaje.hogueras.ToString();
+                #endregion
+
+                #region Metas
+                if (escenario.colisionaConMeta()) estadoJuego.partidaGanada = true;
                 #endregion
 
                 #region Sonido
@@ -774,7 +780,8 @@ namespace TGC.Group.Modelo
                 Frustum.render();
                 olasLavaEffect.SetValue("time", tiempoAcumulado);
 
-                if (!estadoJuego.partidaPerdida)
+                if(estadoJuego.partidaGanada) gui_partida_ganada_render(ElapsedTime);
+                else if (!estadoJuego.partidaPerdida)
                 {
                     renderizarSprites();
                     informador.renderizarInforme(estadoJuego, personaje, ElapsedTime);
@@ -1062,10 +1069,10 @@ namespace TGC.Group.Modelo
         public void inicializarGUIPrincipal()
         {
             // levanto el GUI
-            gui_primaria.Create(MediaDir);
+            gui_menu_principal.Create(MediaDir);
                         
             // menu principal
-            gui_primaria.InitDialog(false,false);
+            gui_menu_principal.InitDialog(false,false);
             int W = D3DDevice.Instance.Width;
             int H = D3DDevice.Instance.Height;
             int x0 = 70;
@@ -1074,11 +1081,11 @@ namespace TGC.Group.Modelo
             int dy2 = dy;
             int dx = 400;
             int item_epsilon = 50;
-            gui_primaria.InsertImage("menu.png",1850,450, directorio.Menu);
+            gui_menu_principal.InsertImage("menu.png",1850,450, directorio.Menu);
             
-            gui_primaria.InsertMenuItem(ID_JUGAR, "Jugar", "open.png", x0, y0, MediaDir, dx, dy);
-            gui_primaria.InsertMenuItem(ID_CONFIGURAR, "Configurar", "navegar.png", x0+dx+item_epsilon, y0 , MediaDir, dx, dy);
-            gui_primaria.InsertMenuItem(ID_APP_EXIT, "Salir", "salir.png", x0, y0 += dy2, MediaDir, dx, dy);
+            gui_menu_principal.InsertMenuItem(ID_JUGAR, "Jugar", "open.png", x0, y0, MediaDir, dx, dy);
+            gui_menu_principal.InsertMenuItem(ID_CONFIGURAR, "Configurar", "navegar.png", x0+dx+item_epsilon, y0 , MediaDir, dx, dy);
+            gui_menu_principal.InsertMenuItem(ID_APP_EXIT, "Salir", "salir.png", x0, y0 += dy2, MediaDir, dx, dy);
            
         }
 
@@ -1094,20 +1101,69 @@ namespace TGC.Group.Modelo
             int y0 = (int)((H - dy) / 2);
             int r = 100;
 
-            gui_secundaria.Create(MediaDir);
-            gui_secundaria.InitDialog(false, false);
-            gui_secundaria.InsertImage("menu_perdiste.png", 1850, 450, directorio.Menu);
+            gui_partida_perdida.Create(MediaDir);
+            gui_partida_perdida.InitDialog(false, false);
+            gui_partida_perdida.InsertImage("menu_perdiste.png", 1850, 450, directorio.Menu);
 
-            gui_secundaria.InsertFrame("Partida Perdida", x0, y0, dx, dy, Color.FromArgb(0, 0, 0));
-            gui_secundaria.InsertItem("Desea reiniciar el juego?", x0 + 200, y0 + 200);
-            gui_secundaria.InsertCircleButton(0, "OK", "ok.png", x0 + 70, y0 + dy - r - 90, mediaDir, r);
-            gui_secundaria.InsertCircleButton(1, "CANCEL", "cancel.png", x0 + dx - r - 70, y0 + dy - r - 90, mediaDir, r);
+            gui_partida_perdida.InsertFrame("Partida Perdida", x0, y0, dx, dy, Color.FromArgb(0, 0, 0));
+            gui_partida_perdida.InsertItem("Desea reiniciar el juego?", x0 + 200, y0 + 200);
+            gui_partida_perdida.InsertCircleButton(0, "OK", "ok.png", x0 + 70, y0 + dy - r - 90, mediaDir, r);
+            gui_partida_perdida.InsertCircleButton(1, "CANCEL", "cancel.png", x0 + dx - r - 70, y0 + dy - r - 90, mediaDir, r);
 
         }
 
+        public void inicializarGUITerciaria()
+        {
+            float W = D3DDevice.Instance.Width;
+            float H = D3DDevice.Instance.Height;
+
+            int dx = (int)(700.0f);
+            int dy = (int)(450.0f);
+            int x0 = (int)((W - dx) / 2);
+            int y0 = (int)((H - dy) / 2);
+            int r = 100;
+
+            gui_partida_ganada.Create(MediaDir);
+            gui_partida_ganada.InitDialog(false, false);
+            gui_partida_ganada.InsertImage("menu_partida_ganada.jpg", 1850, 450, directorio.Menu);
+
+            gui_partida_ganada.InsertFrame("Partida Ganada", x0, y0, dx, dy, Color.FromArgb(0, 0, 0));
+            gui_partida_ganada.InsertCircleButton(0, "OK", "ok.png", x0 + 70, y0 + dy - r - 90, mediaDir, r);
+        }
+
+
+        public void gui_partida_ganada_render(float elapsedTime)
+        {
+            
+            GuiMessage mensaje_gui = gui_partida_ganada.Update(elapsedTime, Input);
+            soundManager.pauseSonidos();
+
+            // proceso el msg
+            switch (mensaje_gui.message)
+            {
+                case MessageType.WM_COMMAND:
+                    switch (mensaje_gui.id)
+                    {
+                        case IDOK:
+                            System.Windows.Forms.Application.Exit(); ;
+                            break;
+                        case IDCANCEL:
+                            System.Windows.Forms.Application.Exit();
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+
+            gui_partida_ganada.Render();
+        }
         public void gui_partida_perdida_render(float elapsedTime)
         {
-            GuiMessage mensaje_gui = gui_secundaria.Update(elapsedTime, Input);
+            GuiMessage mensaje_gui = gui_partida_perdida.Update(elapsedTime, Input);
             soundManager.pauseSonidos();
 
             // proceso el msg
@@ -1132,13 +1188,13 @@ namespace TGC.Group.Modelo
                     break;
             }
 
-            gui_secundaria.Render();
+            gui_partida_perdida.Render();
         }
 
         public void gui_principal_render(float elapsedTime)
         {
             PreRender();
-            GuiMessage mensaje_gui = gui_primaria.Update(elapsedTime, Input);
+            GuiMessage mensaje_gui = gui_menu_principal.Update(elapsedTime, Input);
             
             
             // proceso el msg
@@ -1151,7 +1207,7 @@ namespace TGC.Group.Modelo
 
                         case IDCANCEL:
                             // Resultados OK, y CANCEL del ultimo messagebox
-                            gui_primaria.EndDialog();
+                            gui_menu_principal.EndDialog();
                             profiling = false;
                             if (msg_box_app_exit)
                             {
@@ -1176,7 +1232,7 @@ namespace TGC.Group.Modelo
                             break;*/
 
                         case ID_APP_EXIT:
-                            gui_primaria.Menu_Exit("Desea Salir del Juego?",directorio.Menu, "Crash Bandicoot");
+                            gui_menu_principal.Menu_Exit("Desea Salir del Juego?",directorio.Menu, "Crash Bandicoot");
                             msg_box_app_exit = true;
                             break;
 
@@ -1188,7 +1244,7 @@ namespace TGC.Group.Modelo
                 default:
                     break;
             }
-            gui_primaria.Render();
+            gui_menu_principal.Render();
             PostRender();
         }
         #endregion

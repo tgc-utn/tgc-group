@@ -48,7 +48,7 @@ namespace TGC.Group.Modelo
         private float RADIO_ESFERA;
 
         public TGCVector3 POSICION_INICIAL_PERSONAJE { get; set; } = new TGCVector3(0f,0.1f,0f);
-        public TGCVector3 posicionDesarrollo = new TGCVector3(-4052f, 0.1f, -10507f);
+        public TGCVector3 posicionDesarrollo = new TGCVector3(-15142f, 0.1f, -363f);
         private TGCVector3 CHECKPOINT = new TGCVector3(0f, 0f, 0f);
 
         private DireccionPersonaje direccion = new DireccionPersonaje();

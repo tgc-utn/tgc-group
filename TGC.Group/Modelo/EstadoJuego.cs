@@ -11,6 +11,7 @@ namespace TGC.Group.Modelo
         
         public bool partidaPausada { get; set; } = false;
         public bool partidaPerdida { get; set; } = false;
+        public bool partidaGanada { get; set; } = false;
         public bool menu { get; set; } = true;
         public bool godMode { get; set; } = false;
         
@@ -24,6 +25,7 @@ namespace TGC.Group.Modelo
         {
             partidaPausada = false;
             partidaPerdida = false;
+            partidaGanada = false;
             menu = false;
             godMode = false;
         }
