@@ -48,7 +48,7 @@ namespace TGC.Group.Modelo
         private float RADIO_ESFERA;
 
         public TGCVector3 POSICION_INICIAL_PERSONAJE { get; set; } = new TGCVector3(0f,0.1f,0f);
-        public TGCVector3 posicionDesarrollo = new TGCVector3(-15142f, 0.1f, -363f);
+        public TGCVector3 posicionDesarrollo = new TGCVector3(-504f, 100f, -5700f);
         private TGCVector3 CHECKPOINT = new TGCVector3(0f, 0f, 0f);
 
         private DireccionPersonaje direccion = new DireccionPersonaje();
@@ -132,10 +132,20 @@ namespace TGC.Group.Modelo
                                       *TGCMatrix.Translation(posicionActual)
                                       *matrizTransformacionPlataformaRotante;
             personajeMesh.BoundingBox.transform(TGCMatrix.Translation(posicionActual) * matrizTransformacionPlataformaRotante);
-            
+
         }
-        #region Colisiones
-        public bool colisionaConMesh(TgcMesh mesh) => TgcCollisionUtils.testSphereAABB(esferaPersonaje, mesh.BoundingBox);
+        public void renderizarEmisorParticulas(float ElapsedTime)
+        {
+            if (emisorParticulas != null)
+            {
+                emisorParticulas.Position = position();
+                emisorParticulas.Speed = new TGCVector3(65, 20, 15);
+                emisorParticulas.render(ElapsedTime);
+            }
+        }
+
+    #region Colisiones
+    public bool colisionaConMesh(TgcMesh mesh) => TgcCollisionUtils.testSphereAABB(esferaPersonaje, mesh.BoundingBox);
         public bool colisionaConCaja(Caja box)
         {
             TgcBoundingAxisAlignBox boundingBoxColision = boundingBox();

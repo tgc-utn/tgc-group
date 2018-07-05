@@ -445,7 +445,7 @@ namespace TGC.Group.Modelo
         }
 
 
-        public TgcMesh getClosestLight(TGCVector3 pos, float maxDistance)
+        public TgcMesh obtenerFuenteLuzCercana(TGCVector3 pos, float maxDistance)
         {
             var minDist = float.MaxValue;
             TgcMesh minLight = null;

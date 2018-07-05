@@ -47,7 +47,7 @@ namespace TGC.Group.Modelo.Plataformas
         }
         public void Render(float tiempo)
         {
-            OBB.setRotation(TGCVector3.Multiply(vRotacionOBB,tiempo));
+            //OBB.setRotation(TGCVector3.Multiply(vRotacionOBB,tiempo));
             OBB.Render();
         }
         public override void Update(float tiempo)

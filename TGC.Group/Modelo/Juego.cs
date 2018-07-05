@@ -17,6 +17,7 @@ using TGC.Core.Collision;
 using TGC.Core.Shaders;
 using TGC.Core.Text;
 using TGC.Core.Particle;
+using TGC.Core.Geometry;
 
 using TGC.Group.SphereCollisionUtils;
 using TGC.Group.Modelo.Rampas;
@@ -45,7 +46,6 @@ namespace TGC.Group.Modelo
         private Informador informador;
         private Escenario escenario;
         private EstadoJuego estadoJuego;
-
         public static Octree octree;
         public static SoundManager soundManager;
 
@@ -67,13 +67,6 @@ namespace TGC.Group.Modelo
         private bool boundingBoxActivate = false;
 
 
-        public static List<TgcMesh> meshesConLuz;
-        private Microsoft.DirectX.Direct3D.Effect effectLuzComun;
-        private Microsoft.DirectX.Direct3D.Effect effectLuzLava;
-        private Microsoft.DirectX.Direct3D.Effect personajeLightShader;
-
-        private Microsoft.DirectX.Direct3D.Effect olasLavaEffect;
-        private Microsoft.DirectX.Direct3D.Effect postProcessBloom;
 
 
         #region Personaje
@@ -107,8 +100,7 @@ namespace TGC.Group.Modelo
 
         public bool msg_box_app_exit = false;
         public bool profiling = false;
-
-        //private Microsoft.DirectX.Direct3D.Effect effect;
+        
         public struct POINTAPI
         {
             public Int32 x;
@@ -143,9 +135,6 @@ namespace TGC.Group.Modelo
         }
         #endregion
 
-        float ScreenRes_X;
-        float ScreenRes_Y;
-
         #region Sprites
         public CustomSprite barraDeVida;
         public CustomSprite fruta;
@@ -163,7 +152,13 @@ namespace TGC.Group.Modelo
         private TgcThirdPersonCamera camaraInterna;
         private float cameraOffsetHeight = 400;
         private float cameraOffsetForward = -800;
-        private TGCVector3 traslacionFrustum = new TGCVector3(0f, -0, -2800f);
+        private TGCVector3 traslacionFrustum = new TGCVector3(0f, 0, -2800f);
+        #endregion
+
+        #region Resolucion
+
+        float ScreenRes_X;
+        float ScreenRes_Y;
         #endregion
 
         //Debug -> Hay que borrar estas variables
@@ -178,6 +173,8 @@ namespace TGC.Group.Modelo
         float YPorDesnivelGlobal = 0f;
         float longitudRampaGlobal = 0f;
         float alturaRampaGlobal = 0f;
+        TgcArrow flechaLuz;
+        
         #endregion
 
         private List<Hoguera> Hogueras;
@@ -187,18 +184,34 @@ namespace TGC.Group.Modelo
 
         private int cant_pasadas = 2;
 
+        public static List<TgcMesh> meshesConLuz;
+        private Microsoft.DirectX.Direct3D.Effect effectLuzComun;
+        private Microsoft.DirectX.Direct3D.Effect effectLuzLava;
+        private Microsoft.DirectX.Direct3D.Effect personajeLightShader;
+
+        private Microsoft.DirectX.Direct3D.Effect olasLavaEffect;
+        private Microsoft.DirectX.Direct3D.Effect postProcessBloom;
+
+
         private Surface g_pDepthStencil; // Depth-stencil buffer
         private Texture g_pRenderTarget, g_pGlowMap, g_pRenderTarget4, g_pRenderTarget4Aux;
         private VertexBuffer g_pVBV3D;
         Microsoft.DirectX.Direct3D.Device d3dDevice;
 
+        private readonly int SHADOWMAP_SIZE = 1024;
+        private Microsoft.DirectX.Direct3D.Effect efectoShadow;
+        private TGCVector3 g_LightDir; // direccion de la luz actual
+        private TGCVector3 g_LightPos; // posicion de la luz actual (la que estoy analizando)
+        private TGCMatrix g_LightView; // matriz de view del light
+        private TGCMatrix g_mShadowProj; // Projection matrix for shadow map
+        private Surface g_pDSShadow; // Depth-stencil buffer for rendering to shadow map
+
+        private Texture g_pShadowMap; // Texture to which the shadow map is rendered
+
         public override void Init()
         {
             //Device de DirectX para crear primitivas.
             d3dDevice = D3DDevice.Instance.Device;
-            
-            
-            
             ScreenRes_X = d3dDevice.PresentationParameters.BackBufferWidth;
             ScreenRes_Y = d3dDevice.PresentationParameters.BackBufferHeight;
             
@@ -248,12 +261,9 @@ namespace TGC.Group.Modelo
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara = camaraInterna;
 
-            
-
-            var meshesSinPlatXZ = escenario.scene.Meshes.FindAll(mesh => mesh.Name != "PlataformaX" && mesh.Name != "PlataformaZ");
 
             octree = new Octree();
-            octree.create(meshesSinPlatXZ, escenario.BoundingBox());
+            octree.create(escenario.scene.Meshes, escenario.BoundingBox());
             octree.createDebugOctreeMeshes();// --> Para renderizar las "cajas" que genera
 
             Frustum.Color = Color.Black;
@@ -342,6 +352,32 @@ namespace TGC.Group.Modelo
             //vertex buffer de los triangulos
             g_pVBV3D = new VertexBuffer(typeof(CustomVertex.PositionTextured), 4, d3dDevice, Usage.Dynamic | Usage.WriteOnly, CustomVertex.PositionTextured.Format, Pool.Default);
             g_pVBV3D.SetData(vertices, 0, LockFlags.None);
+
+
+            efectoShadow = TgcShaders.loadEffect(directorio.ShadowMap);
+
+            // Creo el shadowmap.
+            // Format.R32F
+            // Format.X8R8G8B8
+            g_pShadowMap = new Texture(D3DDevice.Instance.Device, SHADOWMAP_SIZE, SHADOWMAP_SIZE, 1, Usage.RenderTarget, Format.R32F, Pool.Default);
+
+            // tengo que crear un stencilbuffer para el shadowmap manualmente
+            // para asegurarme que tenga el mismo tamano que el shadowmap, y que no tenga
+            // multisample, etc etc.
+            g_pDSShadow = D3DDevice.Instance.Device.CreateDepthStencilSurface(SHADOWMAP_SIZE, SHADOWMAP_SIZE, DepthFormat.D24S8, MultiSampleType.None, 0, true);
+            // por ultimo necesito una matriz de proyeccion para el shadowmap, ya
+            // que voy a dibujar desde el pto de vista de la luz.
+            // El angulo tiene que ser mayor a 45 para que la sombra no falle en los extremos del cono de luz
+            // de hecho, un valor mayor a 90 todavia es mejor, porque hasta con 90 grados es muy dificil
+            // lograr que los objetos del borde generen sombras
+            var aspectRatio = D3DDevice.Instance.AspectRatio;
+            g_mShadowProj = TGCMatrix.PerspectiveFovLH(Geometry.DegreeToRadian(80), aspectRatio, 50, 5000);
+            // D3DDevice.Instance.Device.Transform.Projection = TGCMatrix.PerspectiveFovLH(Geometry.DegreeToRadian(45.0f), aspectRatio, 0, -2800f).ToMatrix();
+
+            flechaLuz = new TgcArrow();
+            flechaLuz.Thickness = 1f;
+            flechaLuz.HeadSize = new TGCVector2(2f, 2f);
+            flechaLuz.BodyColor = Color.Blue;
 
 
             //Configurar animacion inicial
@@ -652,6 +688,7 @@ namespace TGC.Group.Modelo
         public void movimientoDePlataformas()
         {
             foreach (Plataforma plataforma in escenario.plataformas) plataforma.Update(tiempoAcumulado);
+            foreach (PlataformaRotante plataforma in escenario.plataformasRotantes) plataforma.Update(tiempoAcumulado);
         }
         public void movimientoDeCajas(TGCVector3 movimientoOriginal)
         {
@@ -777,48 +814,41 @@ namespace TGC.Group.Modelo
                 #region PrimerRender
                 //inicio del primer render
                 D3DDevice.Instance.Device.BeginScene();
-                Frustum.render();
+
                 olasLavaEffect.SetValue("time", tiempoAcumulado);
 
                 if(estadoJuego.partidaGanada) gui_partida_ganada_render(ElapsedTime);
                 else if (!estadoJuego.partidaPerdida)
                 {
+                    Frustum.render();
+                    octree.render(Frustum, boundingBoxActivate);
                     renderizarSprites();
-                    informador.renderizarInforme(estadoJuego, personaje, ElapsedTime);
                     renderizarDebug();
-                    //Renderizo OBB de las plataformas rotantes
-                    escenario.plataformasRotantes.ForEach(plat => plat.Render(tiempoAcumulado));
+                    personaje.renderizarEmisorParticulas(ElapsedTime);
+                    informador.renderizarInforme(estadoJuego, personaje, ElapsedTime);
+
+                  
 
                     if (!estadoJuego.partidaPausada)
                     {
-                        renderizarRestantes();
-                        octree.render(Frustum, boundingBoxActivate);
                         personaje.animateAndRender(ElapsedTime);
-                        if (personaje.emisorParticulas != null)
-                        {
-                            personaje.emisorParticulas.Position = personaje.position();
-                            personaje.emisorParticulas.Speed = new TGCVector3(65, 20, 15);
-                            personaje.emisorParticulas.render(ElapsedTime);
-                        }
-                        escenario.RenderAll();
-
                     }
                     else DrawText.drawText("EN PAUSA", 500, 500, Color.Red);
 
 
                     if (boundingBoxActivate)
                     {
-                        personaje.boundingBox().Render();
                         personaje.esferaPersonaje.Render();
                         escenario.RenderizarBoundingBoxes();
                     }
+                    
 
 
-                    TgcMesh closestLight = escenario.getClosestLight(personaje.position(), 2500f);
-                    if (closestLight != null)
+                    TgcMesh luzCercana = escenario.obtenerFuenteLuzCercana(personaje.position(), 2500f);
+                    if (luzCercana != null)
                     {
                         personaje.effect().SetValue("lightColor", ColorValue.FromColor(Color.White));
-                        personaje.effect().SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(closestLight.Position));
+                        personaje.effect().SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luzCercana.Position));
                         personaje.effect().SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
                     }
                     personaje.effect().SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
@@ -830,10 +860,10 @@ namespace TGC.Group.Modelo
                     personaje.effect().SetValue("lightIntensity", 20);
                     personaje.effect().SetValue("lightAttenuation", 25);
 
-                    foreach (TgcMesh mesh in meshesConLuz)
+                    /*foreach (TgcMesh mesh in meshesConLuz)
                     {
                         mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
-                    }
+                    }*/
 
 
                     //EMISORES DE PARTICULAS
@@ -855,6 +885,7 @@ namespace TGC.Group.Modelo
                 pSurf.Dispose();
                 #endregion
 
+                #region SegundoRender
 
                 // dibujo el glow map
                 postProcessBloom.Technique = "DefaultTechnique";
@@ -901,7 +932,9 @@ namespace TGC.Group.Modelo
                 D3DDevice.Instance.Device.EndScene();
 
                 pSurf.Dispose();
+                #endregion
 
+                #region TercerRender
                 // Hago un blur sobre el glow map
                 // 1er pasada: downfilter x 4
                 // -----------------------------------------------------
@@ -997,6 +1030,62 @@ namespace TGC.Group.Modelo
 
                 D3DDevice.Instance.Device.EndScene();
 
+                #endregion
+
+                #region CuartoRender
+                g_LightPos = personaje.position() + new TGCVector3(0f,1000f,0f);
+                g_LightDir = new TGCVector3(1000f,0f,0f) - g_LightPos;
+                g_LightDir.Normalize();
+
+
+               
+                // Calculo la matriz de view de la luz
+                efectoShadow.SetValue("g_vLightPos", new TGCVector4(g_LightPos.X, g_LightPos.Y, g_LightPos.Z, 1));
+                efectoShadow.SetValue("g_vLightDir", new TGCVector4(g_LightDir.X, g_LightDir.Y, g_LightDir.Z, 1));
+                g_LightView = TGCMatrix.LookAtLH(g_LightPos, g_LightPos + g_LightDir, new TGCVector3(0, 0, 1));
+
+                // inicializacion standard:
+                efectoShadow.SetValue("g_mProjLight", g_mShadowProj.ToMatrix());
+                efectoShadow.SetValue("g_mViewLightProj", (g_LightView * g_mShadowProj).ToMatrix());
+
+                // Primero genero el shadow map, para ello dibujo desde el pto de vista de luz
+                // a una textura, con el VS y PS que generan un mapa de profundidades.
+                pOldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
+                var pShadowSurf = g_pShadowMap.GetSurfaceLevel(0);
+                D3DDevice.Instance.Device.SetRenderTarget(0, pShadowSurf);
+                pOldDS = D3DDevice.Instance.Device.DepthStencilSurface;
+                D3DDevice.Instance.Device.DepthStencilSurface = g_pDSShadow;
+                D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+                D3DDevice.Instance.Device.BeginScene();
+
+                // Hago el render de la escena pp dicha
+                efectoShadow.SetValue("g_txShadow", g_pShadowMap);
+                //RenderScene(true);
+
+                //Renderizar objetos de la escena con ShadowMap
+                var meshesConSombra = escenario.CajasMesh();
+                foreach(var mesh in meshesConSombra)
+                {
+                    mesh.Effect = efectoShadow;
+                    mesh.Technique = "RenderScene";
+                }
+                octree.modelos = meshesConSombra;
+                octree.render(Frustum, boundingBoxActivate);
+
+                octree.modelos = modelosAnterior;
+
+                // Termino
+                D3DDevice.Instance.Device.EndScene();
+
+                //TextureLoader.Save("shadowmap.bmp", ImageFileFormat.Bmp, g_pShadowMap);
+
+                // restuaro el render target y el stencil
+                D3DDevice.Instance.Device.DepthStencilSurface = pOldDS;
+                D3DDevice.Instance.Device.SetRenderTarget(0, pOldRT);
+
+
+                #endregion
+
                 D3DDevice.Instance.Device.BeginScene();
                 RenderFPS();
                 RenderAxis();
@@ -1005,7 +1094,6 @@ namespace TGC.Group.Modelo
             }
         }
 
-        private void renderizarRestantes() => escenario.plataformas.ForEach(plat => { if (plat.plataformaMesh.Name == "PlataformaX" || plat.plataformaMesh.Name == "PlataformaZ") plat.plataformaMesh.Render(); });
         private void renderizarSprites()
         {
             drawer2D.BeginDrawSprite();
@@ -1254,11 +1342,12 @@ namespace TGC.Group.Modelo
             meshesConLuz = new List<TgcMesh>();
             effectLuzComun = TgcShaders.Instance.TgcMeshPhongShader;
             effectLuzLava = effectLuzComun.Clone(effectLuzComun.Device);
+
             foreach (TgcMesh mesh in escenario.scene.Meshes)
             {
                 Microsoft.DirectX.Direct3D.Effect defaultEffect = mesh.Effect;
 
-                TgcMesh luz = escenario.getClosestLight(mesh.BoundingBox.calculateBoxCenter(), 2500f);
+                TgcMesh luz = escenario.obtenerFuenteLuzCercana(mesh.BoundingBox.calculateBoxCenter(), 2500f);
 
                 if (luz == null)
                 {
@@ -1285,7 +1374,7 @@ namespace TGC.Group.Modelo
                         {
                             if (mesh.Layer != "LAVA" && mesh.Layer != "FUEGO" && mesh.Layer != "HOGUERA")
                             {
-                                mesh.Effect = effectLuzComun;
+                               /* mesh.Effect = effectLuzComun;
                                 mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
                                 mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
                                 mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
@@ -1294,7 +1383,7 @@ namespace TGC.Group.Modelo
                                 mesh.Effect.SetValue("ambientColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
                                 mesh.Effect.SetValue("diffuseColor", ColorValue.FromColor(Color.White));
                                 mesh.Effect.SetValue("specularColor", ColorValue.FromColor(Color.DimGray));
-                                mesh.Effect.SetValue("specularExp", 500f);
+                                mesh.Effect.SetValue("specularExp", 500f);*/
                             }
                         }
                         meshesConLuz.Add(mesh);
