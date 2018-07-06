@@ -140,12 +140,14 @@ namespace TGC.Group.Modelo
         public CustomSprite fruta;
         public CustomSprite mascara;
         public CustomSprite hoguera;
+        public CustomSprite pauseSprite;
         //public CustomSprite sonido;
         public Drawer2D drawer2D;
         public TgcText2D textoFrutas;
         public TgcText2D textoMascaras;
         public TgcText2D textoSonido;
         public TgcText2D textoHoguera;
+        
         #endregion
 
         #region Camara
@@ -828,7 +830,13 @@ namespace TGC.Group.Modelo
                 {
                     personaje.animateAndRender(ElapsedTime);
                 }
-                else DrawText.drawText("EN PAUSA", 500, 500, Color.Red);
+                else
+                {
+                    drawer2D.BeginDrawSprite();
+                    drawer2D.DrawSprite(pauseSprite);
+                    drawer2D.EndDrawSprite();
+                }
+                  
 
 
                 if (boundingBoxActivate)
@@ -1428,6 +1436,11 @@ namespace TGC.Group.Modelo
             textoHoguera.Size = new Size(350, 140);
             textoHoguera.changeFont(new System.Drawing.Font("TimesNewRoman", 30, FontStyle.Bold));
 
+
+            pauseSprite = new CustomSprite();
+            pauseSprite.Bitmap = new CustomBitmap(directorio.Paused, d3dDevice);
+            pauseSprite.Position = new TGCVector2(ScreenRes_X/2- pauseSprite.Bitmap.Size.Width/2, ScreenRes_Y/2 - pauseSprite.Bitmap.Size.Height/2);
+
             textoSonido = new TgcText2D();
             textoSonido.Text = "Sound: on";
             textoSonido.Color = Color.Green;
@@ -1435,6 +1448,7 @@ namespace TGC.Group.Modelo
             textoSonido.Position = new Point(1400, 20);
             textoSonido.Size = new Size(200, 20);
             textoSonido.changeFont(new System.Drawing.Font("TimesNewRoman", 15, FontStyle.Bold));
+            
 
         }
 

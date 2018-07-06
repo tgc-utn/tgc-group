@@ -51,6 +51,7 @@ namespace TGC.Group.Modelo
         public string Mascara { get; set; }
         public string Sonido { get; set; }
         public string Hoguera { get; set; }
+        public string Paused { get; set; }
 
         public string ShadowMap { get; set; }
 
@@ -83,6 +84,7 @@ namespace TGC.Group.Modelo
             Mascara = mediaDir + "Imagenes\\mascara.png";
             Sonido = mediaDir + "Imagenes\\sound.png";
             Hoguera = mediaDir + "Imagenes\\hoguera.png";
+            Paused = mediaDir + "Imagenes\\paused.png";
 
             ShadowMap = mediaDir + "ShadowMap.fx";
         }
