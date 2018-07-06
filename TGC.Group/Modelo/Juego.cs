@@ -141,6 +141,8 @@ namespace TGC.Group.Modelo
         public CustomSprite mascara;
         public CustomSprite hoguera;
         public CustomSprite pauseSprite;
+        public CustomSprite soundOnSprite;
+        public CustomSprite soundOffSprite;
         //public CustomSprite sonido;
         public Drawer2D drawer2D;
         public TgcText2D textoFrutas;
@@ -516,7 +518,7 @@ namespace TGC.Group.Modelo
                 #endregion
 
                 #region Sonido
-                if (soundManager.sonido) textoSonido.Text = "Sound: on";
+                if (soundManager.estado_sonido) textoSonido.Text = "Sound: on";
                 else textoSonido.Text = "Sound: off";
                 #endregion
 
@@ -1092,11 +1094,15 @@ namespace TGC.Group.Modelo
             drawer2D.DrawSprite(fruta);
             drawer2D.DrawSprite(mascara);
             drawer2D.DrawSprite(hoguera);
+
+            if (soundManager.estado_sonido) drawer2D.DrawSprite(soundOnSprite);
+            else drawer2D.DrawSprite(soundOffSprite);
+
             drawer2D.EndDrawSprite();
 
             textoFrutas.render();
             textoMascaras.render();
-            textoSonido.render();
+            //textoSonido.render();
             textoHoguera.render();
 
         }
@@ -1440,6 +1446,16 @@ namespace TGC.Group.Modelo
             pauseSprite = new CustomSprite();
             pauseSprite.Bitmap = new CustomBitmap(directorio.Paused, d3dDevice);
             pauseSprite.Position = new TGCVector2(ScreenRes_X/2- pauseSprite.Bitmap.Size.Width/2, ScreenRes_Y/2 - pauseSprite.Bitmap.Size.Height/2);
+
+            soundOnSprite = new CustomSprite();
+            soundOnSprite.Bitmap = new CustomBitmap(directorio.SoundOn, d3dDevice);
+            soundOnSprite.Position = new TGCVector2(ScreenRes_X - soundOnSprite.Bitmap.Size.Width, 0f);
+            
+
+            soundOffSprite = new CustomSprite();
+            soundOffSprite.Bitmap = new CustomBitmap(directorio.SoundOff, d3dDevice);
+            soundOffSprite.Position = new TGCVector2(ScreenRes_X - soundOffSprite.Bitmap.Size.Width, 0f);
+            soundOffSprite.Scaling = new TGCVector2(1f, 1.1f);
 
             textoSonido = new TgcText2D();
             textoSonido.Text = "Sound: on";

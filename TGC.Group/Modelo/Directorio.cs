@@ -52,6 +52,8 @@ namespace TGC.Group.Modelo
         public string Sonido { get; set; }
         public string Hoguera { get; set; }
         public string Paused { get; set; }
+        public string SoundOn { get; set; }
+        public string SoundOff { get; set; }
 
         public string ShadowMap { get; set; }
 
@@ -85,6 +87,8 @@ namespace TGC.Group.Modelo
             Sonido = mediaDir + "Imagenes\\sound.png";
             Hoguera = mediaDir + "Imagenes\\hoguera.png";
             Paused = mediaDir + "Imagenes\\paused.png";
+            SoundOn = mediaDir + "Imagenes\\sound_on.png";
+            SoundOff = mediaDir + "Imagenes\\sound_off.png";
 
             ShadowMap = mediaDir + "ShadowMap.fx";
         }

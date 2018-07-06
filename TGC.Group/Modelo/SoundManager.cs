@@ -23,7 +23,7 @@ namespace TGC.Group.Modelo
         private TgcMp3Player mp3SaltosPlayer = new TgcMp3Player();
         private TgcMp3Player mp3FruitPlayer = new TgcMp3Player();
 
-        public bool sonido { get; set; }  = true;
+        public bool estado_sonido { get; set; }  = true;
 
         public SoundManager(Directorio directorio,Microsoft.DirectX.DirectSound.Device dsDevice)
         {
@@ -47,8 +47,8 @@ namespace TGC.Group.Modelo
         }
         public void actualizarEstado()
         {
-            sonido = !sonido;
-            if (sonido) reanudarSonidos();
+            estado_sonido = !estado_sonido;
+            if (estado_sonido) reanudarSonidos();
             else pauseSonidos();
             
         }
@@ -66,7 +66,7 @@ namespace TGC.Group.Modelo
 
         public void playSonidoCaminar()
         {
-           if(sonido) SonidoCaminar.play();
+           if(estado_sonido) SonidoCaminar.play();
         }
 
         public void stopSonidoCaminar()
@@ -76,22 +76,22 @@ namespace TGC.Group.Modelo
 
         public void playSonidoSaltar()
         {
-            if(sonido)SonidoSalto.play(false);
+            if(estado_sonido)SonidoSalto.play(false);
         }
 
         public void playSonidoFondo()
         {
-          if(sonido)mp3BackgroundPlayer.play(true);
+          if(estado_sonido)mp3BackgroundPlayer.play(true);
         }
 
         public void playSonidoDanio()
         {
-            if (sonido) SonidoDanio.play();
+            if (estado_sonido) SonidoDanio.play();
         }
 
         public void playSonidoFruta()
         {
-            if (sonido)
+            if (estado_sonido)
             {
                 //mp3FruitPlayer.play(false);
                 SonidoMoneda.stop();
@@ -101,7 +101,7 @@ namespace TGC.Group.Modelo
 
         public void playSonidoMoneda()
         {
-            if (sonido)
+            if (estado_sonido)
             {
             SonidoMoneda.stop();
             SonidoMoneda.play(false);
