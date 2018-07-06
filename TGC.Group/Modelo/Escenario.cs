@@ -242,9 +242,10 @@ namespace TGC.Group.Modelo
             Juego.octree.modelos.Remove(mesh);
         }
 
-        public bool personajeSobreFruta()
+
+        public TgcMesh obtenerFrutaColisionada()
         {
-            return Frutas().Exists(fruta => personaje.colisionaConMesh(fruta));
+            return Frutas().Find(fruta => personaje.colisionaConMesh(fruta));
         }
 
         public void eliminarFrutaColisionada()

@@ -480,10 +480,19 @@ namespace TGC.Group.Modelo
                 #endregion
 
                 #region Frutas
-                if (escenario.personajeSobreFruta())
+                TgcMesh fruta;
+                if ((fruta = escenario.obtenerFrutaColisionada()) != null) 
                 {
-                    personaje.aumentarFrutas();
-                    soundManager.playSonidoFruta();
+                    if (fruta.Name == "PODRIDA")
+                    {
+                        personaje.comerFrutaPodrida();
+                        soundManager.playSonidoDanio();
+                    }
+                    else
+                    {
+                        personaje.aumentarFrutas();
+                        soundManager.playSonidoFruta();
+                    }
                     escenario.eliminarFrutaColisionada();
                  }
                  textoFrutas.Text = personaje.frutas.ToString();

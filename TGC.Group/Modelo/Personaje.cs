@@ -284,7 +284,8 @@ namespace TGC.Group.Modelo
         public bool vidaCompleta() => vida == vidaMaxima;
         public bool vivo() => vida > 0;
         public void aumentarVida(float aumento)=>vida += aumento;
-       
+        public void comerFrutaPodrida() => aumentarVida(-0.1f);
+
         public void aumentarFrutas() => frutas++;
         
         public void aumentarMascaras() => mascaras++;
