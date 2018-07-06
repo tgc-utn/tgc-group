@@ -781,7 +781,7 @@ namespace TGC.Group.Modelo
                 var modelosAnterior = octree.modelos;
 
                 #region ShadowMap
-                g_LightPos = personaje.position() + new TGCVector3(0f,800f,0f);
+                g_LightPos = personaje.position() + new TGCVector3(-300f,400f,-300f);
                 g_LightDir = personaje.position() - g_LightPos;
                 g_LightDir.Normalize();
 
