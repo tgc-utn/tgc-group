@@ -812,6 +812,8 @@ namespace TGC.Group.Modelo
                 D3DDevice.Instance.Device.DepthStencilSurface = g_pDepthStencil;
                 D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
             
+
+
                 #region ShadowMap
                 g_LightPos = personaje.position() + new TGCVector3(0f,800f,0f);
                 g_LightDir = personaje.position() - g_LightPos;
@@ -1234,7 +1236,7 @@ namespace TGC.Group.Modelo
 
         public void gui_partida_ganada_render(float elapsedTime)
         {
-            
+            PreRender();
             GuiMessage mensaje_gui = gui_partida_ganada.Update(elapsedTime, Input);
             soundManager.pauseSonidos();
 
@@ -1260,9 +1262,11 @@ namespace TGC.Group.Modelo
             }
 
             gui_partida_ganada.Render();
+            PostRender();
         }
         public void gui_partida_perdida_render(float elapsedTime)
         {
+            PreRender();
             GuiMessage mensaje_gui = gui_partida_perdida.Update(elapsedTime, Input);
             soundManager.pauseSonidos();
 
@@ -1289,6 +1293,7 @@ namespace TGC.Group.Modelo
             }
 
             gui_partida_perdida.Render();
+            PostRender();
         }
 
         public void gui_principal_render(float elapsedTime)
