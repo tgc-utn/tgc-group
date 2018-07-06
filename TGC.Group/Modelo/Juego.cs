@@ -166,19 +166,14 @@ namespace TGC.Group.Modelo
         private TGCVector3 movimientoRealCaja = TGCVector3.Empty;
         //TGCVector3 movimientoPorPlataforma = new TGCVector3(0, 0, 0);
 
-        float coeficienteDiferencialGlobal = 0f;
         TGCVector3 verticeMasAltoGlobal = new TGCVector3(0, 0, 0);
-        bool colisionRampa = false;
+       
         TGCVector3 vectorDiferenciaGlobal = new TGCVector3(0, 0, 0);
-        float YPorDesnivelGlobal = 0f;
-        float longitudRampaGlobal = 0f;
-        float alturaRampaGlobal = 0f;
-        TgcArrow flechaLuz;
+
         
         #endregion
 
-        private List<Hoguera> Hogueras;
-        private List<FuegoLuz> FuegosLuz;
+        
 
         Random generadorRandom = new Random(); //Generador de numeros aleatorios;
 
@@ -275,21 +270,7 @@ namespace TGC.Group.Modelo
             inicializarIluminacion();
             inicializarSprites(d3dDevice);
 
-
-
-
-            Hogueras = new List<Hoguera>();
-            foreach (TgcMesh mesh in escenario.HoguerasMesh())
-            {
-                Hogueras.Add(new Hoguera(mesh, 1));
-            }
-
-            FuegosLuz = new List<FuegoLuz>();
-            foreach (TgcMesh mesh in escenario.FuegosMesh())
-            {
-                FuegosLuz.Add(new FuegoLuz(mesh));
-            }
-
+            
             string compilationErrors;
             olasLavaEffect = Microsoft.DirectX.Direct3D.Effect.FromFile(d3dDevice, MediaDir + "OlasLava.fx",
                 null, null, ShaderFlags.PreferFlowControl, null, out compilationErrors);
@@ -373,11 +354,6 @@ namespace TGC.Group.Modelo
             var aspectRatio = D3DDevice.Instance.AspectRatio;
             g_mShadowProj = TGCMatrix.PerspectiveFovLH(Geometry.DegreeToRadian(80), aspectRatio, 50, 5000);
              D3DDevice.Instance.Device.Transform.Projection = TGCMatrix.PerspectiveFovLH(Geometry.DegreeToRadian(45.0f), aspectRatio, 2f, 4000f).ToMatrix();
-
-            flechaLuz = new TgcArrow();
-            flechaLuz.Thickness = 1f;
-            flechaLuz.HeadSize = new TGCVector2(2f, 2f);
-            flechaLuz.BodyColor = Color.Blue;
 
 
             //Configurar animacion inicial
@@ -646,14 +622,12 @@ namespace TGC.Group.Modelo
 
             if (rampa == null || personaje.jumping)
             {
-                colisionRampa = false;
+               
                 ColisionadorEsferico.GravityEnabled = true;
                 return -1;
             }
             ColisionadorEsferico.GravityEnabled = false;
-
-            colisionRampa = true;
-
+            
             return rampa.obtenerAlturaInstantanea(personaje.position()) + personaje.esferaPersonaje.Radius;
 
         }
@@ -801,18 +775,6 @@ namespace TGC.Group.Modelo
             {
                 Surface pSurf, pOldRT, pOldDS;
                 var modelosAnterior = octree.modelos;
-                // DefaultTechnique no cambia nada de lo visible (Mientras KLum = 1)
-                postProcessBloom.Technique = "DefaultTechnique";
-                // guardo el Render target anterior y seteo la textura como render target
-                pOldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
-                pSurf = g_pRenderTarget.GetSurfaceLevel(0);
-                D3DDevice.Instance.Device.SetRenderTarget(0, pSurf);
-                // hago lo mismo con el depthbuffer, necesito el que no tiene multisampling
-                pOldDS = D3DDevice.Instance.Device.DepthStencilSurface;
-                D3DDevice.Instance.Device.DepthStencilSurface = g_pDepthStencil;
-                D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
-            
-
 
                 #region ShadowMap
                 g_LightPos = personaje.position() + new TGCVector3(0f,800f,0f);
@@ -836,8 +798,19 @@ namespace TGC.Group.Modelo
 
                 #endregion
 
+
                 #region Principales
-                //inicio del primer render
+                
+                // guardo el Render target anterior y seteo la textura como render target
+                pOldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
+                pSurf = g_pRenderTarget.GetSurfaceLevel(0);
+                D3DDevice.Instance.Device.SetRenderTarget(0, pSurf);
+                // hago lo mismo con el depthbuffer, necesito el que no tiene multisampling
+                pOldDS = D3DDevice.Instance.Device.DepthStencilSurface;
+                D3DDevice.Instance.Device.DepthStencilSurface = g_pDepthStencil;
+                D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+
+
                 D3DDevice.Instance.Device.BeginScene();
 
                 olasLavaEffect.SetValue("time", tiempoAcumulado);
@@ -866,10 +839,10 @@ namespace TGC.Group.Modelo
 
 
 
-                TgcMesh luzCercana = escenario.obtenerFuenteLuzCercana(personaje.position(), 2500f);
+                /*TgcMesh luzCercana = escenario.obtenerFuenteLuzCercana(personaje.position(), 2500f);
                 if (luzCercana != null)
                 {
-                    personaje.effect().SetValue("lightColor", ColorValue.FromColor(Color.White));
+                    personaje.effect().SetValue("lightColor", ColorValue.FromColor(Color.Red));
                     personaje.effect().SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luzCercana.Position));
                     personaje.effect().SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
                 }
@@ -882,33 +855,29 @@ namespace TGC.Group.Modelo
                 personaje.effect().SetValue("lightIntensity", 20);
                 personaje.effect().SetValue("lightAttenuation", 25);
 
-                /*foreach (TgcMesh mesh in meshesConLuz)
+               foreach (TgcMesh mesh in meshesConLuz)
                 {
                     mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
                 }*/
 
 
-                //EMISORES DE PARTICULAS
+                //Emisores de Particulas
                 D3DDevice.Instance.ParticlesEnabled = true;
                 D3DDevice.Instance.EnableParticles();
-                foreach (Hoguera s in escenario.hogueras)
-                {
-                    s.renderParticles(ElapsedTime);
-                }
-                foreach (FuegoLuz s in escenario.fuegosLuz)
-                {
-                    s.renderParticles(ElapsedTime);
-                }
-                
-                
-                //Fin del primer render
+                escenario.hogueras.ForEach(hoguera => hoguera.renderParticles(ElapsedTime));
+                escenario.fuegosLuz.ForEach(hoguera => hoguera.renderParticles(ElapsedTime));
+
+
                 D3DDevice.Instance.Device.EndScene();
-                pSurf.Dispose();
                 #endregion
 
-                #region GlowMap
 
+
+                #region GlowMap
                 // dibujo el glow map
+
+
+                // DefaultTechnique no cambia nada de lo visible (Mientras KLum = 1)
                 postProcessBloom.Technique = "DefaultTechnique";
                 pSurf = g_pGlowMap.GetSurfaceLevel(0);
                 D3DDevice.Instance.Device.SetRenderTarget(0, pSurf);
@@ -1391,7 +1360,8 @@ namespace TGC.Group.Modelo
                         {
                             if (mesh.Layer != "LAVA" && mesh.Layer != "FUEGO" && mesh.Layer != "HOGUERA")
                             {
-                               /* mesh.Effect = effectLuzComun;
+                                /*mesh.Effect = effectLuzComun;
+                                
                                 mesh.Technique = TgcShaders.Instance.getTgcMeshTechnique(mesh.RenderType);
                                 mesh.Effect.SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luz.Position));
                                 mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
@@ -1408,9 +1378,9 @@ namespace TGC.Group.Modelo
                 }
                 //mesh.Technique = "RenderScene2";
             }
-            personajeLightShader = TgcShaders.Instance.TgcSkeletalMeshPointLightShader;
-            personaje.effect(personajeLightShader);
-            personaje.technique(TgcShaders.Instance.getTgcSkeletalMeshTechnique(personaje.renderType()));
+            //personajeLightShader = TgcShaders.Instance.TgcSkeletalMeshPointLightShader;
+           // personaje.effect(personajeLightShader);
+            //personaje.technique(TgcShaders.Instance.getTgcSkeletalMeshTechnique(personaje.renderType()));
         }
 
         public void inicializarSprites(Microsoft.DirectX.Direct3D.Device d3dDevice)
