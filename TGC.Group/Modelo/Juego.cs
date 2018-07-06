@@ -372,7 +372,7 @@ namespace TGC.Group.Modelo
             // lograr que los objetos del borde generen sombras
             var aspectRatio = D3DDevice.Instance.AspectRatio;
             g_mShadowProj = TGCMatrix.PerspectiveFovLH(Geometry.DegreeToRadian(80), aspectRatio, 50, 5000);
-            // D3DDevice.Instance.Device.Transform.Projection = TGCMatrix.PerspectiveFovLH(Geometry.DegreeToRadian(45.0f), aspectRatio, 0, -2800f).ToMatrix();
+             D3DDevice.Instance.Device.Transform.Projection = TGCMatrix.PerspectiveFovLH(Geometry.DegreeToRadian(45.0f), aspectRatio, 2f, 4000f).ToMatrix();
 
             flechaLuz = new TgcArrow();
             flechaLuz.Thickness = 1f;
@@ -795,11 +795,12 @@ namespace TGC.Group.Modelo
         public override void Render()
         {
             if (estadoJuego.menu) gui_principal_render(ElapsedTime);
+            else if(estadoJuego.partidaGanada) gui_partida_ganada_render(ElapsedTime);
+            else if (estadoJuego.partidaPerdida) gui_partida_perdida_render(ElapsedTime);
             else
             {
-
                 Surface pSurf, pOldRT, pOldDS;
-           
+                var modelosAnterior = octree.modelos;
                 // DefaultTechnique no cambia nada de lo visible (Mientras KLum = 1)
                 postProcessBloom.Technique = "DefaultTechnique";
                 // guardo el Render target anterior y seteo la textura como render target
@@ -810,82 +811,100 @@ namespace TGC.Group.Modelo
                 pOldDS = D3DDevice.Instance.Device.DepthStencilSurface;
                 D3DDevice.Instance.Device.DepthStencilSurface = g_pDepthStencil;
                 D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+            
+                #region ShadowMap
+                g_LightPos = personaje.position() + new TGCVector3(0f,800f,0f);
+                g_LightDir = personaje.position() - g_LightPos;
+                g_LightDir.Normalize();
 
-                #region PrimerRender
+              
+                D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+
+                //Genero el shadow map
+                RenderShadowMap();
+
+                D3DDevice.Instance.Device.BeginScene();
+                // dibujo la escena pp dicha
+                D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+                RenderScene(false);
+
+                octree.modelos = modelosAnterior;
+                D3DDevice.Instance.Device.EndScene();
+
+
+                #endregion
+
+                #region Principales
                 //inicio del primer render
                 D3DDevice.Instance.Device.BeginScene();
 
                 olasLavaEffect.SetValue("time", tiempoAcumulado);
+                
+            
+                Frustum.render();
+                octree.render(Frustum, boundingBoxActivate);
+                renderizarSprites();
+                renderizarDebug();
+                personaje.renderizarEmisorParticulas(ElapsedTime);
+                informador.renderizarInforme(estadoJuego, personaje, ElapsedTime);
 
-                if(estadoJuego.partidaGanada) gui_partida_ganada_render(ElapsedTime);
-                else if (!estadoJuego.partidaPerdida)
-                {
-                    Frustum.render();
-                    octree.render(Frustum, boundingBoxActivate);
-                    renderizarSprites();
-                    renderizarDebug();
-                    personaje.renderizarEmisorParticulas(ElapsedTime);
-                    informador.renderizarInforme(estadoJuego, personaje, ElapsedTime);
-
-                  
-
-                    if (!estadoJuego.partidaPausada)
-                    {
-                        personaje.animateAndRender(ElapsedTime);
-                    }
-                    else DrawText.drawText("EN PAUSA", 500, 500, Color.Red);
-
-
-                    if (boundingBoxActivate)
-                    {
-                        personaje.esferaPersonaje.Render();
-                        escenario.RenderizarBoundingBoxes();
-                    }
                     
-
-
-                    TgcMesh luzCercana = escenario.obtenerFuenteLuzCercana(personaje.position(), 2500f);
-                    if (luzCercana != null)
-                    {
-                        personaje.effect().SetValue("lightColor", ColorValue.FromColor(Color.White));
-                        personaje.effect().SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luzCercana.Position));
-                        personaje.effect().SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
-                    }
-                    personaje.effect().SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
-                    personaje.effect().SetValue("materialAmbientColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
-                    personaje.effect().SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
-                    personaje.effect().SetValue("materialSpecularColor", ColorValue.FromColor(Color.DimGray));
-                    personaje.effect().SetValue("materialSpecularExp", 500f);
-
-                    personaje.effect().SetValue("lightIntensity", 20);
-                    personaje.effect().SetValue("lightAttenuation", 25);
-
-                    /*foreach (TgcMesh mesh in meshesConLuz)
-                    {
-                        mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
-                    }*/
-
-
-                    //EMISORES DE PARTICULAS
-                    D3DDevice.Instance.ParticlesEnabled = true;
-                    D3DDevice.Instance.EnableParticles();
-                    foreach (Hoguera s in escenario.hogueras)
-                    {
-                        s.renderParticles(ElapsedTime);
-                    }
-                    foreach (FuegoLuz s in escenario.fuegosLuz)
-                    {
-                        s.renderParticles(ElapsedTime);
-                    }
+                if (!estadoJuego.partidaPausada)
+                {
+                    personaje.animateAndRender(ElapsedTime);
                 }
-                else gui_partida_perdida_render(ElapsedTime);
+                else DrawText.drawText("EN PAUSA", 500, 500, Color.Red);
+
+
+                if (boundingBoxActivate)
+                {
+                    personaje.esferaPersonaje.Render();
+                    escenario.RenderizarBoundingBoxes();
+                }
+
+
+
+                TgcMesh luzCercana = escenario.obtenerFuenteLuzCercana(personaje.position(), 2500f);
+                if (luzCercana != null)
+                {
+                    personaje.effect().SetValue("lightColor", ColorValue.FromColor(Color.White));
+                    personaje.effect().SetValue("lightPosition", TGCVector3.Vector3ToFloat4Array(luzCercana.Position));
+                    personaje.effect().SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+                }
+                personaje.effect().SetValue("materialEmissiveColor", ColorValue.FromColor(Color.White));
+                personaje.effect().SetValue("materialAmbientColor", ColorValue.FromColor(Color.FromArgb(50, 50, 50)));
+                personaje.effect().SetValue("materialDiffuseColor", ColorValue.FromColor(Color.White));
+                personaje.effect().SetValue("materialSpecularColor", ColorValue.FromColor(Color.DimGray));
+                personaje.effect().SetValue("materialSpecularExp", 500f);
+
+                personaje.effect().SetValue("lightIntensity", 20);
+                personaje.effect().SetValue("lightAttenuation", 25);
+
+                /*foreach (TgcMesh mesh in meshesConLuz)
+                {
+                    mesh.Effect.SetValue("eyePosition", TGCVector3.Vector3ToFloat4Array(Camara.Position));
+                }*/
+
+
+                //EMISORES DE PARTICULAS
+                D3DDevice.Instance.ParticlesEnabled = true;
+                D3DDevice.Instance.EnableParticles();
+                foreach (Hoguera s in escenario.hogueras)
+                {
+                    s.renderParticles(ElapsedTime);
+                }
+                foreach (FuegoLuz s in escenario.fuegosLuz)
+                {
+                    s.renderParticles(ElapsedTime);
+                }
+                
                 
                 //Fin del primer render
                 D3DDevice.Instance.Device.EndScene();
                 pSurf.Dispose();
                 #endregion
 
-                #region SegundoRender
+                #region GlowMap
 
                 // dibujo el glow map
                 postProcessBloom.Technique = "DefaultTechnique";
@@ -896,7 +915,7 @@ namespace TGC.Group.Modelo
 
 
                 //Dibujamos SOLO los meshes que tienen glow brillantes
-                var modelosAnterior = octree.modelos;
+                
                 octree.modelos = escenario.MeshesLuminosos();
                 octree.render(Frustum, boundingBoxActivate);
 
@@ -934,7 +953,7 @@ namespace TGC.Group.Modelo
                 pSurf.Dispose();
                 #endregion
 
-                #region TercerRender
+                #region Blur
                 // Hago un blur sobre el glow map
                 // 1er pasada: downfilter x 4
                 // -----------------------------------------------------
@@ -1032,59 +1051,6 @@ namespace TGC.Group.Modelo
 
                 #endregion
 
-                #region CuartoRender
-                g_LightPos = personaje.position() + new TGCVector3(0f,1000f,0f);
-                g_LightDir = new TGCVector3(1000f,0f,0f) - g_LightPos;
-                g_LightDir.Normalize();
-
-
-               
-                // Calculo la matriz de view de la luz
-                efectoShadow.SetValue("g_vLightPos", new TGCVector4(g_LightPos.X, g_LightPos.Y, g_LightPos.Z, 1));
-                efectoShadow.SetValue("g_vLightDir", new TGCVector4(g_LightDir.X, g_LightDir.Y, g_LightDir.Z, 1));
-                g_LightView = TGCMatrix.LookAtLH(g_LightPos, g_LightPos + g_LightDir, new TGCVector3(0, 0, 1));
-
-                // inicializacion standard:
-                efectoShadow.SetValue("g_mProjLight", g_mShadowProj.ToMatrix());
-                efectoShadow.SetValue("g_mViewLightProj", (g_LightView * g_mShadowProj).ToMatrix());
-
-                // Primero genero el shadow map, para ello dibujo desde el pto de vista de luz
-                // a una textura, con el VS y PS que generan un mapa de profundidades.
-                pOldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
-                var pShadowSurf = g_pShadowMap.GetSurfaceLevel(0);
-                D3DDevice.Instance.Device.SetRenderTarget(0, pShadowSurf);
-                pOldDS = D3DDevice.Instance.Device.DepthStencilSurface;
-                D3DDevice.Instance.Device.DepthStencilSurface = g_pDSShadow;
-                D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
-                D3DDevice.Instance.Device.BeginScene();
-
-                // Hago el render de la escena pp dicha
-                efectoShadow.SetValue("g_txShadow", g_pShadowMap);
-                //RenderScene(true);
-
-                //Renderizar objetos de la escena con ShadowMap
-                var meshesConSombra = escenario.CajasMesh();
-                foreach(var mesh in meshesConSombra)
-                {
-                    mesh.Effect = efectoShadow;
-                    mesh.Technique = "RenderScene";
-                }
-                octree.modelos = meshesConSombra;
-                octree.render(Frustum, boundingBoxActivate);
-
-                octree.modelos = modelosAnterior;
-
-                // Termino
-                D3DDevice.Instance.Device.EndScene();
-
-                //TextureLoader.Save("shadowmap.bmp", ImageFileFormat.Bmp, g_pShadowMap);
-
-                // restuaro el render target y el stencil
-                D3DDevice.Instance.Device.DepthStencilSurface = pOldDS;
-                D3DDevice.Instance.Device.SetRenderTarget(0, pOldRT);
-
-
-                #endregion
 
                 D3DDevice.Instance.Device.BeginScene();
                 RenderFPS();
@@ -1092,6 +1058,52 @@ namespace TGC.Group.Modelo
                 D3DDevice.Instance.Device.EndScene();
                 D3DDevice.Instance.Device.Present();
             }
+        }
+
+        public void RenderShadowMap()
+        {
+            // Calculo la matriz de view de la luz
+            efectoShadow.SetValue("g_vLightPos", new TGCVector4(g_LightPos.X, g_LightPos.Y, g_LightPos.Z, 1));
+            efectoShadow.SetValue("g_vLightDir", new TGCVector4(g_LightDir.X, g_LightDir.Y, g_LightDir.Z, 1));
+            g_LightView = TGCMatrix.LookAtLH(g_LightPos, g_LightPos + g_LightDir, new TGCVector3(0, 0, 1));
+
+            // inicializacion standard:
+            efectoShadow.SetValue("g_mProjLight", g_mShadowProj.ToMatrix());
+            efectoShadow.SetValue("g_mViewLightProj", (g_LightView * g_mShadowProj).ToMatrix());
+
+            // Primero genero el shadow map, para ello dibujo desde el pto de vista de luz
+            // a una textura, con el VS y PS que generan un mapa de profundidades.
+            var pOldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
+            var pShadowSurf = g_pShadowMap.GetSurfaceLevel(0);
+            D3DDevice.Instance.Device.SetRenderTarget(0, pShadowSurf);
+            var pOldDS = D3DDevice.Instance.Device.DepthStencilSurface;
+            D3DDevice.Instance.Device.DepthStencilSurface = g_pDSShadow;
+            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+            D3DDevice.Instance.Device.BeginScene();
+
+            // Hago el render de la escena pp dicha
+            efectoShadow.SetValue("g_txShadow", g_pShadowMap);
+            RenderScene(true);
+            // Termino
+            D3DDevice.Instance.Device.EndScene();
+
+            // restuaro el render target y el stencil
+            D3DDevice.Instance.Device.DepthStencilSurface = pOldDS;
+            D3DDevice.Instance.Device.SetRenderTarget(0, pOldRT);
+        }
+
+        public void RenderScene(bool shadow)
+        {
+            List<TgcMesh> meshes = escenario.scene.Meshes;
+            meshes.ForEach(mesh =>
+            {
+                if (shadow) mesh.Technique = "RenderShadow";
+                else mesh.Technique = "RenderScene";
+                mesh.Effect = efectoShadow;
+            });
+           
+              octree.modelos = meshes;
+              octree.render(Frustum, boundingBoxActivate);
         }
 
         private void renderizarSprites()
