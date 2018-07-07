@@ -143,12 +143,14 @@ namespace TGC.Group.Modelo
         public CustomSprite pauseSprite;
         public CustomSprite soundOnSprite;
         public CustomSprite soundOffSprite;
+        public CustomSprite cajaSprite;
         //public CustomSprite sonido;
         public Drawer2D drawer2D;
         public TgcText2D textoFrutas;
         public TgcText2D textoMascaras;
         public TgcText2D textoSonido;
         public TgcText2D textoHoguera;
+        public TgcText2D textoCajas;
         
         #endregion
 
@@ -690,6 +692,7 @@ namespace TGC.Group.Modelo
             }
 
             cajaColisionante.afectar(personaje);
+            textoCajas.Text = personaje.cajas.ToString();
             if (cajaColisionante.esTNT()) soundManager.playSonidoDanio();
             
             
@@ -1103,6 +1106,7 @@ namespace TGC.Group.Modelo
             drawer2D.DrawSprite(fruta);
             drawer2D.DrawSprite(mascara);
             drawer2D.DrawSprite(hoguera);
+            drawer2D.DrawSprite(cajaSprite);
 
             if (soundManager.estado_sonido) drawer2D.DrawSprite(soundOnSprite);
             else drawer2D.DrawSprite(soundOffSprite);
@@ -1113,6 +1117,7 @@ namespace TGC.Group.Modelo
             textoMascaras.render();
             //textoSonido.render();
             textoHoguera.render();
+            textoCajas.render();
 
         }
         private void renderizarDebug()
@@ -1408,49 +1413,71 @@ namespace TGC.Group.Modelo
 
         public void inicializarSprites(Microsoft.DirectX.Direct3D.Device d3dDevice)
         {
+
+            float dx = 10f;
+            float dy = 10f;
+           
+
             drawer2D = new Drawer2D();
             barraDeVida = new CustomSprite();
             barraDeVida.Bitmap = new CustomBitmap(directorio.BarraVida, d3dDevice);
-            barraDeVida.Position = new TGCVector2(10, 20);
+            barraDeVida.Position = new TGCVector2(dx, dy);
             
 
             fruta = new CustomSprite();
             fruta.Bitmap = new CustomBitmap(directorio.Fruta, d3dDevice);
-            fruta.Position = new TGCVector2(20, 70);
+            fruta.Position = new TGCVector2(dx +20f, barraDeVida.Position.Y+ fruta.Bitmap.Height/2+ dy);
 
             textoFrutas = new TgcText2D();
             textoFrutas.Text = "0";
             textoFrutas.Color = Color.White;
             textoFrutas.Align = TgcText2D.TextAlign.LEFT;
-            textoFrutas.Position = new Point(100, 80);
+            textoFrutas.Position = new Point((int)(fruta.Position.X+fruta.Bitmap.Width + dx ), (int) (fruta.Position.Y + dy));
             textoFrutas.Size = new Size(350, 140);
             textoFrutas.changeFont(new System.Drawing.Font("TimesNewRoman", 30,FontStyle.Bold));
 
 
             mascara = new CustomSprite();
             mascara.Bitmap = new CustomBitmap(directorio.Mascara, d3dDevice);
-            mascara.Position = new TGCVector2(25, 150);
+            mascara.Position = new TGCVector2(dx + 35f, fruta.Position.Y + mascara.Bitmap.Height/2 +dy);
 
             textoMascaras = new TgcText2D();
             textoMascaras.Text = "0";
             textoMascaras.Color = Color.White;
             textoMascaras.Align = TgcText2D.TextAlign.LEFT;
-            textoMascaras.Position = new Point(100, 200);
+            textoMascaras.Position = new Point((int) (mascara.Position.X + mascara.Bitmap.Width + dx),(int)(mascara.Position.Y +mascara.Bitmap.Height/3+ dy));
             textoMascaras.Size = new Size(350, 140);
             textoMascaras.changeFont(new System.Drawing.Font("TimesNewRoman", 30, FontStyle.Bold));
 
             hoguera = new CustomSprite();
             hoguera.Bitmap = new CustomBitmap(directorio.Hoguera, d3dDevice);
-            hoguera.Position = new TGCVector2(22, 290);
+            hoguera.Position = new TGCVector2(dx + 30f, mascara.Position.Y+ hoguera.Bitmap.Height + dy);
 
             textoHoguera = new TgcText2D();
             textoHoguera.Text = "0";
             textoHoguera.Color = Color.White;
             textoHoguera.Align = TgcText2D.TextAlign.LEFT;
-            textoHoguera.Position = new Point(100, 330);
+            textoHoguera.Position = new Point((int)(hoguera.Position.X + hoguera.Bitmap.Width + dx), (int)(hoguera.Position.Y + hoguera.Bitmap.Height/3 + dy));
             textoHoguera.Size = new Size(350, 140);
             textoHoguera.changeFont(new System.Drawing.Font("TimesNewRoman", 30, FontStyle.Bold));
 
+            cajaSprite = new CustomSprite();
+            cajaSprite.Bitmap = new CustomBitmap(directorio.Caja, d3dDevice);
+            cajaSprite.Scaling = new TGCVector2(0.2f, 0.2f);
+            cajaSprite.Position = new TGCVector2(dx, hoguera.Position.Y + cajaSprite.Bitmap.Height/4 + dy);
+            
+            textoCajas = new TgcText2D();
+            textoCajas.Text = "0";
+            textoCajas.Color = Color.White;
+            textoCajas.Align = TgcText2D.TextAlign.LEFT;
+            textoCajas.Position = new Point((int)(cajaSprite.Position.X + cajaSprite.Bitmap.Width/4 + dx),(int)(cajaSprite.Position.Y + cajaSprite.Bitmap.Height/20 + dy));
+            textoCajas.Size = new Size(350, 140);
+            textoCajas.changeFont(new System.Drawing.Font("TimesNewRoman", 30, FontStyle.Bold));
+
+
+            textoFrutas.Position = new Point(textoCajas.Position.X,textoFrutas.Position.Y);
+            textoHoguera.Position = new Point(textoCajas.Position.X, textoHoguera.Position.Y);
+            textoMascaras.Position = new Point(textoCajas.Position.X, textoMascaras.Position.Y);
 
             pauseSprite = new CustomSprite();
             pauseSprite.Bitmap = new CustomBitmap(directorio.Paused, d3dDevice);

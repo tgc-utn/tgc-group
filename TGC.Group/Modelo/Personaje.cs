@@ -28,6 +28,7 @@ namespace TGC.Group.Modelo
         public int frutas { get; set; } = 0;
         public int mascaras { get; set; } = 0;
         public int hogueras { get; set; } = 0;
+        public int cajas { get; set; } = 0;
 
         public bool moving { get; set; } = false;
         public bool jumping { get; set; } = false;
@@ -291,6 +292,8 @@ namespace TGC.Group.Modelo
         public void aumentarMascaras() => mascaras++;
         
         public void aumentarHogueras() => hogueras++;
+
+        public void aumentarCajas() => cajas++;
         #endregion
     }
 }

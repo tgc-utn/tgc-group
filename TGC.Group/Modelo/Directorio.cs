@@ -51,6 +51,7 @@ namespace TGC.Group.Modelo
         public string Mascara { get; set; }
         public string Sonido { get; set; }
         public string Hoguera { get; set; }
+        public string Caja { get; set; }
         public string Paused { get; set; }
         public string SoundOn { get; set; }
         public string SoundOff { get; set; }
@@ -86,6 +87,7 @@ namespace TGC.Group.Modelo
             Mascara = mediaDir + "Imagenes\\mascara.png";
             Sonido = mediaDir + "Imagenes\\sound.png";
             Hoguera = mediaDir + "Imagenes\\hoguera.png";
+            Caja = mediaDir + "Imagenes\\caja.png";
             Paused = mediaDir + "Imagenes\\paused.png";
             SoundOn = mediaDir + "Imagenes\\sound_on.png";
             SoundOff = mediaDir + "Imagenes\\sound_off.png";
