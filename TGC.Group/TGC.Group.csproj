@@ -28,6 +28,8 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -53,6 +55,9 @@
     <StartupObject>TGC.Group.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BulletSharp, Version=0.10.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\BulletSharp.0.10\lib\net40-client\BulletSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.DirectX, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.dll</HintPath>
@@ -61,19 +66,77 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.Direct3D.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DirectX.Direct3DX, Version=1.0.2910.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2911.0\Microsoft.DirectX.Direct3DX.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.DirectX.DirectInput, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\Windows\Microsoft.NET\DirectX for Managed Code\1.0.2902.0\Microsoft.DirectX.DirectInput.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DirectX.DirectSound, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
     <Reference Include="Microsoft.VisualC" />
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="TGC.Core, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\TGC.Core.2.3.1\lib\net471\TGC.Core.dll</HintPath>
+    <Reference Include="TGC.Core, Version=2.3.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TGC.Core.2.3.3\lib\net471\TGC.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GUI\GUI.cs" />
+    <Compile Include="GUI\GUIItem.cs" />
+    <Compile Include="Modelo\Cajas\Caja.cs" />
+    <Compile Include="Modelo\Cajas\CajaNitro.cs" />
+    <Compile Include="Modelo\Cajas\CajaTnt.cs" />
+    <Compile Include="Modelo\EstadoJuego.cs" />
+    <Compile Include="Modelo\FuegoLuz.cs" />
+    <Compile Include="Modelo\Hoguera.cs" />
+    <Compile Include="Modelo\Informador.cs" />
+    <Compile Include="Modelo\Rampas\Rampa.cs" />
+    <Compile Include="Modelo\Rampas\RampaX.cs" />
+    <Compile Include="Modelo\Rampas\RampaZ.cs" />
+    <Compile Include="Modelo\Calculos.cs" />
+    <Compile Include="Modelo\Camara.cs" />
+    <Compile Include="Modelo\ComparadorTgcVector3.cs" />
+    <Compile Include="Modelo\DireccionPersonaje.cs" />
+    <Compile Include="Modelo\Direction Vectors\DirectionVector.cs" />
+    <Compile Include="Modelo\Direction Vectors\DownDirection.cs" />
+    <Compile Include="Modelo\Direction Vectors\DownLeftDirection.cs" />
+    <Compile Include="Modelo\Direction Vectors\DownRightDirection.cs" />
+    <Compile Include="Modelo\Direction Vectors\LeftDirection.cs" />
+    <Compile Include="Modelo\Direction Vectors\RightDirection.cs" />
+    <Compile Include="Modelo\Direction Vectors\UpDirection.cs" />
+    <Compile Include="Modelo\Direction Vectors\UpLeftDirection.cs" />
+    <Compile Include="Modelo\Direction Vectors\UpRightDirection.cs" />
+    <Compile Include="Modelo\Directorio.cs" />
+    <Compile Include="Modelo\Escenario.cs" />
+    <Compile Include="Modelo\Juego.cs" />
+    <Compile Include="Modelo\Personaje.cs" />
+    <Compile Include="Modelo\PisoInercia.cs" />
+    <Compile Include="Modelo\Plataformas\Plataforma.cs" />
+    <Compile Include="Modelo\Plataformas\PlataformaRotante.cs" />
+    <Compile Include="Modelo\Plataformas\PlataformaX.cs" />
+    <Compile Include="Modelo\Plataformas\PlataformaY.cs" />
+    <Compile Include="Modelo\Plataformas\PlataformaZ.cs" />
+    <Compile Include="Modelo\SoundManager.cs" />
+    <Compile Include="Optimizacion\Octree.cs" />
+    <Compile Include="Optimizacion\OctreeBuilder.cs" />
+    <Compile Include="Optimizacion\OctreeNode.cs" />
+    <Compile Include="SphereCollisionUtils\BoundingBoxCollider.cs" />
+    <Compile Include="SphereCollisionUtils\SphereOBBCollider.cs" />
+    <Compile Include="SphereCollisionUtils\Collider.cs" />
+    <Compile Include="SphereCollisionUtils\SphereCollisionManager.cs" />
+    <Compile Include="SphereCollisionUtils\SphereTriangleCollisionManager.cs" />
+    <Compile Include="SphereCollisionUtils\TriangleMeshCollider.cs" />
+    <Compile Include="Sprites\AnimatedSprite.cs" />
+    <Compile Include="Sprites\CustomBitmap.cs" />
+    <Compile Include="Sprites\CustomSprite.cs" />
+    <Compile Include="Sprites\Drawer2D.cs" />
+    <Compile Include="VectorMovement\DirectionAngle.cs" />
+    <Compile Include="VectorMovement\DownDirection.cs" />
+    <Compile Include="VectorMovement\DownLeftDirection.cs" />
+    <Compile Include="VectorMovement\DownRightDirection.cs" />
     <Compile Include="Form\GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -85,9 +148,13 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
-    <Compile Include="Model\GameModel.cs" />
+    <Compile Include="VectorMovement\LeftDirection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VectorMovement\RightDirection.cs" />
+    <Compile Include="VectorMovement\UpDirection.cs" />
+    <Compile Include="VectorMovement\UpLeftDirection.cs" />
+    <Compile Include="VectorMovement\UpRightDirection.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -156,14 +223,21 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Media\cajaMadera4.jpg" />
-    <Content Include="Media\LogoTGC-TgcScene.xml" />
+    <Folder Include="Media\" />
+    <Folder Include="Text\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\BulletSharp.0.10\build\net40-client\BulletSharp.targets" Condition="Exists('..\packages\BulletSharp.0.10\build\net40-client\BulletSharp.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\BulletSharp.0.10\build\net40-client\BulletSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BulletSharp.0.10\build\net40-client\BulletSharp.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
