@@ -1,0 +1,33 @@
+<tgcScene>
+  <name>scene1</name>
+  <texturesExport enabled="True" dir="Textures" />
+  <lightmapExport enabled="False" dir="LightMaps" />
+  <sceneBoundingBox min="[-20.0107,-12.4761,-20.216]" max="[14.4465,15.0247,17.1393]" />
+  <materials count="1">
+    <m name="Standardmaterial" type="Standardmaterial">
+      <ambient>[0,0,0,0]</ambient>
+      <diffuse>[0,0,0,0]</diffuse>
+      <specular>[0,0,0,0]</specular>
+      <opacity>1</opacity>
+      <alphaBlendEnable>False</alphaBlendEnable>
+      <bitmap uvTiling="[1,1]" uvOffset="[1,1]">granito.jpg</bitmap>
+    </m>
+  </materials>
+  <meshes count="1">
+    <mesh name="Box" layer="" type="Original" matId="0" color="[1,1,1]" visibility="1.0" lightmap="">
+      <boundingBox min="[-20.0107,-12.4761,-20.216]" max="[14.4465,15.0247,17.1393]" />
+      <coordinatesIdx count="36">0 1 2 2 3 0 4 5 6 6 7 4 0 3 5 5 4 0 3 2 6 6 5 3 2 1 7 7 6 2 1 0 4 4 7 1 </coordinatesIdx>
+      <textCoordsIdx count="36">0 1 2 2 3 0 3 0 1 1 2 3 3 0 1 1 2 3 3 0 1 1 2 3 3 0 1 1 2 3 3 0 1 1 2 3 </textCoordsIdx>
+      <colorsIdx count="36">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </colorsIdx>
+      <matIds count="1">0 </matIds>
+      <textCoordsLightMapIdx count="0">
+      </textCoordsLightMapIdx>
+      <vertices count="24">-20.0107 -12.4761 -20.216 -20.0107 -12.4761 17.1393 14.4465 -12.4761 17.1393 14.4465 -12.4761 -20.216 -20.0107 15.0247 -20.216 14.4465 15.0247 -20.216 14.4465 15.0247 17.1393 -20.0107 15.0247 17.1393 </vertices>
+      <normals count="24">0 0 -1.5708 0 0 -1.5708 0 0 -1.5708 0 0 -1.5708 0 0 1.5708 0 0 1.5708 0 0 1.5708 0 0 1.5708 </normals>
+      <texCoords count="8">1 0 1 -1 0 -1 0 0 </texCoords>
+      <colors count="3">255 255 255 </colors>
+      <texCoordsLightMap count="0">
+      </texCoordsLightMap>
+    </mesh>
+  </meshes>
+</tgcScene>
