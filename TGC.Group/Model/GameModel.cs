@@ -1,4 +1,5 @@
 using Microsoft.DirectX.DirectInput;
+using System;
 using System.Drawing;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
@@ -7,6 +8,7 @@ using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
+
 
 namespace TGC.Group.Model
 {
@@ -30,11 +32,15 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        //Caja que se muestra en el ejemplo.
-        private TGCBox Box { get; set; }
 
-        //Mesh de TgcLogo.
-        private TgcMesh Mesh { get; set; }
+        private const float MOVEMENT_SPEED = 100f;
+        //private TgcThirdPersonCamera camaraInterna;
+       
+        //Caja que se muestra en el ejemplo.
+        private TGCBox Suelo { get; set; }
+
+        //Mesh de Bandicoot.
+        private TgcMesh Bandicoot { get; set; }
 
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
@@ -52,33 +58,35 @@ namespace TGC.Group.Model
 
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
-            var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
+            var TexturaSuelo = MediaDir + "/floor2_3.jpg";
 
             //Cargamos una textura, tener en cuenta que cargar una textura significa crear una copia en memoria.
             //Es importante cargar texturas en Init, si se hace en el render loop podemos tener grandes problemas si instanciamos muchas.
-            var texture = TgcTexture.createTexture(pathTexturaCaja);
+            var texture = TgcTexture.createTexture(TexturaSuelo);
 
             //Creamos una caja 3D ubicada de dimensiones (5, 10, 5) y la textura como color.
-            var size = new TGCVector3(5, 10, 5);
+            var size = new TGCVector3(80, 1, 300);
             //Construimos una caja según los parámetros, por defecto la misma se crea con centro en el origen y se recomienda así para facilitar las transformaciones.
-            Box = TGCBox.fromSize(size, texture);
+            Suelo = TGCBox.fromSize(size, texture);
             //Posición donde quiero que este la caja, es común que se utilicen estructuras internas para las transformaciones.
             //Entonces actualizamos la posición lógica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
-            Box.Position = new TGCVector3(-25, 0, 0);
+            Suelo.Position = new TGCVector3(0, -.5f, -140);
 
             //Cargo el unico mesh que tiene la escena.
-            Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
+            Bandicoot = new TgcSceneLoader().loadSceneFromFile(MediaDir + "/crash/CRASH (2)-TgcScene.xml").Meshes[0];
             //Defino una escala en el modelo logico del mesh que es muy grande.
-            Mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
+            Bandicoot.Scale = new TGCVector3(0.05f, 0.05f, 0.05f);
+            Bandicoot.RotateY(2.95f);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
             //El framework maneja una cámara estática, pero debe ser inicializada.
             //Posición de la camara.
-            var cameraPosition = new TGCVector3(0, 0, 125);
+            var cameraPosition = new TGCVector3(0, 30, 50);
             //Quiero que la camara mire hacia el origen (0,0,0).
-            var lookAt = TGCVector3.Empty;
+            var lookAt = Bandicoot.Position;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
+
             Camara.SetCamera(cameraPosition, lookAt);
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
@@ -93,11 +101,54 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
-            //Capturar Input teclado
+            //Capturar Input teclado utilizado para movimiento 
+
+            var anguloCamara = TGCVector3.Empty;
+            var movimiento = TGCVector3.Empty;
+
             if (Input.keyPressed(Key.F))
             {
                 BoundingBox = !BoundingBox;
             }
+
+            // movimiento lateral
+            if (Input.keyDown(Key.Left) || Input.keyDown(Key.A))
+            {
+                movimiento.X = 1;
+            }
+            else if (Input.keyDown(Key.Right) || Input.keyDown(Key.D))
+            {
+                movimiento.X = -1;
+            }
+
+            //Movernos adelante y atras, sobre el eje Z.
+            if (Input.keyDown(Key.Up) || Input.keyDown(Key.W))
+            {
+                movimiento.Z = -1;
+            }
+            else if (Input.keyDown(Key.Down) || Input.keyDown(Key.S))
+            {
+                movimiento.Z = 1;
+            }
+
+            //salto
+
+            if(Input.keyPressed(Key.Space))
+            {
+                secuenciaSalto(Bandicoot);
+            }
+
+            //Posicion original del mesh principal (o sea del bandicoot)
+            var originalPos = Bandicoot.Position;
+            anguloCamara = Bandicoot.Position;
+
+            //Multiplicar movimiento por velocidad y elapsedTime
+            movimiento *= MOVEMENT_SPEED * ElapsedTime;
+            Bandicoot.Move(movimiento);
+            
+            //Desplazar camara para seguir al personaje
+
+            Camara.SetCamera(Camara.Position + new TGCVector3(movimiento), anguloCamara);
 
             //Capturar Input Mouse
             if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
@@ -114,9 +165,36 @@ namespace TGC.Group.Model
                 }
             }
 
+            if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_RIGHT))
+            {
+                //Pruebo si baja camara
+                Camara.SetCamera(Camara.Position + new TGCVector3(0, -10f, 0), Camara.LookAt);
+
+                //igual que si sube a cierta altura reinicio camara
+                if (Camara.Position.Y < -200f)
+                {
+                    Camara.SetCamera(new TGCVector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
+                }
+            }
+
             PostUpdate();
         }
 
+        private void secuenciaSalto(TgcMesh personaje)
+        {
+            Int32 tiempo;
+
+            for (tiempo = 0;  tiempo < 3; tiempo++)
+            {
+                personaje.Move(0, 1, 0);
+            }
+
+            //for (tiempo = 0; tiempo < 3; tiempo++)
+            //{
+            //    personaje.Move(0, -1, 0);
+            //}
+
+        }
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aquí todo el código referido al renderizado.
@@ -133,22 +211,22 @@ namespace TGC.Group.Model
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
-            Box.Transform = TGCMatrix.Scaling(Box.Scale) * TGCMatrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) * TGCMatrix.Translation(Box.Position);
+            Suelo.Transform = TGCMatrix.Scaling(Suelo.Scale) * TGCMatrix.RotationYawPitchRoll(Suelo.Rotation.Y, Suelo.Rotation.X, Suelo.Rotation.Z) * TGCMatrix.Translation(Suelo.Position);
             //A modo ejemplo realizamos toda las multiplicaciones, pero aquí solo nos hacia falta la traslación.
             //Finalmente invocamos al render de la caja
-            Box.Render();
+            Suelo.Render();
 
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
-            Mesh.UpdateMeshTransform();
+            Bandicoot.UpdateMeshTransform();
             //Render del mesh
-            Mesh.Render();
+            Bandicoot.Render();
 
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (BoundingBox)
             {
-                Box.BoundingBox.Render();
-                Mesh.BoundingBox.Render();
+                Suelo.BoundingBox.Render();
+                Bandicoot.BoundingBox.Render();
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
@@ -163,9 +241,9 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             //Dispose de la caja.
-            Box.Dispose();
+            Suelo.Dispose();
             //Dispose del mesh.
-            Mesh.Dispose();
+            Bandicoot.Dispose();
         }
     }
 }
