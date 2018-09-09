@@ -25,6 +25,11 @@ namespace TGC.Group.Model
         /// </summary>
         /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
         /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
+
+        private bool saltando;
+        private int direccionSalto = 1;
+        private float posInicialBandicoot;
+        private float alturaMaximaSalto = 20f;
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
@@ -76,13 +81,13 @@ namespace TGC.Group.Model
             Bandicoot = new TgcSceneLoader().loadSceneFromFile(MediaDir + "/crash/CRASH (2)-TgcScene.xml").Meshes[0];
             //Defino una escala en el modelo logico del mesh que es muy grande.
             Bandicoot.Scale = new TGCVector3(0.05f, 0.05f, 0.05f);
-            Bandicoot.RotateY(2.95f);
+            Bandicoot.RotateY(3.12f);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
             //El framework maneja una cámara estática, pero debe ser inicializada.
             //Posición de la camara.
-            var cameraPosition = new TGCVector3(0, 30, 50);
+            var cameraPosition = new TGCVector3(-5, 20, 50);
             //Quiero que la camara mire hacia el origen (0,0,0).
             var lookAt = Bandicoot.Position;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
@@ -90,6 +95,8 @@ namespace TGC.Group.Model
             Camara.SetCamera(cameraPosition, lookAt);
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
+            Bandicoot.BoundingBox.setExtremes(new TGCVector3(0, 0, 0), new TGCVector3(-185f, 225f, -100f));
+            posInicialBandicoot = Bandicoot.Position.Y;
         }
 
         /// <summary>
@@ -133,10 +140,13 @@ namespace TGC.Group.Model
 
             //salto
 
-            if(Input.keyPressed(Key.Space))
+            if(Input.keyPressed(Key.Space) && !saltando)
             {
-                secuenciaSalto(Bandicoot);
+                saltando = true;
+                direccionSalto = 1;
             }
+
+
 
             //Posicion original del mesh principal (o sea del bandicoot)
             var originalPos = Bandicoot.Position;
@@ -144,8 +154,23 @@ namespace TGC.Group.Model
 
             //Multiplicar movimiento por velocidad y elapsedTime
             movimiento *= MOVEMENT_SPEED * ElapsedTime;
+
             Bandicoot.Move(movimiento);
-            
+            if (saltando){
+                Bandicoot.Move(0,direccionSalto* MOVEMENT_SPEED * ElapsedTime, 0);
+
+                //Si la posicion en Y es mayor a la maxima altura. 
+                if (Bandicoot.Position.Y > alturaMaximaSalto) {
+                    direccionSalto = -1;
+                }
+
+                if (Bandicoot.Position.Y <= posInicialBandicoot) {
+                    saltando = false;
+                        }
+            }
+
+
+
             //Desplazar camara para seguir al personaje
 
             Camara.SetCamera(Camara.Position + new TGCVector3(movimiento), anguloCamara);
@@ -180,21 +205,7 @@ namespace TGC.Group.Model
             PostUpdate();
         }
 
-        private void secuenciaSalto(TgcMesh personaje)
-        {
-            Int32 tiempo;
-
-            for (tiempo = 0;  tiempo < 3; tiempo++)
-            {
-                personaje.Move(0, 1, 0);
-            }
-
-            //for (tiempo = 0; tiempo < 3; tiempo++)
-            //{
-            //    personaje.Move(0, -1, 0);
-            //}
-
-        }
+   
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aquí todo el código referido al renderizado.
