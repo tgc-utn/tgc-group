@@ -8,7 +8,7 @@ using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
-
+using TGC.Core.Terrain;
 
 namespace TGC.Group.Model
 {
@@ -37,7 +37,6 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-
         private const float MOVEMENT_SPEED = 100f;
         //private TgcThirdPersonCamera camaraInterna;
        
@@ -50,6 +49,8 @@ namespace TGC.Group.Model
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
 
+        private TgcSimpleTerrain terrain;
+
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
         ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
@@ -60,6 +61,11 @@ namespace TGC.Group.Model
         {
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
+
+            var path = $"{MediaDir}\\Heightmap\\hawai.jpg";
+            var center = new TGCVector3(0f, 0f, 0f);
+            terrain = new TgcSimpleTerrain();
+            terrain.loadHeightmap(path, 20f, 1.3f, center);
 
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
@@ -146,8 +152,6 @@ namespace TGC.Group.Model
                 direccionSalto = 1;
             }
 
-
-
             //Posicion original del mesh principal (o sea del bandicoot)
             var originalPos = Bandicoot.Position;
             anguloCamara = Bandicoot.Position;
@@ -166,7 +170,7 @@ namespace TGC.Group.Model
 
                 if (Bandicoot.Position.Y <= posInicialBandicoot) {
                     saltando = false;
-                        }
+                }
             }
 
 
@@ -220,6 +224,8 @@ namespace TGC.Group.Model
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
             DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.OrangeRed);
 
+            terrain.Render();
+
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
             Suelo.Transform = TGCMatrix.Scaling(Suelo.Scale) * TGCMatrix.RotationYawPitchRoll(Suelo.Rotation.Y, Suelo.Rotation.X, Suelo.Rotation.Z) * TGCMatrix.Translation(Suelo.Position);
@@ -255,6 +261,8 @@ namespace TGC.Group.Model
             Suelo.Dispose();
             //Dispose del mesh.
             Bandicoot.Dispose();
+
+            terrain.Dispose();
         }
     }
 }
