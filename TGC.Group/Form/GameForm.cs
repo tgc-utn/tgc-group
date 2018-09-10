@@ -12,8 +12,8 @@ using TGC.Group.Model;
 namespace TGC.Group.Form
 {
     /// <summary>
-    ///     GameForm es el formulario de entrada, el mismo invocara a nuestro modelo  que extiende TgcExample, e inicia el
-    ///     render loop.
+    ///     GameForm es el formulario de entrada, el mismo invocara a nuestro modelo que extiende TgcExample, 
+    ///     e inicia el render loop.
     /// </summary>
     public partial class GameForm : System.Windows.Forms.Form
     {
