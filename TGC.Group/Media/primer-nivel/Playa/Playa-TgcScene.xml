@@ -1,4 +1,31 @@
 <tgcScene>
-	<name>Playa</name>
+	<name>playa</name>
 	<texturesExport enabled='true' dir='Textures'/>
 	<lightmapExport enabled='false' dir='LightMaps'/>
+	<sceneBoundingBox min='[-413.395,-12.9373,-143.061]' max='[-35.9151,146.177,425.803]'/>
+	<materials count='25'>
+		<m name='Material #66' type='Standardmaterial'>
+			<ambient>[149.94,149.94,149.94,255.0]</ambient>
+			<diffuse>[149.94,149.94,149.94,255.0]</diffuse>
+			<specular>[229.5,229.5,229.5,255.0]</specular>
+			<opacity>100.0</opacity>
+			<alphaBlendEnable>false</alphaBlendEnable>
+			<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>barro2.ifl</bitmap>
+		</m>
+		<m name='Material #68' type='Standardmaterial'>
+			<ambient>[127.5,127.5,127.5,255.0]</ambient>
+			<diffuse>[127.5,127.5,127.5,255.0]</diffuse>
+			<specular>[229.5,229.5,229.5,255.0]</specular>
+			<opacity>100.0</opacity>
+			<alphaBlendEnable>false</alphaBlendEnable>
+			<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>grass.jpg</bitmap>
+		</m>
+		<m name='Material #70' type='Standardmaterial'>
+			<ambient>[149.94,149.94,149.94,255.0]</ambient>
+			<diffuse>[149.94,149.94,149.94,255.0]</diffuse>
+			<specular>[229.5,229.5,229.5,255.0]</specular>
+			<opacity>100.0</opacity>
+			<alphaBlendEnable>false</alphaBlendEnable>
+			<bitmap uvTiling='[1.0,1.0]' uvOffset='[0.0,0.0]'>barro2.jpg</bitmap>
+		</m>
+		<m name='multi_Layer0_001' type='Multimaterial'>
