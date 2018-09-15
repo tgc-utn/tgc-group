@@ -47,11 +47,19 @@ namespace TGC.Group.Form
 
         private void GameForm_Load(object sender, EventArgs e)
         {
+            //FullScreen, van en este orden para que queda oculta la barra de Windows.
+            //this.WindowState = FormWindowState.Normal;
+            //this.FormBorderStyle = FormBorderStyle.None;
+            //this.WindowState = FormWindowState.Maximized;
+
+            //OriginalBorderStyle
+            //this.FormBorderStyle = FormBorderStyle.Sizable;
+
             //Iniciar graficos.
             InitGraphics();
 
             //Titulo de la ventana principal.
-            Text = Modelo.Name + " - " + Modelo.Description;
+            Text = Modelo.Name + @" - " + Modelo.Description;
 
             //Focus panel3D.
             panel3D.Focus();
@@ -167,7 +175,7 @@ namespace TGC.Group.Form
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Error en Init() del juego", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(e.Message, @"Error en Init() del juego", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
