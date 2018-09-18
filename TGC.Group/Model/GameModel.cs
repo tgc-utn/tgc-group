@@ -68,12 +68,13 @@ namespace TGC.Group.Model
             personaje.Scale = new TGCVector3(0.75f, 0.75f, 0.75f);
 
 
-            camara = new GameCamera(personaje.Position, 200, -300);
-            var cameraPosition = new TGCVector3(0, 0, 200);
+            camara = new GameCamera(personaje.Position, 100, 200);
+            //var cameraPosition = new TGCVector3(0, 0, 200);
             //Quiero que la camara mire hacia el origen (0,0,0).
-            var lookAt = TGCVector3.Empty;
+            //var lookAt = TGCVector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
-            Camara.SetCamera(cameraPosition, lookAt);
+            //Camara.SetCamera(cameraPosition, lookAt);
+            Camara = camara;
 
         }
 
@@ -85,12 +86,6 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
-
-            //Capturar Input teclado
-            if (Input.keyPressed(Key.F))
-            {
-                BoundingBox = !BoundingBox;
-            }
 
             camara.Target = personaje.Position;
 
