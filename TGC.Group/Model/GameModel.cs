@@ -32,7 +32,7 @@ namespace TGC.Group.Model
 
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
-
+        private const float VELOCIDAD_DESPLAZAMIENTO = 50f;
         private TgcScene scene;
         private TgcSkeletalMesh personaje;
         private GameCamera camara;
@@ -61,19 +61,21 @@ namespace TGC.Group.Model
                     MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\Robot\\Parado-TgcSkeletalAnim.xml"
                 });
 
+            personaje.AutoTransform = false;
+
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
             //Escalarlo porque es muy grande
-            personaje.Position = new TGCVector3(100, 0, 100);
-            personaje.Scale = new TGCVector3(0.75f, 0.75f, 0.75f);
+            personaje.Position = new TGCVector3(0, 0, 100);
+            personaje.Scale = new TGCVector3(0.15f, 0.15f, 0.15f);
 
-
-            camara = new GameCamera(personaje.Position, 200, -300);
-            var cameraPosition = new TGCVector3(0, 0, 200);
+            camara = new GameCamera(personaje.Position, 100, 200);
+            //var cameraPosition = new TGCVector3(0, 0, 200);
             //Quiero que la camara mire hacia el origen (0,0,0).
-            var lookAt = TGCVector3.Empty;
+            //var lookAt = TGCVector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
-            Camara.SetCamera(cameraPosition, lookAt);
+            //Camara.SetCamera(cameraPosition, lookAt);
+            Camara = camara;
 
         }
 
@@ -86,11 +88,7 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
-            //Capturar Input teclado
-            if (Input.keyPressed(Key.F))
-            {
-                BoundingBox = !BoundingBox;
-            }
+            CalcularMovimiento();
 
             camara.Target = personaje.Position;
 
@@ -106,6 +104,12 @@ namespace TGC.Group.Model
         {
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
+
+            personaje.Transform =
+                TGCMatrix.Scaling(personaje.Scale)
+                            * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
+                            * TGCMatrix.Translation(personaje.Position);
+
 
             personaje.animateAndRender(ElapsedTime);
 
@@ -135,6 +139,53 @@ namespace TGC.Group.Model
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
+        }
+
+        private void CalcularMovimiento()
+        {
+            var velocidadCaminar = VELOCIDAD_DESPLAZAMIENTO * ElapsedTime;
+
+            //Calcular proxima posicion de personaje segun Input
+            var moving = false;
+            var movement = TGCVector3.Empty;
+            
+            if (Input.keyDown(Key.W))
+            {
+                movement.Z = -velocidadCaminar;
+                moving = true;
+            }
+
+            if (Input.keyDown(Key.S))
+            {
+                movement.Z = velocidadCaminar;
+                moving = true;
+            }
+
+            if (Input.keyDown(Key.D))
+            {
+                movement.X = -velocidadCaminar;
+                moving = true;
+            }
+
+            if (Input.keyDown(Key.A))
+            {
+                movement.X = velocidadCaminar;
+                moving = true;
+            }
+
+            if (moving)
+            {
+                personaje.playAnimation("Caminando", true);
+
+                //Aplicar movimiento, internamente suma valores a la posicion actual del mesh.
+                personaje.Move(movement);
+            }
+            else
+            {
+                personaje.playAnimation("Parado", true);
+            }
+
+            camara.Target = personaje.Position;
         }
 
         /// <summary>

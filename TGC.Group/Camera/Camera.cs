@@ -13,7 +13,7 @@ namespace TGC.Group.Camera
         private TGCVector3 position;
 
         /// <summary>
-        ///     Crear una nueva camara
+        ///     Crear una nueva camara 
         /// </summary>
         public GameCamera()
         {
