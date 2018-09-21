@@ -1,5 +1,4 @@
 using Microsoft.DirectX.DirectInput;
-using System;
 using System.Drawing;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
@@ -7,7 +6,13 @@ using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.SkeletalAnimation;
+using TGC.Core.Geometry;
+using TGC.Core.Mathematica;
+using TGC.Core.BoundingVolumes;
+using TGC.Core.Collision;
+using TGC.Core.Textures;
 using TGC.Group.Camera;
+using System;
 
 namespace TGC.Group.Model
 {
@@ -37,6 +42,13 @@ namespace TGC.Group.Model
         private TgcScene scene;
         private TgcSkeletalMesh personaje;
         private GameCamera camara;
+        //private TgcPlane plano;
+        private TgcMesh planoIzq;
+        private TgcMesh planoDer;
+        private TgcMesh planoFront;
+        private TgcMesh planoBack;
+        //private TgcBoundingAxisAlignBox nuevoBB;
+
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -51,6 +63,45 @@ namespace TGC.Group.Model
 
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\plataformas-TgcScene.xml");
+
+            //scene.Meshes.ForEach((mesh) => { Console.WriteLine(mesh.Name); });
+
+            //plano = new TgcPlane(new TGCVector3(19, -3, 300),
+            //                     new TGCVector3(100, 100, -1000),
+            //                     TgcPlane.Orientations.YZplane,
+            //                     TgcTexture.createTexture(MediaDir + "primer-nivel\\texturas\\barro2.jpg"), 0, 0);
+
+            //plano = new TGCPlane(19, -3, 300, 0);
+
+            //planoIzq = TGCBox.fromSize(new TGCVector3(0, 10, -20), new TGCVector3(15, 15, 15), Color.Violet);
+
+            planoIzq = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\planoHorizontal-TgcScene.xml").Meshes[0];
+            planoIzq.AutoTransform = false;
+
+            planoDer = planoIzq.createMeshInstance("planoDer");
+            planoDer.AutoTransform = false;
+            planoDer.Move(-39, 0, 0);      
+            //planoDer.Transform.Translate(planoIzq.Position.X + 20, 0, 0);
+            //planoDer.UpdateMeshTransform();
+            //planoDer.updateBoundingBox();
+
+            planoFront = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\planoVertical-TgcScene.xml").Meshes[0];
+            planoFront.AutoTransform = false;
+            planoFront.Move(50,0,-65);
+            // quise crear una instancia de planoIzq y rotarla pero no hubo forma de rotar el BB, segun un mail, esta hecho para que no rote, tambien probe calcularlo de nuevo y mostrarlo, pero no renderiza.
+
+
+            //planoFront.AutoUpdateBoundingBox = true;
+            //planoFront.BoundingBox.transform(TGCMatrix.RotationY(FastMath.PI_HALF));
+            //rotacionFront = TGCMatrix.RotationX(FastMath.PI_HALF/*TGCMatrix.RotationX(FastMath.PI_HALF)*/);
+            //planoFront.UpdateMeshTransform();
+            //nuevoBB = planoFront.createBoundingBox();
+            //planoFront.updateBoundingBox();
+
+            planoBack = planoFront.createMeshInstance("planoBack");
+            planoBack.AutoTransform = false;
+            planoBack.Move(0, 0, 135); // por que el mov. de este es relativo al del otro? no son instancias separadas ? 
+
 
             var skeletalLoader = new TgcSkeletalLoader();
             personaje = skeletalLoader.loadMeshAndAnimationsFromFile(
@@ -77,8 +128,6 @@ namespace TGC.Group.Model
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             //Camara.SetCamera(cameraPosition, lookAt);
             Camara = camara;
-
-            BoundingBox = true;
 
         }
 
@@ -108,6 +157,25 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
+            //plano.Render();
+            //plano.BoundingBox.Render();
+
+            //box.Transform =
+            //    TGCMatrix.Scaling(box.Scale)
+            //                * TGCMatrix.RotationYawPitchRoll(box.Rotation.Y, box.Rotation.X, box.Rotation.Z)
+            //                * TGCMatrix.Translation(box.Position);
+
+            //planoIzq.Render();
+            //planoFront.Transform = rotacionFront;
+            //planoFront.updateBoundingBox();
+            //planoFront.UpdateMeshTransform();
+            //nuevoBB.Render();
+            planoBack.BoundingBox.Render();
+            planoFront.BoundingBox.Render();
+            planoIzq.BoundingBox.Render();
+            planoDer.BoundingBox.Render();
+            
+
             personaje.Transform =
                 TGCMatrix.Scaling(personaje.Scale)
                             * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
@@ -116,7 +184,7 @@ namespace TGC.Group.Model
 
             personaje.animateAndRender(ElapsedTime);
 
-            Console.WriteLine("nombre: {0} \n", personaje.Name);
+            personaje.BoundingBox.Render();
 
             scene.RenderAll();
 
@@ -138,10 +206,8 @@ namespace TGC.Group.Model
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (BoundingBox)
             {
-                personaje.BoundingBox.Render();
-                foreach (var mesh in scene.Meshes) {
-                    mesh.BoundingBox.Render();
-                }
+                //Box.BoundingBox.Render();
+                //Mesh.BoundingBox.Render();
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
@@ -180,12 +246,62 @@ namespace TGC.Group.Model
                 moving = true;
             }
 
+            var current_pos = personaje.Position;
+
+            personaje.Move(movement);
+
+            //if (TgcCollisionUtils.testAABBAABB(planoIzq.BoundingBox, personaje.BoundingBox))
+            if(ChocoConLimite(personaje, planoIzq) || ChocoConLimite(personaje, planoDer))
+            {
+                //plano.Color = Color.Red;
+                //plano.updateValues();
+                
+
+                personaje.Position = current_pos;
+                //personaje.Move(-movement.X, -movement.Y, -movement.Z);
+                
+                //planoIzq.updateValues();
+            }
+            else
+            {
+                //plano.Color = Color.Violet;
+                //plano.updateValues();
+                //Console.WriteLine("NO COLISIONNNNNNN");
+                //planoIzq.updateValues();
+               
+                
+            }
+
+            if (ChocoConLimite(personaje, planoFront))
+            { // HUBO CAMBIO DE ESCENARIO
+                /* Aca deberiamos hacer algo como no testear mas contra las cosas del escenario anterior y testear
+                  contra las del escenario actual. 
+                */
+
+                planoFront.BoundingBox.setRenderColor(Color.AliceBlue);
+            }
+            else {
+                planoFront.BoundingBox.setRenderColor(Color.Yellow);
+            }
+
+            if (ChocoConLimite(personaje, planoBack))
+            { // HUBO CAMBIO DE ESCENARIO
+              /* Aca deberiamos hacer algo como no testear mas contra las cosas del escenario anterior y testear
+                  contra las del escenario actual. 
+              */
+
+                planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
+            }
+            else {
+                planoBack.BoundingBox.setRenderColor(Color.Yellow);
+            }
+
             if (moving)
             {
                 personaje.playAnimation("Caminando", true);
 
                 //Aplicar movimiento, internamente suma valores a la posicion actual del mesh.
-                personaje.Move(movement);
+             
             }
             else
             {
@@ -193,6 +309,10 @@ namespace TGC.Group.Model
             }
 
             camara.Target = personaje.Position;
+        }
+
+        private bool ChocoConLimite(TgcSkeletalMesh personaje, TgcMesh planoIzq) {
+            return TgcCollisionUtils.testAABBAABB(planoIzq.BoundingBox, personaje.BoundingBox);
         }
 
         /// <summary>
@@ -205,6 +325,8 @@ namespace TGC.Group.Model
             //Dispose del mesh.
             scene.DisposeAll();
             personaje.Dispose();
+            planoIzq.Dispose();
+            planoDer.Dispose();
         }
     }
 }
