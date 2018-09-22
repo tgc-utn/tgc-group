@@ -36,6 +36,8 @@ namespace TGC.Group.Model
         private TgcScene scene;
         private TgcSkeletalMesh personaje;
         private GameCamera camara;
+        private TGCMatrix transformacionPersonaje;
+        private TGCVector3 movimiento;
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -62,6 +64,7 @@ namespace TGC.Group.Model
                 });
 
             personaje.AutoTransform = false;
+            personaje.Transform = TGCMatrix.Identity;
 
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
@@ -90,9 +93,59 @@ namespace TGC.Group.Model
 
             CalcularMovimiento();
 
+            if (Input.keyDown(Key.Q))
+            {
+                BoundingBox = !BoundingBox;
+            }
+
             camara.Target = personaje.Position;
 
             PostUpdate();
+        }
+
+        private void CalcularMovimiento()
+        {
+            var velocidadCaminar = VELOCIDAD_DESPLAZAMIENTO * ElapsedTime;
+
+            //Calcular proxima posicion de personaje segun Input
+            var moving = false;
+            movimiento = TGCVector3.Empty;
+            //transformacionPersonaje = TGCMatrix.Identity;
+
+            if (Input.keyDown(Key.W))
+            {
+                movimiento += new TGCVector3(0, 0, -velocidadCaminar);
+                moving = true;
+            }
+
+            if (Input.keyDown(Key.S))
+            {
+                movimiento += new TGCVector3(0, 0, velocidadCaminar);
+                moving = true;
+            }
+
+            if (Input.keyDown(Key.D))
+            {
+                movimiento += new TGCVector3(-velocidadCaminar, 0, 0);
+                moving = true;
+            }
+
+            if (Input.keyDown(Key.A))
+            {
+                movimiento += new TGCVector3(velocidadCaminar, 0, 0);
+                moving = true;
+            }
+
+            if (moving)
+            {
+                personaje.playAnimation("Caminando", true);
+
+                personaje.Position += movimiento;
+            }
+            else
+            {
+                personaje.playAnimation("Parado", true);
+            }
         }
 
         /// <summary>
@@ -105,12 +158,12 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            personaje.Transform =
+            personaje.Transform = 
                 TGCMatrix.Scaling(personaje.Scale)
-                            * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
-                            * TGCMatrix.Translation(personaje.Position);
+                * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
+                * TGCMatrix.Translation(personaje.Position);
 
-
+            
             personaje.animateAndRender(ElapsedTime);
 
             scene.RenderAll();
@@ -133,59 +186,12 @@ namespace TGC.Group.Model
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (BoundingBox)
             {
-                //Box.BoundingBox.Render();
+                personaje.BoundingBox.Render();
                 //Mesh.BoundingBox.Render();
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
-        }
-
-        private void CalcularMovimiento()
-        {
-            var velocidadCaminar = VELOCIDAD_DESPLAZAMIENTO * ElapsedTime;
-
-            //Calcular proxima posicion de personaje segun Input
-            var moving = false;
-            var movement = TGCVector3.Empty;
-            
-            if (Input.keyDown(Key.W))
-            {
-                movement.Z = -velocidadCaminar;
-                moving = true;
-            }
-
-            if (Input.keyDown(Key.S))
-            {
-                movement.Z = velocidadCaminar;
-                moving = true;
-            }
-
-            if (Input.keyDown(Key.D))
-            {
-                movement.X = -velocidadCaminar;
-                moving = true;
-            }
-
-            if (Input.keyDown(Key.A))
-            {
-                movement.X = velocidadCaminar;
-                moving = true;
-            }
-
-            if (moving)
-            {
-                personaje.playAnimation("Caminando", true);
-
-                //Aplicar movimiento, internamente suma valores a la posicion actual del mesh.
-                personaje.Move(movement);
-            }
-            else
-            {
-                personaje.playAnimation("Parado", true);
-            }
-
-            camara.Target = personaje.Position;
         }
 
         /// <summary>
