@@ -1,4 +1,5 @@
 using Microsoft.DirectX.DirectInput;
+using System;
 using System.Drawing;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
@@ -79,6 +80,8 @@ namespace TGC.Group.Model
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             //Camara.SetCamera(cameraPosition, lookAt);
             Camara = camara;
+
+            BoundingBox = true;
 
         }
 
@@ -166,6 +169,8 @@ namespace TGC.Group.Model
             
             personaje.animateAndRender(ElapsedTime);
 
+            Console.WriteLine("nombre: {0} \n", personaje.Name);
+
             scene.RenderAll();
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
@@ -187,7 +192,9 @@ namespace TGC.Group.Model
             if (BoundingBox)
             {
                 personaje.BoundingBox.Render();
-                //Mesh.BoundingBox.Render();
+                foreach (var mesh in scene.Meshes) {
+                    mesh.BoundingBox.Render();
+                }
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
