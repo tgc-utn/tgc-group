@@ -37,8 +37,8 @@ namespace TGC.Group.Model
         private TgcScene scene;
         private TgcSkeletalMesh personaje;
         private GameCamera camara;
-        private TGCMatrix transformacionPersonaje;
         private TGCVector3 movimiento;
+        private TGCMatrix ultimaPos;
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -50,9 +50,10 @@ namespace TGC.Group.Model
         {
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
-
+            
             var loader = new TgcSceneLoader();
             scene = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\plataformas-TgcScene.xml");
+            
 
             var skeletalLoader = new TgcSkeletalLoader();
             personaje = skeletalLoader.loadMeshAndAnimationsFromFile(
@@ -64,6 +65,7 @@ namespace TGC.Group.Model
                     MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\Robot\\Parado-TgcSkeletalAnim.xml"
                 });
 
+
             personaje.AutoTransform = false;
             personaje.Transform = TGCMatrix.Identity;
 
@@ -72,6 +74,7 @@ namespace TGC.Group.Model
             //Escalarlo porque es muy grande
             personaje.Position = new TGCVector3(0, 0, 100);
             personaje.Scale = new TGCVector3(0.15f, 0.15f, 0.15f);
+            ultimaPos = TGCMatrix.Translation(personaje.Position);
 
             camara = new GameCamera(personaje.Position, 100, 200);
             //var cameraPosition = new TGCVector3(0, 0, 200);
@@ -143,7 +146,8 @@ namespace TGC.Group.Model
             {
                 personaje.playAnimation("Caminando", true);
 
-                personaje.Position += movimiento;
+                //personaje.Position += movimiento;
+                ultimaPos *= TGCMatrix.Translation(movimiento);
             }
             else
             {
@@ -164,9 +168,10 @@ namespace TGC.Group.Model
             personaje.Transform = 
                 TGCMatrix.Scaling(personaje.Scale)
                 * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
-                * TGCMatrix.Translation(personaje.Position);
+                * ultimaPos;
 
-            
+            personaje.BoundingBox.transform(personaje.Transform);
+
             personaje.animateAndRender(ElapsedTime);
 
             Console.WriteLine("nombre: {0} \n", personaje.Name);
