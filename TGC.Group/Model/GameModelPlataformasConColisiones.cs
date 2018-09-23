@@ -42,6 +42,7 @@ namespace TGC.Group.Model
         private TgcScene scene;
         private TgcSkeletalMesh personaje;
         private GameCamera camara;
+        private TGCMatrix desplazamiento;
         //private TgcPlane plano;
         private TgcMesh planoIzq;
         private TgcMesh planoDer;
@@ -80,14 +81,14 @@ namespace TGC.Group.Model
 
             planoDer = planoIzq.createMeshInstance("planoDer");
             planoDer.AutoTransform = false;
-            planoDer.Move(-39, 0, 0);      
-            //planoDer.Transform.Translate(planoIzq.Position.X + 20, 0, 0);
-            //planoDer.UpdateMeshTransform();
-            //planoDer.updateBoundingBox();
+            planoDer.Transform = TGCMatrix.Translation(-39, 0, 0);
+            planoDer.BoundingBox.transform(planoDer.Transform);
 
             planoFront = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\planoVertical-TgcScene.xml").Meshes[0];
             planoFront.AutoTransform = false;
-            planoFront.Move(50,0,-65);
+            planoFront.Transform = TGCMatrix.Translation(50, 0, -65);
+            planoFront.BoundingBox.transform(planoFront.Transform);
+            //planoFront.Move(50,0,-65);
             // quise crear una instancia de planoIzq y rotarla pero no hubo forma de rotar el BB, segun un mail, esta hecho para que no rote, tambien probe calcularlo de nuevo y mostrarlo, pero no renderiza.
 
 
@@ -100,7 +101,9 @@ namespace TGC.Group.Model
 
             planoBack = planoFront.createMeshInstance("planoBack");
             planoBack.AutoTransform = false;
-            planoBack.Move(0, 0, 135); // por que el mov. de este es relativo al del otro? no son instancias separadas ? 
+            planoBack.Transform = TGCMatrix.Translation(0, 0, 135);
+            planoBack.BoundingBox.transform(planoBack.Transform);
+            //planoBack.Move(0, 0, 135); // por que el mov. de este es relativo al del otro? no son instancias separadas ? 
 
 
             var skeletalLoader = new TgcSkeletalLoader();
@@ -157,8 +160,7 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            //plano.Render();
-            //plano.BoundingBox.Render();
+          
 
             //box.Transform =
             //    TGCMatrix.Scaling(box.Scale)
@@ -174,12 +176,13 @@ namespace TGC.Group.Model
             planoFront.BoundingBox.Render();
             planoIzq.BoundingBox.Render();
             planoDer.BoundingBox.Render();
-            
+
 
             personaje.Transform =
                 TGCMatrix.Scaling(personaje.Scale)
                             * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
                             * TGCMatrix.Translation(personaje.Position);
+                            //* desplazamiento;
 
 
             personaje.animateAndRender(ElapsedTime);
@@ -248,6 +251,7 @@ namespace TGC.Group.Model
 
             var current_pos = personaje.Position;
 
+            //desplazamiento = TGCMatrix.Translation(movement.X, movement.Y, movement.Z);
             personaje.Move(movement);
 
             //if (TgcCollisionUtils.testAABBAABB(planoIzq.BoundingBox, personaje.BoundingBox))
@@ -255,10 +259,12 @@ namespace TGC.Group.Model
             {
                 //plano.Color = Color.Red;
                 //plano.updateValues();
-                
 
-                personaje.Position = current_pos;
-                //personaje.Move(-movement.X, -movement.Y, -movement.Z);
+                //desplazamiento = TGCMatrix.Translation(current_pos.X, current_pos.Y, current_pos.Z);
+
+                //personaje.Position = current_pos;
+                
+                personaje.Move(-movement.X, -movement.Y, -movement.Z);
                 
                 //planoIzq.updateValues();
             }
