@@ -39,18 +39,29 @@ namespace TGC.Group.Model
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
         private const float VELOCIDAD_DESPLAZAMIENTO = 50f;
-        private TgcScene scene;
+        private TgcScene escenaPlataformas;
         private TgcSkeletalMesh personaje;
         private GameCamera camara;
         private TGCVector3 movimiento;
         private TGCMatrix ultimaPos;
-        //private TgcPlane plano;
+
+        // Planos de limite
         private TgcMesh planoIzq;
         private TgcMesh planoDer;
         private TgcMesh planoFront;
         private TgcMesh planoBack;
-        //private TgcBoundingAxisAlignBox nuevoBB;
 
+        // Plataformas
+        private TgcMesh plataforma1;
+        private TgcMesh plataforma2;
+
+        //Transformaciones de plataforma
+        private TGCMatrix transformacionBox;
+        private TGCMatrix transformacionBox2;
+
+        //Constantes para velocidades de movimiento de plataforma
+        private const float MOVEMENT_SPEED = 1f;
+        private float orbitaDeRotacion;
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -64,18 +75,14 @@ namespace TGC.Group.Model
             var d3dDevice = D3DDevice.Instance.Device;
 
             var loader = new TgcSceneLoader();
-            scene = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\plataformas-TgcScene.xml");
+            escenaPlataformas = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\escenarioPlataformas-TgcScene.xml");
 
-            //scene.Meshes.ForEach((mesh) => { Console.WriteLine(mesh.Name); });
+            plataforma1 = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\plataforma-TgcScene.xml").Meshes[0];
 
-            //plano = new TgcPlane(new TGCVector3(19, -3, 300),
-            //                     new TGCVector3(100, 100, -1000),
-            //                     TgcPlane.Orientations.YZplane,
-            //                     TgcTexture.createTexture(MediaDir + "primer-nivel\\texturas\\barro2.jpg"), 0, 0);
+            plataforma2 = plataforma1.createMeshInstance(plataforma1.Name + "2");
 
-            //plano = new TGCPlane(19, -3, 300, 0);
-
-            //planoIzq = TGCBox.fromSize(new TGCVector3(0, 10, -20), new TGCVector3(15, 15, 15), Color.Violet);
+            plataforma1.AutoTransform = false;
+            plataforma2.AutoTransform = false;
 
             planoIzq = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\planoHorizontal-TgcScene.xml").Meshes[0];
             planoIzq.AutoTransform = false;
@@ -89,22 +96,11 @@ namespace TGC.Group.Model
             planoFront.AutoTransform = false;
             planoFront.Transform = TGCMatrix.Translation(50, 0, -65);
             planoFront.BoundingBox.transform(planoFront.Transform);
-            //planoFront.Move(50,0,-65);
-            // quise crear una instancia de planoIzq y rotarla pero no hubo forma de rotar el BB, segun un mail, esta hecho para que no rote, tambien probe calcularlo de nuevo y mostrarlo, pero no renderiza.
-
-
-            //planoFront.AutoUpdateBoundingBox = true;
-            //planoFront.BoundingBox.transform(TGCMatrix.RotationY(FastMath.PI_HALF));
-            //rotacionFront = TGCMatrix.RotationX(FastMath.PI_HALF/*TGCMatrix.RotationX(FastMath.PI_HALF)*/);
-            //planoFront.UpdateMeshTransform();
-            //nuevoBB = planoFront.createBoundingBox();
-            //planoFront.updateBoundingBox();
 
             planoBack = planoFront.createMeshInstance("planoBack");
             planoBack.AutoTransform = false;
             planoBack.Transform = TGCMatrix.Translation(0, 0, 135);
             planoBack.BoundingBox.transform(planoBack.Transform);
-            //planoBack.Move(0, 0, 135); // por que el mov. de este es relativo al del otro? no son instancias separadas ? 
 
 
             var skeletalLoader = new TgcSkeletalLoader();
@@ -127,11 +123,6 @@ namespace TGC.Group.Model
             ultimaPos = TGCMatrix.Translation(personaje.Position);
 
             camara = new GameCamera(personaje.Position, 100, 200);
-            //var cameraPosition = new TGCVector3(0, 0, 200);
-            //Quiero que la camara mire hacia el origen (0,0,0).
-            //var lookAt = TGCVector3.Empty;
-            //Configuro donde esta la posicion de la camara y hacia donde mira.
-            //Camara.SetCamera(cameraPosition, lookAt);
             Camara = camara;
 
         }
@@ -144,6 +135,8 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
+
+            AnimarPlataformas();
 
             CalcularMovimiento();
 
@@ -167,21 +160,6 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-
-
-            //box.Transform =
-            //    TGCMatrix.Scaling(box.Scale)
-            //                * TGCMatrix.RotationYawPitchRoll(box.Rotation.Y, box.Rotation.X, box.Rotation.Z)
-            //                * TGCMatrix.Translation(box.Position);
-
-            //planoIzq.Render();
-            //planoFront.Transform = rotacionFront;
-            //planoFront.updateBoundingBox();
-            //planoFront.UpdateMeshTransform();
-            //nuevoBB.Render();
-
-            //Render de BoundingBox, muy útil para debug de colisiones.
-
             personaje.Transform =
                TGCMatrix.Scaling(personaje.Scale)
                            * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
@@ -192,6 +170,7 @@ namespace TGC.Group.Model
 
             personaje.animateAndRender(ElapsedTime);
 
+            RenderizarPlataformas();
 
             if (BoundingBox)
             {
@@ -199,31 +178,52 @@ namespace TGC.Group.Model
                 planoFront.BoundingBox.Render();
                 planoIzq.BoundingBox.Render();
                 planoDer.BoundingBox.Render();
+                plataforma1.BoundingBox.Render();
+                plataforma2.BoundingBox.Render();
                 personaje.BoundingBox.Render();
             }
   
+            escenaPlataformas.RenderAll();
 
-            scene.RenderAll();
-
-            //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
-            //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
-            //Box.Transform = TGCMatrix.Scaling(Box.Scale) * TGCMatrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) * TGCMatrix.Translation(Box.Position);
-
-
-            //A modo ejemplo realizamos toda las multiplicaciones, pero aquí solo nos hacia falta la traslación.
-            //Finalmente invocamos al render de la caja
-            //Box.Render();
-
-            //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
-            //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
-            //Mesh.UpdateMeshTransform();
-            //Render del mesh
-            //Mesh.Render();
-
-            
-
+   
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
+        }
+
+        private void AnimarPlataformas() {
+            //Muevo las plataformas
+            var Mover = TGCMatrix.Translation(0, 0, -10);
+            var Mover2 = TGCMatrix.Translation(0, 0, 65);
+
+            //Punto por donde va a rotar
+            var Trasladar = TGCMatrix.Translation(0, 0, 10);
+            var Trasladar2 = TGCMatrix.Translation(0, 0, -10);
+
+            //Aplico la rotacion
+            var Rot = TGCMatrix.RotationX(orbitaDeRotacion);
+
+            //Giro para que la caja quede derecha
+            var RotInversa = TGCMatrix.RotationX(-orbitaDeRotacion);
+
+            transformacionBox = Mover * Trasladar * Rot * Trasladar * RotInversa;
+            transformacionBox2 = Mover2 * Trasladar2 * RotInversa * Trasladar2 * Rot;
+        }
+
+        private void RenderizarPlataformas() {
+            //Dibujar la primera plataforma en pantalla
+            plataforma1.Transform = transformacionBox;
+            plataforma1.Render();
+            plataforma1.BoundingBox.transform(plataforma1.Transform);
+            plataforma1.BoundingBox.Render();
+
+            //Dibujar la segunda plataforma en pantalla
+            plataforma2.Transform = transformacionBox2;
+            plataforma2.Render();
+            plataforma2.BoundingBox.transform(plataforma2.Transform);
+            plataforma2.BoundingBox.Render();
+
+            //Recalculamos la orbita de rotacion
+            orbitaDeRotacion += MOVEMENT_SPEED * ElapsedTime;
         }
 
         private void CalcularMovimiento()
@@ -350,10 +350,11 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             //Dispose del mesh.
-            scene.DisposeAll();
+            escenaPlataformas.DisposeAll();
             personaje.Dispose();
-            planoIzq.Dispose();
-            planoDer.Dispose();
+            planoIzq.Dispose(); // solo se borran los originales
+            planoFront.Dispose(); // solo se borran los originales
+            plataforma1.Dispose(); // solo se borran los originales
         }
     }
 }
