@@ -42,7 +42,8 @@ namespace TGC.Group.Model
         private TgcScene scene;
         private TgcSkeletalMesh personaje;
         private GameCamera camara;
-        private TGCMatrix desplazamiento;
+        private TGCVector3 movimiento;
+        private TGCMatrix ultimaPos;
         //private TgcPlane plano;
         private TgcMesh planoIzq;
         private TgcMesh planoDer;
@@ -123,6 +124,7 @@ namespace TGC.Group.Model
             //Escalarlo porque es muy grande
             personaje.Position = new TGCVector3(0, 0, 100);
             personaje.Scale = new TGCVector3(0.15f, 0.15f, 0.15f);
+            ultimaPos = TGCMatrix.Translation(personaje.Position);
 
             camara = new GameCamera(personaje.Position, 100, 200);
             //var cameraPosition = new TGCVector3(0, 0, 200);
@@ -145,6 +147,11 @@ namespace TGC.Group.Model
 
             CalcularMovimiento();
 
+            if (Input.keyDown(Key.Q))
+            {
+                BoundingBox = !BoundingBox;
+            }
+
             camara.Target = personaje.Position;
 
             PostUpdate();
@@ -160,7 +167,7 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-          
+
 
             //box.Transform =
             //    TGCMatrix.Scaling(box.Scale)
@@ -172,22 +179,29 @@ namespace TGC.Group.Model
             //planoFront.updateBoundingBox();
             //planoFront.UpdateMeshTransform();
             //nuevoBB.Render();
-            planoBack.BoundingBox.Render();
-            planoFront.BoundingBox.Render();
-            planoIzq.BoundingBox.Render();
-            planoDer.BoundingBox.Render();
 
+            //Render de BoundingBox, muy útil para debug de colisiones.
 
             personaje.Transform =
-                TGCMatrix.Scaling(personaje.Scale)
-                            * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
-                            * TGCMatrix.Translation(personaje.Position);
-                            //* desplazamiento;
+               TGCMatrix.Scaling(personaje.Scale)
+                           * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
+                           * TGCMatrix.Translation(personaje.Position)
+                           * ultimaPos;
 
+            personaje.BoundingBox.transform(personaje.Transform);
 
             personaje.animateAndRender(ElapsedTime);
 
-            personaje.BoundingBox.Render();
+
+            if (BoundingBox)
+            {
+                planoBack.BoundingBox.Render();
+                planoFront.BoundingBox.Render();
+                planoIzq.BoundingBox.Render();
+                planoDer.BoundingBox.Render();
+                personaje.BoundingBox.Render();
+            }
+  
 
             scene.RenderAll();
 
@@ -206,12 +220,7 @@ namespace TGC.Group.Model
             //Render del mesh
             //Mesh.Render();
 
-            //Render de BoundingBox, muy útil para debug de colisiones.
-            if (BoundingBox)
-            {
-                //Box.BoundingBox.Render();
-                //Mesh.BoundingBox.Render();
-            }
+            
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
@@ -223,59 +232,43 @@ namespace TGC.Group.Model
 
             //Calcular proxima posicion de personaje segun Input
             var moving = false;
-            var movement = TGCVector3.Empty;
+            movimiento = TGCVector3.Empty;
             
             if (Input.keyDown(Key.W))
             {
-                movement.Z = -velocidadCaminar;
+                movimiento.Z = -velocidadCaminar;
                 moving = true;
             }
 
             if (Input.keyDown(Key.S))
             {
-                movement.Z = velocidadCaminar;
+                movimiento.Z = velocidadCaminar;
                 moving = true;
             }
 
             if (Input.keyDown(Key.D))
             {
-                movement.X = -velocidadCaminar;
+                movimiento.X = -velocidadCaminar;
                 moving = true;
             }
 
             if (Input.keyDown(Key.A))
             {
-                movement.X = velocidadCaminar;
+                movimiento.X = velocidadCaminar;
                 moving = true;
             }
 
-            var current_pos = personaje.Position;
-
-            //desplazamiento = TGCMatrix.Translation(movement.X, movement.Y, movement.Z);
-            personaje.Move(movement);
-
-            //if (TgcCollisionUtils.testAABBAABB(planoIzq.BoundingBox, personaje.BoundingBox))
-            if(ChocoConLimite(personaje, planoIzq) || ChocoConLimite(personaje, planoDer))
+            if (ChocoConLimite(personaje, planoIzq))
             {
-                //plano.Color = Color.Red;
-                //plano.updateValues();
+                NoMoverHacia(Key.A);
 
-                //desplazamiento = TGCMatrix.Translation(current_pos.X, current_pos.Y, current_pos.Z);
-
-                //personaje.Position = current_pos;
-                
-                personaje.Move(-movement.X, -movement.Y, -movement.Z);
-                
-                //planoIzq.updateValues();
             }
-            else
+            else if (ChocoConLimite(personaje, planoDer))
             {
-                //plano.Color = Color.Violet;
-                //plano.updateValues();
-                //Console.WriteLine("NO COLISIONNNNNNN");
-                //planoIzq.updateValues();
-               
-                
+                NoMoverHacia(Key.D);
+            }
+            else { // no hay colisiones contra los planos laterales
+                ultimaPos *= TGCMatrix.Translation(movimiento);
             }
 
             if (ChocoConLimite(personaje, planoFront))
@@ -305,9 +298,6 @@ namespace TGC.Group.Model
             if (moving)
             {
                 personaje.playAnimation("Caminando", true);
-
-                //Aplicar movimiento, internamente suma valores a la posicion actual del mesh.
-             
             }
             else
             {
@@ -315,6 +305,37 @@ namespace TGC.Group.Model
             }
 
             camara.Target = personaje.Position;
+        }
+
+        private void NoMoverHacia(Key key) {
+            switch(key)
+            {
+                case Key.A:
+                    if (movimiento.X > 0) // los ejes estan al reves de como pensaba, o lo entendi mal.
+                        ultimaPos *= TGCMatrix.Translation(0, movimiento.Y, movimiento.Z);
+                    else
+                        ultimaPos *= TGCMatrix.Translation(movimiento);
+                    break;
+                case Key.D:
+                    if (movimiento.X < 0)
+                        ultimaPos *= TGCMatrix.Translation(0, movimiento.Y, movimiento.Z);
+                    else
+                        ultimaPos *= TGCMatrix.Translation(movimiento);
+                    break;
+                case Key.S:
+                    if (movimiento.Z > 0)
+                        ultimaPos *= TGCMatrix.Translation(movimiento.X, movimiento.Y, 0);
+                    else
+                        ultimaPos *= TGCMatrix.Translation(movimiento);
+                    break;
+                case Key.W:
+                    if (movimiento.Z < 0)
+                        ultimaPos *= TGCMatrix.Translation(movimiento.X, movimiento.Y, 0);
+                    else
+                        ultimaPos *= TGCMatrix.Translation(movimiento);
+                    break;
+            }
+                
         }
 
         private bool ChocoConLimite(TgcSkeletalMesh personaje, TgcMesh planoIzq) {
