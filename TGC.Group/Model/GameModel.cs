@@ -214,8 +214,8 @@ namespace TGC.Group.Model
 
         private void AnimarPlataformas() {
             //Muevo las plataformas
-            var Mover = TGCMatrix.Translation(0, 0, -10);
-            var Mover2 = TGCMatrix.Translation(0, 0, 65);
+            var Mover = TGCMatrix.Translation(0, 12, -10);
+            var Mover2 = TGCMatrix.Translation(0, 12, 65);
 
             //Punto por donde va a rotar
             var Trasladar = TGCMatrix.Translation(0, 0, 10);
