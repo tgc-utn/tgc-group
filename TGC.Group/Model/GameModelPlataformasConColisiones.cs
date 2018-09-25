@@ -45,6 +45,9 @@ namespace TGC.Group.Model
         private TGCVector3 movimiento;
         private TGCMatrix ultimaPos;
 
+        private bool estaEnLaPlataforma1;
+        private bool estaEnLaPlataforma2;
+
         // Planos de limite
         private TgcMesh planoIzq;
         private TgcMesh planoDer;
@@ -160,17 +163,36 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            personaje.Transform =
-               TGCMatrix.Scaling(personaje.Scale)
-                           * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
-                           * TGCMatrix.Translation(personaje.Position)
-                           * ultimaPos;
+            RenderizarPlataformas();
+
+            if (estaEnLaPlataforma1)
+            {
+                personaje.Transform = transformacionBox;
+            }
+            if (estaEnLaPlataforma2)
+            {
+                personaje.Transform = TGCMatrix.Scaling(personaje.Scale) * transformacionBox2;
+
+               // personaje.Transform =
+               //TGCMatrix.Scaling(personaje.Scale)
+               //            * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
+               //            * TGCMatrix.Translation(personaje.Position)
+               //            * transformacionBox2;
+            }
+            else
+            {
+                personaje.Transform =
+           TGCMatrix.Scaling(personaje.Scale)
+                       * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
+                       * TGCMatrix.Translation(personaje.Position)
+                       * ultimaPos;
 
             personaje.BoundingBox.transform(personaje.Transform);
+            }
+
+            personaje.BoundingBox.Render();
 
             personaje.animateAndRender(ElapsedTime);
-
-            RenderizarPlataformas();
 
             if (BoundingBox)
             {
@@ -229,6 +251,8 @@ namespace TGC.Group.Model
         private void CalcularMovimiento()
         {
             var velocidadCaminar = VELOCIDAD_DESPLAZAMIENTO * ElapsedTime;
+            estaEnLaPlataforma1 = false;
+            estaEnLaPlataforma2 = false;
 
             //Calcular proxima posicion de personaje segun Input
             var moving = false;
@@ -295,6 +319,28 @@ namespace TGC.Group.Model
                 planoBack.BoundingBox.setRenderColor(Color.Yellow);
             }
 
+            if (ChocoConPlataforma(personaje, plataforma1))
+            {
+                estaEnLaPlataforma1 = true;
+
+                //MoverSegunPlataforma(personaje, plataforma1);
+            }
+            else
+            {
+                //ultimaPos *= TGCMatrix.Translation(movimiento);
+            }
+
+            if (ChocoConPlataforma(personaje, plataforma2))
+            {
+                estaEnLaPlataforma2 = true;
+
+                //MoverSegunPlataforma(personaje, plataforma2);
+            }
+            else
+            {
+                //ultimaPos *= TGCMatrix.Translation(movimiento);
+            }
+
             if (moving)
             {
                 personaje.playAnimation("Caminando", true);
@@ -305,6 +351,12 @@ namespace TGC.Group.Model
             }
 
             camara.Target = personaje.Position;
+        }
+
+        private void MoverSegunPlataforma(TgcSkeletalMesh personaje, TgcMesh plataforma)
+        {
+            //ultimaPos *= transformacionBox;
+            //personaje.BoundingBox.transform(plataforma.Transform);
         }
 
         private void NoMoverHacia(Key key) {
@@ -336,6 +388,11 @@ namespace TGC.Group.Model
                     break;
             }
                 
+        }
+
+        private bool ChocoConPlataforma(TgcSkeletalMesh personaje, TgcMesh plataforma)
+        {
+            return TgcCollisionUtils.testAABBAABB(plataforma.BoundingBox, personaje.BoundingBox);
         }
 
         private bool ChocoConLimite(TgcSkeletalMesh personaje, TgcMesh planoIzq) {
