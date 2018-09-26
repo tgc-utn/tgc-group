@@ -41,6 +41,7 @@ namespace TGC.Group.Model
         private const float VELOCIDAD_DESPLAZAMIENTO = 50f;
         private TgcScene escenaPlaya;
         private TgcSkeletalMesh personaje;
+        private TgcMesh caja1;
         private GameCamera camara;
         private TGCVector3 movimiento;
         private TGCMatrix ultimaPos;
@@ -96,6 +97,10 @@ namespace TGC.Group.Model
             planoFront.Transform = TGCMatrix.Translation(50, 0, -30);
             planoFront.BoundingBox.transform(planoFront.Transform);
 
+            caja1 = loader.loadSceneFromFile(MediaDir + "primer-nivel\\Playa final\\caja-TgcScene.xml").Meshes[0];
+
+            //caja1.Transform = TGCMatrix.Scaling(0.001f, 0.001f, 0.001f);
+            //caja1.BoundingBox.transform(caja1.Transform);
 
             var skeletalLoader = new TgcSkeletalLoader();
             personaje = skeletalLoader.loadMeshAndAnimationsFromFile(
@@ -151,7 +156,9 @@ namespace TGC.Group.Model
         {
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
-       
+
+            caja1.Render();
+
                 personaje.Transform =
            TGCMatrix.Scaling(personaje.Scale)
                        * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
@@ -171,6 +178,7 @@ namespace TGC.Group.Model
                 planoIzq.BoundingBox.Render();
                 planoDer.BoundingBox.Render();
                 personaje.BoundingBox.Render();
+                caja1.BoundingBox.Render();
             }
 
             escenaPlaya.RenderAll();
@@ -318,6 +326,7 @@ namespace TGC.Group.Model
         {
             //Dispose del mesh.
             escenaPlaya.DisposeAll();
+            caja1.Dispose();
             personaje.Dispose();
             planoIzq.Dispose(); // solo se borran los originales
             planoFront.Dispose(); // solo se borran los originales
