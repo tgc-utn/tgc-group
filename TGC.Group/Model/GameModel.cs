@@ -39,12 +39,12 @@ namespace TGC.Group.Model
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
         private const float VELOCIDAD_DESPLAZAMIENTO = 50f;
-        private TgcScene escenaPlataformas;
+        private TgcScene escenaPlaya;
         private TgcSkeletalMesh personaje;
         private GameCamera camara;
         private TGCVector3 movimiento;
         private TGCMatrix ultimaPos;
-
+   
         private bool estaEnLaPlataforma1;
         private bool estaEnLaPlataforma2;
 
@@ -53,14 +53,6 @@ namespace TGC.Group.Model
         private TgcMesh planoDer;
         private TgcMesh planoFront;
         private TgcMesh planoBack;
-
-        // Plataformas
-        private TgcMesh plataforma1;
-        private TgcMesh plataforma2;
-
-        //Transformaciones de plataforma
-        private TGCMatrix transformacionBox;
-        private TGCMatrix transformacionBox2;
 
         //Constantes para velocidades de movimiento de plataforma
         private const float MOVEMENT_SPEED = 1f;
@@ -78,32 +70,31 @@ namespace TGC.Group.Model
             var d3dDevice = D3DDevice.Instance.Device;
 
             var loader = new TgcSceneLoader();
-            escenaPlataformas = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\escenarioPlataformas-TgcScene.xml");
-
-            plataforma1 = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\plataforma-TgcScene.xml").Meshes[0];
-
-            plataforma2 = plataforma1.createMeshInstance(plataforma1.Name + "2");
-
-            plataforma1.AutoTransform = false;
-            plataforma2.AutoTransform = false;
-
-            planoIzq = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\planoHorizontal-TgcScene.xml").Meshes[0];
+            escenaPlaya = loader.loadSceneFromFile(MediaDir + "primer-nivel\\Playa final\\Playa-TgcScene.xml");
+              
+            planoIzq = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\planoHorizontal-TgcScene.xml").Meshes[0];            
             planoIzq.AutoTransform = false;
-
+           
             planoDer = planoIzq.createMeshInstance("planoDer");
             planoDer.AutoTransform = false;
-            planoDer.Transform = TGCMatrix.Translation(-39, 0, 0);
+            planoDer.Transform = TGCMatrix.Translation(-12, 0, 0) * TGCMatrix.Scaling(1, 1, 2.2f);
             planoDer.BoundingBox.transform(planoDer.Transform);
+
+            planoIzq.Transform = TGCMatrix.Translation(14, 0, 0) * TGCMatrix.Scaling(1, 1, 2.2f);
+            planoIzq.BoundingBox.transform(planoIzq.Transform);
+
+            //planoDerechoAbajo = planoIzq.createMeshInstance("planoDer");
 
             planoFront = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\planoVertical-TgcScene.xml").Meshes[0];
             planoFront.AutoTransform = false;
-            planoFront.Transform = TGCMatrix.Translation(50, 0, -65);
-            planoFront.BoundingBox.transform(planoFront.Transform);
 
             planoBack = planoFront.createMeshInstance("planoBack");
             planoBack.AutoTransform = false;
-            planoBack.Transform = TGCMatrix.Translation(0, 0, 135);
+            planoBack.Transform = TGCMatrix.Translation(50, 0, 140);
             planoBack.BoundingBox.transform(planoBack.Transform);
+
+            planoFront.Transform = TGCMatrix.Translation(50, 0, -30);
+            planoFront.BoundingBox.transform(planoFront.Transform);
 
 
             var skeletalLoader = new TgcSkeletalLoader();
@@ -121,7 +112,7 @@ namespace TGC.Group.Model
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
             //Escalarlo porque es muy grande
-            personaje.Position = new TGCVector3(0, 0, 100);
+            personaje.Position = new TGCVector3(10, 0, 60);
             personaje.Scale = new TGCVector3(0.15f, 0.15f, 0.15f);
             ultimaPos = TGCMatrix.Translation(personaje.Position);
 
@@ -138,8 +129,6 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
-
-            AnimarPlataformas();
 
             CalcularMovimiento();
 
@@ -162,25 +151,7 @@ namespace TGC.Group.Model
         {
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
-
-            RenderizarPlataformas();
-
-            if (estaEnLaPlataforma1)
-            {
-                personaje.Transform = transformacionBox;
-            }
-            if (estaEnLaPlataforma2)
-            {
-                personaje.Transform = TGCMatrix.Scaling(personaje.Scale) * transformacionBox2;
-
-               // personaje.Transform =
-               //TGCMatrix.Scaling(personaje.Scale)
-               //            * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
-               //            * TGCMatrix.Translation(personaje.Position)
-               //            * transformacionBox2;
-            }
-            else
-            {
+       
                 personaje.Transform =
            TGCMatrix.Scaling(personaje.Scale)
                        * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
@@ -188,8 +159,7 @@ namespace TGC.Group.Model
                        * ultimaPos;
 
             personaje.BoundingBox.transform(personaje.Transform);
-            }
-
+            
             personaje.BoundingBox.Render();
 
             personaje.animateAndRender(ElapsedTime);
@@ -200,64 +170,24 @@ namespace TGC.Group.Model
                 planoFront.BoundingBox.Render();
                 planoIzq.BoundingBox.Render();
                 planoDer.BoundingBox.Render();
-                plataforma1.BoundingBox.Render();
-                plataforma2.BoundingBox.Render();
                 personaje.BoundingBox.Render();
             }
-  
-            escenaPlataformas.RenderAll();
+
+            escenaPlaya.RenderAll();
 
    
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
 
-        private void AnimarPlataformas() {
-            //Muevo las plataformas
-            var Mover = TGCMatrix.Translation(0, 12, -10);
-            var Mover2 = TGCMatrix.Translation(0, 12, 65);
-
-            //Punto por donde va a rotar
-            var Trasladar = TGCMatrix.Translation(0, 0, 10);
-            var Trasladar2 = TGCMatrix.Translation(0, 0, -10);
-
-            //Aplico la rotacion
-            var Rot = TGCMatrix.RotationX(orbitaDeRotacion);
-
-            //Giro para que la caja quede derecha
-            var RotInversa = TGCMatrix.RotationX(-orbitaDeRotacion);
-
-            transformacionBox = Mover * Trasladar * Rot * Trasladar * RotInversa;
-            transformacionBox2 = Mover2 * Trasladar2 * RotInversa * Trasladar2 * Rot;
-        }
-
-        private void RenderizarPlataformas() {
-            //Dibujar la primera plataforma en pantalla
-            plataforma1.Transform = transformacionBox;
-            plataforma1.Render();
-            plataforma1.BoundingBox.transform(plataforma1.Transform);
-            plataforma1.BoundingBox.Render();
-
-            //Dibujar la segunda plataforma en pantalla
-            plataforma2.Transform = transformacionBox2;
-            plataforma2.Render();
-            plataforma2.BoundingBox.transform(plataforma2.Transform);
-            plataforma2.BoundingBox.Render();
-
-            //Recalculamos la orbita de rotacion
-            orbitaDeRotacion += MOVEMENT_SPEED * ElapsedTime;
-        }
-
         private void CalcularMovimiento()
         {
             var velocidadCaminar = VELOCIDAD_DESPLAZAMIENTO * ElapsedTime;
-            estaEnLaPlataforma1 = false;
-            estaEnLaPlataforma2 = false;
 
             //Calcular proxima posicion de personaje segun Input
             var moving = false;
             movimiento = TGCVector3.Empty;
-            
+  
             if (Input.keyDown(Key.W))
             {
                 movimiento.Z = -velocidadCaminar;
@@ -284,14 +214,39 @@ namespace TGC.Group.Model
 
             if (ChocoConLimite(personaje, planoIzq))
             {
-                NoMoverHacia(Key.A);
+                if (ChocoConLimite(personaje, planoBack))
+                {
+                    var noTeMuevasParaAtras = new TGCVector3(0, movimiento.Y, 0);
+                    NoMoverHacia(Key.S, noTeMuevasParaAtras);
 
+                    planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
+                }
+                else {
+                    planoBack.BoundingBox.setRenderColor(Color.Yellow);
+                    NoMoverHacia(Key.A, movimiento);
+                }
             }
             else if (ChocoConLimite(personaje, planoDer))
             {
-                NoMoverHacia(Key.D);
+                if (ChocoConLimite(personaje, planoBack))
+                {
+                    var noTeMuevasParaAtras = new TGCVector3(0, movimiento.Y, 0);
+                    NoMoverHacia(Key.S, noTeMuevasParaAtras);
+                    planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
+                }
+                else {
+                    NoMoverHacia(Key.D, movimiento);
+                    planoBack.BoundingBox.setRenderColor(Color.Yellow);
+                }
             }
-            else { // no hay colisiones contra los planos laterales
+
+            else if (ChocoConLimite(personaje, planoBack)) {
+                NoMoverHacia(Key.S, movimiento);
+                planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
+            }
+            else
+            { // no hay colisiones contra los planos laterales
+                planoBack.BoundingBox.setRenderColor(Color.Yellow);
                 ultimaPos *= TGCMatrix.Translation(movimiento);
             }
 
@@ -307,40 +262,6 @@ namespace TGC.Group.Model
                 planoFront.BoundingBox.setRenderColor(Color.Yellow);
             }
 
-            if (ChocoConLimite(personaje, planoBack))
-            { // HUBO CAMBIO DE ESCENARIO
-              /* Aca deberiamos hacer algo como no testear mas contra las cosas del escenario anterior y testear
-                  contra las del escenario actual. 
-              */
-
-                planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
-            }
-            else {
-                planoBack.BoundingBox.setRenderColor(Color.Yellow);
-            }
-
-            if (ChocoConPlataforma(personaje, plataforma1))
-            {
-                estaEnLaPlataforma1 = true;
-
-                //MoverSegunPlataforma(personaje, plataforma1);
-            }
-            else
-            {
-                //ultimaPos *= TGCMatrix.Translation(movimiento);
-            }
-
-            if (ChocoConPlataforma(personaje, plataforma2))
-            {
-                estaEnLaPlataforma2 = true;
-
-                //MoverSegunPlataforma(personaje, plataforma2);
-            }
-            else
-            {
-                //ultimaPos *= TGCMatrix.Translation(movimiento);
-            }
-
             if (moving)
             {
                 personaje.playAnimation("Caminando", true);
@@ -353,46 +274,35 @@ namespace TGC.Group.Model
             camara.Target = personaje.Position;
         }
 
-        private void MoverSegunPlataforma(TgcSkeletalMesh personaje, TgcMesh plataforma)
-        {
-            //ultimaPos *= transformacionBox;
-            //personaje.BoundingBox.transform(plataforma.Transform);
-        }
-
-        private void NoMoverHacia(Key key) {
+        private void NoMoverHacia(Key key, TGCVector3 vector) {
             switch(key)
             {
                 case Key.A:
                     if (movimiento.X > 0) // los ejes estan al reves de como pensaba, o lo entendi mal.
-                        ultimaPos *= TGCMatrix.Translation(0, movimiento.Y, movimiento.Z);
+                        ultimaPos *= TGCMatrix.Translation(0, vector.Y, vector.Z);
                     else
-                        ultimaPos *= TGCMatrix.Translation(movimiento);
+                        ultimaPos *= TGCMatrix.Translation(vector);
                     break;
                 case Key.D:
                     if (movimiento.X < 0)
-                        ultimaPos *= TGCMatrix.Translation(0, movimiento.Y, movimiento.Z);
+                        ultimaPos *= TGCMatrix.Translation(0, vector.Y, vector.Z);
                     else
-                        ultimaPos *= TGCMatrix.Translation(movimiento);
+                        ultimaPos *= TGCMatrix.Translation(vector);
                     break;
                 case Key.S:
                     if (movimiento.Z > 0)
-                        ultimaPos *= TGCMatrix.Translation(movimiento.X, movimiento.Y, 0);
+                        ultimaPos *= TGCMatrix.Translation(vector.X, vector.Y, 0);
                     else
-                        ultimaPos *= TGCMatrix.Translation(movimiento);
+                        ultimaPos *= TGCMatrix.Translation(vector);
                     break;
                 case Key.W:
                     if (movimiento.Z < 0)
-                        ultimaPos *= TGCMatrix.Translation(movimiento.X, movimiento.Y, 0);
+                        ultimaPos *= TGCMatrix.Translation(vector.X, vector.Y, 0);
                     else
-                        ultimaPos *= TGCMatrix.Translation(movimiento);
+                        ultimaPos *= TGCMatrix.Translation(vector);
                     break;
             }
                 
-        }
-
-        private bool ChocoConPlataforma(TgcSkeletalMesh personaje, TgcMesh plataforma)
-        {
-            return TgcCollisionUtils.testAABBAABB(plataforma.BoundingBox, personaje.BoundingBox);
         }
 
         private bool ChocoConLimite(TgcSkeletalMesh personaje, TgcMesh planoIzq) {
@@ -407,11 +317,10 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             //Dispose del mesh.
-            escenaPlataformas.DisposeAll();
+            escenaPlaya.DisposeAll();
             personaje.Dispose();
             planoIzq.Dispose(); // solo se borran los originales
             planoFront.Dispose(); // solo se borran los originales
-            plataforma1.Dispose(); // solo se borran los originales
         }
     }
 }
