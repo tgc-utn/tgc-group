@@ -46,6 +46,7 @@ namespace TGC.Group.Model
         private GameCamera camara;
         private TGCVector3 movimiento;
         private TGCMatrix ultimaPos;
+        private TGCMatrix auxUltimaPos;
         private ArrayList cajasPlaya;
 
         // Planos de limite
@@ -54,7 +55,10 @@ namespace TGC.Group.Model
         private TgcMesh planoFront;
         private TgcMesh planoBack;
 
-        private TgcArrow segment;
+        private TgcArrow segment = new TgcArrow();
+        private bool colisionoContraLimite;
+        private bool colisionoContraMesh;
+        private bool moving;
 
         //Constantes para velocidades de movimiento de plataforma
         private const float MOVEMENT_SPEED = 1f;
@@ -122,6 +126,10 @@ namespace TGC.Group.Model
             personaje.Position = new TGCVector3(10, 0, 60);
             personaje.Scale = new TGCVector3(0.15f, 0.15f, 0.15f);
             ultimaPos = TGCMatrix.Translation(personaje.Position);
+            auxUltimaPos = TGCMatrix.Identity; //TGCMatrix.Translation(personaje.Position);
+
+            colisionoContraLimite = true;
+            colisionoContraMesh = true;
 
             camara = new GameCamera(personaje.Position, 100, 200);
             Camara = camara;
@@ -137,9 +145,37 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
+            auxUltimaPos = ultimaPos;
+
             CalcularMovimiento();
 
-            CalcularColisiones();
+            if (colisionoContraLimite)
+            {
+                ultimaPos = auxUltimaPos;
+
+                CalcularColisiones();
+
+                if (colisionoContraMesh)
+                {
+                    ultimaPos = auxUltimaPos;
+                }
+
+            }
+            else
+            {
+                CalcularColisiones();
+
+                if (colisionoContraMesh)
+                {
+                    ultimaPos = auxUltimaPos;
+                }
+                else {
+                    ultimaPos *= TGCMatrix.Translation(movimiento);
+                }
+            }
+
+            colisionoContraLimite = true;
+            colisionoContraMesh = true;
 
             if (Input.keyDown(Key.Q))
             {
@@ -163,8 +199,6 @@ namespace TGC.Group.Model
 
             caja1.Render();
 
-            segment.Render();
-
                 personaje.Transform =
            TGCMatrix.Scaling(personaje.Scale)
                        * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
@@ -179,6 +213,7 @@ namespace TGC.Group.Model
 
             if (BoundingBox)
             {
+                segment.Render();
                 planoBack.BoundingBox.Render();
                 planoFront.BoundingBox.Render();
                 planoIzq.BoundingBox.Render();
@@ -199,9 +234,9 @@ namespace TGC.Group.Model
             var velocidadCaminar = VELOCIDAD_DESPLAZAMIENTO * ElapsedTime;
 
             //Calcular proxima posicion de personaje segun Input
-            var moving = false;
+            moving = false;
             movimiento = TGCVector3.Empty;
-  
+            
             if (Input.keyDown(Key.W))
             {
                 movimiento.Z = -velocidadCaminar;
@@ -226,64 +261,77 @@ namespace TGC.Group.Model
                 moving = true;
             }
 
-            if (ChocoConLimite(personaje, planoIzq))
-            {
-                if (ChocoConLimite(personaje, planoBack))
-                {
-                    var noTeMuevasParaAtras = new TGCVector3(0, movimiento.Y, 0);
-                    NoMoverHacia(Key.S, noTeMuevasParaAtras);
-
-                    planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
-                }
-                else {
-                    planoBack.BoundingBox.setRenderColor(Color.Yellow);
-                    NoMoverHacia(Key.A, movimiento);
-                }
-            }
-            else if (ChocoConLimite(personaje, planoDer))
-            {
-                if (ChocoConLimite(personaje, planoBack))
-                {
-                    var noTeMuevasParaAtras = new TGCVector3(0, movimiento.Y, 0);
-                    NoMoverHacia(Key.S, noTeMuevasParaAtras);
-                    planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
-                }
-                else {
-                    NoMoverHacia(Key.D, movimiento);
-                    planoBack.BoundingBox.setRenderColor(Color.Yellow);
-                }
-            }
-
-            else if (ChocoConLimite(personaje, planoBack)) {
-                NoMoverHacia(Key.S, movimiento);
-                planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
-            }
-            else
-            { // no hay colisiones contra los planos laterales
-                planoBack.BoundingBox.setRenderColor(Color.Yellow);
-                ultimaPos *= TGCMatrix.Translation(movimiento);
-            }
-
-            if (ChocoConLimite(personaje, planoFront))
-            { // HUBO CAMBIO DE ESCENARIO
-                /* Aca deberiamos hacer algo como no testear mas contra las cosas del escenario anterior y testear
-                  contra las del escenario actual. 
-                */
-
-                planoFront.BoundingBox.setRenderColor(Color.AliceBlue);
-            }
-            else {
-                planoFront.BoundingBox.setRenderColor(Color.Yellow);
-            }
-
             if (moving)
             {
-                personaje.playAnimation("Caminando", true);
+                if (ChocoConLimite(personaje, planoIzq))
+                {
+                    if (ChocoConLimite(personaje, planoBack))
+                    {
+                        var noTeMuevasParaAtras = new TGCVector3(movimiento.X, movimiento.Y, 0);
+                        NoMoverHacia(Key.A, noTeMuevasParaAtras);
+
+                        planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
+                    }
+                    else
+                    {
+                        planoBack.BoundingBox.setRenderColor(Color.Yellow);
+                        NoMoverHacia(Key.A, movimiento);
+                    }
+                }
+                else if (ChocoConLimite(personaje, planoDer))
+                {
+                    if (ChocoConLimite(personaje, planoBack))
+                    {
+                        var noTeMuevasParaAtras = new TGCVector3(movimiento.X, movimiento.Y, 0);
+                        NoMoverHacia(Key.D, noTeMuevasParaAtras);
+                        planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
+                    }
+                    else
+                    {
+                        NoMoverHacia(Key.D, movimiento);
+                        planoBack.BoundingBox.setRenderColor(Color.Yellow);
+                    }
+                }
+                else if (ChocoConLimite(personaje, planoBack))
+                {
+                    NoMoverHacia(Key.S, movimiento);
+                    planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
+                }
+                else
+                { // no hay colisiones contra los planos laterales
+                    planoBack.BoundingBox.setRenderColor(Color.Yellow);
+                    colisionoContraLimite = false;
+                }
+
+                if (ChocoConLimite(personaje, planoFront))
+                { // HUBO CAMBIO DE ESCENARIO
+                  /* Aca deberiamos hacer algo como no testear mas contra las cosas del escenario anterior y testear
+                    contra las del escenario actual. 
+                  */
+
+                    planoFront.BoundingBox.setRenderColor(Color.AliceBlue);
+                }
+                else
+                {
+                    planoFront.BoundingBox.setRenderColor(Color.Yellow);
+                }
+
+                personaje.playAnimation("Caminando", true); // esto creo que esta mal, si colisiono no deberia caminar.
             }
-            else
-            {
+            else {
+                colisionoContraLimite = false;
                 personaje.playAnimation("Parado", true);
+                //auxUltimaPos *= TGCMatrix.Translation(movimiento);
             }
+
+            //if (moving)
+            //{
+            //    personaje.playAnimation("Caminando", true);
+            //}
+            //else
+            //{
+            //    personaje.playAnimation("Parado", true);
+            //}
 
             camara.Target = personaje.Position;
         }
@@ -293,27 +341,27 @@ namespace TGC.Group.Model
             {
                 case Key.A:
                     if (movimiento.X > 0) // los ejes estan al reves de como pensaba, o lo entendi mal.
-                        ultimaPos *= TGCMatrix.Translation(0, vector.Y, vector.Z);
+                        auxUltimaPos *= TGCMatrix.Translation(0, vector.Y, vector.Z);
                     else
-                        ultimaPos *= TGCMatrix.Translation(vector);
+                        auxUltimaPos *= TGCMatrix.Translation(vector);
                     break;
                 case Key.D:
                     if (movimiento.X < 0)
-                        ultimaPos *= TGCMatrix.Translation(0, vector.Y, vector.Z);
+                        auxUltimaPos *= TGCMatrix.Translation(0, vector.Y, vector.Z);
                     else
-                        ultimaPos *= TGCMatrix.Translation(vector);
+                        auxUltimaPos *= TGCMatrix.Translation(vector);
                     break;
                 case Key.S:
                     if (movimiento.Z > 0)
-                        ultimaPos *= TGCMatrix.Translation(vector.X, vector.Y, 0);
+                        auxUltimaPos *= TGCMatrix.Translation(vector.X, vector.Y, 0);
                     else
-                        ultimaPos *= TGCMatrix.Translation(vector);
+                        auxUltimaPos *= TGCMatrix.Translation(vector);
                     break;
                 case Key.W:
                     if (movimiento.Z < 0)
-                        ultimaPos *= TGCMatrix.Translation(vector.X, vector.Y, 0);
+                        auxUltimaPos *= TGCMatrix.Translation(vector.X, vector.Y, 0);
                     else
-                        ultimaPos *= TGCMatrix.Translation(vector);
+                        auxUltimaPos *= TGCMatrix.Translation(vector);
                     break;
             }
                 
@@ -324,45 +372,61 @@ namespace TGC.Group.Model
         }
 
         private void CalcularColisiones() {
-            foreach (TgcMesh caja in cajasPlaya) {
-                // calcular el centro de cada cara, para armar un rayo y saber contra que cara estas colisionando.
-                // si hubo colision con la cara de adelante, no deberias poder avanzar y deberias poder empujarla
-                // si hubo colision con cara del costado, no podrias moverte hacia el costado
-                // si hubo colision de espalda, no deberias poder moverte hacia atras.
-                //mesh.BoundingBox.calculateBoxCenter
-
-                var velocidadCaminar = VELOCIDAD_DESPLAZAMIENTO * ElapsedTime;
-
-                var rayos = ArmarRayosEnCadaCara(caja); // quizas esto de armar los rayos pueda hacerse en el init asi no se hace en cada update, por ahora lo dejo aca.
-
-                var puntoInterseccion = TGCVector3.Empty;
-
-                if (TgcCollisionUtils.intersectRayAABB((TgcRay) rayos[0], personaje.BoundingBox, out puntoInterseccion)) {
-                    NoMoverHacia(Key.S, movimiento);
-                    //personaje.playAnimation("Parado", true);
-                } // esta parado encima de la caja
-
-                // No testeo en direccion -y porque no podrias estar abajo de la caja
-
-                var rayoZ = (TgcRay)rayos[2];
-
-                segment = TgcArrow.fromDirection(rayoZ.Origin, new TGCVector3(0,0,10)); 
-
-                if (TgcCollisionUtils.intersectRayAABB(rayoZ, personaje.BoundingBox, out puntoInterseccion))
+            if (moving)
+            {
+                foreach (TgcMesh caja in cajasPlaya)
                 {
-                    //var bb = personaje.BoundingBox;
-                    //var centroBB = bb.calculateBoxCenter();
-                    //var ZCaraDelanteraPersonajeAlturaRayo = (new TGCVector3(centroBB.X, rayoZ.Origin.Y, centroBB.Z - (FastMath.Abs(bb.PMax.Z - bb.PMin.Z) / 2))).Z;
-                    if (FastMath.Abs(puntoInterseccion.Z - rayoZ.Origin.Z) < 5)
+                    // calcular el centro de cada cara, para armar un rayo y saber contra que cara estas colisionando.
+                    // si hubo colision con la cara de adelante, no deberias poder avanzar y deberias poder empujarla
+                    // si hubo colision con cara del costado, no podrias moverte hacia el costado
+                    // si hubo colision de espalda, no deberias poder moverte hacia atras.
+                    //mesh.BoundingBox.calculateBoxCenter
+
+                    var velocidadCaminar = VELOCIDAD_DESPLAZAMIENTO * ElapsedTime;
+
+                    var rayos = ArmarRayosEnCadaCara(caja); // quizas esto de armar los rayos pueda hacerse en el init asi no se hace en cada update, por ahora lo dejo aca.
+
+                    var puntoInterseccion = TGCVector3.Empty;
+
+                    if (TgcCollisionUtils.intersectRayAABB((TgcRay)rayos[0], personaje.BoundingBox, out puntoInterseccion))
                     {
-                        personaje.playAnimation("Empujar", true);
-                        //NoMoverHacia(Key.W, movimiento);
+                        NoMoverHacia(Key.S, movimiento);
+                        //personaje.playAnimation("Parado", true);
+                    } // esta parado encima de la caja
+
+                    // No testeo en direccion -y porque no podrias estar abajo de la caja
+
+                    var rayoZ = (TgcRay)rayos[2];
+
+                    segment = TgcArrow.fromDirection(rayoZ.Origin, new TGCVector3(0, 0, 10));
+
+                    if (TgcCollisionUtils.intersectRayAABB(rayoZ, personaje.BoundingBox, out puntoInterseccion))
+                    {
+                        //var bb = personaje.BoundingBox;
+                        //var centroBB = bb.calculateBoxCenter();
+                        //var ZCaraDelanteraPersonajeAlturaRayo = (new TGCVector3(centroBB.X, rayoZ.Origin.Y, centroBB.Z - (FastMath.Abs(bb.PMax.Z - bb.PMin.Z) / 2))).Z;
+                        if (FastMath.Abs(puntoInterseccion.Z - rayoZ.Origin.Z) < 5)
+                        { // tenes que empujar la caja y moverla hacia adelante.
+                            NoMoverHacia(Key.W, movimiento);
+                            personaje.playAnimation("Empujar", true);
+                            break; // sino caga el valor del flag
+                        } else
+                        {
+                            colisionoContraMesh = false;
+                            personaje.playAnimation("Caminando", true);
+                        }
                     }
                     else
+                    {
+                        colisionoContraMesh = false;
                         personaje.playAnimation("Caminando", true);
 
-                } // tenes que empujar la caja
-                
+                    }
+                }
+            }
+            else {
+                colisionoContraMesh = false;
+                personaje.playAnimation("Parado", true);
             }
         }
 
