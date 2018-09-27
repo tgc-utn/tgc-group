@@ -48,6 +48,8 @@ namespace TGC.Group.Model
         private TGCMatrix ultimaPos;
         private TGCMatrix auxUltimaPos;
         private ArrayList cajasPlaya;
+        private TGCMatrix movimientoCaja;
+        private TGCMatrix auxMovimientoCaja;
 
         // Planos de limite
         private TgcMesh planoIzq;
@@ -102,8 +104,11 @@ namespace TGC.Group.Model
             planoFront.BoundingBox.transform(planoFront.Transform);
 
             caja1 = loader.loadSceneFromFile(MediaDir + "primer-nivel\\Playa final\\caja-TgcScene.xml").Meshes[0];
+            caja1.AutoTransform = false;
+            movimientoCaja = TGCMatrix.Translation(caja1.Position);
 
             cajasPlaya = new ArrayList();
+
 
             cajasPlaya.Add(caja1);
 
@@ -125,7 +130,7 @@ namespace TGC.Group.Model
             //Escalarlo porque es muy grande
             personaje.Position = new TGCVector3(10, 0, 60);
             personaje.Scale = new TGCVector3(0.15f, 0.15f, 0.15f);
-            ultimaPos = TGCMatrix.Translation(personaje.Position);
+            ultimaPos = TGCMatrix.Translation(new TGCVector3(10, 0, 60));
             auxUltimaPos = TGCMatrix.Identity; //TGCMatrix.Translation(personaje.Position);
 
             colisionoContraLimite = true;
@@ -145,31 +150,50 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
-            auxUltimaPos = ultimaPos;
+            auxUltimaPos = TGCMatrix.Identity; //CopiarMatriz4x4(ultimaPos);
+            //auxUltimaPos = ultimaPos; // tengo que pasarle una copia de ultimaPos, no la referencia, sino al modificar auxUltimaPos se modifica ultimaPos y visceversa
+            auxMovimientoCaja = TGCMatrix.Identity;
 
             CalcularMovimiento();
 
             if (colisionoContraLimite)
             {
-                ultimaPos = auxUltimaPos;
+                ultimaPos *= auxUltimaPos;
+                //CopiarMatriz4x4(auxUltimaPos, ultimaPos);
 
                 CalcularColisiones();
 
                 if (colisionoContraMesh)
                 {
-                    ultimaPos = auxUltimaPos;
-                }
+                    ultimaPos *= auxUltimaPos;
 
+                    movimientoCaja *= auxMovimientoCaja; //TGCMatrix.Translation(0, 0, movimiento.Z);
+                    //CopiarMatriz4x4(auxUltimaPos, ultimaPos);
+                }
             }
+                
             else
             {
                 CalcularColisiones();
 
                 if (colisionoContraMesh)
                 {
-                    ultimaPos = auxUltimaPos;
+                    ultimaPos *= auxUltimaPos;
+                    // SI NO ASIGNAS IDENTITY PASA ESTO: 
+                    //el problema es que en esta linea de arriba la transformacion en Z de auxUltimaPos (M43) deberia ser cero, pero es igual al valor de ultimaPos
+                    // SI ASIGNAS IDENTITY PASA ESTO (como esta ahora): 
+                    //auxUltimaPos tiene bien el M43 en 0, pero ultimaPos ya tiene el valor nuevo de Z, y eso no deberia pasar, deberia tener el viejo...
+
+                    movimientoCaja *= auxMovimientoCaja;
+                    //CopiarMatriz4x4(auxUltimaPos, ultimaPos);
                 }
                 else {
+                    // Ahora esta entrando aca luego de que colisiona con la caja, 
+                    // como que detecta la colision solo una vez, pero si se queda en el lugar ya no la detecta, 
+                    // la vuelve a detectar cuando se mueve, pero ya es tarde porque ya paso por aca 
+                    // y el valor de ultimaPos ya quedo actualizado, por eso pasa lo que pasa.
+                    // Igual creo que esta cayendo aca porque en el debuggeo en un momento entre testeo y testeo deja de moverse posta, pero
+                    // lo que no entiendo es por que pasa cuando lo corres normal
                     ultimaPos *= TGCMatrix.Translation(movimiento);
                 }
             }
@@ -187,6 +211,34 @@ namespace TGC.Group.Model
             PostUpdate();
         }
 
+        //private TGCMatrix CopiarMatriz4x4(TGCMatrix original) {
+        //    var copia = TGCMatrix.Identity;
+
+        //    copia.Origin = original.Origin;
+
+        //    copia.M11 = original.M11;
+        //    copia.M12 = original.M12;
+        //    copia.M13 = original.M13;
+        //    copia.M14 = original.M14;
+
+        //    copia.M21 = original.M21;
+        //    copia.M22 = original.M22;
+        //    copia.M23 = original.M23;
+        //    copia.M24 = original.M24;
+
+        //    copia.M31 = original.M31;
+        //    copia.M32 = original.M32;
+        //    copia.M33 = original.M33;
+        //    copia.M34 = original.M34;
+
+        //    copia.M41 = original.M41;
+        //    copia.M42 = original.M42;
+        //    copia.M43 = original.M43;
+        //    copia.M44 = original.M44;
+
+        //    return copia;
+        //}
+
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
         ///     Escribir aquí todo el código referido al renderizado.
@@ -197,12 +249,15 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
+            caja1.Transform = movimientoCaja;
+            caja1.BoundingBox.transform(caja1.Transform);
+
             caja1.Render();
 
                 personaje.Transform =
            TGCMatrix.Scaling(personaje.Scale)
                        * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
-                       * TGCMatrix.Translation(personaje.Position)
+                       * TGCMatrix.Translation(personaje.Position) // esto es para que inicalmente arranque donde tiene que arrancar, creo.
                        * ultimaPos;
 
             personaje.BoundingBox.transform(personaje.Transform);
@@ -320,8 +375,9 @@ namespace TGC.Group.Model
             }
             else {
                 colisionoContraLimite = false;
+                
                 personaje.playAnimation("Parado", true);
-                //auxUltimaPos *= TGCMatrix.Translation(movimiento);
+                
             }
 
             //if (moving)
@@ -382,7 +438,7 @@ namespace TGC.Group.Model
                     // si hubo colision de espalda, no deberias poder moverte hacia atras.
                     //mesh.BoundingBox.calculateBoxCenter
 
-                    var velocidadCaminar = VELOCIDAD_DESPLAZAMIENTO * ElapsedTime;
+                    //var velocidadCaminar = VELOCIDAD_DESPLAZAMIENTO * ElapsedTime;
 
                     var rayos = ArmarRayosEnCadaCara(caja); // quizas esto de armar los rayos pueda hacerse en el init asi no se hace en cada update, por ahora lo dejo aca.
 
@@ -395,6 +451,22 @@ namespace TGC.Group.Model
                     } // esta parado encima de la caja
 
                     // No testeo en direccion -y porque no podrias estar abajo de la caja
+
+                    if (TgcCollisionUtils.intersectRayAABB((TgcRay)rayos[3], personaje.BoundingBox, out puntoInterseccion))
+                    {
+                        if (FastMath.Abs(((TgcRay)rayos[3]).Origin.Z - puntoInterseccion.Z) < 15)
+                        { // tenes que empujar la caja y moverla hacia adelante.
+                            NoMoverHacia(Key.S, movimiento);
+                            personaje.playAnimation("Parado", true);
+                            auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
+                            break; // sino caga el valor del flag
+                        }
+                        else
+                        {
+                            colisionoContraMesh = false;
+                            personaje.playAnimation("Caminando", true);
+                        }
+                    }
 
                     var rayoZ = (TgcRay)rayos[2];
 
@@ -409,6 +481,7 @@ namespace TGC.Group.Model
                         { // tenes que empujar la caja y moverla hacia adelante.
                             NoMoverHacia(Key.W, movimiento);
                             personaje.playAnimation("Empujar", true);
+                            auxMovimientoCaja = TGCMatrix.Translation(0, 0, movimiento.Z);
                             break; // sino caga el valor del flag
                         } else
                         {
