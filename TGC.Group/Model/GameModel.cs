@@ -405,7 +405,7 @@ namespace TGC.Group.Model
                         //var bb = personaje.BoundingBox;
                         //var centroBB = bb.calculateBoxCenter();
                         //var ZCaraDelanteraPersonajeAlturaRayo = (new TGCVector3(centroBB.X, rayoZ.Origin.Y, centroBB.Z - (FastMath.Abs(bb.PMax.Z - bb.PMin.Z) / 2))).Z;
-                        if (FastMath.Abs(puntoInterseccion.Z - rayoZ.Origin.Z) < 5)
+                        if (FastMath.Abs(puntoInterseccion.Z - rayoZ.Origin.Z) < 15)
                         { // tenes que empujar la caja y moverla hacia adelante.
                             NoMoverHacia(Key.W, movimiento);
                             personaje.playAnimation("Empujar", true);
