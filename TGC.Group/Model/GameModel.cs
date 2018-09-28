@@ -47,9 +47,13 @@ namespace TGC.Group.Model
         private TGCVector3 movimiento;
         private TGCMatrix ultimaPos;
         private TGCMatrix auxUltimaPos;
-        private ArrayList cajasPlaya;
+        private ArrayList meshesColisionables;
         private TGCMatrix movimientoCaja;
         private TGCMatrix auxMovimientoCaja;
+
+        // Solo para mostrar
+        private MeshTipoCaja caja1Mesh;
+        //
 
         // Planos de limite
         private TgcMesh planoIzq;
@@ -107,10 +111,7 @@ namespace TGC.Group.Model
             caja1.AutoTransform = false;
             movimientoCaja = TGCMatrix.Translation(caja1.Position);
 
-            cajasPlaya = new ArrayList();
-
-
-            cajasPlaya.Add(caja1);
+            caja1.BoundingBox.transform(TGCMatrix.Translation(caja1.Position.X, caja1.Position.Y, caja1.Position.Z));
 
             var skeletalLoader = new TgcSkeletalLoader();
             personaje = skeletalLoader.loadMeshAndAnimationsFromFile(
@@ -154,6 +155,14 @@ namespace TGC.Group.Model
             //auxUltimaPos = ultimaPos; // tengo que pasarle una copia de ultimaPos, no la referencia, sino al modificar auxUltimaPos se modifica ultimaPos y visceversa
             auxMovimientoCaja = TGCMatrix.Identity;
 
+            // Agrego a la lista de meshes colisionables tipo caja, todas las cosas del pedazo de escenario donde estoy contra las que puedo colisionar.
+            caja1Mesh = new MeshTipoCaja(caja1);
+
+            meshesColisionables = new ArrayList();
+
+            meshesColisionables.Add(caja1Mesh);
+            // 
+
             CalcularMovimiento();
 
             if (colisionoContraLimite)
@@ -195,7 +204,8 @@ namespace TGC.Group.Model
                     // Igual creo que esta cayendo aca porque en el debuggeo en un momento entre testeo y testeo deja de moverse posta, pero
                     // lo que no entiendo es por que pasa cuando lo corres normal
                     ultimaPos *= TGCMatrix.Translation(movimiento);
-                    
+
+                    //movimientoCaja *= TGCMatrix.Identity;
                 }
             }
 
@@ -269,7 +279,7 @@ namespace TGC.Group.Model
 
             if (BoundingBox)
             {
-                segment.Render();
+                caja1Mesh.RenderizaRayos();
                 planoBack.BoundingBox.Render();
                 planoFront.BoundingBox.Render();
                 planoIzq.BoundingBox.Render();
@@ -431,24 +441,37 @@ namespace TGC.Group.Model
         private void CalcularColisiones() {
             if (moving)
             {
-                foreach (TgcMesh caja in cajasPlaya)
+                foreach (MeshTipoCaja caja in meshesColisionables)
                 {
-
-                    // Armar los rayos de cada cara
-                    var meshTipoCajaConRayos = new MeshTipoCaja(caja);
-
-                    colisionoContraMesh = meshTipoCajaConRayos.ChocoConFrente(personaje);
+                    colisionoContraMesh = caja1Mesh.ChocoConFrente(personaje);
 
                     if (colisionoContraMesh)
                     {
                         auxMovimientoCaja = TGCMatrix.Translation(0, 0, movimiento.Z);
                         personaje.playAnimation("Empujar", true);
+                        auxUltimaPos *= TGCMatrix.Translation(movimiento);
                         break;
                     }
                     else {
-                        auxMovimientoCaja = TGCMatrix.Translation(0,0,0);
+                        colisionoContraMesh = caja1Mesh.ChocoArriba(personaje) || 
+                                              caja1Mesh.ChocoAtras(personaje) || 
+                                              caja1Mesh.ChocoALaIzquierda(personaje) ||
+                                              caja1Mesh.ChocoALaDerecha(personaje);
+
+                        if (colisionoContraMesh) {
+                            auxMovimientoCaja *= TGCMatrix.Translation(0, 0, 0);
+                            auxUltimaPos *= TGCMatrix.Translation(0, 0, 0);
+                            //auxUltimaPos *= TGCMatrix.Identity;
+                            break;
+                            //personaje.playAnimation("Parado", true);
+                        }
+
+                        auxUltimaPos *= TGCMatrix.Translation(movimiento);
+                        auxMovimientoCaja *= TGCMatrix.Translation(0,0,0);
                         personaje.playAnimation("Caminando", true);
                     }
+
+
                 }
             }
             else {
@@ -457,35 +480,6 @@ namespace TGC.Group.Model
 
             }
         }
-
-        //private void ColisionConRayo(TgcRay rayo, Key key, String eje, TGCVector3 movimientoMesh) {
-        //    var puntoInterseccion = TGCVector3.Empty;
-
-        //    switch (eje) {
-        //        case "x":
-
-        //    }
-
-        //    if (TgcCollisionUtils.intersectRayAABB(rayo, personaje.BoundingBox, out puntoInterseccion))
-        //    {
-        //        if (FastMath.Abs(puntoInterseccion.X - rayo.Origin.X) < 1)
-        //        { // tenes que empujar la mesh y moverla hacia adelante.
-        //            NoMoverHacia(key, movimiento);
-        //            personaje.playAnimation("Parado", true);
-        //            auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
-        //        }
-        //        else
-        //        {
-        //            colisionoContraMesh = false;
-        //            personaje.playAnimation("Caminando", true);
-        //        }
-
-        //    } // Esta a arriba del mesh
-        //}
-
-        
-
-        
 
         /// <summary>
         ///     Se llama cuando termina la ejecución del ejemplo.
@@ -499,10 +493,11 @@ namespace TGC.Group.Model
             personaje.Dispose();
             planoIzq.Dispose(); // solo se borran los originales
             planoFront.Dispose(); // solo se borran los originales
+            caja1.Dispose();
 
-            foreach (TgcMesh mesh in cajasPlaya) {
-                mesh.Dispose(); // mmm, no se que pasaria con las instancias...
-            }
+            //foreach (TgcMesh mesh in meshesColisionables) {
+            //    mesh.Dispose(); // mmm, no se que pasaria con las instancias...
+            //} // recontra TODO
         }
     }
 }

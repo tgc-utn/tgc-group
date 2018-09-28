@@ -2,6 +2,8 @@
 using System.Collections;
 using TGC.Core.Mathematica;
 using TGC.Core.SkeletalAnimation;
+using System;
+using TGC.Core.Geometry;
 
 namespace TGC.Group.Model
 {
@@ -21,7 +23,7 @@ namespace TGC.Group.Model
         }
 
         public bool Colisionar(TgcSkeletalMesh personaje) {
-            return TgcCollisionUtils.intersectRayAABB(this.ray, personaje.BoundingBox, out puntoInterseccion) ;
+            return TgcCollisionUtils.intersectRayAABB(this.ray, personaje.BoundingBox, out this.puntoInterseccion) ;
         }
 
         protected abstract int DistanciaMinima();
@@ -31,5 +33,10 @@ namespace TGC.Group.Model
         }
 
         protected abstract float Intervalo();
+
+        internal void Render()
+        {
+            TgcArrow.fromDirection(this.origen, this.direccion * 15).Render();
+        }
     }
 }

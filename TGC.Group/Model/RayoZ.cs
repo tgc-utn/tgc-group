@@ -13,7 +13,7 @@ namespace TGC.Group.Model
 
         protected override int DistanciaMinima()
         {
-            return 10;
+            return 4;
         }
 
         protected override float Intervalo()

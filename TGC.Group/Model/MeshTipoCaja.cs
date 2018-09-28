@@ -13,20 +13,26 @@ namespace TGC.Group.Model
     {
         private TgcMesh mesh;
         private List<Rayo> rayosZ;
+        private List<Rayo> rayosMenosZ;
         private List<Rayo> rayosX;
+        private List<Rayo> rayosMenosX;
         private List<Rayo> rayosY;
+        private List<Rayo> rayosMenosY;
 
         public MeshTipoCaja(TgcMesh caja)
         {
             this.mesh = caja;
             this.rayosX = new List<Rayo>();
+            this.rayosMenosX = new List<Rayo>();
             this.rayosY = new List<Rayo>();
+            this.rayosMenosY = new List<Rayo>();
             this.rayosZ = new List<Rayo>();
+            this.rayosMenosZ = new List<Rayo>();
+
             GenerarRayos();
         }
 
         private void GenerarRayos() {
-
             // el orden es el mismo que retorna el metodo computeFaces de un BB, visto de frente (hacia -z) => Up, Down, Front, Back, Right, Left
             var rayos = new List<Rayo>();
 
@@ -45,34 +51,99 @@ namespace TGC.Group.Model
             var centroCaraZ = HallarCentroDeCara("z");
             var centroCaraMenosZ = HallarCentroDeCara("-z");
 
-            var rayoCaraX = new RayoX(centroCaraX, new TGCVector3(1,0,0));
-            var rayoCaraMenosX = new RayoX(centroCaraMenosX, new TGCVector3(-1, 0, 0));
-            var rayoCaraY = new RayoY(centroCaraY, new TGCVector3(0, 1, 0));
-            var rayoCaraMenosY = new RayoY(centroCaraMenosY, new TGCVector3(0, -1, 0));
-            var rayoCaraZ = new RayoZ(centroCaraZ, new TGCVector3(0, 0, 1));
-            var rayoCaraMenosZ = new RayoZ(centroCaraMenosZ, new TGCVector3(0, 0, -1));
+            var rayoCentroCaraX = new RayoX(centroCaraX, new TGCVector3(1,0,0));
+            var rayoIzqCaraX = new RayoX(new TGCVector3(centroCaraX.X, centroCaraX.Y, mesh.BoundingBox.PMin.Z), new TGCVector3(1, 0, 0));
+            var rayoDerCaraX = new RayoX(new TGCVector3(centroCaraX.X, centroCaraX.Y, mesh.BoundingBox.PMax.Z), new TGCVector3(1, 0, 0));
 
-            rayosY.Add(rayoCaraY); // Up
-            rayosY.Add(rayoCaraMenosY); // Down
+            var rayoCaraMenosX = new RayoX(centroCaraMenosX, new TGCVector3(-1, 0, 0));
+            var rayoIzqCaraMenosX = new RayoX(new TGCVector3(centroCaraMenosX.X, centroCaraMenosX.Y, mesh.BoundingBox.PMin.Z), new TGCVector3(-1, 0, 0));
+            var rayoDerCaraMenosX = new RayoX(new TGCVector3(centroCaraMenosX.X, centroCaraMenosX.Y, mesh.BoundingBox.PMax.Z), new TGCVector3(-1, 0, 0));
+
+            var rayoCaraY = new RayoY(centroCaraY, new TGCVector3(0, 1, 0));
+            var rayoIzqCaraY = new RayoY(new TGCVector3(mesh.BoundingBox.PMax.X, centroCaraY.Y, centroCaraY.Z), new TGCVector3(0, 1, 0));
+            var rayoDerCaraY = new RayoY(new TGCVector3(mesh.BoundingBox.PMin.X, centroCaraY.Y, centroCaraY.Z), new TGCVector3(0, 1, 0));
+
+            var rayoCaraMenosY = new RayoY(centroCaraMenosY, new TGCVector3(0, -1, 0));
+            var rayoIzqCaraMenosY = new RayoY(new TGCVector3(mesh.BoundingBox.PMax.X, centroCaraMenosY.Y, centroCaraMenosY.Z), new TGCVector3(0, -1, 0));
+            var rayoDerCaraMenosY = new RayoY(new TGCVector3(mesh.BoundingBox.PMin.X, centroCaraMenosY.Y, centroCaraMenosY.Z), new TGCVector3(0, -1, 0));
+
+            var rayoCaraZ = new RayoZ(centroCaraZ, new TGCVector3(0, 0, 1));
+            var rayoIzqCaraZ = new RayoZ(new TGCVector3(mesh.BoundingBox.PMax.X, centroCaraZ.Y, centroCaraZ.Z), new TGCVector3(0, 0, 1));
+            var rayoDerCaraZ = new RayoZ(new TGCVector3(mesh.BoundingBox.PMin.X, centroCaraZ.Y, centroCaraZ.Z), new TGCVector3(0, 0, 1));
+
+            var rayoCaraMenosZ = new RayoZ(centroCaraMenosZ, new TGCVector3(0, 0, -1));
+            var rayoIzqCaraMenosZ = new RayoZ(new TGCVector3(mesh.BoundingBox.PMax.X, centroCaraMenosZ.Y, centroCaraMenosZ.Z), new TGCVector3(0, 0, -1));
+            var rayoDerCaraMenosZ = new RayoZ(new TGCVector3(mesh.BoundingBox.PMin.X, centroCaraMenosZ.Y, centroCaraMenosZ.Z), new TGCVector3(0, 0, -1));
+
+            rayosY.Add(rayoCaraY); // UpCentro
+            rayosY.Add(rayoIzqCaraY); // UpIzq
+            rayosY.Add(rayoDerCaraY); // UpDer
+
+            rayosMenosY.Add(rayoCaraMenosY); // Down
+            rayosMenosY.Add(rayoIzqCaraMenosY); // DownIzq
+            rayosMenosY.Add(rayoDerCaraMenosY); // DownDer
+
             rayosZ.Add(rayoCaraZ); // Front
-            rayosZ.Add(rayoCaraMenosZ); // Back
-            rayosX.Add(rayoCaraMenosX); // Right
-            rayosX.Add(rayoCaraX); // Left
-        
+            rayosZ.Add(rayoIzqCaraZ); // FrontIzq
+            rayosZ.Add(rayoDerCaraZ); // FronDer
+
+            rayosMenosZ.Add(rayoCaraMenosZ); // Back
+            rayosMenosZ.Add(rayoIzqCaraMenosZ); // BackIzq
+            rayosMenosZ.Add(rayoDerCaraMenosZ); // BackDer
+
+            rayosMenosX.Add(rayoCaraMenosX); // Right
+            rayosMenosX.Add(rayoIzqCaraMenosX); // RightIzq
+            rayosMenosX.Add(rayoDerCaraMenosX); // RightDer
+
+            rayosX.Add(rayoCentroCaraX); // Left
+            rayosX.Add(rayoIzqCaraX); // LeftIzq
+            rayosX.Add(rayoDerCaraX);        
         }
 
         public bool ChocoConFrente(TgcSkeletalMesh personaje) {
-            
+            //this.GenerarRayos();
+            return this.TesteoDeRayos(personaje, rayosZ);   
+        }
+
+        public bool ChocoALaIzquierda(TgcSkeletalMesh personaje) {
+            //this.GenerarRayos();
+            return this.TesteoDeRayos(personaje, rayosX);
+        }
+
+        public bool ChocoArriba(TgcSkeletalMesh personaje)
+        {
+            //this.GenerarRayos();
+            return this.TesteoDeRayos(personaje, rayosY);
+        }
+
+        public bool ChocoALaDerecha(TgcSkeletalMesh personaje) {
+            //this.GenerarRayos();
+            return this.TesteoDeRayos(personaje, rayosMenosX);
+        }
+
+        public bool ChocoAtras(TgcSkeletalMesh personaje)
+        {
+            //this.GenerarRayos();
+            return this.TesteoDeRayos(personaje, rayosMenosZ);
+        }
+
+        public bool ChocoAbajo(TgcSkeletalMesh personaje)
+        {
+            //this.GenerarRayos();
+            return this.TesteoDeRayos(personaje, rayosMenosY);
+        }
+
+        private bool TesteoDeRayos(TgcSkeletalMesh personaje, List<Rayo> rayos) {
             var puntoInterseccion = TGCVector3.Empty;
 
-            foreach (Rayo rayo in rayosZ) {
-
+            foreach (Rayo rayo in rayos)
+            {
                 rayo.Colisionar(personaje);
-                
-                if(rayo.HuboColision()) {
+
+                if (rayo.HuboColision())
+                {
                     return true;
                 }
-               
             }
 
             return false;
@@ -102,6 +173,21 @@ namespace TGC.Group.Model
                 default:
                     throw new Exception("direccion invalida");
             }
+        }
+
+        internal void RenderizaRayos()
+        {
+            rayosX.ForEach(rayo => { rayo.Render(); });
+
+            rayosMenosX.ForEach(rayo => { rayo.Render(); });
+
+            rayosY.ForEach(rayo => { rayo.Render(); });
+
+            rayosMenosY.ForEach(rayo => { rayo.Render(); });
+
+            rayosZ.ForEach(rayo => { rayo.Render(); });
+
+            rayosMenosZ.ForEach(rayo => { rayo.Render(); });
         }
     }
 }
