@@ -188,7 +188,7 @@ namespace TGC.Group.Model
                     //CopiarMatriz4x4(auxUltimaPos, ultimaPos);
                 }
                 else {
-                    // Ahora esta entrando aca luego de que colisiona con la caja, 
+                    // Ahora esta entrando aca luego de que colisiona con la mesh, 
                     // como que detecta la colision solo una vez, pero si se queda en el lugar ya no la detecta, 
                     // la vuelve a detectar cuando se mueve, pero ya es tarde porque ya paso por aca 
                     // y el valor de ultimaPos ya quedo actualizado, por eso pasa lo que pasa.
@@ -433,149 +433,28 @@ namespace TGC.Group.Model
             {
                 foreach (TgcMesh caja in cajasPlaya)
                 {
-                    // calcular el centro de cada cara, para armar un rayo y saber contra que cara estas colisionando.
-                    // si hubo colision con la cara de adelante, no deberias poder avanzar y deberias poder empujarla
-                    // si hubo colision con cara del costado, no podrias moverte hacia el costado
-                    // si hubo colision de espalda, no deberias poder moverte hacia atras.
-                    //mesh.BoundingBox.calculateBoxCenter
 
-                    //var velocidadCaminar = VELOCIDAD_DESPLAZAMIENTO * ElapsedTime;
+                    // Armar los rayos de cada cara
+                    var meshTipoCajaConRayos = new MeshTipoCaja(caja);
 
-                    var rayos = ArmarRayosEnCadaCara(caja); // quizas esto de armar los rayos pueda hacerse en el init asi no se hace en cada update, por ahora lo dejo aca.
+                    colisionoContraMesh = meshTipoCajaConRayos.ChocoConFrente(personaje);
 
-                    var puntoInterseccion = TGCVector3.Empty;
-
-                    if (TgcCollisionUtils.intersectRayAABB((TgcRay)rayos[5], personaje.BoundingBox, out puntoInterseccion))
+                    if (colisionoContraMesh)
                     {
-                        Console.WriteLine(String.Format("PuntoIntersecX : {0}, OriginX: {1}", puntoInterseccion.X, ((TgcRay)rayos[5]).Origin.X));
-                        if (FastMath.Abs(puntoInterseccion.X - ((TgcRay)rayos[5]).Origin.X) < 1)
-                        { // tenes que empujar la caja y moverla hacia adelante.
-                            NoMoverHacia(Key.D, movimiento);
-                            personaje.playAnimation("Parado", true);
-                            auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
-                            break;
-                        }
-                        else
-                        {
-                            colisionoContraMesh = false;
-                            personaje.playAnimation("Caminando", true);
-                        }
-
-                    } // Esta a la izquierda del mesh
-
-                    if (TgcCollisionUtils.intersectRayAABB((TgcRay)rayos[4], personaje.BoundingBox, out puntoInterseccion))
-                    {
-                        //Console.WriteLine(String.Format("PuntoIntersecX : {0}, OriginX: {1}", puntoInterseccion.X, ((TgcRay)rayos[4]).Origin.X));
-                        if (FastMath.Abs(puntoInterseccion.X - ((TgcRay)rayos[4]).Origin.X) < 1)
-                        { // tenes que empujar la caja y moverla hacia adelante.
-                            NoMoverHacia(Key.A, movimiento);
-                            personaje.playAnimation("Parado", true);
-                            auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
-                            break;
-                        }
-                        else
-                        {
-                            colisionoContraMesh = false;
-                            personaje.playAnimation("Caminando", true);
-                        }
-
-                    } // Esta a la derecha del mesh
-
-                    // No testeo en direccion -y porque no podrias estar abajo de la caja
-
-                    if (TgcCollisionUtils.intersectRayAABB((TgcRay)rayos[0], personaje.BoundingBox, out puntoInterseccion))
-                    {
-                        if (FastMath.Abs(puntoInterseccion.X - ((TgcRay)rayos[0]).Origin.X) < 1)
-                        { // tenes que empujar la caja y moverla hacia adelante.
-                            NoMoverHacia(Key.S, movimiento);
-                            personaje.playAnimation("Parado", true);
-                            auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
-                            break;
-                        }
-                        else
-                        {
-                            colisionoContraMesh = false;
-                            personaje.playAnimation("Caminando", true);
-                        }
-
-                    } // Esta a arriba del mesh
-
-                    if (TgcCollisionUtils.intersectRayAABB((TgcRay)rayos[3], personaje.BoundingBox, out puntoInterseccion))
-                    {
-                        if (FastMath.Abs(((TgcRay)rayos[3]).Origin.Z - puntoInterseccion.Z) < 15)
-                        { // tenes que empujar la caja y moverla hacia adelante.
-                            NoMoverHacia(Key.S, movimiento);
-                            personaje.playAnimation("Parado", true);
-                            auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
-                            break; // sino caga el valor del flag
-                        }
-                        else
-                        {
-                            colisionoContraMesh = false;
-                            personaje.playAnimation("Caminando", true);
-                        }
+                        auxMovimientoCaja = TGCMatrix.Translation(0, 0, movimiento.Z);
+                        personaje.playAnimation("Empujar", true);
+                        break;
                     }
-
-                    var rayoZ = (TgcRay)rayos[2];
-
-                    segment = TgcArrow.fromDirection(rayoZ.Origin, new TGCVector3(0, 0, 10));
-
-                    if (TgcCollisionUtils.intersectRayAABB(rayoZ, personaje.BoundingBox, out puntoInterseccion))
-                    {
-                        //var bb = personaje.BoundingBox;
-                        //var centroBB = bb.calculateBoxCenter();
-                        //var ZCaraDelanteraPersonajeAlturaRayo = (new TGCVector3(centroBB.X, rayoZ.Origin.Y, centroBB.Z - (FastMath.Abs(bb.PMax.Z - bb.PMin.Z) / 2))).Z;
-                        if (FastMath.Abs(puntoInterseccion.Z - rayoZ.Origin.Z) < 10)
-                        { // tenes que empujar la caja y moverla hacia adelante.
-                            NoMoverHacia(Key.W, movimiento);
-                            personaje.playAnimation("Empujar", true);
-                            auxMovimientoCaja = TGCMatrix.Translation(0, 0, movimiento.Z);
-                            break; // sino caga el valor del flag
-                        } else
-                        {
-                            colisionoContraMesh = false;
-                            personaje.playAnimation("Caminando", true);
-                        }
-                    }
-                    else
-                    {
-                        colisionoContraMesh = false;
+                    else {
+                        auxMovimientoCaja = TGCMatrix.Translation(0,0,0);
                         personaje.playAnimation("Caminando", true);
-
                     }
                 }
             }
             else {
+                colisionoContraMesh = false;
+                personaje.playAnimation("Parado", true);
 
-                var rayos = ArmarRayosEnCadaCara((TgcMesh)cajasPlaya[0]);
-
-                var rayoZ = (TgcRay)rayos[2];
-
-                var puntoInterseccion = TGCVector3.Empty;
-
-                if (TgcCollisionUtils.intersectRayAABB(rayoZ, personaje.BoundingBox, out puntoInterseccion))
-                {
-                    //var bb = personaje.BoundingBox;
-                    //var centroBB = bb.calculateBoxCenter();
-                    //var ZCaraDelanteraPersonajeAlturaRayo = (new TGCVector3(centroBB.X, rayoZ.Origin.Y, centroBB.Z - (FastMath.Abs(bb.PMax.Z - bb.PMin.Z) / 2))).Z;
-                    if (FastMath.Abs(puntoInterseccion.Z - rayoZ.Origin.Z) < 15)
-                    { // tenes que empujar la caja y moverla hacia adelante.
-                        NoMoverHacia(Key.W, movimiento);
-                        personaje.playAnimation("Parado", true);
-                        auxMovimientoCaja = TGCMatrix.Translation(0, 0, movimiento.Z);
-                        return; // sino caga el valor del flag
-                    }
-                    else
-                    {
-                        colisionoContraMesh = false;
-                        personaje.playAnimation("Parado", true);
-                    }
-                }
-                else {
-                    colisionoContraMesh = false;
-                    personaje.playAnimation("Parado", true);
-                }
-               
             }
         }
 
@@ -590,7 +469,7 @@ namespace TGC.Group.Model
         //    if (TgcCollisionUtils.intersectRayAABB(rayo, personaje.BoundingBox, out puntoInterseccion))
         //    {
         //        if (FastMath.Abs(puntoInterseccion.X - rayo.Origin.X) < 1)
-        //        { // tenes que empujar la caja y moverla hacia adelante.
+        //        { // tenes que empujar la mesh y moverla hacia adelante.
         //            NoMoverHacia(key, movimiento);
         //            personaje.playAnimation("Parado", true);
         //            auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
@@ -604,65 +483,9 @@ namespace TGC.Group.Model
         //    } // Esta a arriba del mesh
         //}
 
-        private ArrayList ArmarRayosEnCadaCara(TgcMesh meshTipoCaja) {
-            // el orden es el mismo que retorna el metodo computeFaces de un BB, visto de frente (hacia -z) => Up, Down, Front, Back, Right, Left
-            var rayos = new ArrayList();
+        
 
-            // Solucion casera del centro...
-            //var PMax = meshTipoCaja.BoundingBox.PMax;
-            //var PMin = meshTipoCaja.BoundingBox.PMin;
-            //var centro = new TGCVector3((PMax.X + PMin.X) / 2, (PMax.Y + PMin.Y) / 2, (PMax.Z + PMin.Z) / 2);
-            //
-
-            var centro = meshTipoCaja.BoundingBox.calculateBoxCenter();
-
-            var centroCaraX = HallarCentroDeCara(meshTipoCaja, centro, "x");
-            var centroCaraMenosX = HallarCentroDeCara(meshTipoCaja, centro, "-x");
-            var centroCaraY = HallarCentroDeCara(meshTipoCaja, centro, "y");
-            var centroCaraMenosY = HallarCentroDeCara(meshTipoCaja, centro, "-y");
-            var centroCaraZ = HallarCentroDeCara(meshTipoCaja, centro, "z");
-            var centroCaraMenosZ = HallarCentroDeCara(meshTipoCaja, centro, "-z");
-
-            var rayoCaraX = new TgcRay(centroCaraX, new TGCVector3(1,0,0));
-            var rayoCaraMenosX = new TgcRay(centroCaraMenosX, new TGCVector3(-1, 0, 0));
-            var rayoCaraY = new TgcRay(centroCaraY, new TGCVector3(0, 1, 0));
-            var rayoCaraMenosY = new TgcRay(centroCaraMenosY, new TGCVector3(0, -1, 0));
-            var rayoCaraZ = new TgcRay(centroCaraZ, new TGCVector3(0, 0, 1));
-            var rayoCaraMenosZ = new TgcRay(centroCaraMenosZ, new TGCVector3(0, 0, -1));
-
-            rayos.Add(rayoCaraY); // Up
-            rayos.Add(rayoCaraMenosY); // Down
-            rayos.Add(rayoCaraZ); // Front
-            rayos.Add(rayoCaraMenosZ); // Back
-            rayos.Add(rayoCaraMenosX); // Right
-            rayos.Add(rayoCaraX); // Left
-
-            return rayos;
-        }
-
-        private TGCVector3 HallarCentroDeCara(TgcMesh meshTipoCaja, TGCVector3 centro, String dirCara)
-        { // le pasas el centro para no tener que calcularlo cada vez que entras aca. en dirCara quise no pasarle un string, pero no anduvo con TGCVector3
-            var PMin = meshTipoCaja.BoundingBox.PMin;
-            var PMax = meshTipoCaja.BoundingBox.PMax;
-            
-            switch (dirCara)
-            {
-                case "x":
-                    return new TGCVector3(centro.X + (FastMath.Abs(PMax.X - PMin.X) / 2), centro.Y, centro.Z);
-                case "-x":
-                    return new TGCVector3(centro.X - (FastMath.Abs(PMax.X - PMin.X) / 2), centro.Y, centro.Z);
-                case "y":
-                    return new TGCVector3(centro.X, centro.Y + (FastMath.Abs(PMax.Y - PMin.Y) / 2), centro.Z);
-                case "-y":
-                    return new TGCVector3(centro.X, centro.Y - (FastMath.Abs(PMax.Y - PMin.Y) / 2), centro.Z);
-                case "z":
-                    return new TGCVector3(centro.X, centro.Y, centro.Z + (FastMath.Abs(PMax.Z - PMin.Z) / 2));
-                case "-z":
-                    return new TGCVector3(centro.X, centro.Y, centro.Z - (FastMath.Abs(PMax.Z - PMin.Z) / 2));
-                default:
-                    throw new Exception("direccion invalida");
-            }
-        }
+        
 
         /// <summary>
         ///     Se llama cuando termina la ejecución del ejemplo.
