@@ -26,7 +26,7 @@ namespace TGC.Group.Model
             return TgcCollisionUtils.intersectRayAABB(this.ray, personaje.BoundingBox, out this.puntoInterseccion) ;
         }
 
-        protected abstract int DistanciaMinima();
+        public abstract int DistanciaMinima();
 
         public bool HuboColision() {
             return FastMath.Abs(this.Intervalo()) < this.DistanciaMinima();

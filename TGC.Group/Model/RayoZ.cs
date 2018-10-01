@@ -11,7 +11,7 @@ namespace TGC.Group.Model
 
         }
 
-        protected override int DistanciaMinima()
+        public override int DistanciaMinima()
         {
             return 4;
         }

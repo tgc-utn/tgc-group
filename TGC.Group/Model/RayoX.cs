@@ -4,15 +4,13 @@ namespace TGC.Group.Model
 {
     public class RayoX : Rayo
     {
-        private int distanciaMinima;
-
         public RayoX(TGCVector3 centroCara, TGCVector3 direccion)
             : base (centroCara, direccion)
         {
          
         }
 
-        protected override int DistanciaMinima() {
+        public override int DistanciaMinima() {
             return 2;
         }
 

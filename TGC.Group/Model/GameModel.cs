@@ -48,7 +48,6 @@ namespace TGC.Group.Model
         private TGCMatrix ultimaPos; 
         private ArrayList meshesColisionables;
         private TGCMatrix movimientoCaja;
-        private TGCMatrix auxMovimientoCaja;
 
         // Solo para mostrar
         private MeshTipoCaja caja1Mesh;
@@ -127,9 +126,9 @@ namespace TGC.Group.Model
             //Configurar animacion inicial
             personaje.playAnimation("Parado", true);
             //Escalarlo porque es muy grande
-            personaje.Position = new TGCVector3(10, 0, 60);
+            personaje.Position = new TGCVector3(25, 0, 60);
             personaje.Scale = new TGCVector3(0.15f, 0.15f, 0.15f);
-            ultimaPos = TGCMatrix.Translation(new TGCVector3(10, 0, 60));
+            ultimaPos = TGCMatrix.Translation(personaje.Position);
 
             BoundingBox = true;
 
@@ -147,7 +146,7 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
-            auxMovimientoCaja = TGCMatrix.Identity;
+            movimientoCaja = TGCMatrix.Identity;
 
             // Agrego a la lista de meshes colisionables tipo caja, todas las cosas del pedazo de escenario donde estoy contra las que puedo colisionar.
             caja1Mesh = new MeshTipoCaja(caja1);
@@ -163,8 +162,6 @@ namespace TGC.Group.Model
 
             ultimaPos *= TGCMatrix.Translation(movimiento);
 
-            movimientoCaja *= auxMovimientoCaja;
-
             if (Input.keyDown(Key.Q))
             {
                 BoundingBox = !BoundingBox;
@@ -174,34 +171,6 @@ namespace TGC.Group.Model
 
             PostUpdate();
         }
-
-        //private TGCMatrix CopiarMatriz4x4(TGCMatrix original) {
-        //    var copia = TGCMatrix.Identity;
-
-        //    copia.Origin = original.Origin;
-
-        //    copia.M11 = original.M11;
-        //    copia.M12 = original.M12;
-        //    copia.M13 = original.M13;
-        //    copia.M14 = original.M14;
-
-        //    copia.M21 = original.M21;
-        //    copia.M22 = original.M22;
-        //    copia.M23 = original.M23;
-        //    copia.M24 = original.M24;
-
-        //    copia.M31 = original.M31;
-        //    copia.M32 = original.M32;
-        //    copia.M33 = original.M33;
-        //    copia.M34 = original.M34;
-
-        //    copia.M41 = original.M41;
-        //    copia.M42 = original.M42;
-        //    copia.M43 = original.M43;
-        //    copia.M44 = original.M44;
-
-        //    return copia;
-        //}
 
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
@@ -213,16 +182,15 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            caja1.Transform = movimientoCaja;
+            caja1.Transform *= movimientoCaja;
             caja1.BoundingBox.transform(caja1.Transform);
 
             caja1.Render();
 
-                personaje.Transform =
-           TGCMatrix.Scaling(personaje.Scale)
-                       * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
-                       * TGCMatrix.Translation(personaje.Position) // esto es para que inicalmente arranque donde tiene que arrancar, creo.
-                       * ultimaPos;
+            personaje.Transform =
+                TGCMatrix.Scaling(personaje.Scale)
+                * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
+                * ultimaPos;
 
             personaje.BoundingBox.transform(personaje.Transform);
             
@@ -243,7 +211,6 @@ namespace TGC.Group.Model
 
             escenaPlaya.RenderAll();
 
-   
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
@@ -352,31 +319,27 @@ namespace TGC.Group.Model
                 {
                     if (caja.ChocoConFrente(personaje))
                     {
-                        auxMovimientoCaja = TGCMatrix.Translation(0, 0, movimiento.Z);
+                        movimientoCaja = TGCMatrix.Translation(0, 0, movimiento.Z*3); // + distancia minima del rayo
                         personaje.playAnimation("Empujar", true);
                         break;
                     }
                     else if (caja.ChocoArriba(personaje))
                     {
-                        auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
-                        movimiento.Y = 0; // Ojo, que pasa si quiero saltar desde arriba de la plataforma
+                        movimiento.Y = 0; // Ojo, que pasa si quiero saltar desde arriba de la plataforma?
                         break;
                     }
                     else if (caja.ChocoAtras(personaje))
                     {
-                        auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
                         NoMoverHacia(Key.S);
                         break;
                     }
                     else if (caja.ChocoALaIzquierda(personaje))
                     {
-                        auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
                         NoMoverHacia(Key.D);
                         break;
                     }
                     else if (caja.ChocoALaDerecha(personaje))
                     {
-                        auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
                         NoMoverHacia(Key.A);
                         break;
                     }
