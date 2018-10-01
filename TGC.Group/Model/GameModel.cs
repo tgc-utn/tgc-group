@@ -45,8 +45,7 @@ namespace TGC.Group.Model
         private TgcMesh caja1;
         private GameCamera camara;
         private TGCVector3 movimiento;
-        private TGCMatrix ultimaPos;
-        private TGCMatrix auxUltimaPos;
+        private TGCMatrix ultimaPos; 
         private ArrayList meshesColisionables;
         private TGCMatrix movimientoCaja;
         private TGCMatrix auxMovimientoCaja;
@@ -62,8 +61,6 @@ namespace TGC.Group.Model
         private TgcMesh planoBack;
 
         private TgcArrow segment = new TgcArrow();
-        private bool colisionoContraLimite;
-        private bool colisionoContraMesh;
         private bool moving;
 
         //Constantes para velocidades de movimiento de plataforma
@@ -109,9 +106,10 @@ namespace TGC.Group.Model
 
             caja1 = loader.loadSceneFromFile(MediaDir + "primer-nivel\\Playa final\\caja-TgcScene.xml").Meshes[0];
             caja1.AutoTransform = false;
-            movimientoCaja = TGCMatrix.Translation(caja1.Position);
-
-            caja1.BoundingBox.transform(TGCMatrix.Translation(caja1.Position.X, caja1.Position.Y, caja1.Position.Z));
+            caja1.Transform = TGCMatrix.Translation(10, 0, 0);
+            movimientoCaja = caja1.Transform;
+            
+            caja1.BoundingBox.transform(caja1.Transform);
 
             var skeletalLoader = new TgcSkeletalLoader();
             personaje = skeletalLoader.loadMeshAndAnimationsFromFile(
@@ -132,10 +130,6 @@ namespace TGC.Group.Model
             personaje.Position = new TGCVector3(10, 0, 60);
             personaje.Scale = new TGCVector3(0.15f, 0.15f, 0.15f);
             ultimaPos = TGCMatrix.Translation(new TGCVector3(10, 0, 60));
-            auxUltimaPos = TGCMatrix.Identity; //TGCMatrix.Translation(personaje.Position);
-
-            colisionoContraLimite = true;
-            colisionoContraMesh = true;
 
             BoundingBox = true;
 
@@ -153,8 +147,6 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
-            auxUltimaPos = TGCMatrix.Identity; //CopiarMatriz4x4(ultimaPos);
-            //auxUltimaPos = ultimaPos; // tengo que pasarle una copia de ultimaPos, no la referencia, sino al modificar auxUltimaPos se modifica ultimaPos y visceversa
             auxMovimientoCaja = TGCMatrix.Identity;
 
             // Agrego a la lista de meshes colisionables tipo caja, todas las cosas del pedazo de escenario donde estoy contra las que puedo colisionar.
@@ -167,52 +159,11 @@ namespace TGC.Group.Model
 
             CalcularMovimiento();
 
-            if (colisionoContraLimite)
-            {
-                ultimaPos *= TGCMatrix.Translation(movimiento); 
-                //CopiarMatriz4x4(auxUltimaPos, ultimaPos);
+            CalcularColisiones();
 
-                CalcularColisiones();
+            ultimaPos *= TGCMatrix.Translation(movimiento);
 
-                if (colisionoContraMesh)
-                {
-                    ultimaPos *= auxUltimaPos;
-
-                    movimientoCaja *= auxMovimientoCaja; //TGCMatrix.Translation(0, 0, movimiento.Z);
-                    //CopiarMatriz4x4(auxUltimaPos, ultimaPos);
-                }
-            }
-                
-            else
-            {
-                CalcularColisiones();
-
-                if (colisionoContraMesh)
-                {
-                    ultimaPos *= auxUltimaPos;
-                    // SI NO ASIGNAS IDENTITY PASA ESTO: 
-                    //el problema es que en esta linea de arriba la transformacion en Z de auxUltimaPos (M43) deberia ser cero, pero es igual al valor de ultimaPos
-                    // SI ASIGNAS IDENTITY PASA ESTO (como esta ahora): 
-                    //auxUltimaPos tiene bien el M43 en 0, pero ultimaPos ya tiene el valor nuevo de Z, y eso no deberia pasar, deberia tener el viejo...
-
-                    movimientoCaja *= auxMovimientoCaja;
-                    //CopiarMatriz4x4(auxUltimaPos, ultimaPos);
-                }
-                else {
-                    // Ahora esta entrando aca luego de que colisiona con la mesh, 
-                    // como que detecta la colision solo una vez, pero si se queda en el lugar ya no la detecta, 
-                    // la vuelve a detectar cuando se mueve, pero ya es tarde porque ya paso por aca 
-                    // y el valor de ultimaPos ya quedo actualizado, por eso pasa lo que pasa.
-                    // Igual creo que esta cayendo aca porque en el debuggeo en un momento entre testeo y testeo deja de moverse posta, pero
-                    // lo que no entiendo es por que pasa cuando lo corres normal
-                    ultimaPos *= TGCMatrix.Translation(movimiento);
-
-                    //movimientoCaja *= TGCMatrix.Identity;
-                }
-            }
-
-            colisionoContraLimite = true;
-            colisionoContraMesh = true;
+            movimientoCaja *= auxMovimientoCaja;
 
             if (Input.keyDown(Key.Q))
             {
@@ -299,6 +250,8 @@ namespace TGC.Group.Model
 
         private void CalcularMovimiento()
         {
+            personaje.playAnimation("Parado", true);
+
             var velocidadCaminar = VELOCIDAD_DESPLAZAMIENTO * ElapsedTime;
 
             //Calcular proxima posicion de personaje segun Input
@@ -331,22 +284,24 @@ namespace TGC.Group.Model
 
             if (moving)
             {
+                //personaje.playAnimation("Caminando", true); // esto creo que esta mal, si colisiono no deberia caminar.
+
                 if (ChocoConLimite(personaje, planoIzq))
                     NoMoverHacia(Key.A);
 
                 if (ChocoConLimite(personaje, planoBack))
                 {
                     NoMoverHacia(Key.S);
-
                     planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
                 }
-                else // esto no hace falta despues
-                        planoBack.BoundingBox.setRenderColor(Color.Yellow);
+                else
+                { // esto no hace falta despues
+                    planoBack.BoundingBox.setRenderColor(Color.Yellow);
+                }
 
                 if (ChocoConLimite(personaje, planoDer))
                     NoMoverHacia(Key.D);
-                
-
+               
                 if (ChocoConLimite(personaje, planoFront))
                 { // HUBO CAMBIO DE ESCENARIO
                   /* Aca deberiamos hacer algo como no testear mas contra las cosas del escenario anterior y testear
@@ -360,23 +315,7 @@ namespace TGC.Group.Model
                     planoFront.BoundingBox.setRenderColor(Color.Yellow);
                 }
 
-                personaje.playAnimation("Caminando", true); // esto creo que esta mal, si colisiono no deberia caminar.
             }
-            else {
-                colisionoContraLimite = false;
-                
-                //personaje.playAnimation("Parado", true);
-                
-            }
-
-            //if (moving)
-            //{
-            //    personaje.playAnimation("Caminando", true);
-            //}
-            //else
-            //{
-            //    personaje.playAnimation("Parado", true);
-            //}
         }
 
         private void NoMoverHacia(Key key) { 
@@ -402,8 +341,8 @@ namespace TGC.Group.Model
                 
         }
 
-        private bool ChocoConLimite(TgcSkeletalMesh personaje, TgcMesh planoIzq) {
-            return TgcCollisionUtils.testAABBAABB(planoIzq.BoundingBox, personaje.BoundingBox);
+        private bool ChocoConLimite(TgcSkeletalMesh personaje, TgcMesh plano) {
+            return TgcCollisionUtils.testAABBAABB(plano.BoundingBox, personaje.BoundingBox);
         }
 
         private void CalcularColisiones() {
@@ -411,41 +350,37 @@ namespace TGC.Group.Model
             {
                 foreach (MeshTipoCaja caja in meshesColisionables)
                 {
-                    colisionoContraMesh = caja1Mesh.ChocoConFrente(personaje);
-
-                    if (colisionoContraMesh)
+                    if (caja.ChocoConFrente(personaje))
                     {
                         auxMovimientoCaja = TGCMatrix.Translation(0, 0, movimiento.Z);
                         personaje.playAnimation("Empujar", true);
-                        auxUltimaPos *= TGCMatrix.Translation(movimiento);
                         break;
                     }
-                    else {
-                        colisionoContraMesh = caja1Mesh.ChocoArriba(personaje) || 
-                                              caja1Mesh.ChocoAtras(personaje) || 
-                                              caja1Mesh.ChocoALaIzquierda(personaje) ||
-                                              caja1Mesh.ChocoALaDerecha(personaje);
-
-                        if (colisionoContraMesh) {
-                            auxMovimientoCaja *= TGCMatrix.Translation(0, 0, 0);
-                            auxUltimaPos *= TGCMatrix.Translation(0, 0, 0);
-                            //auxUltimaPos *= TGCMatrix.Identity;
-                            break;
-                            //personaje.playAnimation("Parado", true);
-                        }
-
-                        auxUltimaPos *= TGCMatrix.Translation(movimiento);
-                        auxMovimientoCaja *= TGCMatrix.Translation(0,0,0);
-                        personaje.playAnimation("Caminando", true);
+                    else if (caja.ChocoArriba(personaje))
+                    {
+                        auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
+                        movimiento.Y = 0; // Ojo, que pasa si quiero saltar desde arriba de la plataforma
+                        break;
                     }
-
-
+                    else if (caja.ChocoAtras(personaje))
+                    {
+                        auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
+                        NoMoverHacia(Key.S);
+                        break;
+                    }
+                    else if (caja.ChocoALaIzquierda(personaje))
+                    {
+                        auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
+                        NoMoverHacia(Key.D);
+                        break;
+                    }
+                    else if (caja.ChocoALaDerecha(personaje))
+                    {
+                        auxMovimientoCaja = TGCMatrix.Translation(0, 0, 0);
+                        NoMoverHacia(Key.A);
+                        break;
+                    }
                 }
-            }
-            else {
-                colisionoContraMesh = false;
-                personaje.playAnimation("Parado", true);
-
             }
         }
 

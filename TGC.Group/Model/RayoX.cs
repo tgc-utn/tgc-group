@@ -18,7 +18,7 @@ namespace TGC.Group.Model
 
         protected override float Intervalo()
         {
-            return this.puntoInterseccion.X - this.origen.Z;
+            return this.puntoInterseccion.X - this.origen.X;
         }
     }
 }
