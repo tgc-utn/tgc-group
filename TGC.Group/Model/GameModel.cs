@@ -88,10 +88,10 @@ namespace TGC.Group.Model
            
             planoDer = planoIzq.createMeshInstance("planoDer");
             planoDer.AutoTransform = false;
-            planoDer.Transform = TGCMatrix.Translation(-12, 0, 0) * TGCMatrix.Scaling(1, 1, 2.2f);
+            planoDer.Transform = TGCMatrix.Translation(-12, 0, -22) * TGCMatrix.Scaling(1, 1, 2.2f);
             planoDer.BoundingBox.transform(planoDer.Transform);
 
-            planoIzq.Transform = TGCMatrix.Translation(14, 0, 0) * TGCMatrix.Scaling(1, 1, 2.2f);
+            planoIzq.Transform = TGCMatrix.Translation(25, 0, -22) * TGCMatrix.Scaling(1, 1, 2.2f);
             planoIzq.BoundingBox.transform(planoIzq.Transform);
 
             //planoDerechoAbajo = planoIzq.createMeshInstance("planoDer");
@@ -101,10 +101,10 @@ namespace TGC.Group.Model
 
             planoBack = planoFront.createMeshInstance("planoBack");
             planoBack.AutoTransform = false;
-            planoBack.Transform = TGCMatrix.Translation(50, 0, 140);
+            planoBack.Transform = TGCMatrix.Translation(50, 0, 70);
             planoBack.BoundingBox.transform(planoBack.Transform);
 
-            planoFront.Transform = TGCMatrix.Translation(50, 0, -30);
+            planoFront.Transform = TGCMatrix.Translation(50, 0, -197);
             planoFront.BoundingBox.transform(planoFront.Transform);
 
             caja1 = loader.loadSceneFromFile(MediaDir + "primer-nivel\\Playa final\\caja-TgcScene.xml").Meshes[0];
@@ -137,7 +137,7 @@ namespace TGC.Group.Model
             colisionoContraLimite = true;
             colisionoContraMesh = true;
 
-            camara = new GameCamera(personaje.Position, 100, 200);
+            camara = new GameCamera(personaje.Position, 60, 200);
             Camara = camara;
 
         }
@@ -217,7 +217,7 @@ namespace TGC.Group.Model
                 BoundingBox = !BoundingBox;
             }
 
-            camara.Target = personaje.Position;
+            camara.Target = ultimaPos.Origin;
 
             PostUpdate();
         }
@@ -399,8 +399,6 @@ namespace TGC.Group.Model
             //{
             //    personaje.playAnimation("Parado", true);
             //}
-
-            camara.Target = personaje.Position;
         }
 
         private void NoMoverHacia(Key key, TGCVector3 vector) {
