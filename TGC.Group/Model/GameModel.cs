@@ -137,6 +137,8 @@ namespace TGC.Group.Model
             colisionoContraLimite = true;
             colisionoContraMesh = true;
 
+            BoundingBox = true;
+
             camara = new GameCamera(personaje.Position, 60, 200);
             Camara = camara;
 
@@ -167,7 +169,7 @@ namespace TGC.Group.Model
 
             if (colisionoContraLimite)
             {
-                ultimaPos *= auxUltimaPos; 
+                ultimaPos *= TGCMatrix.Translation(movimiento); 
                 //CopiarMatriz4x4(auxUltimaPos, ultimaPos);
 
                 CalcularColisiones();
@@ -330,44 +332,20 @@ namespace TGC.Group.Model
             if (moving)
             {
                 if (ChocoConLimite(personaje, planoIzq))
-                {
-                    if (ChocoConLimite(personaje, planoBack))
-                    {
-                        var noTeMuevasParaAtras = new TGCVector3(movimiento.X, movimiento.Y, 0);
-                        NoMoverHacia(Key.A, noTeMuevasParaAtras);
+                    NoMoverHacia(Key.A);
 
-                        planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
-                    }
-                    else
-                    {
-                        planoBack.BoundingBox.setRenderColor(Color.Yellow);
-                        NoMoverHacia(Key.A, movimiento);
-                    }
-                }
-                else if (ChocoConLimite(personaje, planoDer))
+                if (ChocoConLimite(personaje, planoBack))
                 {
-                    if (ChocoConLimite(personaje, planoBack))
-                    {
-                        var noTeMuevasParaAtras = new TGCVector3(movimiento.X, movimiento.Y, 0);
-                        NoMoverHacia(Key.D, noTeMuevasParaAtras);
-                        planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
-                    }
-                    else
-                    {
-                        NoMoverHacia(Key.D, movimiento);
-                        planoBack.BoundingBox.setRenderColor(Color.Yellow);
-                    }
-                }
-                else if (ChocoConLimite(personaje, planoBack))
-                {
-                    NoMoverHacia(Key.S, movimiento);
+                    NoMoverHacia(Key.S);
+
                     planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
                 }
-                else
-                { // no hay colisiones contra los planos laterales
-                    planoBack.BoundingBox.setRenderColor(Color.Yellow);
-                    colisionoContraLimite = false;
-                }
+                else // esto no hace falta despues
+                        planoBack.BoundingBox.setRenderColor(Color.Yellow);
+
+                if (ChocoConLimite(personaje, planoDer))
+                    NoMoverHacia(Key.D);
+                
 
                 if (ChocoConLimite(personaje, planoFront))
                 { // HUBO CAMBIO DE ESCENARIO
@@ -401,32 +379,24 @@ namespace TGC.Group.Model
             //}
         }
 
-        private void NoMoverHacia(Key key, TGCVector3 vector) {
+        private void NoMoverHacia(Key key) { 
             switch(key)
             {
                 case Key.A:
                     if (movimiento.X > 0) // los ejes estan al reves de como pensaba, o lo entendi mal.
-                        auxUltimaPos *= TGCMatrix.Translation(0, vector.Y, vector.Z);
-                    else
-                        auxUltimaPos *= TGCMatrix.Translation(vector);
+                        movimiento.X = 0;
                     break;
                 case Key.D:
                     if (movimiento.X < 0)
-                        auxUltimaPos *= TGCMatrix.Translation(0, vector.Y, vector.Z);
-                    else
-                        auxUltimaPos *= TGCMatrix.Translation(vector);
+                        movimiento.X = 0;
                     break;
                 case Key.S:
                     if (movimiento.Z > 0)
-                        auxUltimaPos *= TGCMatrix.Translation(vector.X, vector.Y, 0);
-                    else
-                        auxUltimaPos *= TGCMatrix.Translation(vector);
+                        movimiento.Z = 0;
                     break;
                 case Key.W:
                     if (movimiento.Z < 0)
-                        auxUltimaPos *= TGCMatrix.Translation(vector.X, vector.Y, 0);
-                    else
-                        auxUltimaPos *= TGCMatrix.Translation(vector);
+                        movimiento.Z = 0;
                     break;
             }
                 
