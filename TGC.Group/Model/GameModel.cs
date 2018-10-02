@@ -263,11 +263,6 @@ namespace TGC.Group.Model
                         movimientoCaja = TGCMatrix.Translation(0, 0, movimiento.Z*3); // + distancia minima del rayo
                         break;
                     }
-                    else if (caja.ChocoArriba(personaje))
-                    {
-                        movimiento.Y = 0; // Ojo, que pasa si quiero saltar desde arriba de la plataforma?
-                        break;
-                    }
                     else if (caja.ChocoAtras(personaje))
                     {
                         NoMoverHacia(Key.S);
@@ -281,6 +276,17 @@ namespace TGC.Group.Model
                     else if (caja.ChocoALaDerecha(personaje))
                     {
                         NoMoverHacia(Key.A);
+                        break;
+                    }
+                    else if (caja.ChocoArriba(personaje))
+                    {
+                        if (movimiento.Y < 0)
+                        {
+                            movimiento.Y = 0; // Ojo, que pasa si quiero saltar desde arriba de la plataforma?
+                            personaje.colisionaEnY = true;
+                            if (movimiento.X == 0 && movimiento.Z == 0)
+                                personaje.moving = false;
+                        }
                         break;
                     }
                 }

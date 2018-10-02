@@ -14,6 +14,7 @@ namespace TGC.Group.Model
     {
         public TgcSkeletalMesh Mesh { get; set; }
         public bool moving;
+        public bool colisionaEnY;
         private TGCMatrix ultimaPosicion;
         public TGCVector3 movimiento;
         private const float VelocidadDesplazamiento = 50f;
@@ -28,7 +29,7 @@ namespace TGC.Group.Model
 
         private GameModel Context;
         //
-        float VelocidadY = 0f;
+        public float VelocidadY = 0f;
         float VelocidadSalto = 90f;
         float Gravedad = -60f;
         float VelocidadTerminal = -50f;
@@ -71,6 +72,7 @@ namespace TGC.Group.Model
 
             //Calcular proxima posicion de personaje segun Input
             moving = false;
+            colisionaEnY = false;
             movimiento = TGCVector3.Empty;
             //transformacionPersonaje = TGCMatrix.Identity;
 
@@ -103,7 +105,7 @@ namespace TGC.Group.Model
                 VelocidadY = VelocidadSalto;
             }
 
-            if (NoColisionaEnY())
+            if (!colisionaEnY)
             {
                 VelocidadY = FastMath.Clamp(VelocidadY + Gravedad * elapsedTime, VelocidadTerminal, -VelocidadTerminal);
 
@@ -125,11 +127,6 @@ namespace TGC.Group.Model
             {
                 Mesh.playAnimation("Parado", true);
             }
-        }
-
-        private bool NoColisionaEnY()
-        {
-            return ultimaPosicion.Origin.Y > 0 || VelocidadY > 0;
         }
 
         public void Render()
