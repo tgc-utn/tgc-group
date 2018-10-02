@@ -82,6 +82,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera\Camera.cs" />
     <Compile Include="Form\GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -93,7 +94,15 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\Escenario.cs" />
+    <Compile Include="Model\EscenarioPlaya.cs" />
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Model\MeshTipoCaja.cs" />
+    <Compile Include="Model\Personaje.cs" />
+    <Compile Include="Model\Rayo.cs" />
+    <Compile Include="Model\RayoX.cs" />
+    <Compile Include="Model\RayoY.cs" />
+    <Compile Include="Model\RayoZ.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
@@ -164,8 +173,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Media\cajaMadera4.jpg" />
-    <Content Include="Media\LogoTGC-TgcScene.xml" />
+    <Folder Include="Media\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
