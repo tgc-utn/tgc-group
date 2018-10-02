@@ -38,10 +38,10 @@ namespace TGC.Group.Model
         }
 
         //Boleano para ver si dibujamos el boundingbox
-        private bool BoundingBox { get; set; }
+        public bool BoundingBox { get; set; }
         private const float VELOCIDAD_DESPLAZAMIENTO = 50f;
         private TgcScene escenaPlaya;
-        private TgcSkeletalMesh personaje;
+        private Personaje personaje = new Personaje();
         private TgcMesh caja1;
         private GameCamera camara;
         private TGCVector3 movimiento;
@@ -60,7 +60,6 @@ namespace TGC.Group.Model
         private TgcMesh planoBack;
 
         private TgcArrow segment = new TgcArrow();
-        private bool moving;
 
         //Constantes para velocidades de movimiento de plataforma
         private const float MOVEMENT_SPEED = 1f;
@@ -110,31 +109,12 @@ namespace TGC.Group.Model
             
             caja1.BoundingBox.transform(caja1.Transform);
 
-            var skeletalLoader = new TgcSkeletalLoader();
-            personaje = skeletalLoader.loadMeshAndAnimationsFromFile(
-                MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\Robot\\Robot-TgcSkeletalMesh.xml",
-                MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\Robot\\",
-                new[]
-                {
-                    MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\Robot\\Caminando-TgcSkeletalAnim.xml",
-                    MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\Robot\\Parado-TgcSkeletalAnim.xml",
-                    MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\Robot\\Empujar-TgcSkeletalAnim.xml"
-                });
-
-            personaje.AutoTransform = false;
-
-            //Configurar animacion inicial
-            personaje.playAnimation("Parado", true);
-            //Escalarlo porque es muy grande
-            personaje.Position = new TGCVector3(25, 0, 60);
-            personaje.Scale = new TGCVector3(0.15f, 0.15f, 0.15f);
-            ultimaPos = TGCMatrix.Translation(personaje.Position);
+            personaje.Init(this);
 
             BoundingBox = true;
 
             camara = new GameCamera(personaje.Position, 60, 200);
             Camara = camara;
-
         }
 
         /// <summary>
@@ -156,18 +136,22 @@ namespace TGC.Group.Model
             meshesColisionables.Add(caja1Mesh);
             // 
 
+            personaje.Update();
+
+            movimiento = personaje.movimiento;
+
             CalcularMovimiento();
 
             CalcularColisiones();
 
-            ultimaPos *= TGCMatrix.Translation(movimiento);
+            personaje.Movete(movimiento);
 
             if (Input.keyDown(Key.Q))
             {
                 BoundingBox = !BoundingBox;
             }
 
-            camara.Target = ultimaPos.Origin;
+            camara.Target = personaje.Position;
 
             PostUpdate();
         }
@@ -187,16 +171,7 @@ namespace TGC.Group.Model
 
             caja1.Render();
 
-            personaje.Transform =
-                TGCMatrix.Scaling(personaje.Scale)
-                * TGCMatrix.RotationYawPitchRoll(personaje.Rotation.Y, personaje.Rotation.X, personaje.Rotation.Z)
-                * ultimaPos;
-
-            personaje.BoundingBox.transform(personaje.Transform);
-            
-            personaje.BoundingBox.Render();
-
-            personaje.animateAndRender(ElapsedTime);
+            personaje.Render();
 
             if (BoundingBox)
             {
@@ -205,7 +180,6 @@ namespace TGC.Group.Model
                 planoFront.BoundingBox.Render();
                 planoIzq.BoundingBox.Render();
                 planoDer.BoundingBox.Render();
-                personaje.BoundingBox.Render();
                 caja1.BoundingBox.Render();
             }
 
@@ -217,39 +191,7 @@ namespace TGC.Group.Model
 
         private void CalcularMovimiento()
         {
-            personaje.playAnimation("Parado", true);
-
-            var velocidadCaminar = VELOCIDAD_DESPLAZAMIENTO * ElapsedTime;
-
-            //Calcular proxima posicion de personaje segun Input
-            moving = false;
-            movimiento = TGCVector3.Empty;
-            
-            if (Input.keyDown(Key.W))
-            {
-                movimiento.Z = -velocidadCaminar;
-                moving = true;
-            }
-
-            if (Input.keyDown(Key.S))
-            {
-                movimiento.Z = velocidadCaminar;
-                moving = true;
-            }
-
-            if (Input.keyDown(Key.D))
-            {
-                movimiento.X = -velocidadCaminar;
-                moving = true;
-            }
-
-            if (Input.keyDown(Key.A))
-            {
-                movimiento.X = velocidadCaminar;
-                moving = true;
-            }
-
-            if (moving)
+            if (personaje.moving)
             {
                 //personaje.playAnimation("Caminando", true); // esto creo que esta mal, si colisiono no deberia caminar.
 
@@ -305,22 +247,20 @@ namespace TGC.Group.Model
                         movimiento.Z = 0;
                     break;
             }
-                
         }
 
-        private bool ChocoConLimite(TgcSkeletalMesh personaje, TgcMesh plano) {
+        private bool ChocoConLimite(Personaje personaje, TgcMesh plano) {
             return TgcCollisionUtils.testAABBAABB(plano.BoundingBox, personaje.BoundingBox);
         }
 
         private void CalcularColisiones() {
-            if (moving)
+            if (personaje.moving)
             {
                 foreach (MeshTipoCaja caja in meshesColisionables)
                 {
                     if (caja.ChocoConFrente(personaje))
                     {
                         movimientoCaja = TGCMatrix.Translation(0, 0, movimiento.Z*3); // + distancia minima del rayo
-                        personaje.playAnimation("Empujar", true);
                         break;
                     }
                     else if (caja.ChocoArriba(personaje))

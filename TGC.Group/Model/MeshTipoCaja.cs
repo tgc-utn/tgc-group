@@ -100,50 +100,48 @@ namespace TGC.Group.Model
             rayosX.Add(rayoDerCaraX);        
         }
 
-        public bool ChocoConFrente(TgcSkeletalMesh personaje) {
+        public bool ChocoConFrente(Personaje personaje) {
             //this.GenerarRayos();
             return this.TesteoDeRayos(personaje, rayosZ);   
         }
 
-        public bool ChocoALaIzquierda(TgcSkeletalMesh personaje) {
+        public bool ChocoALaIzquierda(Personaje personaje) {
             //this.GenerarRayos();
             return this.TesteoDeRayos(personaje, rayosX);
         }
 
-        public bool ChocoArriba(TgcSkeletalMesh personaje)
+        public bool ChocoArriba(Personaje personaje)
         {
             //this.GenerarRayos();
             return this.TesteoDeRayos(personaje, rayosY);
         }
 
-        public bool ChocoALaDerecha(TgcSkeletalMesh personaje) {
+        public bool ChocoALaDerecha(Personaje personaje) {
             //this.GenerarRayos();
             return this.TesteoDeRayos(personaje, rayosMenosX);
         }
 
-        public bool ChocoAtras(TgcSkeletalMesh personaje)
+        public bool ChocoAtras(Personaje personaje)
         {
             //this.GenerarRayos();
             return this.TesteoDeRayos(personaje, rayosMenosZ);
         }
 
-        public bool ChocoAbajo(TgcSkeletalMesh personaje)
+        public bool ChocoAbajo(Personaje personaje)
         {
             //this.GenerarRayos();
             return this.TesteoDeRayos(personaje, rayosMenosY);
         }
 
-        private bool TesteoDeRayos(TgcSkeletalMesh personaje, List<Rayo> rayos) {
+        private bool TesteoDeRayos(Personaje personaje, List<Rayo> rayos) {
             var puntoInterseccion = TGCVector3.Empty;
 
             foreach (Rayo rayo in rayos)
             {
-                rayo.Colisionar(personaje);
+                rayo.Colisionar(personaje.Mesh);
 
                 if (rayo.HuboColision())
-                {
                     return true;
-                }
             }
 
             return false;

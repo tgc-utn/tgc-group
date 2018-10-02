@@ -93,6 +93,7 @@
     </Compile>
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\MeshTipoCaja.cs" />
+    <Compile Include="Model\Personaje.cs" />
     <Compile Include="Model\Rayo.cs" />
     <Compile Include="Model\RayoX.cs" />
     <Compile Include="Model\RayoY.cs" />
