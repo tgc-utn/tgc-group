@@ -14,6 +14,7 @@ using TGC.Core.Textures;
 using TGC.Group.Camera;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace TGC.Group.Model
 {
@@ -47,17 +48,13 @@ namespace TGC.Group.Model
         private TGCVector3 movimiento;
         private ArrayList meshesColisionables;
         private TGCMatrix movimientoCaja;
+        private Dictionary<string, Escenario> escenarios;
+        private Escenario escenarioActual;
+        
 
         // Solo para mostrar
         private MeshTipoCaja caja1Mesh;
         //
-
-        // Planos de limite
-        private TgcMesh planoPiso;
-        private TgcMesh planoIzq;
-        private TgcMesh planoDer;
-        private TgcMesh planoFront;
-        private TgcMesh planoBack;
 
         private TgcArrow segment = new TgcArrow();
 
@@ -75,37 +72,12 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
+            escenarios = new Dictionary<string, Escenario>();
+
+            escenarios["playa"] = new EscenarioPlaya(this);
+
+            escenarioActual = escenarios["playa"];
             var loader = new TgcSceneLoader();
-            escenaPlaya = loader.loadSceneFromFile(MediaDir + "primer-nivel\\Playa final\\Playa-TgcScene.xml");
-              
-            planoIzq = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\planoHorizontal-TgcScene.xml").Meshes[0];            
-            planoIzq.AutoTransform = false;
-           
-            planoDer = planoIzq.createMeshInstance("planoDer");
-            planoDer.AutoTransform = false;
-            planoDer.Transform = TGCMatrix.Translation(-12, 0, -22) * TGCMatrix.Scaling(1, 1, 2.2f);
-            planoDer.BoundingBox.transform(planoDer.Transform);
-
-            planoIzq.Transform = TGCMatrix.Translation(25, 0, -22) * TGCMatrix.Scaling(1, 1, 2.2f);
-            planoIzq.BoundingBox.transform(planoIzq.Transform);
-
-            //planoDerechoAbajo = planoIzq.createMeshInstance("planoDer");
-
-            planoFront = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\planoVertical-TgcScene.xml").Meshes[0];
-            planoFront.AutoTransform = false;
-
-            planoBack = planoFront.createMeshInstance("planoBack");
-            planoBack.AutoTransform = false;
-            planoBack.Transform = TGCMatrix.Translation(50, 0, 70);
-            planoBack.BoundingBox.transform(planoBack.Transform);
-
-            planoFront.Transform = TGCMatrix.Translation(50, 0, -197);
-            planoFront.BoundingBox.transform(planoFront.Transform);
-
-            planoPiso = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\planoPiso-TgcScene.xml").Meshes[0];
-            planoPiso.AutoTransform = false;
-            planoPiso.BoundingBox.transform(TGCMatrix.Scaling(1, 1, 2) * TGCMatrix.Translation(0,0,200));
-
             caja1 = loader.loadSceneFromFile(MediaDir + "primer-nivel\\Playa final\\caja-TgcScene.xml").Meshes[0];
             caja1.AutoTransform = false;
             caja1.Transform = TGCMatrix.Translation(10, 0, 0);
@@ -180,15 +152,11 @@ namespace TGC.Group.Model
             if (BoundingBox)
             {
                 caja1Mesh.RenderizaRayos();
-                planoBack.BoundingBox.Render();
-                planoFront.BoundingBox.Render();
-                planoIzq.BoundingBox.Render();
-                planoDer.BoundingBox.Render();
-                planoPiso.BoundingBox.Render();
+                
                 caja1.BoundingBox.Render();
             }
 
-            escenaPlaya.RenderAll();
+            escenarioActual.Render();
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
@@ -200,36 +168,36 @@ namespace TGC.Group.Model
             {
                 //personaje.playAnimation("Caminando", true); // esto creo que esta mal, si colisiono no deberia caminar.
 
-                if (ChocoConLimite(personaje, planoIzq))
+                if (ChocoConLimite(personaje, escenarioActual.planoIzq))
                     NoMoverHacia(Key.A);
 
-                if (ChocoConLimite(personaje, planoBack))
+                if (ChocoConLimite(personaje, escenarioActual.planoBack))
                 {
                     NoMoverHacia(Key.S);
-                    planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
+                    escenarioActual.planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
                 }
                 else
                 { // esto no hace falta despues
-                    planoBack.BoundingBox.setRenderColor(Color.Yellow);
+                    escenarioActual.planoBack.BoundingBox.setRenderColor(Color.Yellow);
                 }
 
-                if (ChocoConLimite(personaje, planoDer))
+                if (ChocoConLimite(personaje, escenarioActual.planoDer))
                     NoMoverHacia(Key.D);
 
-                if (ChocoConLimite(personaje, planoFront))
+                if (ChocoConLimite(personaje, escenarioActual.planoFront))
                 { // HUBO CAMBIO DE ESCENARIO
                   /* Aca deberiamos hacer algo como no testear mas contra las cosas del escenario anterior y testear
                     contra las del escenario actual. 
                   */
 
-                    planoFront.BoundingBox.setRenderColor(Color.AliceBlue);
+                    escenarioActual.planoFront.BoundingBox.setRenderColor(Color.AliceBlue);
                 }
                 else
                 {
-                    planoFront.BoundingBox.setRenderColor(Color.Yellow);
+                    escenarioActual.planoFront.BoundingBox.setRenderColor(Color.Yellow);
                 }
 
-                if (ChocoConLimite(personaje, planoPiso))
+                if (ChocoConLimite(personaje, escenarioActual.planoPiso))
                 {
                     if (movimiento.Y < 0)
                         {
@@ -312,11 +280,11 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             //Dispose del mesh.
-            escenaPlaya.DisposeAll();
+            //escenarioActual.DisposeAll();
             personaje.Dispose();
-            planoIzq.Dispose(); // solo se borran los originales
-            planoFront.Dispose(); // solo se borran los originales
-            planoPiso.Dispose();
+            escenarioActual.planoIzq.Dispose(); // solo se borran los originales
+            escenarioActual.planoFront.Dispose(); // solo se borran los originales
+            escenarioActual.planoPiso.Dispose();
             caja1.Dispose();
 
             //foreach (TgcMesh mesh in meshesColisionables) {
