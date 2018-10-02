@@ -58,7 +58,7 @@ namespace TGC.Group.Model
             //Configurar animacion inicial
             Mesh.playAnimation("Parado", true);
             //Escalarlo porque es muy grande
-            Mesh.Position = new TGCVector3(0, 0, 100);
+            Mesh.Position = new TGCVector3(25, 0, 50);
             Mesh.Scale = new TGCVector3(0.15f, 0.15f, 0.15f);
             ultimaPosicion = TGCMatrix.Translation(Mesh.Position);
         }
@@ -149,6 +149,13 @@ namespace TGC.Group.Model
         public void Dispose()
         {
             Mesh.Dispose();
+        }
+
+        internal void ColisionoEnY()
+        {
+            this.colisionaEnY = true;
+            if (movimiento.X == 0 && movimiento.Z == 0)
+                this.moving = false;
         }
     }
 }

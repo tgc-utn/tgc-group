@@ -45,7 +45,6 @@ namespace TGC.Group.Model
         private TgcMesh caja1;
         private GameCamera camara;
         private TGCVector3 movimiento;
-        private TGCMatrix ultimaPos; 
         private ArrayList meshesColisionables;
         private TGCMatrix movimientoCaja;
 
@@ -54,6 +53,7 @@ namespace TGC.Group.Model
         //
 
         // Planos de limite
+        private TgcMesh planoPiso;
         private TgcMesh planoIzq;
         private TgcMesh planoDer;
         private TgcMesh planoFront;
@@ -101,6 +101,10 @@ namespace TGC.Group.Model
 
             planoFront.Transform = TGCMatrix.Translation(50, 0, -197);
             planoFront.BoundingBox.transform(planoFront.Transform);
+
+            planoPiso = loader.loadSceneFromFile(MediaDir + "primer-nivel\\pozo-plataformas\\tgc-scene\\plataformas\\planoPiso-TgcScene.xml").Meshes[0];
+            planoPiso.AutoTransform = false;
+            planoPiso.BoundingBox.transform(TGCMatrix.Scaling(1, 1, 2) * TGCMatrix.Translation(0,0,200));
 
             caja1 = loader.loadSceneFromFile(MediaDir + "primer-nivel\\Playa final\\caja-TgcScene.xml").Meshes[0];
             caja1.AutoTransform = false;
@@ -180,6 +184,7 @@ namespace TGC.Group.Model
                 planoFront.BoundingBox.Render();
                 planoIzq.BoundingBox.Render();
                 planoDer.BoundingBox.Render();
+                planoPiso.BoundingBox.Render();
                 caja1.BoundingBox.Render();
             }
 
@@ -210,7 +215,7 @@ namespace TGC.Group.Model
 
                 if (ChocoConLimite(personaje, planoDer))
                     NoMoverHacia(Key.D);
-               
+
                 if (ChocoConLimite(personaje, planoFront))
                 { // HUBO CAMBIO DE ESCENARIO
                   /* Aca deberiamos hacer algo como no testear mas contra las cosas del escenario anterior y testear
@@ -224,6 +229,14 @@ namespace TGC.Group.Model
                     planoFront.BoundingBox.setRenderColor(Color.Yellow);
                 }
 
+                if (ChocoConLimite(personaje, planoPiso))
+                {
+                    if (movimiento.Y < 0)
+                        {
+                            movimiento.Y = 0; // Ojo, que pasa si quiero saltar desde arriba de la plataforma?
+                            personaje.ColisionoEnY();
+                        }
+                }
             }
         }
 
@@ -283,9 +296,7 @@ namespace TGC.Group.Model
                         if (movimiento.Y < 0)
                         {
                             movimiento.Y = 0; // Ojo, que pasa si quiero saltar desde arriba de la plataforma?
-                            personaje.colisionaEnY = true;
-                            if (movimiento.X == 0 && movimiento.Z == 0)
-                                personaje.moving = false;
+                            personaje.ColisionoEnY();
                         }
                         break;
                     }
@@ -305,6 +316,7 @@ namespace TGC.Group.Model
             personaje.Dispose();
             planoIzq.Dispose(); // solo se borran los originales
             planoFront.Dispose(); // solo se borran los originales
+            planoPiso.Dispose();
             caja1.Dispose();
 
             //foreach (TgcMesh mesh in meshesColisionables) {
