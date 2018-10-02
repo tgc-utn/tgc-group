@@ -19,15 +19,24 @@ namespace TGC.Group.Model
         private List<Rayo> rayosY;
         private List<Rayo> rayosMenosY;
 
-        public MeshTipoCaja(TgcMesh caja)
+        public MeshTipoCaja()
         {
-            this.mesh = caja;
             this.rayosX = new List<Rayo>();
             this.rayosMenosX = new List<Rayo>();
             this.rayosY = new List<Rayo>();
             this.rayosMenosY = new List<Rayo>();
             this.rayosZ = new List<Rayo>();
             this.rayosMenosZ = new List<Rayo>();
+
+            Init();
+        }
+
+        private void Init() {
+            var loader = new TgcSceneLoader();
+            mesh = loader.loadSceneFromFile(GameModel.Media + "primer-nivel\\Playa final\\caja-TgcScene.xml").Meshes[0];
+            mesh.AutoTransform = false;
+            mesh.Transform = TGCMatrix.Translation(10, 0, 0);
+            mesh.BoundingBox.transform(mesh.Transform);
 
             GenerarRayos();
         }
@@ -98,6 +107,28 @@ namespace TGC.Group.Model
             rayosX.Add(rayoCentroCaraX); // Left
             rayosX.Add(rayoIzqCaraX); // LeftIzq
             rayosX.Add(rayoDerCaraX);        
+        }
+
+        internal void Render()
+        {
+            mesh.Render();
+        }
+
+        public void Update(TGCMatrix movimientoCaja)
+        {
+            ClearRayos();
+            GenerarRayos();
+            mesh.Transform *= movimientoCaja;
+            mesh.BoundingBox.transform(mesh.Transform);
+        }
+
+        private void ClearRayos() {
+            rayosX.Clear();
+            rayosMenosX.Clear();
+            rayosY.Clear();
+            rayosMenosY.Clear();
+            rayosZ.Clear();
+            rayosMenosZ.Clear();
         }
 
         public bool ChocoConFrente(Personaje personaje) {

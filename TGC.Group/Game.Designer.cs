@@ -94,5 +94,17 @@ namespace TGC.Group {
                 this["Texturas"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("..\\..\\Media\\")]
+        public string MediaDir {
+            get {
+                return ((string)(this["MediaDir"]));
+            }
+            set {
+                this["MediaDir"] = value;
+            }
+        }
     }
 }

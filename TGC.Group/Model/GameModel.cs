@@ -39,14 +39,17 @@ namespace TGC.Group.Model
         }
 
         //Boleano para ver si dibujamos el boundingbox
+        public static String Media
+        {
+            get => "../../Media/";
+        }
         public bool BoundingBox { get; set; }
         private const float VELOCIDAD_DESPLAZAMIENTO = 50f;
-        private TgcScene escenaPlaya;
         private Personaje personaje = new Personaje();
         private TgcMesh caja1;
         private GameCamera camara;
         private TGCVector3 movimiento;
-        private ArrayList meshesColisionables;
+        
         private TGCMatrix movimientoCaja;
         private Dictionary<string, Escenario> escenarios;
         private Escenario escenarioActual;
@@ -72,20 +75,20 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
+            personaje.Init(this);
+
             escenarios = new Dictionary<string, Escenario>();
 
-            escenarios["playa"] = new EscenarioPlaya(this);
+            escenarios["playa"] = new EscenarioPlaya(this, personaje);
 
             escenarioActual = escenarios["playa"];
-            var loader = new TgcSceneLoader();
-            caja1 = loader.loadSceneFromFile(MediaDir + "primer-nivel\\Playa final\\caja-TgcScene.xml").Meshes[0];
-            caja1.AutoTransform = false;
-            caja1.Transform = TGCMatrix.Translation(10, 0, 0);
-            movimientoCaja = caja1.Transform;
-            
-            caja1.BoundingBox.transform(caja1.Transform);
 
-            personaje.Init(this);
+            //var loader = new TgcSceneLoader();
+            //caja1 = loader.loadSceneFromFile(Media + "primer-nivel\\Playa final\\caja-TgcScene.xml").Meshes[0];
+            //caja1.AutoTransform = false;
+            //caja1.Transform = TGCMatrix.Translation(10, 0, 0);
+            //movimientoCaja = caja1.Transform;
+            
 
             BoundingBox = true;
 
@@ -104,23 +107,17 @@ namespace TGC.Group.Model
 
             movimientoCaja = TGCMatrix.Identity;
 
-            // Agrego a la lista de meshes colisionables tipo caja, todas las cosas del pedazo de escenario donde estoy contra las que puedo colisionar.
-            caja1Mesh = new MeshTipoCaja(caja1);
+            //// Agrego a la lista de meshes colisionables tipo caja, todas las cosas del pedazo de escenario donde estoy contra las que puedo colisionar.
+            //caja1Mesh = new MeshTipoCaja(caja1);
 
-            meshesColisionables = new ArrayList();
+            //meshesColisionables = new ArrayList();
 
-            meshesColisionables.Add(caja1Mesh);
-            // 
+            //meshesColisionables.Add(caja1Mesh);
+            //// 
 
             personaje.Update();
 
-            movimiento = personaje.movimiento;
-
-            CalcularMovimiento();
-
-            CalcularColisiones();
-
-            personaje.Movete(movimiento);
+            escenarioActual.Update();
 
             if (Input.keyDown(Key.Q))
             {
@@ -142,19 +139,7 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            caja1.Transform *= movimientoCaja;
-            caja1.BoundingBox.transform(caja1.Transform);
-
-            caja1.Render();
-
             personaje.Render();
-
-            if (BoundingBox)
-            {
-                caja1Mesh.RenderizaRayos();
-                
-                caja1.BoundingBox.Render();
-            }
 
             escenarioActual.Render();
 
@@ -162,115 +147,11 @@ namespace TGC.Group.Model
             PostRender();
         }
 
-        private void CalcularMovimiento()
-        {
-            if (personaje.moving)
-            {
-                //personaje.playAnimation("Caminando", true); // esto creo que esta mal, si colisiono no deberia caminar.
+        
 
-                if (ChocoConLimite(personaje, escenarioActual.planoIzq))
-                    NoMoverHacia(Key.A);
+        
 
-                if (ChocoConLimite(personaje, escenarioActual.planoBack))
-                {
-                    NoMoverHacia(Key.S);
-                    escenarioActual.planoBack.BoundingBox.setRenderColor(Color.AliceBlue);
-                }
-                else
-                { // esto no hace falta despues
-                    escenarioActual.planoBack.BoundingBox.setRenderColor(Color.Yellow);
-                }
-
-                if (ChocoConLimite(personaje, escenarioActual.planoDer))
-                    NoMoverHacia(Key.D);
-
-                if (ChocoConLimite(personaje, escenarioActual.planoFront))
-                { // HUBO CAMBIO DE ESCENARIO
-                  /* Aca deberiamos hacer algo como no testear mas contra las cosas del escenario anterior y testear
-                    contra las del escenario actual. 
-                  */
-
-                    escenarioActual.planoFront.BoundingBox.setRenderColor(Color.AliceBlue);
-                }
-                else
-                {
-                    escenarioActual.planoFront.BoundingBox.setRenderColor(Color.Yellow);
-                }
-
-                if (ChocoConLimite(personaje, escenarioActual.planoPiso))
-                {
-                    if (movimiento.Y < 0)
-                        {
-                            movimiento.Y = 0; // Ojo, que pasa si quiero saltar desde arriba de la plataforma?
-                            personaje.ColisionoEnY();
-                        }
-                }
-            }
-        }
-
-        private void NoMoverHacia(Key key) { 
-            switch(key)
-            {
-                case Key.A:
-                    if (movimiento.X > 0) // los ejes estan al reves de como pensaba, o lo entendi mal.
-                        movimiento.X = 0;
-                    break;
-                case Key.D:
-                    if (movimiento.X < 0)
-                        movimiento.X = 0;
-                    break;
-                case Key.S:
-                    if (movimiento.Z > 0)
-                        movimiento.Z = 0;
-                    break;
-                case Key.W:
-                    if (movimiento.Z < 0)
-                        movimiento.Z = 0;
-                    break;
-            }
-        }
-
-        private bool ChocoConLimite(Personaje personaje, TgcMesh plano) {
-            return TgcCollisionUtils.testAABBAABB(plano.BoundingBox, personaje.BoundingBox);
-        }
-
-        private void CalcularColisiones() {
-            if (personaje.moving)
-            {
-                foreach (MeshTipoCaja caja in meshesColisionables)
-                {
-                    if (caja.ChocoConFrente(personaje))
-                    {
-                        movimientoCaja = TGCMatrix.Translation(0, 0, movimiento.Z*3); // + distancia minima del rayo
-                        break;
-                    }
-                    else if (caja.ChocoAtras(personaje))
-                    {
-                        NoMoverHacia(Key.S);
-                        break;
-                    }
-                    else if (caja.ChocoALaIzquierda(personaje))
-                    {
-                        NoMoverHacia(Key.D);
-                        break;
-                    }
-                    else if (caja.ChocoALaDerecha(personaje))
-                    {
-                        NoMoverHacia(Key.A);
-                        break;
-                    }
-                    else if (caja.ChocoArriba(personaje))
-                    {
-                        if (movimiento.Y < 0)
-                        {
-                            movimiento.Y = 0; // Ojo, que pasa si quiero saltar desde arriba de la plataforma?
-                            personaje.ColisionoEnY();
-                        }
-                        break;
-                    }
-                }
-            }
-        }
+        
 
         /// <summary>
         ///     Se llama cuando termina la ejecución del ejemplo.
@@ -285,7 +166,6 @@ namespace TGC.Group.Model
             escenarioActual.planoIzq.Dispose(); // solo se borran los originales
             escenarioActual.planoFront.Dispose(); // solo se borran los originales
             escenarioActual.planoPiso.Dispose();
-            caja1.Dispose();
 
             //foreach (TgcMesh mesh in meshesColisionables) {
             //    mesh.Dispose(); // mmm, no se que pasaria con las instancias...
