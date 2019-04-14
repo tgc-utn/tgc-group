@@ -1,5 +1,7 @@
 using Microsoft.DirectX.DirectInput;
 using System.Drawing;
+using System.Collections;
+using System.Linq;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
@@ -7,6 +9,8 @@ using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
+using System.Collections.Generic;
+using System;
 
 namespace TGC.Group.Model
 {
@@ -39,6 +43,9 @@ namespace TGC.Group.Model
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
 
+        //Scenary
+        private Scenary Scenary { get; set; }
+
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
         ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
@@ -47,6 +54,11 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Init()
         {
+            actionByKey.Add(Key.A, () => Mesh.Move(0.1f, 0, 0));
+            actionByKey.Add(Key.D, () => Mesh.Move(-0.1f, 0, 0));
+            actionByKey.Add(Key.W, () => Mesh.Move(0, 0.1f, 0));
+            actionByKey.Add(Key.S, () => Mesh.Move(0, -0.1f, 0));
+
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
@@ -82,6 +94,7 @@ namespace TGC.Group.Model
             Camara.SetCamera(cameraPosition, lookAt);
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
+            this.Scenary = new Scenary(new TGCVector3(0,0,0));
         }
 
         /// <summary>
@@ -89,15 +102,25 @@ namespace TGC.Group.Model
         ///     Se debe escribir toda la lógica de computo del modelo, así como también verificar entradas del usuario y reacciones
         ///     ante ellas.
         /// </summary>
+        /// 
+
+        private Dictionary<Key,System.Action> actionByKey = new Dictionary<Key, System.Action>();
+        
+
         public override void Update()
         {
             PreUpdate();
 
+            this.Scenary.Update();
+
             //Capturar Input teclado
             if (Input.keyPressed(Key.F))
             {
+                Console.WriteLine("ffff");
                 BoundingBox = !BoundingBox;
             }
+
+            foreach (var key in actionByKey.Keys.Where(key => Input.keyDown(key))) { actionByKey[key].Invoke(); }
 
             //Capturar Input Mouse
             if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
@@ -126,6 +149,8 @@ namespace TGC.Group.Model
         {
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
+
+            this.Scenary.Render();
 
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
@@ -162,6 +187,7 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Dispose()
         {
+            this.Scenary.Dispose();
             //Dispose de la caja.
             Box.Dispose();
             //Dispose del mesh.
