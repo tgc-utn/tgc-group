@@ -29,6 +29,7 @@ namespace TGC.Group.Model
         /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
+            Console.WriteLine("Mediadir: "+mediaDir);
             Category = Game.Default.Category;
             Name = Game.Default.Name;
             Description = Game.Default.Description;
@@ -79,7 +80,7 @@ namespace TGC.Group.Model
             //Defino una escala en el modelo logico del mesh que es muy grande.
             Mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
 
-            TgcLogo = new Element(new TGCVector3(0, 0, 0), Mesh);
+            TgcLogo = new Element(TGCVector3.Empty, Mesh);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.

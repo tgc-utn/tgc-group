@@ -94,5 +94,17 @@ namespace TGC.Group {
                 this["TexturaCaja"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("tierra.jpg")]
+        public string TexturaTierra {
+            get {
+                return ((string)(this["TexturaTierra"]));
+            }
+            set {
+                this["TexturaTierra"] = value;
+            }
+        }
     }
 }

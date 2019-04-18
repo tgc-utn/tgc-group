@@ -20,8 +20,8 @@ namespace TGC.Group.Model
 
 
         public Chunk(TGCVector3 origin)
-        {
-            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, "c:\\workspace\\tgc\\Media\\Texturas\\tierra.jpg");
+        { 
+            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, Game.Default.MediaDirectory + Game.Default.TexturaTierra);
             this.floor = new TgcPlane(origin, DefaultSize, Orientations.XZplane, pisoTexture);
             this.Elements = new List<Element>(); //rand
             this.size = DefaultSize;
@@ -39,6 +39,7 @@ namespace TGC.Group.Model
 
         public void Render()
         {
+            this.floor.updateValues();
             this.floor.Render();
             this.Elements.ForEach(element => element.Render());
         }
