@@ -94,6 +94,8 @@
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
     <Compile Include="Model\Chunk.cs" />
+    <Compile Include="Model\Collisionable.cs" />
+    <Compile Include="Model\CollisionManager.cs" />
     <Compile Include="Model\Element.cs" />
     <Compile Include="Model\Entity.cs" />
     <Compile Include="Model\Scenary.cs" />

@@ -11,8 +11,7 @@ namespace TGC.Group.Model
     class Chunk
     {
         private TgcPlane floor;
-        private List<Element> elements;
-        private List<Entity> entities;
+        public List<Element> Elements { get; }
 
         private TGCVector3 size;
 
@@ -24,28 +23,30 @@ namespace TGC.Group.Model
         {
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, "c:\\workspace\\tgc\\Media\\Texturas\\tierra.jpg");
             this.floor = new TgcPlane(origin, DefaultSize, Orientations.XZplane, pisoTexture);
-            this.elements = new List<Element>(); //rand
-            this.entities = new List<Entity>(); //rand, depending on difficulty?
+            this.Elements = new List<Element>(); //rand
             this.size = DefaultSize;
+        }
+
+        public List<Entity> Init()
+        {
+            return new List<Entity>();
         }
 
         public void Update()
         {
-            this.entities.ForEach(element => element.Update());
+            this.Elements.ForEach(element => element.Update());
         }
 
         public void Render()
         {
             this.floor.Render();
-            this.elements.ForEach(element => element.Render());
-            this.entities.ForEach(entity => entity.Render());
+            this.Elements.ForEach(element => element.Render());
         }
 
         public void Dispose()
         {
             this.floor.Dispose();
-            this.elements.ForEach(element => element.Dispose());
-            this.entities.ForEach(entity => entity.Dispose());
+            this.Elements.ForEach(element => element.Dispose());
         }
     }
 }

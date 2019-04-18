@@ -35,10 +35,10 @@ namespace TGC.Group.Model
         }
 
         //Caja que se muestra en el ejemplo.
-        private TGCBox Box { get; set; }
+        private Element Box { get; set; }
 
         //Mesh de TgcLogo.
-        private TgcMesh Mesh { get; set; }
+        private Element TgcLogo { get; set; }
 
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
@@ -52,13 +52,10 @@ namespace TGC.Group.Model
         ///     procesamiento que podemos pre calcular para nuestro juego.
         ///     Borrar el codigo ejemplo no utilizado.
         /// </summary>
+        /// 
+
         public override void Init()
         {
-            actionByKey.Add(Key.A, () => Mesh.Move(0.1f, 0, 0));
-            actionByKey.Add(Key.D, () => Mesh.Move(-0.1f, 0, 0));
-            actionByKey.Add(Key.W, () => Mesh.Move(0, 0.1f, 0));
-            actionByKey.Add(Key.S, () => Mesh.Move(0, -0.1f, 0));
-
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
@@ -73,15 +70,16 @@ namespace TGC.Group.Model
             //Creamos una caja 3D ubicada de dimensiones (5, 10, 5) y la textura como color.
             var size = new TGCVector3(5, 10, 5);
             //Construimos una caja según los parámetros, por defecto la misma se crea con centro en el origen y se recomienda así para facilitar las transformaciones.
-            Box = TGCBox.fromSize(size, texture);
             //Posición donde quiero que este la caja, es común que se utilicen estructuras internas para las transformaciones.
             //Entonces actualizamos la posición lógica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
-            Box.Position = new TGCVector3(-25, 0, 0);
+            Box = new Element(new TGCVector3(-25, 0, 0), TGCBox.fromSize(size, texture).ToMesh("caja"));
 
             //Cargo el unico mesh que tiene la escena.
-            Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
+            TgcMesh Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
             //Defino una escala en el modelo logico del mesh que es muy grande.
             Mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
+
+            TgcLogo = new Element(new TGCVector3(0, 0, 0), Mesh);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
@@ -111,16 +109,15 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
+            CollisionManager.CheckCollitions(this.Scenary.GetCollisionables());
+
             this.Scenary.Update();
 
             //Capturar Input teclado
             if (Input.keyPressed(Key.F))
             {
-                Console.WriteLine("ffff");
                 BoundingBox = !BoundingBox;
             }
-
-            foreach (var key in actionByKey.Keys.Where(key => Input.keyDown(key))) { actionByKey[key].Invoke(); }
 
             //Capturar Input Mouse
             if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
@@ -150,30 +147,20 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            this.Scenary.Render();
-
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
             DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.OrangeRed);
 
-            //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
-            //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
-            Box.Transform = TGCMatrix.Scaling(Box.Scale) * TGCMatrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) * TGCMatrix.Translation(Box.Position);
-            //A modo ejemplo realizamos toda las multiplicaciones, pero aquí solo nos hacia falta la traslación.
-            //Finalmente invocamos al render de la caja
-            Box.Render();
-
-            //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
-            //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
-            Mesh.UpdateMeshTransform();
             //Render del mesh
-            Mesh.Render();
+            Box.Render();
+            TgcLogo.Render();
+            Scenary.Render();
 
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (BoundingBox)
             {
-                Box.BoundingBox.Render();
-                Mesh.BoundingBox.Render();
+                Box.getCollisionVolume().Render();
+                TgcLogo.getCollisionVolume().Render();
             }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
@@ -191,7 +178,7 @@ namespace TGC.Group.Model
             //Dispose de la caja.
             Box.Dispose();
             //Dispose del mesh.
-            Mesh.Dispose();
+            TgcLogo.Dispose();
         }
     }
 }

@@ -1,22 +1,28 @@
 ﻿using System;
+using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Model
 {
-    class Entity
+    class Entity : Collisionable
     {
-        internal void Render()
+        public void Render()
         {
             return;
         }
 
-        internal void Update()
+        public void Update()
         {
             return;
         }
 
-        internal void Dispose()
+        public void Dispose()
         {
             return;
+        }
+
+        public override TgcBoundingAxisAlignBox getCollisionVolume()
+        {
+            throw new NotImplementedException();
         }
     }
 }
