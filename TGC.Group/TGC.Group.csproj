@@ -98,6 +98,7 @@
     <Compile Include="Model\CollisionManager.cs" />
     <Compile Include="Model\Element.cs" />
     <Compile Include="Model\Entity.cs" />
+    <Compile Include="Model\Camera.cs" />
     <Compile Include="Model\Scenary.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Program.cs" />
