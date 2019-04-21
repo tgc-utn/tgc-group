@@ -1,4 +1,5 @@
 ﻿using Microsoft.DirectX.DirectInput;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using TGC.Core.Camara;
@@ -8,7 +9,7 @@ using TGC.Core.Mathematica;
 
 namespace TGC.Group.Model
 {
-    public class Camera : TgcCamera 
+    public class Camera : TgcCamera
     {
         private readonly Point mouseCenter;
         private TGCMatrix cameraRotation;
@@ -28,14 +29,14 @@ namespace TGC.Group.Model
             RotationSpeed = 0.1f;
             MovementSpeed = 500f;
             initialDirectionView = new TGCVector3(0, 0, -1);
-            leftrightRot = FastMath.PI_HALF;
-            updownRot = -FastMath.PI /10.0f;
-            cameraRotation = TGCMatrix.RotationX(updownRot) * TGCMatrix.RotationY(leftrightRot);
+            leftrightRot = 0;
+            updownRot = 0;
             Cursor.Hide();
         }
 
         private static Point GetMouseCenter()
         {
+
             return new Point(D3DDevice.Instance.Device.Viewport.Width / 2, D3DDevice.Instance.Device.Viewport.Height / 2);
         }
 
@@ -55,8 +56,9 @@ namespace TGC.Group.Model
 
         public TGCMatrix CalculateCameraRotation()
         {
-            leftrightRot -= -Input.XposRelative * RotationSpeed;
-            updownRot -= Input.YposRelative * RotationSpeed;
+            leftrightRot += Input.XposRelative * RotationSpeed;
+            updownRot = FastMath.Clamp( updownRot - Input.YposRelative * RotationSpeed, -FastMath.PI_HALF, FastMath.PI_HALF);
+
             return TGCMatrix.RotationX(updownRot) * TGCMatrix.RotationY(leftrightRot);
         }
 
