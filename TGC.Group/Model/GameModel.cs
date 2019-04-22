@@ -77,6 +77,7 @@ namespace TGC.Group.Model
 
             //Cargo el unico mesh que tiene la escena.
             TgcMesh Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
+
             //Defino una escala en el modelo logico del mesh que es muy grande.
             Mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
 

@@ -12,7 +12,6 @@ namespace TGC.Group.Model
     {
         private TgcPlane floor;
         public List<Element> Elements { get; }
-
         private TGCVector3 size;
 
         static private TGCVector3 DefaultSize = new TGCVector3(1000, 1000, 1000);

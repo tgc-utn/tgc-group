@@ -106,5 +106,17 @@ namespace TGC.Group {
                 this["TexturaTierra"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("fish.jpg")]
+        public string TexturaFish {
+            get {
+                return ((string)(this["TexturaFish"]));
+            }
+            set {
+                this["TexturaFish"] = value;
+            }
+        }
     }
 }
