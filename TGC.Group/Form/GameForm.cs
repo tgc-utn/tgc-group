@@ -134,6 +134,7 @@ namespace TGC.Group.Form
                 // Process application messages.
                 Application.DoEvents();
             }
+            ShutDown();
         }
 
         /// <summary>
