@@ -179,6 +179,7 @@
   <ItemGroup>
     <Content Include="Media\cajaMadera4.jpg" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
+    <Content Include="res\subnautica-portada.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
