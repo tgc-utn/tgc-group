@@ -11,6 +11,10 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using System.Collections.Generic;
 using System;
+using TGC.Group.Model.Scenes;
+using TGC.Core.Text;
+using TGC.Group.Form;
+using System.Windows.Forms;
 
 namespace TGC.Group.Model
 {
@@ -22,6 +26,21 @@ namespace TGC.Group.Model
     /// </summary>
     public class GameModel : TgcExample
     {
+        private Scene _scene = null;
+        private Scene Scene
+        {
+            set
+            {
+                if(_scene != null)
+                {
+                    _scene.Dispose();
+                }
+                _scene = value;
+                Camara = _scene.Camera;
+            }
+            get { return _scene; }
+        }
+
         /// <summary>
         ///     Constructor del juego.
         /// </summary>
@@ -29,135 +48,46 @@ namespace TGC.Group.Model
         /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
-            Console.WriteLine("Mediadir: "+mediaDir);
+            Console.WriteLine("Mediadir: " + mediaDir);
             Category = Game.Default.Category;
             Name = Game.Default.Name;
             Description = Game.Default.Description;
         }
 
-        //Caja que se muestra en el ejemplo.
-        private Element Box { get; set; }
-
-        //Mesh de TgcLogo.
-        private Element TgcLogo { get; set; }
-
-        //Boleano para ver si dibujamos el boundingbox
-        private bool BoundingBox { get; set; }
-
-        //Scenary
-        private Scenary Scenary { get; set; }
-
-        /// <summary>
-        ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
-        ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
-        ///     procesamiento que podemos pre calcular para nuestro juego.
-        ///     Borrar el codigo ejemplo no utilizado.
-        /// </summary>
-        /// 
-
         public override void Init()
         {
-            //Device de DirectX para crear primitivas.
-            var d3dDevice = D3DDevice.Instance.Device;
-
-            //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
-            //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
-            var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
-
-            //Cargamos una textura, tener en cuenta que cargar una textura significa crear una copia en memoria.
-            //Es importante cargar texturas en Init, si se hace en el render loop podemos tener grandes problemas si instanciamos muchas.
-            var texture = TgcTexture.createTexture(pathTexturaCaja);
-
-            //Creamos una caja 3D ubicada de dimensiones (5, 10, 5) y la textura como color.
-            var size = new TGCVector3(5, 10, 5);
-            //Construimos una caja según los parámetros, por defecto la misma se crea con centro en el origen y se recomienda así para facilitar las transformaciones.
-            //Posición donde quiero que este la caja, es común que se utilicen estructuras internas para las transformaciones.
-            //Entonces actualizamos la posición lógica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
-            Box = new Element(new TGCVector3(-25, 0, 0), TGCBox.fromSize(size, texture).ToMesh("caja"));
-
-            //Cargo el unico mesh que tiene la escena.
-            TgcMesh Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
-            //Defino una escala en el modelo logico del mesh que es muy grande.
-            Mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
-
-            TgcLogo = new Element(TGCVector3.Empty, Mesh);
-
-            Camara = new  Camera(new TGCVector3(30, 30, 200), Input);
-
-            //Internamente el framework construye la matriz de view con estos dos vectores.
-            //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
-            this.Scenary = new Scenary(new TGCVector3(0,0,0));
+            //note(fede): Only at this point the Input field has been initialized by the form
+            Scene = new StartMenu(Input)
+                .onGameStart(() => {
+                    Scene = new GameScene(Input, MediaDir);
+                })
+                .onGameExit(() => {
+                    GameForm.Stop();
+                    Application.Exit();
+                });
         }
-
-        /// <summary>
-        ///     Se llama en cada frame.
-        ///     Se debe escribir toda la lógica de computo del modelo, así como también verificar entradas del usuario y reacciones
-        ///     ante ellas.
-        /// </summary>
-        /// 
-
-        private Dictionary<Key,System.Action> actionByKey = new Dictionary<Key, System.Action>();
-        
 
         public override void Update()
         {
             PreUpdate();
 
-            CollisionManager.CheckCollitions(this.Scenary.GetCollisionables());
-
-            this.Scenary.Update();
-
-            //Capturar Input teclado
-            if (Input.keyPressed(Key.F))
-            {
-                BoundingBox = !BoundingBox;
-            }
+            Scene.Update();
 
             PostUpdate();
         }
 
-        /// <summary>
-        ///     Se llama cada vez que hay que refrescar la pantalla.
-        ///     Escribir aquí todo el código referido al renderizado.
-        ///     Borrar todo lo que no haga falta.
-        /// </summary>
         public override void Render()
         {
-            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            //Dibuja un texto por pantalla
-            DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
-            DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.OrangeRed);
+            Scene.Render();
 
-            //Render del mesh
-            Box.Render();
-            TgcLogo.Render();
-            Scenary.Render();
-
-            //Render de BoundingBox, muy útil para debug de colisiones.
-            if (BoundingBox)
-            {
-                Box.getCollisionVolume().Render();
-                TgcLogo.getCollisionVolume().Render();
-            }
-
-            //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
         }
 
-        /// <summary>
-        ///     Se llama cuando termina la ejecución del ejemplo.
-        ///     Hacer Dispose() de todos los objetos creados.
-        ///     Es muy importante liberar los recursos, sobretodo los gráficos ya que quedan bloqueados en el device de video.
-        /// </summary>
         public override void Dispose()
         {
-            this.Scenary.Dispose();
-            //Dispose de la caja.
-            Box.Dispose();
-            //Dispose del mesh.
-            TgcLogo.Dispose();
+            Scene.Dispose();
         }
     }
 }
