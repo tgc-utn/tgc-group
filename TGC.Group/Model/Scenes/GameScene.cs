@@ -90,7 +90,6 @@ namespace TGC.Group.Model.Scenes
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (BoundingBox)
             {
-                DrawText.drawText("Tu mamá", 300, 300, Color.Violet);
                 Box.getCollisionVolume().Render();
                 TgcLogo.getCollisionVolume().Render();
             }
