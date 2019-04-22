@@ -28,12 +28,12 @@ namespace TGC.Group.Form
         /// <summary>
         ///     Ejemplo del juego a correr
         /// </summary>
-        private TgcExample Modelo { get; set; }
+        private static TgcExample Modelo { get; set; }
 
         /// <summary>
         ///     Obtener o parar el estado del RenderLoop.
         /// </summary>
-        private bool ApplicationRunning { get; set; }
+        private static bool ApplicationRunning { get; set; }
 
         /// <summary>
         ///     Permite manejar el sonido.
@@ -182,7 +182,7 @@ namespace TGC.Group.Form
         /// <summary>
         ///     Deja de ejecutar el ejemplo actual
         /// </summary>
-        public void StopCurrentExample()
+        public static void StopCurrentExample()
         {
             if (Modelo != null)
             {
@@ -194,7 +194,7 @@ namespace TGC.Group.Form
         /// <summary>
         ///     Finalizar aplicacion
         /// </summary>
-        public void ShutDown()
+        public static void ShutDown()
         {
             ApplicationRunning = false;
 
@@ -203,6 +203,10 @@ namespace TGC.Group.Form
             //Liberar Device al finalizar la aplicacion
             D3DDevice.Instance.Dispose();
             TexturesPool.Instance.clearAll();
+        }
+        public static void Stop()
+        {
+            ApplicationRunning = false;
         }
     }
 }

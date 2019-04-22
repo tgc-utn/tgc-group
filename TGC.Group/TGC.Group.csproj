@@ -96,9 +96,15 @@
     <Compile Include="Model\Chunk.cs" />
     <Compile Include="Model\Collisionable.cs" />
     <Compile Include="Model\CollisionManager.cs" />
+    <Compile Include="TGCUtils\CustomBitmap.cs" />
+    <Compile Include="TGCUtils\CustomSprite.cs" />
+    <Compile Include="TGCUtils\Drawer2D.cs" />
     <Compile Include="Model\Element.cs" />
     <Compile Include="Model\Entity.cs" />
     <Compile Include="Model\Camera.cs" />
+    <Compile Include="Model\Scenes\GameScene.cs" />
+    <Compile Include="Model\Scenes\Scene.cs" />
+    <Compile Include="Model\Scenes\StartMenu.cs" />
     <Compile Include="Model\Scenary.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Program.cs" />
@@ -173,6 +179,7 @@
   <ItemGroup>
     <Content Include="Media\cajaMadera4.jpg" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
+    <Content Include="res\subnautica-portada.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
