@@ -37,7 +37,11 @@ namespace TGC.Group.Model
             topMaxPoint = new TGCVector3(this.size.X, this.size.Y, origin.Z);
 
             //TODO borrar esto
+            var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
             List<Element> tmp = new List<Element>();
+            var texture = TgcTexture.createTexture(pathTexturaCaja);
+            var Box = new Element(new TGCVector3(-25, 0, 0), TGCBox.fromSize(size, texture).ToMesh("caja"));
+
             tmp.Add();
 
             this.elements.AddRange(Segment.GenerateOf(origin, maxPoint, 10, new List<Element>()));
