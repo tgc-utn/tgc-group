@@ -1,7 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)"
-              GeneratedClassNamespace="TGC.Group" GeneratedClassName="Game">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TGC.Group" GeneratedClassName="Game">
   <Profiles />
   <Settings>
     <Setting Name="Category" Type="System.String" Scope="User">
@@ -14,10 +12,10 @@
       <Value Profile="(Default)">Mi idea - Descripción de la idea</Value>
     </Setting>
     <Setting Name="ShadersDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)">..\..\Shaders\</Value>
+      <Value Profile="(Default)">..\..\..\Shaders\</Value>
     </Setting>
     <Setting Name="MediaDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)">..\..\Media\</Value>
+      <Value Profile="(Default)">..\..\..\Media\</Value>
     </Setting>
     <Setting Name="TexturaCaja" Type="System.String" Scope="User">
       <Value Profile="(Default)">cajaMadera4.jpg</Value>
