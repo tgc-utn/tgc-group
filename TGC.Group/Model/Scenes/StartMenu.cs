@@ -21,7 +21,7 @@ namespace TGC.Group.Model.Scenes
         private Callback onGameStartCallback = () => {}, onGameExitCallback = () => {};
 
         TgcText2D DrawTextBig = new TgcText2D(), DrawTextSmall = new TgcText2D();
-        Drawer2D drawer = new Drawer2D();
+        Drawer2D drawer;
         CustomSprite sprite;
         private double x = 600;
         private int yBase = 600;
@@ -31,6 +31,8 @@ namespace TGC.Group.Model.Scenes
 
             DrawTextBig.changeFont(new Font("Arial Black", 40f));
             DrawTextSmall.changeFont(new Font("Arial Black", 25f));
+
+            drawer = new Drawer2D();
             sprite = new CustomSprite();
 
             sprite.Bitmap = new CustomBitmap("../../res/subnautica-portada.png", D3DDevice.Instance.Device);

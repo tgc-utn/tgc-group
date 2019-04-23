@@ -33,6 +33,9 @@ namespace TGC.Group.Model.Scenes
 
         private Dictionary<Key, System.Action> actionByKey = new Dictionary<Key, System.Action>();
 
+        public delegate void Callback();
+        Callback onEscapeCallback = () => {};
+
         public GameScene(TgcD3dInput Input, string MediaDir) : base(Input)
         {
             this.Scenary = new Scenary(new TGCVector3(0, 0, 0));
@@ -75,6 +78,10 @@ namespace TGC.Group.Model.Scenes
             {
                 BoundingBox = !BoundingBox;
             }
+            if (Input.keyPressed(Key.Escape))
+            {
+                onEscapeCallback();
+            }
         }
         public override void Render()
         {
@@ -101,6 +108,13 @@ namespace TGC.Group.Model.Scenes
             Box.Dispose();
             //Dispose del mesh.
             TgcLogo.Dispose();
+        }
+
+
+        public GameScene onEscape(Callback onEscapeCallback)
+        {
+            this.onEscapeCallback = onEscapeCallback;
+            return this;
         }
     }
 }

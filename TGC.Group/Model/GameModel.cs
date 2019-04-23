@@ -26,20 +26,50 @@ namespace TGC.Group.Model
     /// </summary>
     public class GameModel : TgcExample
     {
-        private Scene _scene = null;
-        private Scene Scene
+        private GameScene _gameScene;
+        private GameScene GameScene
+        {
+            get
+            {
+                return _gameScene ??
+                    new GameScene(Input, MediaDir)
+                    .onEscape(() => {
+                        newScene = StartMenu;
+                    });
+            }
+            set
+            {
+                if (_gameScene  != null) _gameScene.Dispose();
+
+                _gameScene = value;
+            }
+        }
+        private StartMenu _startMenu;
+        private StartMenu StartMenu
+        {
+            get // Call this getter only from Init() onwards
+            {
+                return _startMenu;
+            }
+            set
+            {
+                if (_startMenu != null) _startMenu.Dispose();
+                _startMenu = value;
+            }
+        }
+
+        private Scene _curentScene = null;
+        private Scene CurrentScene
         {
             set
             {
-                if(_scene != null)
-                {
-                    _scene.Dispose();
-                }
-                _scene = value;
-                Camara = _scene.Camera;
+                _curentScene = value;
+                Camara = _curentScene.Camera;
             }
-            get { return _scene; }
+            get { return _curentScene; }
         }
+
+        private Scene newScene;
 
         /// <summary>
         ///     Constructor del juego.
@@ -57,21 +87,24 @@ namespace TGC.Group.Model
         public override void Init()
         {
             //note(fede): Only at this point the Input field has been initialized by the form
-            Scene = new StartMenu(Input)
-                .onGameStart(() => {
-                    Scene = new GameScene(Input, MediaDir);
-                })
-                .onGameExit(() => {
-                    GameForm.Stop();
-                    Application.Exit();
-                });
+            _startMenu = new StartMenu(Input)
+                    .onGameStart(() => {
+                        newScene = GameScene;
+                    })
+                    .onGameExit(() => {
+                        GameForm.Stop();
+                        Application.Exit();
+                    });
+            CurrentScene = StartMenu;
         }
 
         public override void Update()
         {
+            ChangeSceneIfNecessary();
+
             PreUpdate();
 
-            Scene.Update();
+            CurrentScene.Update();
 
             PostUpdate();
         }
@@ -80,14 +113,20 @@ namespace TGC.Group.Model
         {
             PreRender();
 
-            Scene.Render();
+            CurrentScene.Render();
 
             PostRender();
         }
 
         public override void Dispose()
         {
-            Scene.Dispose();
+            CurrentScene.Dispose();
+        }
+
+        private void ChangeSceneIfNecessary()
+        {
+            if (newScene != null) CurrentScene = newScene;
+            newScene = null;
         }
     }
 }
