@@ -11,19 +11,34 @@ namespace TGC.Group.Model
     class Chunk
     {
         private TgcPlane floor;
-        public List<Element> Elements { get; }
         private TGCVector3 size;
+        private List<Element> elements;
 
         static private TGCVector3 DefaultSize = new TGCVector3(1000, 1000, 1000);
         static private TGCVector3 DefaultFloorSize = new TGCVector3(1000, 0, 1000);
 
 
         public Chunk(TGCVector3 origin)
-        { 
+        {
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, Game.Default.MediaDirectory + Game.Default.TexturaTierra);
             this.floor = new TgcPlane(origin, DefaultSize, Orientations.XZplane, pisoTexture);
-            this.Elements = new List<Element>(); //rand
             this.size = DefaultSize;
+            this.elements = new List<Element>();
+
+            TGCVector3 floorOrigin, mediumOrigin, topOrigin, maxPoint, mediumMaxPoint, topMaxPoint;
+            int boxQuantity;
+
+            floorOrigin = origin;
+            mediumOrigin = new TGCVector3(origin.X, this.size.Y / 3, origin.Z);
+            topOrigin = new TGCVector3(origin.X, 2 * this.size.Y / 3, origin.Z);
+
+            maxPoint = new TGCVector3(this.size.X, this.size.Y/3, origin.Z);
+            mediumMaxPoint = new TGCVector3(this.size.X, 2*this.size.Y / 3, origin.Z);
+            topMaxPoint = new TGCVector3(this.size.X, this.size.Y, origin.Z);
+
+            this.elements.Add(Segment.GenerateOf(origin, maxPoint, 10, new List<Element>()));
+            this.elements.Add(Segment.GenerateOf(mediumOrigin, mediumMaxPoint, 10, new List<Element>()));
+            this.elements.Add(Segment.GenerateOf(topOrigin, topMaxPoint, 10, new List<Element>()));
         }
 
         public List<Entity> Init()

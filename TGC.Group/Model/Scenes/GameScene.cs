@@ -92,6 +92,10 @@ namespace TGC.Group.Model.Scenes
             {
                 Box.getCollisionVolume().Render();
                 TgcLogo.getCollisionVolume().Render();
+                DrawText.drawText("Pmin: "+ Box.getCollisionVolume().PMin.ToString(), 0, 40, Color.White);
+                DrawText.drawText("Pmax: " + Box.getCollisionVolume().PMax.ToString(), 0, 90, Color.White);
+                DrawText.drawText("Position: " + Box.getCollisionVolume().Position.ToString(), 0, 140, Color.White);
+                Box.getCollisionVolume().PMax.ToString();
             }
         }
 
