@@ -36,9 +36,13 @@ namespace TGC.Group.Model
             mediumMaxPoint = new TGCVector3(this.size.X, 2*this.size.Y / 3, origin.Z);
             topMaxPoint = new TGCVector3(this.size.X, this.size.Y, origin.Z);
 
-            this.elements.Add(Segment.GenerateOf(origin, maxPoint, 10, new List<Element>()));
-            this.elements.Add(Segment.GenerateOf(mediumOrigin, mediumMaxPoint, 10, new List<Element>()));
-            this.elements.Add(Segment.GenerateOf(topOrigin, topMaxPoint, 10, new List<Element>()));
+            //TODO borrar esto
+            List<Element> tmp = new List<Element>();
+            tmp.Add();
+
+            this.elements.AddRange(Segment.GenerateOf(origin, maxPoint, 10, new List<Element>()));
+            this.elements.AddRange(Segment.GenerateOf(mediumOrigin, mediumMaxPoint, 10, new List<Element>()));
+            this.elements.AddRange(Segment.GenerateOf(topOrigin, topMaxPoint, 10, new List<Element>()));
         }
 
         public List<Entity> Init()

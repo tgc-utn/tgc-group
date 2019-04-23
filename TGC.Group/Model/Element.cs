@@ -8,12 +8,18 @@ namespace TGC.Group.Model
 {
     class Element : Collisionable
     {
-        TgcMesh model;
+        public TgcMesh model { get; set; }
+
 
         public Element(TGCVector3 origin, TgcMesh model)
         {
             this.model = model;
             model.Position = origin;
+        }
+
+        public Element(TGCVector3 origin, TgcMesh model, TGCVector3 scale) : this(origin,model)
+        {
+            this.model.Scale = scale;
         }
 
         public void Update()
