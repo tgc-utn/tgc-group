@@ -52,6 +52,11 @@ namespace TGC.Group.Model
 
         }
 
+        public void RenderBoundingBox()
+        {
+            this.chunks.ForEach(chunk => chunk.RenderBoundingBox());
+        }
+
         public void Dispose()
         {
             this.chunks.ForEach(chunk => chunk.Dispose());

@@ -8,18 +8,18 @@ namespace TGC.Group.Model
 {
     class Element : Collisionable
     {
-        public TgcMesh model { get; set; }
+        public TgcMesh Model { get; set; }
 
 
         public Element(TGCVector3 origin, TgcMesh model)
         {
-            this.model = model;
+            this.Model = model;
             model.Position = origin;
         }
 
         public Element(TGCVector3 origin, TgcMesh model, TGCVector3 scale) : this(origin,model)
         {
-            this.model.Scale = scale;
+            this.Model.Scale = scale;
         }
 
         public void Update()
@@ -31,20 +31,20 @@ namespace TGC.Group.Model
         {
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
             //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
-            model.UpdateMeshTransform();
-            model.Render();
+            Model.UpdateMeshTransform();
+            Model.Render();
             return;
         }
 
         public void Dispose()
         {
-            model.Dispose();
+            Model.Dispose();
             return;
         }
 
         public override TgcBoundingAxisAlignBox getCollisionVolume()
         {
-            return model.BoundingBox;
+            return Model.BoundingBox;
         }
     }
 }

@@ -2,55 +2,63 @@
 using System.Collections.Generic;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Mathematica;
+using TGC.Core.SceneLoader;
 
 namespace TGC.Group.Model
 {
     class Segment
     {
-        public static List<Element> GenerateOf(TGCVector3 origin, TGCVector3 maxPoint, int divisions, List<Element> elements)
+        public static List<Element> GenerateOf(TGCVector3 origin, TGCVector3 maxPoint, int divisions, List<Element> list)
         {
-            float x, minY, maxY, z, i, j;
+            float x, y, yy, z, xx, zz;
+            y = origin.Y;
+            yy = maxPoint.Y;
 
-            x = origin.X;
-            minY = origin.Y;
-            maxY = maxPoint.Y;
+            var boundingBoxes = new List<TgcBoundingAxisAlignBox>();
+            TgcBoundingAxisAlignBox newBox;
+
             z = origin.Z;
-
-            List<TgcBoundingAxisAlignBox> res = new List<TgcBoundingAxisAlignBox>();
-
-            for (i=1; i<=divisions; i++)
+            for (int i=1; i<= divisions; i++)
             {
-                for(j = 1; j<=divisions; j++)
+                x = origin.X;
+                zz = i * maxPoint.Z / divisions;
+                for (int j = 1; j <= divisions; j++)
                 {
-                    res.Add(new TgcBoundingAxisAlignBox(new TGCVector3(x, minY, z), new TGCVector3(x, maxY, z)));
-                    x = x + (j * maxPoint.X / divisions);
+                    xx = j * maxPoint.X / divisions;
+                    newBox = new TgcBoundingAxisAlignBox(new TGCVector3(x, y, z), new TGCVector3(xx , yy, zz));
+                    boundingBoxes.Add(newBox);
+                    x = xx;
                 }
-                z = z + (i * maxPoint.Z / divisions);
+                z = zz;
             }
 
-            //TODO hacerlo bien
-            Element lala = elements.Find(element=>true);
+            var box = list.Find(id => true);
 
-            TgcBoundingAxisAlignBox lili, lele = lala.getCollisionVolume();
-            lili = res.Find(element => true);
+            var res = new List<Element>();
 
-            List<Element> realRes = new List<Element>();
-            foreach(var el in res)
+            foreach(var aBox in boundingBoxes.GetRange(0,1))
             {
-                float xx, yy, zz;
-                TGCVector3 max;
-                xx = lele.PMax.X - lele.PMin.X;
-                yy = lele.PMax.Y - lele.PMin.Y;
-                zz = lele.PMax.Z - lele.PMin.Z;
+                var model = box.Model.clone("box");
+                var boundingModel = model.createBoundingBox();
 
-                max = new TGCVector3(el.PMin.X + xx, el.PMin.Y + yy, el.PMin.Z + zz);
+                TGCVector3 absoluteMax, newMax, scale;
 
-                Element toAdd = new Element(el.PMin, lala.model, new TGCVector3(el.PMax.X / max.X, el.PMax.Y / max.Y, el.PMax.Z / max.Z));
+                absoluteMax = boundingModel.PMax - boundingModel.PMin;
+                newMax = aBox.PMin + absoluteMax;
+                scale = new TGCVector3(
+                    (aBox.PMax.X - aBox.PMin.X) / absoluteMax.X,
+                    (aBox.PMax.Y - aBox.PMin.Y) / absoluteMax.Y,
+                    (aBox.PMax.Z - aBox.PMin.Z) / absoluteMax.Z);
 
-                realRes.Add(toAdd);
+                model.Scale = scale;
+                model.updateBoundingBox();
+                res.Add(new Element(
+                    new TGCVector3(aBox.PMin.X + aBox.PMin.X/2,
+                    aBox.PMin.Y + aBox.PMin.Y / 2,
+                    aBox.PMin.Z + aBox.PMin.Z / 2), model));
             }
 
-            return realRes;
+            return res;
         }
     }
 }

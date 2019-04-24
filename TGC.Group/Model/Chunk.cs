@@ -12,7 +12,7 @@ namespace TGC.Group.Model
     {
         private TgcPlane floor;
         private TGCVector3 size;
-        private List<Element> elements;
+        public List<Element> Elements { get; set; }
 
         static private TGCVector3 DefaultSize = new TGCVector3(1000, 1000, 1000);
         static private TGCVector3 DefaultFloorSize = new TGCVector3(1000, 0, 1000);
@@ -23,30 +23,31 @@ namespace TGC.Group.Model
             var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, Game.Default.MediaDirectory + Game.Default.TexturaTierra);
             this.floor = new TgcPlane(origin, DefaultSize, Orientations.XZplane, pisoTexture);
             this.size = DefaultSize;
-            this.elements = new List<Element>();
+            this.Elements = new List<Element>();
 
             TGCVector3 floorOrigin, mediumOrigin, topOrigin, maxPoint, mediumMaxPoint, topMaxPoint;
-            int boxQuantity;
+            int divisions = 10;
 
             floorOrigin = origin;
             mediumOrigin = new TGCVector3(origin.X, this.size.Y / 3, origin.Z);
             topOrigin = new TGCVector3(origin.X, 2 * this.size.Y / 3, origin.Z);
 
-            maxPoint = new TGCVector3(this.size.X, this.size.Y/3, origin.Z);
-            mediumMaxPoint = new TGCVector3(this.size.X, 2*this.size.Y / 3, origin.Z);
-            topMaxPoint = new TGCVector3(this.size.X, this.size.Y, origin.Z);
+            maxPoint = new TGCVector3(this.size.X, this.size.Y/3, this.size.Z);
+            mediumMaxPoint = new TGCVector3(this.size.X, 2*this.size.Y / 3, this.size.Z);
+            topMaxPoint = new TGCVector3(this.size.X, this.size.Y, this.size.Z);
 
             //TODO borrar esto
-            var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
+            var pathTexturaCaja = Game.Default.MediaDirectory + Game.Default.TexturaCaja;
             List<Element> tmp = new List<Element>();
             var texture = TgcTexture.createTexture(pathTexturaCaja);
             var Box = new Element(new TGCVector3(-25, 0, 0), TGCBox.fromSize(size, texture).ToMesh("caja"));
 
-            tmp.Add();
+            tmp.Add(Box);
+            //-----------------
 
-            this.elements.AddRange(Segment.GenerateOf(origin, maxPoint, 10, new List<Element>()));
-            this.elements.AddRange(Segment.GenerateOf(mediumOrigin, mediumMaxPoint, 10, new List<Element>()));
-            this.elements.AddRange(Segment.GenerateOf(topOrigin, topMaxPoint, 10, new List<Element>()));
+            this.Elements.AddRange(Segment.GenerateOf(floorOrigin, maxPoint, divisions, tmp));
+            this.Elements.AddRange(Segment.GenerateOf(mediumOrigin, mediumMaxPoint, divisions, tmp));
+            this.Elements.AddRange(Segment.GenerateOf(topOrigin, topMaxPoint, divisions, tmp));
         }
 
         public List<Entity> Init()
@@ -64,6 +65,11 @@ namespace TGC.Group.Model
             this.floor.updateValues();
             this.floor.Render();
             this.Elements.ForEach(element => element.Render());
+        }
+
+        public void RenderBoundingBox()
+        {
+            this.Elements.ForEach(element => element.getCollisionVolume().Render());
         }
 
         public void Dispose()

@@ -96,6 +96,7 @@ namespace TGC.Group.Model.Scenes
                 DrawText.drawText("Pmax: " + Box.getCollisionVolume().PMax.ToString(), 0, 90, Color.White);
                 DrawText.drawText("Position: " + Box.getCollisionVolume().Position.ToString(), 0, 140, Color.White);
                 Box.getCollisionVolume().PMax.ToString();
+                Scenary.RenderBoundingBox();
             }
         }
 
