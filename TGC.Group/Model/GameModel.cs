@@ -26,37 +26,8 @@ namespace TGC.Group.Model
     /// </summary>
     public class GameModel : TgcExample
     {
-        private GameScene _gameScene;
-        private GameScene GameScene
-        {
-            get
-            {
-                return _gameScene ??
-                    new GameScene(Input, MediaDir)
-                    .onEscape(() => {
-                        newScene = StartMenu;
-                    });
-            }
-            set
-            {
-                if (_gameScene  != null) _gameScene.Dispose();
-
-                _gameScene = value;
-            }
-        }
-        private StartMenu _startMenu;
-        private StartMenu StartMenu
-        {
-            get // Call this getter only from Init() onwards
-            {
-                return _startMenu;
-            }
-            set
-            {
-                if (_startMenu != null) _startMenu.Dispose();
-                _startMenu = value;
-            }
-        }
+        private GameScene gameScene;
+        private StartMenu startMenu;
 
         private Scene _curentScene = null;
         private Scene CurrentScene
@@ -69,7 +40,7 @@ namespace TGC.Group.Model
             get { return _curentScene; }
         }
 
-        private Scene newScene;
+        private Scene brandNewScene;
 
         /// <summary>
         ///     Constructor del juego.
@@ -87,15 +58,16 @@ namespace TGC.Group.Model
         public override void Init()
         {
             //note(fede): Only at this point the Input field has been initialized by the form
-            _startMenu = new StartMenu(Input)
-                    .onGameStart(() => {
-                        newScene = GameScene;
-                    })
-                    .onGameExit(() => {
-                        GameForm.Stop();
-                        Application.Exit();
-                    });
-            CurrentScene = StartMenu;
+            startMenu =
+                new StartMenu(Input)
+                    .onGameStart(() => SetNewScene(gameScene))
+                    .onGameExit(StopGame);
+
+            gameScene =
+                new GameScene(Input, MediaDir)
+                    .OnEscape(() => SetNewScene(startMenu));
+
+            SetNewScene(startMenu);
         }
 
         public override void Update()
@@ -125,8 +97,23 @@ namespace TGC.Group.Model
 
         private void ChangeSceneIfNecessary()
         {
-            if (newScene != null) CurrentScene = newScene;
-            newScene = null;
+            if (brandNewScene != null) CurrentScene = brandNewScene;
+            brandNewScene = null;
+        }
+
+        /**
+         * This methods anounces the INTENTION of changing the current scene, but doesn't actually changes it
+         * The ChangeSceneIfNecessary() method will change the scene at a safe time
+         */
+        private void SetNewScene(Scene newScene)
+        {
+            brandNewScene = newScene;
+        }
+
+        private void StopGame()
+        {
+            GameForm.Stop();
+            Application.Exit();
         }
     }
 }

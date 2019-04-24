@@ -111,7 +111,7 @@ namespace TGC.Group.Model.Scenes
         }
 
 
-        public GameScene onEscape(Callback onEscapeCallback)
+        public GameScene OnEscape(Callback onEscapeCallback)
         {
             this.onEscapeCallback = onEscapeCallback;
             return this;
