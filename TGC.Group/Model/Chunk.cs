@@ -5,6 +5,7 @@ using static TGC.Core.Geometry.TgcPlane;
 using TGC.Core.Mathematica;
 using TGC.Core.Textures;
 using TGC.Core.Direct3D;
+using TGC.Core.SceneLoader;
 
 namespace TGC.Group.Model
 {
@@ -24,25 +25,27 @@ namespace TGC.Group.Model
             this.floor = new TgcPlane(origin, DefaultSize, Orientations.XZplane, pisoTexture);
             this.size = DefaultSize;
             this.Elements = new List<Element>();
+            var max = origin + size;
 
             TGCVector3 floorOrigin, mediumOrigin, topOrigin, maxPoint, mediumMaxPoint, topMaxPoint;
             int divisions = 10;
 
             floorOrigin = origin;
-            mediumOrigin = new TGCVector3(origin.X, this.size.Y / 3, origin.Z);
-            topOrigin = new TGCVector3(origin.X, 2 * this.size.Y / 3, origin.Z);
+            mediumOrigin = new TGCVector3(origin.X, max.Y / 3, origin.Z);
+            topOrigin = new TGCVector3(origin.X, 2 * max.Y / 3, origin.Z);
 
-            maxPoint = new TGCVector3(this.size.X, this.size.Y/3, this.size.Z);
-            mediumMaxPoint = new TGCVector3(this.size.X, 2*this.size.Y / 3, this.size.Z);
-            topMaxPoint = new TGCVector3(this.size.X, this.size.Y, this.size.Z);
+            maxPoint = new TGCVector3(max.X, max.Y/3, max.Z);
+            mediumMaxPoint = new TGCVector3(max.X, 2* max.Y/ 3, max.Z);
+            topMaxPoint = new TGCVector3(max.X, max.Y, max.Z);
 
             //TODO borrar esto
-            var pathTexturaCaja = Game.Default.MediaDirectory + Game.Default.TexturaCaja;
+            //var pathTexturaCaja = Game.Default.MediaDirectory + Game.Default.TexturaCaja;
+            //var texture = TgcTexture.createTexture(pathTexturaCaja);
+            //var Box = new Element(new TGCVector3(-25, 0, 0), TGCBox.fromSize(size, texture).ToMesh("caja"));
             List<Element> tmp = new List<Element>();
-            var texture = TgcTexture.createTexture(pathTexturaCaja);
-            var Box = new Element(new TGCVector3(-25, 0, 0), TGCBox.fromSize(size, texture).ToMesh("caja"));
+            TgcMesh Mesh = new TgcSceneLoader().loadSceneFromFile(Game.Default.MediaDirectory + "LogoTGC-TgcScene.xml").Meshes[0];
 
-            tmp.Add(Box);
+            tmp.Add(new Element(new TGCVector3(-25, 0, 0),Mesh));
             //-----------------
 
             this.Elements.AddRange(Segment.GenerateOf(floorOrigin, maxPoint, divisions, tmp));

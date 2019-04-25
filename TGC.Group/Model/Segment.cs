@@ -10,55 +10,62 @@ namespace TGC.Group.Model
     {
         public static List<Element> GenerateOf(TGCVector3 origin, TGCVector3 maxPoint, int divisions, List<Element> list)
         {
-            float x, y, yy, z, xx, zz;
+            var mesh = list.Find(id => true).Mesh; //TODO elements for generate
+
+            return GenerateScaleBoxes(origin, maxPoint, divisions)
+                .ConvertAll(scaleBox => ScaleMesh(scaleBox, mesh))
+                .ConvertAll(scaledMesh => new Element(scaledMesh.Position, scaledMesh));
+        }
+
+        private static List<TgcBoundingAxisAlignBox> GenerateScaleBoxes(TGCVector3 origin, TGCVector3 maxPoint, int divisions)
+        {
+            float x, y, z, xx, yy, zz, zIncrement, xIncrement;
+            var scaleBoxes = new List<TgcBoundingAxisAlignBox>();
+
             y = origin.Y;
             yy = maxPoint.Y;
 
-            var boundingBoxes = new List<TgcBoundingAxisAlignBox>();
-            TgcBoundingAxisAlignBox newBox;
+            zIncrement = (maxPoint.Z - origin.Z) / divisions;
+            xIncrement = (maxPoint.X - origin.X) / divisions;
 
             z = origin.Z;
-            for (int i=1; i<= divisions; i++)
+            for (int i = 1; i <= divisions; i++)
             {
                 x = origin.X;
-                zz = i * maxPoint.Z / divisions;
+                zz = origin.Z + i * zIncrement;
                 for (int j = 1; j <= divisions; j++)
                 {
-                    xx = j * maxPoint.X / divisions;
-                    newBox = new TgcBoundingAxisAlignBox(new TGCVector3(x, y, z), new TGCVector3(xx , yy, zz));
-                    boundingBoxes.Add(newBox);
+                    xx = origin.X + j * xIncrement;
+                    scaleBoxes.Add(new TgcBoundingAxisAlignBox(new TGCVector3(x, y, z), new TGCVector3(xx, yy, zz)));
                     x = xx;
                 }
                 z = zz;
             }
 
-            var box = list.Find(id => true);
+            return scaleBoxes;
+        }
 
-            var res = new List<Element>();
+        private static TgcMesh ScaleMesh(TgcBoundingAxisAlignBox scaleBox, TgcMesh mesh)
+        {
+            var newMesh = mesh.clone(mesh.Name);
+            var boundingBox = newMesh.BoundingBox ?? newMesh.createBoundingBox();
 
-            foreach(var aBox in boundingBoxes.GetRange(0,1))
-            {
-                var model = box.Model.clone("box");
-                var boundingModel = model.createBoundingBox();
+            newMesh.Scale = ScaleOfBoxToBox(boundingBox, scaleBox);
+            newMesh.Position = scaleBox.PMin;
 
-                TGCVector3 absoluteMax, newMax, scale;
+            newMesh.updateBoundingBox();
+            return newMesh;
+        }
 
-                absoluteMax = boundingModel.PMax - boundingModel.PMin;
-                newMax = aBox.PMin + absoluteMax;
-                scale = new TGCVector3(
-                    (aBox.PMax.X - aBox.PMin.X) / absoluteMax.X,
-                    (aBox.PMax.Y - aBox.PMin.Y) / absoluteMax.Y,
-                    (aBox.PMax.Z - aBox.PMin.Z) / absoluteMax.Z);
+        private static TGCVector3 ScaleOfBoxToBox(TgcBoundingAxisAlignBox boundingBox, TgcBoundingAxisAlignBox scaleBox)
+        {
+            var boundingBoxMax = boundingBox.PMax - boundingBox.PMin;
+            var scaleBoxMax = scaleBox.PMax - scaleBox.PMin;
 
-                model.Scale = scale;
-                model.updateBoundingBox();
-                res.Add(new Element(
-                    new TGCVector3(aBox.PMin.X + aBox.PMin.X/2,
-                    aBox.PMin.Y + aBox.PMin.Y / 2,
-                    aBox.PMin.Z + aBox.PMin.Z / 2), model));
-            }
-
-            return res;
+            return new TGCVector3(
+                scaleBoxMax.X / boundingBoxMax.X,
+                scaleBoxMax.Y / boundingBoxMax.Y,
+                scaleBoxMax.Z / boundingBoxMax.Z);
         }
     }
 }

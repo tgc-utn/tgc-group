@@ -16,6 +16,8 @@ namespace TGC.Group.Model
         {
             this.chunks = new List<Chunk>();
             this.chunks.Add(new Chunk(initialPoint));
+            this.chunks.Add(new Chunk(new TGCVector3(1000,0,0)));
+
 
             this.entities = new List<Entity>();
 
