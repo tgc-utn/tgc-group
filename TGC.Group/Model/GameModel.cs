@@ -28,6 +28,7 @@ namespace TGC.Group.Model
     {
         private GameScene gameScene;
         private StartMenu startMenu;
+        private PauseMenu pauseMenu;
 
         private Scene _curentScene = null;
         private Scene CurrentScene
@@ -58,14 +59,19 @@ namespace TGC.Group.Model
         public override void Init()
         {
             //note(fede): Only at this point the Input field has been initialized by the form
-            startMenu =
-                new StartMenu(Input)
+
+            startMenu = new StartMenu(Input)
                     .onGameStart(() => SetNewScene(gameScene))
                     .onGameExit(StopGame);
 
-            gameScene =
-                new GameScene(Input, MediaDir)
-                    .OnEscape(() => SetNewScene(startMenu));
+            pauseMenu = new PauseMenu(Input)
+                .OnGoToStartMenu(() => {
+                    CreateNewGameScene();
+                    SetNewScene(startMenu);
+                })
+                .OnReturnToGame(() => SetNewScene(gameScene));
+
+            CreateNewGameScene();
 
             SetNewScene(startMenu);
         }
@@ -114,6 +120,12 @@ namespace TGC.Group.Model
         {
             GameForm.Stop();
             Application.Exit();
+        }
+
+        private void CreateNewGameScene()
+        {
+            gameScene = new GameScene(Input, MediaDir)
+                    .OnEscape(() => SetNewScene(pauseMenu));
         }
     }
 }
