@@ -15,9 +15,7 @@ namespace TGC.Group.Model
         private TGCVector3 size;
         public List<Element> Elements { get; set; }
 
-        static private TGCVector3 DefaultSize = new TGCVector3(1000, 1000, 1000);
-        static private TGCVector3 DefaultFloorSize = new TGCVector3(1000, 0, 1000);
-
+        static public TGCVector3 DefaultSize { get; } = new TGCVector3(1000, 1000, 1000);
 
         public Chunk(TGCVector3 origin)
         {
@@ -28,7 +26,7 @@ namespace TGC.Group.Model
             var max = origin + size;
 
             TGCVector3 floorOrigin, mediumOrigin, topOrigin, maxPoint, mediumMaxPoint, topMaxPoint;
-            int divisions = 10;
+            int divisions = 8;
 
             floorOrigin = origin;
             mediumOrigin = new TGCVector3(origin.X, max.Y / 3, origin.Z);
