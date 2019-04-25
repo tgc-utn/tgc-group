@@ -84,8 +84,8 @@ namespace TGC.Group.Model.Scenes
             }
             if (Input.keyPressed(Key.Escape))
             {
-                Surface backBuffer = D3DDevice.Instance.Device.GetBackBuffer(0, 0, BackBufferType.Mono);
-                onEscapeCallback(backBuffer);
+                //Surface backBuffer = D3DDevice.Instance.Device.GetBackBuffer(0, 0, BackBufferType.Mono);
+                onEscapeCallback(null);
             }
         }
         public override void Render()

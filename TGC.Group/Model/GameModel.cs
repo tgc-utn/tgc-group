@@ -127,7 +127,11 @@ namespace TGC.Group.Model
         private void CreateNewGameScene()
         {
             gameScene = new GameScene(Input, MediaDir)
-                    .OnEscape((backBuffer) => SetNewScene(pauseMenu.WithBackBufferData(backBuffer)));
+                    .OnEscape((backBuffer) => SetNewScene(
+                        pauseMenu.WithPreRender(() => {
+                            Camara = gameScene.Camera;
+                            gameScene.Render();
+                        })));
         }
     }
 }
