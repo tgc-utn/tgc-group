@@ -84,7 +84,10 @@ namespace TGC.Group.Model
 
             CurrentScene.Update();
 
-            PostUpdate();
+            if(CurrentScene.Uses3DCamera)
+            {
+                PostUpdate();
+            }
         }
 
         public override void Render()
@@ -129,7 +132,6 @@ namespace TGC.Group.Model
             gameScene = new GameScene(Input, MediaDir)
                     .OnEscape((backBuffer) => SetNewScene(
                         pauseMenu.WithPreRender(() => {
-                            Camara = gameScene.Camera;
                             gameScene.Render();
                         })));
         }

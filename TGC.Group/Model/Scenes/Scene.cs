@@ -10,6 +10,8 @@ namespace TGC.Group.Model.Scenes
 {
     abstract class Scene
     {
+        protected bool _uses3DCamera = true;
+        public bool Uses3DCamera { get { return _uses3DCamera; } }
         private TgcCamera _camera = null;
         public TgcCamera Camera
         {
