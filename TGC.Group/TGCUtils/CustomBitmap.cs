@@ -18,6 +18,17 @@ namespace TGC.Group.TGCUtils
                 throw new Exception(string.Format("Error at loading texture: {0}", filePath));
             }
         }
+        public CustomBitmap(Texture texture)
+        {
+            try
+            {
+                D3dTexture = texture;
+            }
+            catch
+            {
+                throw new Exception("Error at creating CustomBitmap from texture");
+            }
+        }
 
         #region Miembros de IDisposable
 

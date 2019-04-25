@@ -6,6 +6,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.Text;
 using System;
 using TGC.Group.TGCUtils;
+using Microsoft.DirectX.Direct3D;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -29,8 +30,8 @@ namespace TGC.Group.Model.Scenes
         public StartMenu(TgcD3dInput Input) : base(Input)
         {
 
-            DrawTextBig.changeFont(new Font("Arial Black", 40f));
-            DrawTextSmall.changeFont(new Font("Arial Black", 25f));
+            DrawTextBig.changeFont(new System.Drawing.Font("Arial Black", 40f));
+            DrawTextSmall.changeFont(new System.Drawing.Font("Arial Black", 25f));
 
             drawer = new Drawer2D();
             sprite = new CustomSprite();
@@ -49,6 +50,8 @@ namespace TGC.Group.Model.Scenes
         }
         override public void Render()
         {
+            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Blue, 1.0f, 0);
+
             drawer.BeginDrawSprite();
             drawer.DrawSprite(sprite);
             drawer.EndDrawSprite();

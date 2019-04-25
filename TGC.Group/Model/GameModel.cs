@@ -89,7 +89,9 @@ namespace TGC.Group.Model
 
         public override void Render()
         {
-            PreRender();
+            //PreRender();
+            D3DDevice.Instance.Device.BeginScene();
+            TexturesManager.Instance.clearAll();
 
             CurrentScene.Render();
 
@@ -125,7 +127,7 @@ namespace TGC.Group.Model
         private void CreateNewGameScene()
         {
             gameScene = new GameScene(Input, MediaDir)
-                    .OnEscape(() => SetNewScene(pauseMenu));
+                    .OnEscape((backBuffer) => SetNewScene(pauseMenu.WithBackBufferData(backBuffer)));
         }
     }
 }
