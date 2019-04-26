@@ -67,12 +67,12 @@ namespace TGC.Group.Model
 
             pauseMenu = new PauseMenu(Input)
                 .OnGoToStartMenu(() => {
-                    CreateNewGameScene();
+                    ResetGame();
                     SetNextScene(startMenu);
                 })
                 .OnReturnToGame(() => SetNextScene(gameScene));
 
-            CreateNewGameScene();
+            ResetGame();
 
             SetNextScene(startMenu);
         }
@@ -125,7 +125,7 @@ namespace TGC.Group.Model
             Application.Exit();
         }
 
-        private void CreateNewGameScene()
+        private void ResetGame()
         {
             gameScene = new GameScene(Input, MediaDir)
                     .OnEscape(() => SetNextScene(
