@@ -9,15 +9,23 @@ namespace TGC.Group.Model
 {
     internal class World
     {
-        private readonly List<Chunk> chunks;
-        private readonly List<Entity> entities;
+        private List<Chunk> chunks;
+        private List<Entity> entities;
 
         public World(TGCVector3 initialPoint)
         {
+            //TODO generation conditions and algorithm
             this.chunks = new List<Chunk>
             {
                 new Chunk(initialPoint), 
-                new Chunk(new TGCVector3(Chunk.DefaultSize.X, 0, 0))
+                new Chunk(new TGCVector3(Chunk.DefaultSize.X, 0, 0)),
+                new Chunk(new TGCVector3(Chunk.DefaultSize.X*2, 0, 0)),
+                new Chunk(new TGCVector3(0, 0, Chunk.DefaultSize.Z)),
+                new Chunk(new TGCVector3(0, 0, Chunk.DefaultSize.Z*2)),
+                new Chunk(new TGCVector3(Chunk.DefaultSize.X, 0, Chunk.DefaultSize.Z)),
+                new Chunk(new TGCVector3(Chunk.DefaultSize.X*2, 0, Chunk.DefaultSize.Z)),
+                new Chunk(new TGCVector3(Chunk.DefaultSize.X, 0, Chunk.DefaultSize.Z*2)),
+                new Chunk(new TGCVector3(Chunk.DefaultSize.X*2, 0, Chunk.DefaultSize.Z*2))
             };
 
             this.entities = new List<Entity>();

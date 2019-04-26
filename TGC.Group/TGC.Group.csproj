@@ -104,9 +104,12 @@
     <Compile Include="Model\Chunk.cs" />
     <Compile Include="Model\Collisionable.cs" />
     <Compile Include="Model\CollisionManager.cs" />
+    <Compile Include="Model\Resources\Meshes\CoralMeshes.cs" />
+    <Compile Include="Model\Resources\Meshes\FishMeshes.cs" />
     <Compile Include="Model\Segment.cs" />
     <Compile Include="Model\Utils\Cube.cs" />
     <Compile Include="Model\Scenes\PauseMenu.cs" />
+    <Compile Include="Model\Utils\SpamRate.cs" />
     <Compile Include="TGCUtils\CustomBitmap.cs" />
     <Compile Include="TGCUtils\CustomSprite.cs" />
     <Compile Include="TGCUtils\Drawer2D.cs" />

@@ -7,18 +7,42 @@ using TGC.Group.Model.Utils;
 
 namespace TGC.Group.Model
 {
-    internal static class Segment
+    internal class Segment
     {
-        public static IEnumerable<Element> GenerateOf(TGCVector3 origin, TGCVector3 maxPoint, int divisions, List<Element> list)
-        {
-            var mesh = list.Find(id => true).Mesh; //TODO elements for generate
+        private readonly Cube cube;
 
-            return GenerateScaleBoxes(origin, maxPoint, divisions)
-                .ConvertAll(scaleBox => ScaleMesh(scaleBox, mesh))
-                .ConvertAll(scaledMesh => new Element(scaledMesh.Position, scaledMesh));
+        private Segment(Cube cube)
+        {
+            this.cube = cube;
         }
 
-        private static List<Cube> GenerateScaleBoxes(TGCVector3 origin, TGCVector3 maxPoint, int divisions)
+        public IEnumerable<Element> GenerateElements(int divisions, SpamRate spamRate, List<Element> list)
+        {
+            var random = new Random();
+
+            return GenerateCubes(this.cube.PMin, this.cube.PMax, divisions)
+                .FindAll(scaleBox => spamRate.spam())
+                .ConvertAll(scaleBox => ScaleMesh(scaleBox,list[random.Next(list.Count)].Mesh))
+                .ConvertAll(scaledMesh => new Element(scaledMesh));
+        }
+
+        public static List<Segment> GenerateSegments(TGCVector3 pMin, TGCVector3 pMax, int quantity)
+        {
+            var res = new List<Segment>();
+
+            for (var i = 0; i < quantity; i++)
+            {
+                var cube = new Cube(
+                    new TGCVector3(pMin.X, pMin.Y + pMax.Y * i / quantity, pMin.Z),
+                    new TGCVector3(pMax.X, pMin.Y + pMax.Y * (i + 1) / quantity, pMax.Z));
+                
+                res.Add(new Segment(cube));
+            }
+
+            return res;
+        }
+
+        private static List<Cube> GenerateCubes(TGCVector3 origin, TGCVector3 maxPoint, int divisions)
         {
             var scaleBoxes = new List<Cube>();
 
@@ -36,7 +60,7 @@ namespace TGC.Group.Model
                 for (var j = 1; j <= divisions; j++)
                 {
                     var xx = origin.X + j * xIncrement;
-                    scaleBoxes.Add(new Cube(new TGCVector3(x, y, z), new TGCVector3(xx, yy, zz)));
+                    scaleBoxes.Add(new Cube(new TGCVector3(x, y, z), new TGCVector3(xx, yy, zz)));                        
                     x = xx;
                 }
                 z = zz;
@@ -49,7 +73,8 @@ namespace TGC.Group.Model
         {
             var newMesh = mesh.clone(mesh.Name);
             var boundingBox = newMesh.BoundingBox ?? newMesh.createBoundingBox();
-
+            
+            newMesh.changeD3dMesh(mesh.D3dMesh);
             newMesh.Scale = ScaleOfBoxToBox(boundingBox, scaleCube);
             newMesh.Position = scaleCube.PMin;
 
