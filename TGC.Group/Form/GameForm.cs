@@ -99,7 +99,7 @@ namespace TGC.Group.Form
             var currentDirectory = Environment.CurrentDirectory + "\\";
 
             //Cargar shaders del framework
-            TgcShaders.Instance.loadCommonShaders(currentDirectory + Game.Default.ShadersDirectory);
+            TGCShaders.Instance.LoadCommonShaders(currentDirectory + Game.Default.ShadersDirectory, D3DDevice.Instance);
 
             //Juego a ejecutar, si quisiéramos tener diferentes modelos aquí podemos cambiar la instancia e invocar a otra clase.
             Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory,
