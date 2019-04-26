@@ -22,8 +22,6 @@ namespace TGC.Group.Model.Scenes
 {
     class GameScene : Scene
     {
-        private Color backgroundColor = Color.FromArgb(1, 78, 129, 179);
-
         TgcText2D DrawText = new TgcText2D();
         private Element Box { get; set; }
         private Element TgcLogo { get; set; }
@@ -41,6 +39,8 @@ namespace TGC.Group.Model.Scenes
 
         public GameScene(TgcD3dInput Input, string MediaDir) : base(Input)
         {
+            backgroundColor = Color.FromArgb(1, 78, 129, 179);
+
             this.Scenary = new Scenary(new TGCVector3(0, 0, 0));
 
             //Device de DirectX para crear primitivas.
@@ -83,13 +83,12 @@ namespace TGC.Group.Model.Scenes
             }
             if (Input.keyPressed(Key.Escape))
             {
-                //Surface backBuffer = D3DDevice.Instance.Device.GetBackBuffer(0, 0, BackBufferType.Mono);
                 onEscapeCallback();
             }
         }
         public override void Render()
         {
-            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, backgroundColor, 1.0f, 0);
+            ClearScreen();
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
             DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camera.Position), 0, 30, Color.OrangeRed);

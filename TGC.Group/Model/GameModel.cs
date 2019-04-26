@@ -37,11 +37,12 @@ namespace TGC.Group.Model
             {
                 _curentScene = value;
                 Camara = _curentScene.Camera;
+                nextScene = null;
             }
             get { return _curentScene; }
         }
 
-        private Scene brandNewScene;
+        private Scene nextScene;
 
         /// <summary>
         ///     Constructor del juego.
@@ -61,24 +62,24 @@ namespace TGC.Group.Model
             //note(fede): Only at this point the Input field has been initialized by the form
 
             startMenu = new StartMenu(Input)
-                    .onGameStart(() => SetNewScene(gameScene))
+                    .onGameStart(() => SetNextScene(gameScene))
                     .onGameExit(StopGame);
 
             pauseMenu = new PauseMenu(Input)
                 .OnGoToStartMenu(() => {
                     CreateNewGameScene();
-                    SetNewScene(startMenu);
+                    SetNextScene(startMenu);
                 })
-                .OnReturnToGame(() => SetNewScene(gameScene));
+                .OnReturnToGame(() => SetNextScene(gameScene));
 
             CreateNewGameScene();
 
-            SetNewScene(startMenu);
+            SetNextScene(startMenu);
         }
 
         public override void Update()
         {
-            ChangeSceneIfNecessary();
+            if (hasToChangeScene()) CurrentScene = nextScene;
 
             PreUpdate();
 
@@ -92,7 +93,6 @@ namespace TGC.Group.Model
 
         public override void Render()
         {
-            //PreRender();
             D3DDevice.Instance.Device.BeginScene();
             TexturesManager.Instance.clearAll();
 
@@ -101,24 +101,22 @@ namespace TGC.Group.Model
             PostRender();
         }
 
+        private bool hasToChangeScene() { return nextScene != null; }
+
         public override void Dispose()
         {
             CurrentScene.Dispose();
         }
 
-        private void ChangeSceneIfNecessary()
-        {
-            if (brandNewScene != null) CurrentScene = brandNewScene;
-            brandNewScene = null;
-        }
 
         /**
          * This methods anounces the INTENTION of changing the current scene, but doesn't actually changes it
-         * The ChangeSceneIfNecessary() method will change the scene at a safe time
+         * The ChangeScene() method will change the scene at a safe time and should not be called by any 
+         * other than the GameModel
          */
-        private void SetNewScene(Scene newScene)
+        private void SetNextScene(Scene newScene)
         {
-            brandNewScene = newScene;
+            nextScene = newScene;
         }
 
         private void StopGame()
@@ -130,7 +128,7 @@ namespace TGC.Group.Model
         private void CreateNewGameScene()
         {
             gameScene = new GameScene(Input, MediaDir)
-                    .OnEscape(() => SetNewScene(
+                    .OnEscape(() => SetNextScene(
                         pauseMenu.WithPreRender(gameScene.Render)
                     ));
         }

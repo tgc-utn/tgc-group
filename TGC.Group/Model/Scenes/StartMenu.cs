@@ -19,9 +19,8 @@ namespace TGC.Group.Model.Scenes
     class StartMenu : Scene
     {
         public delegate void Callback();
-        private Callback onGameStartCallback = () => {}, onGameExitCallback = () => {};
-
-        TgcText2D DrawTextBig = new TgcText2D(), DrawTextSmall = new TgcText2D();
+        private Callback onGameStartCallback, onGameExitCallback;
+        TgcText2D DrawTextBig, DrawTextSmall;
         Drawer2D drawer;
         CustomSprite sprite;
         private double x = 600;
@@ -29,6 +28,9 @@ namespace TGC.Group.Model.Scenes
         private Pointer pointer = Pointer.UP;
         public StartMenu(TgcD3dInput Input) : base(Input)
         {
+            onGameStartCallback = onGameExitCallback = () => {};
+            DrawTextBig = new TgcText2D();
+            DrawTextSmall = new TgcText2D();
 
             DrawTextBig.changeFont(new System.Drawing.Font("Arial Black", 40f));
             DrawTextSmall.changeFont(new System.Drawing.Font("Arial Black", 25f));
@@ -50,7 +52,7 @@ namespace TGC.Group.Model.Scenes
         }
         override public void Render()
         {
-            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Blue, 1.0f, 0);
+            ClearScreen();
 
             drawer.BeginDrawSprite();
             drawer.DrawSprite(sprite);
