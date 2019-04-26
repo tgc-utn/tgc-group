@@ -6,6 +6,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.Text;
 using System;
 using TGC.Group.TGCUtils;
+using Microsoft.DirectX.Direct3D;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -18,22 +19,26 @@ namespace TGC.Group.Model.Scenes
     class StartMenu : Scene
     {
         public delegate void Callback();
-        private Callback onGameStartCallback = () => {}, onGameExitCallback = () => {};
-
-        TgcText2D DrawTextBig = new TgcText2D(), DrawTextSmall = new TgcText2D();
-        Drawer2D drawer = new Drawer2D();
+        private Callback onGameStartCallback, onGameExitCallback;
+        TgcText2D DrawTextBig, DrawTextSmall;
+        Drawer2D drawer;
         CustomSprite sprite;
         private double x = 600;
         private int yBase = 600;
         private Pointer pointer = Pointer.UP;
         public StartMenu(TgcD3dInput Input) : base(Input)
         {
+            onGameStartCallback = onGameExitCallback = () => {};
+            DrawTextBig = new TgcText2D();
+            DrawTextSmall = new TgcText2D();
 
-            DrawTextBig.changeFont(new Font("Arial Black", 40f));
-            DrawTextSmall.changeFont(new Font("Arial Black", 25f));
+            DrawTextBig.changeFont(new System.Drawing.Font("Arial Black", 40f));
+            DrawTextSmall.changeFont(new System.Drawing.Font("Arial Black", 25f));
+
+            drawer = new Drawer2D();
             sprite = new CustomSprite();
 
-            sprite.Bitmap = new CustomBitmap("../../res/subnautica-portada.png", D3DDevice.Instance.Device);
+            sprite.Bitmap = new CustomBitmap("../../../res/subnautica-portada.png", D3DDevice.Instance.Device);
 
             float size = .3335f;
             sprite.Scaling = new TGCVector2(size, size);
@@ -41,12 +46,14 @@ namespace TGC.Group.Model.Scenes
 
         override public void Update()
         {
-            if (Input.keyDown(Key.DownArrow)) pointer = Pointer.DOWN;
-            if (Input.keyDown(Key.UpArrow)) pointer = Pointer.UP;
-            if (Input.keyDown(Key.Return)) fireAction();
+            if (Input.keyPressed(Key.DownArrow)) pointer = Pointer.DOWN;
+            if (Input.keyPressed(Key.UpArrow)) pointer = Pointer.UP;
+            if (Input.keyPressed(Key.Return)) fireAction();
         }
         override public void Render()
         {
+            ClearScreen();
+
             drawer.BeginDrawSprite();
             drawer.DrawSprite(sprite);
             drawer.EndDrawSprite();

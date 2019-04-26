@@ -16,6 +16,7 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Group.Model.Scenes;
 using TGC.Core.Camara;
+using Microsoft.DirectX.Direct3D;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -33,10 +34,15 @@ namespace TGC.Group.Model.Scenes
 
         private Dictionary<Key, System.Action> actionByKey = new Dictionary<Key, System.Action>();
 
+        public delegate void Callback();
+        Callback onEscapeCallback = () => {};
+
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         {
-            this.World = new World(new TGCVector3(0, 0, 0));
+            backgroundColor = Color.FromArgb(1, 78, 129, 179);
 
+            this.World = new World(new TGCVector3(0, 0, 0));
+            
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
@@ -75,9 +81,14 @@ namespace TGC.Group.Model.Scenes
             {
                 this.BoundingBox = !this.BoundingBox;
             }
+            if (Input.keyPressed(Key.Escape))
+            {
+                onEscapeCallback();
+            }
         }
         public override void Render()
         {
+            ClearScreen();
             //Dibuja un texto por pantalla
             this.DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
             this.DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(this.Camera.Position), 0, 30, Color.OrangeRed);
@@ -105,6 +116,13 @@ namespace TGC.Group.Model.Scenes
             this.Box.Dispose();
             //Dispose del mesh.
             this.TgcLogo.Dispose();
+        }
+
+
+        public GameScene OnEscape(Callback onEscapeCallback)
+        {
+            this.onEscapeCallback = onEscapeCallback;
+            return this;
         }
     }
 }

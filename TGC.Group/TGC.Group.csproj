@@ -106,6 +106,7 @@
     <Compile Include="Model\CollisionManager.cs" />
     <Compile Include="Model\Segment.cs" />
     <Compile Include="Model\Utils\Cube.cs" />
+    <Compile Include="Model\Scenes\PauseMenu.cs" />
     <Compile Include="TGCUtils\CustomBitmap.cs" />
     <Compile Include="TGCUtils\CustomSprite.cs" />
     <Compile Include="TGCUtils\Drawer2D.cs" />

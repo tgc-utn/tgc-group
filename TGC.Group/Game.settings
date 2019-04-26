@@ -12,10 +12,10 @@
       <Value Profile="(Default)">Copia de subnautica</Value>
     </Setting>
     <Setting Name="ShadersDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)">..\..\Shaders\</Value>
+      <Value Profile="(Default)">..\..\..\Shaders\</Value>
     </Setting>
     <Setting Name="MediaDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)">..\..\Media\</Value>
+      <Value Profile="(Default)">..\..\..\Media\</Value>
     </Setting>
     <Setting Name="TexturaCaja" Type="System.String" Scope="User">
       <Value Profile="(Default)">cajaMadera4.jpg</Value>
