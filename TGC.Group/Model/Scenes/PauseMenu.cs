@@ -42,6 +42,11 @@ namespace TGC.Group.Model.Scenes
                 Decide();
                 pointer = Pointer.UP;
             }
+            if (Input.keyPressed(Key.Escape))
+            {
+                onReturnToGameCallback();
+                pointer = Pointer.UP;
+            }
             if (Input.keyPressed(Key.UpArrow))
             {
                 pointer = Pointer.UP;
