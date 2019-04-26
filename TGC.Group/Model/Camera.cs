@@ -85,6 +85,11 @@ namespace TGC.Group.Model
             {
                 moveVector += new TGCVector3(1, 0, 0) * MovementSpeed;
             }
+            
+            if (Input.keyDown(Key.Space))
+            {
+                moveVector += new TGCVector3(0, 1, 0) * MovementSpeed;
+            }
 
             return moveVector;
         }

@@ -23,5 +23,8 @@
     <Setting Name="TexturaTierra" Type="System.String" Scope="User">
       <Value Profile="(Default)">tierra.jpg</Value>
     </Setting>
+    <Setting Name="TexturaFish" Type="System.String" Scope="User">
+      <Value Profile="(Default)">fish.jpg</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

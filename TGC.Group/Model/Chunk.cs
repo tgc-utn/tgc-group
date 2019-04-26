@@ -5,29 +5,44 @@ using static TGC.Core.Geometry.TgcPlane;
 using TGC.Core.Mathematica;
 using TGC.Core.Textures;
 using TGC.Core.Direct3D;
+using TGC.Core.SceneLoader;
+using TGC.Group.Model.Resources;
+using TGC.Group.Model.Resources.Meshes;
+using TGC.Group.Model.Utils;
 
 namespace TGC.Group.Model
 {
-    class Chunk
+    internal class Chunk
     {
-        private TgcPlane floor;
+        private readonly TgcPlane floor;
+        
+        private static readonly TgcTexture FloorTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, 
+            Game.Default.MediaDirectory + Game.Default.TexturaTierra);
         public List<Element> Elements { get; }
 
-        private TGCVector3 size;
-
-        static private TGCVector3 DefaultSize = new TGCVector3(1000, 1000, 1000);
-        static private TGCVector3 DefaultFloorSize = new TGCVector3(1000, 0, 1000);
-
+        public static TGCVector3 DefaultSize { get; } = new TGCVector3(2000, 2000, 2000);
 
         public Chunk(TGCVector3 origin)
-        { 
-            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, Game.Default.MediaDirectory + Game.Default.TexturaTierra);
-            this.floor = new TgcPlane(origin, DefaultSize, Orientations.XZplane, pisoTexture);
-            this.Elements = new List<Element>(); //rand
-            this.size = DefaultSize;
+        {
+            var max = origin + DefaultSize;
+
+            var segments = Segment.GenerateSegments(origin, max, 3);
+
+            var divisions = (int) (DefaultSize.X / 100);
+
+            var fishes = FishMeshes.All().ConvertAll(x => new Element(x));
+            var coralElements = CoralMeshes.All().ConvertAll(x => new Element(x));
+
+            this.Elements = new List<Element>();
+            
+            this.Elements.AddRange(segments[0].GenerateElements(divisions/2, SpawnRate.of(1,10), coralElements));
+            this.Elements.AddRange(segments[1].GenerateElements(divisions/2, SpawnRate.of(1,100), fishes));
+            this.Elements.AddRange(segments[2].GenerateElements(divisions/2, SpawnRate.of(1,100), fishes));
+            
+            this.floor = new TgcPlane(origin, DefaultSize, Orientations.XZplane, FloorTexture);
         }
 
-        public List<Entity> Init()
+        public IEnumerable<Entity> Init()
         {
             return new List<Entity>();
         }
@@ -42,6 +57,11 @@ namespace TGC.Group.Model
             this.floor.updateValues();
             this.floor.Render();
             this.Elements.ForEach(element => element.Render());
+        }
+
+        public void RenderBoundingBox()
+        {
+            this.Elements.ForEach(element => element.getCollisionVolume().Render());
         }
 
         public void Dispose()
