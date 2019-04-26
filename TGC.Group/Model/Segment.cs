@@ -32,11 +32,11 @@ namespace TGC.Group.Model
 
             var yStep = (pMax.Y - pMin.Y) / quantity;
 
-            for (var i = 0; i < quantity; i++)
+            for (var yDelta = 0; yDelta < quantity; yDelta++)
             {
                 var cube = new Cube(
-                    new TGCVector3(pMin.X, pMin.Y + i * yStep, pMin.Z),
-                    new TGCVector3(pMax.X, pMin.Y + (i+1) * yStep, pMax.Z));
+                    new TGCVector3(pMin.X, pMin.Y + yDelta * yStep, pMin.Z),
+                    new TGCVector3(pMax.X, pMin.Y + (yDelta+1) * yStep, pMax.Z));
                 
                 res.Add(new Segment(cube));
             }
