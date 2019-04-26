@@ -51,14 +51,14 @@ namespace TGC.Group.Model
             var xStep = (maxPoint.X - origin.X) / divisions;
             var zStep = (maxPoint.Z - origin.Z) / divisions;
 
-            for (var i = 0; i < divisions; i++)
+            for (var zDelta = 0; zDelta < divisions; zDelta++)
             {
-                for (var j = 0; j < divisions; j++)
+                for (var xDelta = 0; xDelta < divisions; xDelta++)
                 {
                     res.Add(
                         new Cube(
-                            new TGCVector3(origin.X + j * xStep, origin.Y, origin.Z + i * zStep), 
-                            new TGCVector3(origin.X + (j+1) * xStep, maxPoint.Y, origin.Z + (i+1) * zStep)));                        
+                            new TGCVector3(origin.X + xDelta * xStep, origin.Y, origin.Z + zDelta * zStep), 
+                            new TGCVector3(origin.X + (xDelta+1) * xStep, maxPoint.Y, origin.Z + (zDelta+1) * zStep)));                        
                 }
             }
 
