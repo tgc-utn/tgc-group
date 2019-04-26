@@ -35,9 +35,9 @@ namespace TGC.Group.Model
 
             this.Elements = new List<Element>();
             
-            this.Elements.AddRange(segments[0].GenerateElements(divisions/2, SpamRate.of(1,10), coralElements));
-            this.Elements.AddRange(segments[1].GenerateElements(divisions/2, SpamRate.of(1,100), fishes));
-            this.Elements.AddRange(segments[2].GenerateElements(divisions/2, SpamRate.of(1,100), fishes));
+            this.Elements.AddRange(segments[0].GenerateElements(divisions/2, SpawnRate.of(1,10), coralElements));
+            this.Elements.AddRange(segments[1].GenerateElements(divisions/2, SpawnRate.of(1,100), fishes));
+            this.Elements.AddRange(segments[2].GenerateElements(divisions/2, SpawnRate.of(1,100), fishes));
             
             this.floor = new TgcPlane(origin, DefaultSize, Orientations.XZplane, FloorTexture);
         }

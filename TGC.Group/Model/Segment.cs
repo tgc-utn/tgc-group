@@ -16,12 +16,12 @@ namespace TGC.Group.Model
             this.cube = cube;
         }
 
-        public IEnumerable<Element> GenerateElements(int divisions, SpamRate spamRate, List<Element> list)
+        public IEnumerable<Element> GenerateElements(int divisions, SpawnRate spawnRate, List<Element> list)
         {
             var random = new Random();
 
             return GenerateCubes(this.cube.PMin, this.cube.PMax, divisions)
-                .FindAll(scaleBox => spamRate.spam())
+                .FindAll(scaleBox => spawnRate.hasToSpawn())
                 .ConvertAll(scaleBox => ScaleMesh(scaleBox,list[random.Next(list.Count)].Mesh))
                 .ConvertAll(scaledMesh => new Element(scaledMesh));
         }
@@ -30,13 +30,13 @@ namespace TGC.Group.Model
         {
             var res = new List<Segment>();
 
-            var yIncrement = (pMax.Y - pMin.Y) / quantity;
+            var yStep = (pMax.Y - pMin.Y) / quantity;
 
             for (var i = 0; i < quantity; i++)
             {
                 var cube = new Cube(
-                    new TGCVector3(pMin.X, pMin.Y + i * yIncrement, pMin.Z),
-                    new TGCVector3(pMax.X, pMin.Y + (i+1) * yIncrement, pMax.Z));
+                    new TGCVector3(pMin.X, pMin.Y + i * yStep, pMin.Z),
+                    new TGCVector3(pMax.X, pMin.Y + (i+1) * yStep, pMax.Z));
                 
                 res.Add(new Segment(cube));
             }
@@ -47,9 +47,9 @@ namespace TGC.Group.Model
         private static List<Cube> GenerateCubes(TGCVector3 origin, TGCVector3 maxPoint, int divisions)
         {
             var res = new List<Cube>();
-            
-            var zIncrement = (maxPoint.Z - origin.Z) / divisions;
-            var xIncrement = (maxPoint.X - origin.X) / divisions;
+
+            var xStep = (maxPoint.X - origin.X) / divisions;
+            var zStep = (maxPoint.Z - origin.Z) / divisions;
 
             for (var i = 0; i < divisions; i++)
             {
@@ -57,8 +57,8 @@ namespace TGC.Group.Model
                 {
                     res.Add(
                         new Cube(
-                            new TGCVector3(origin.X + j * xIncrement, origin.Y, origin.Z + i * zIncrement), 
-                            new TGCVector3(origin.X + (j+1) * xIncrement, maxPoint.Y, origin.Z + (i+1) * zIncrement)));                        
+                            new TGCVector3(origin.X + j * xStep, origin.Y, origin.Z + i * zStep), 
+                            new TGCVector3(origin.X + (j+1) * xStep, maxPoint.Y, origin.Z + (i+1) * zStep)));                        
                 }
             }
 
