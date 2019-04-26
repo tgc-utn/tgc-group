@@ -9,41 +9,41 @@ using TGC.Core.SceneLoader;
 
 namespace TGC.Group.Model
 {
-    class Chunk
+    internal class Chunk
     {
-        private TgcPlane floor;
-        private TGCVector3 size;
-        public List<Element> Elements { get; set; }
+        private readonly TgcPlane floor;
+        private readonly TGCVector3 size;
+        public List<Element> Elements { get; }
 
-        static public TGCVector3 DefaultSize { get; } = new TGCVector3(1000, 1000, 1000);
+        public static TGCVector3 DefaultSize { get; } = new TGCVector3(1000, 1000, 1000);
 
         public Chunk(TGCVector3 origin)
         {
-            var pisoTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, Game.Default.MediaDirectory + Game.Default.TexturaTierra);
-            this.floor = new TgcPlane(origin, DefaultSize, Orientations.XZplane, pisoTexture);
+            var floorTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, 
+                Game.Default.MediaDirectory + Game.Default.TexturaTierra);
+            this.floor = new TgcPlane(origin, DefaultSize, Orientations.XZplane, floorTexture);
             this.size = DefaultSize;
             this.Elements = new List<Element>();
-            var max = origin + size;
+            var max = origin + this.size;
 
-            TGCVector3 floorOrigin, mediumOrigin, topOrigin, maxPoint, mediumMaxPoint, topMaxPoint;
-            int divisions = 8;
+            const int divisions = 8;
 
-            floorOrigin = origin;
-            mediumOrigin = new TGCVector3(origin.X, max.Y / 3, origin.Z);
-            topOrigin = new TGCVector3(origin.X, 2 * max.Y / 3, origin.Z);
+            var floorOrigin = origin;
+            var mediumOrigin = new TGCVector3(origin.X, max.Y / 3, origin.Z);
+            var topOrigin = new TGCVector3(origin.X, 2 * max.Y / 3, origin.Z);
 
-            maxPoint = new TGCVector3(max.X, max.Y/3, max.Z);
-            mediumMaxPoint = new TGCVector3(max.X, 2* max.Y/ 3, max.Z);
-            topMaxPoint = new TGCVector3(max.X, max.Y, max.Z);
+            var maxPoint = new TGCVector3(max.X, max.Y/3, max.Z);
+            var mediumMaxPoint = new TGCVector3(max.X, 2* max.Y/ 3, max.Z);
+            var topMaxPoint = new TGCVector3(max.X, max.Y, max.Z);
 
             //TODO borrar esto
             //var pathTexturaCaja = Game.Default.MediaDirectory + Game.Default.TexturaCaja;
             //var texture = TgcTexture.createTexture(pathTexturaCaja);
             //var Box = new Element(new TGCVector3(-25, 0, 0), TGCBox.fromSize(size, texture).ToMesh("caja"));
-            List<Element> tmp = new List<Element>();
-            TgcMesh Mesh = new TgcSceneLoader().loadSceneFromFile(Game.Default.MediaDirectory + "LogoTGC-TgcScene.xml").Meshes[0];
+            var tmp = new List<Element>();
+            TgcMesh mesh = new TgcSceneLoader().loadSceneFromFile(Game.Default.MediaDirectory + "LogoTGC-TgcScene.xml").Meshes[0];
 
-            tmp.Add(new Element(new TGCVector3(-25, 0, 0),Mesh));
+            tmp.Add(new Element(new TGCVector3(-25, 0, 0),mesh));
             //-----------------
 
             this.Elements.AddRange(Segment.GenerateOf(floorOrigin, maxPoint, divisions, tmp));
@@ -51,7 +51,7 @@ namespace TGC.Group.Model
             this.Elements.AddRange(Segment.GenerateOf(topOrigin, topMaxPoint, divisions, tmp));
         }
 
-        public List<Entity> Init()
+        public IEnumerable<Entity> Init()
         {
             return new List<Entity>();
         }

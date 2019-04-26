@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Group.Model.Utils;
 
 namespace TGC.Group.Model
 {
-    class Segment
+    internal static class Segment
     {
-        public static List<Element> GenerateOf(TGCVector3 origin, TGCVector3 maxPoint, int divisions, List<Element> list)
+        public static IEnumerable<Element> GenerateOf(TGCVector3 origin, TGCVector3 maxPoint, int divisions, List<Element> list)
         {
             var mesh = list.Find(id => true).Mesh; //TODO elements for generate
 
@@ -17,26 +18,25 @@ namespace TGC.Group.Model
                 .ConvertAll(scaledMesh => new Element(scaledMesh.Position, scaledMesh));
         }
 
-        private static List<TgcBoundingAxisAlignBox> GenerateScaleBoxes(TGCVector3 origin, TGCVector3 maxPoint, int divisions)
+        private static List<Cube> GenerateScaleBoxes(TGCVector3 origin, TGCVector3 maxPoint, int divisions)
         {
-            float x, y, z, xx, yy, zz, zIncrement, xIncrement;
-            var scaleBoxes = new List<TgcBoundingAxisAlignBox>();
+            var scaleBoxes = new List<Cube>();
 
-            y = origin.Y;
-            yy = maxPoint.Y;
+            var y = origin.Y;
+            var yy = maxPoint.Y;
 
-            zIncrement = (maxPoint.Z - origin.Z) / divisions;
-            xIncrement = (maxPoint.X - origin.X) / divisions;
+            var zIncrement = (maxPoint.Z - origin.Z) / divisions;
+            var xIncrement = (maxPoint.X - origin.X) / divisions;
 
-            z = origin.Z;
-            for (int i = 1; i <= divisions; i++)
+            var z = origin.Z;
+            for (var i = 1; i <= divisions; i++)
             {
-                x = origin.X;
-                zz = origin.Z + i * zIncrement;
-                for (int j = 1; j <= divisions; j++)
+                var x = origin.X;
+                var zz = origin.Z + i * zIncrement;
+                for (var j = 1; j <= divisions; j++)
                 {
-                    xx = origin.X + j * xIncrement;
-                    scaleBoxes.Add(new TgcBoundingAxisAlignBox(new TGCVector3(x, y, z), new TGCVector3(xx, yy, zz)));
+                    var xx = origin.X + j * xIncrement;
+                    scaleBoxes.Add(new Cube(new TGCVector3(x, y, z), new TGCVector3(xx, yy, zz)));
                     x = xx;
                 }
                 z = zz;
@@ -45,22 +45,22 @@ namespace TGC.Group.Model
             return scaleBoxes;
         }
 
-        private static TgcMesh ScaleMesh(TgcBoundingAxisAlignBox scaleBox, TgcMesh mesh)
+        private static TgcMesh ScaleMesh(Cube scaleCube, TgcMesh mesh)
         {
             var newMesh = mesh.clone(mesh.Name);
             var boundingBox = newMesh.BoundingBox ?? newMesh.createBoundingBox();
 
-            newMesh.Scale = ScaleOfBoxToBox(boundingBox, scaleBox);
-            newMesh.Position = scaleBox.PMin;
+            newMesh.Scale = ScaleOfBoxToBox(boundingBox, scaleCube);
+            newMesh.Position = scaleCube.PMin;
 
             newMesh.updateBoundingBox();
             return newMesh;
         }
 
-        private static TGCVector3 ScaleOfBoxToBox(TgcBoundingAxisAlignBox boundingBox, TgcBoundingAxisAlignBox scaleBox)
+        private static TGCVector3 ScaleOfBoxToBox(TgcBoundingAxisAlignBox boundingBox, Cube scaleCube)
         {
             var boundingBoxMax = boundingBox.PMax - boundingBox.PMin;
-            var scaleBoxMax = scaleBox.PMax - scaleBox.PMin;
+            var scaleBoxMax = scaleCube.PMax - scaleCube.PMin;
 
             return new TGCVector3(
                 scaleBoxMax.X / boundingBoxMax.X,

@@ -22,27 +22,27 @@ namespace TGC.Group.Model.Scenes
     class GameScene : Scene
     {
         TgcText2D DrawText = new TgcText2D();
-        private Element Box { get; set; }
-        private Element TgcLogo { get; set; }
+        private Element Box { get; }
+        private Element TgcLogo { get; }
 
         //Scenary
-        private Scenary Scenary { get; set; }
+        private World World { get; }
 
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
 
         private Dictionary<Key, System.Action> actionByKey = new Dictionary<Key, System.Action>();
 
-        public GameScene(TgcD3dInput Input, string MediaDir) : base(Input)
+        public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         {
-            this.Scenary = new Scenary(new TGCVector3(0, 0, 0));
+            this.World = new World(new TGCVector3(0, 0, 0));
 
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
-            var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
+            var pathTexturaCaja = mediaDir + Game.Default.TexturaCaja;
 
             //Cargamos una textura, tener en cuenta que cargar una textura significa crear una copia en memoria.
             //Es importante cargar texturas en Init, si se hace en el render loop podemos tener grandes problemas si instanciamos muchas.
@@ -56,56 +56,55 @@ namespace TGC.Group.Model.Scenes
             Box = new Element(new TGCVector3(-25, 0, 0), TGCBox.fromSize(size, texture).ToMesh("caja"));
 
             //Cargo el unico mesh que tiene la escena.
-            TgcMesh Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
+            TgcMesh Mesh = new TgcSceneLoader().loadSceneFromFile(mediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
             //Defino una escala en el modelo logico del mesh que es muy grande.
             Mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
 
-            TgcLogo = new Element(TGCVector3.Empty, Mesh);
+            this.TgcLogo = new Element(TGCVector3.Empty, Mesh);
 
-            this.Camera = new Camera(new TGCVector3(30, 30, 200), Input);
+            this.Camera = new Camera(new TGCVector3(30, 30, 200), input);
         }
 
         public override void Update()
         {
-            CollisionManager.CheckCollitions(this.Scenary.GetCollisionables());
+            CollisionManager.CheckCollitions(this.World.GetCollisionables());
 
-            this.Scenary.Update();
+            this.World.Update();
             //Capturar Input teclado
-            if (Input.keyPressed(Key.F))
+            if (this.Input.keyPressed(Key.F))
             {
-                BoundingBox = !BoundingBox;
+                this.BoundingBox = !this.BoundingBox;
             }
         }
         public override void Render()
         {
             //Dibuja un texto por pantalla
-            DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
-            DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camera.Position), 0, 30, Color.OrangeRed);
+            this.DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
+            this.DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(this.Camera.Position), 0, 30, Color.OrangeRed);
 
             //Render del mesh
-            Box.Render();
-            TgcLogo.Render();
-            Scenary.Render();
+            this.Box.Render();
+            this.TgcLogo.Render();
+            this.World.Render();
 
             //Render de BoundingBox, muy útil para debug de colisiones.
-            if (BoundingBox)
-            {
-                Box.getCollisionVolume().Render();
-                TgcLogo.getCollisionVolume().Render();
-                DrawText.drawText("Pmin: "+ Box.getCollisionVolume().PMin.ToString(), 0, 40, Color.White);
-                DrawText.drawText("Pmax: " + Box.getCollisionVolume().PMax.ToString(), 0, 90, Color.White);
-                DrawText.drawText("Position: " + Box.getCollisionVolume().Position.ToString(), 0, 140, Color.White);
-                Box.getCollisionVolume().PMax.ToString();
-                Scenary.RenderBoundingBox();
+            if (this.BoundingBox) {
+                this.Box.getCollisionVolume().Render();
+                this.TgcLogo.getCollisionVolume().Render();
+                this.DrawText.drawText("Pmin: "+ this.Box.getCollisionVolume().PMin.ToString(), 0, 40, Color.White);
+                this.DrawText.drawText("Pmax: " + this.Box.getCollisionVolume().PMax.ToString(), 0, 90, Color.White);
+                this.DrawText.drawText("Position: " + this.Box.getCollisionVolume().Position.ToString(), 0, 140, Color.White);
+                this.Box.getCollisionVolume().PMax.ToString();
+                this.World.RenderBoundingBox();
             }
         }
 
         public override void Dispose()
         {
             //Dispose de la caja.
-            Box.Dispose();
+            this.Box.Dispose();
             //Dispose del mesh.
-            TgcLogo.Dispose();
+            this.TgcLogo.Dispose();
         }
     }
 }

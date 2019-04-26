@@ -55,8 +55,9 @@
     <StartupObject>TGC.Group.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BulletSharp, Version=0.10.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\BulletSharp.0.10\lib\net40-client\BulletSharp.dll</HintPath>
+    <Reference Include="BulletSharp, Version=0.11.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\BulletSharp.0.11.1\lib\net40-client\BulletSharp.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.DirectX, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <SpecificVersion>False</SpecificVersion>
@@ -77,8 +78,9 @@
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="TGC.Core, Version=2.3.3.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="TGC.Core, Version=2.3.3.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\TGC.Core.2.3.3\lib\net471\TGC.Core.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +99,7 @@
     <Compile Include="Model\Collisionable.cs" />
     <Compile Include="Model\CollisionManager.cs" />
     <Compile Include="Model\Segment.cs" />
+    <Compile Include="Model\Utils\Cube.cs" />
     <Compile Include="TGCUtils\CustomBitmap.cs" />
     <Compile Include="TGCUtils\CustomSprite.cs" />
     <Compile Include="TGCUtils\Drawer2D.cs" />
@@ -106,7 +109,7 @@
     <Compile Include="Model\Scenes\GameScene.cs" />
     <Compile Include="Model\Scenes\Scene.cs" />
     <Compile Include="Model\Scenes\StartMenu.cs" />
-    <Compile Include="Model\Scenary.cs" />
+    <Compile Include="Model\World.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -187,12 +190,12 @@
     <PreBuildEvent>
     </PreBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\BulletSharp.0.10\build\net40-client\BulletSharp.targets" Condition="Exists('..\packages\BulletSharp.0.10\build\net40-client\BulletSharp.targets')" />
+  <Import Project="..\packages\BulletSharp.0.11.1\build\net40-client\BulletSharp.targets" Condition="Exists('..\packages\BulletSharp.0.11.1\build\net40-client\BulletSharp.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>Este proyecto hace referencia a los paquetes NuGet que faltan en este equipo. Use la restauración de paquetes NuGet para descargarlos. Para obtener más información, consulte http://go.microsoft.com/fwlink/?LinkID=322105. El archivo que falta es {0}.</ErrorText>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\BulletSharp.0.10\build\net40-client\BulletSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BulletSharp.0.10\build\net40-client\BulletSharp.targets'))" />
+    <Error Condition="!Exists('..\packages\BulletSharp.0.11.1\build\net40-client\BulletSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\BulletSharp.0.11.1\build\net40-client\BulletSharp.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

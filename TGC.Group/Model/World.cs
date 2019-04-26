@@ -7,23 +7,24 @@ using TGC.Core.Mathematica;
 
 namespace TGC.Group.Model
 {
-    class Scenary
+    internal class World
     {
-        private List<Chunk> chunks;
-        private List<Entity> entities;
+        private readonly List<Chunk> chunks;
+        private readonly List<Entity> entities;
 
-        public Scenary(TGCVector3 initialPoint)
+        public World(TGCVector3 initialPoint)
         {
-            this.chunks = new List<Chunk>();
-            this.chunks.Add(new Chunk(initialPoint));
-            this.chunks.Add(new Chunk(new TGCVector3(Chunk.DefaultSize.X,0,0)));
-
+            this.chunks = new List<Chunk>
+            {
+                new Chunk(initialPoint), 
+                new Chunk(new TGCVector3(Chunk.DefaultSize.X, 0, 0))
+            };
 
             this.entities = new List<Entity>();
 
-            foreach(var chunk in chunks)
+            foreach(var chunk in this.chunks)
             {
-                entities.AddRange(chunk.Init());
+                this.entities.AddRange(chunk.Init());
             }
         }
 
@@ -31,9 +32,9 @@ namespace TGC.Group.Model
         {
             var res = new List<Collisionable>();
 
-            res.AddRange(entities);
+            res.AddRange(this.entities);
 
-            foreach (var chunk in chunks)
+            foreach (var chunk in this.chunks)
             {
                 res.AddRange(chunk.Elements);
             }
