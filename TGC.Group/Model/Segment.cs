@@ -30,11 +30,13 @@ namespace TGC.Group.Model
         {
             var res = new List<Segment>();
 
+            var yIncrement = (pMax.Y - pMin.Y) / quantity;
+
             for (var i = 0; i < quantity; i++)
             {
                 var cube = new Cube(
-                    new TGCVector3(pMin.X, pMin.Y + pMax.Y * i / quantity, pMin.Z),
-                    new TGCVector3(pMax.X, pMin.Y + pMax.Y * (i + 1) / quantity, pMax.Z));
+                    new TGCVector3(pMin.X, pMin.Y + i * yIncrement, pMin.Z),
+                    new TGCVector3(pMax.X, pMin.Y + (i+1) * yIncrement, pMax.Z));
                 
                 res.Add(new Segment(cube));
             }
@@ -44,29 +46,23 @@ namespace TGC.Group.Model
 
         private static List<Cube> GenerateCubes(TGCVector3 origin, TGCVector3 maxPoint, int divisions)
         {
-            var scaleBoxes = new List<Cube>();
-
-            var y = origin.Y;
-            var yy = maxPoint.Y;
-
+            var res = new List<Cube>();
+            
             var zIncrement = (maxPoint.Z - origin.Z) / divisions;
             var xIncrement = (maxPoint.X - origin.X) / divisions;
 
-            var z = origin.Z;
-            for (var i = 1; i <= divisions; i++)
+            for (var i = 0; i < divisions; i++)
             {
-                var x = origin.X;
-                var zz = origin.Z + i * zIncrement;
-                for (var j = 1; j <= divisions; j++)
+                for (var j = 0; j < divisions; j++)
                 {
-                    var xx = origin.X + j * xIncrement;
-                    scaleBoxes.Add(new Cube(new TGCVector3(x, y, z), new TGCVector3(xx, yy, zz)));                        
-                    x = xx;
+                    res.Add(
+                        new Cube(
+                            new TGCVector3(origin.X + j * xIncrement, origin.Y, origin.Z + i * zIncrement), 
+                            new TGCVector3(origin.X + (j+1) * xIncrement, maxPoint.Y, origin.Z + (i+1) * zIncrement)));                        
                 }
-                z = zz;
             }
 
-            return scaleBoxes;
+            return res;
         }
 
         private static TgcMesh ScaleMesh(Cube scaleCube, TgcMesh mesh)
