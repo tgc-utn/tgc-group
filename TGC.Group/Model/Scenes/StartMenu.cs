@@ -33,7 +33,7 @@ namespace TGC.Group.Model.Scenes
             DrawTextSmall.changeFont(new Font("Arial Black", 25f));
             sprite = new CustomSprite();
 
-            sprite.Bitmap = new CustomBitmap("../../res/subnautica-portada.png", D3DDevice.Instance.Device);
+            sprite.Bitmap = new CustomBitmap("../../../res/subnautica-portada.png", D3DDevice.Instance.Device);
 
             float size = .3335f;
             sprite.Scaling = new TGCVector2(size, size);
