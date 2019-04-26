@@ -104,6 +104,7 @@
     <Compile Include="Model\Chunk.cs" />
     <Compile Include="Model\Collisionable.cs" />
     <Compile Include="Model\CollisionManager.cs" />
+    <Compile Include="Model\Scenes\PauseMenu.cs" />
     <Compile Include="TGCUtils\CustomBitmap.cs" />
     <Compile Include="TGCUtils\CustomSprite.cs" />
     <Compile Include="TGCUtils\Drawer2D.cs" />
