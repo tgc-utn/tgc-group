@@ -130,10 +130,9 @@ namespace TGC.Group.Model
         private void CreateNewGameScene()
         {
             gameScene = new GameScene(Input, MediaDir)
-                    .OnEscape((backBuffer) => SetNewScene(
-                        pauseMenu.WithPreRender(() => {
-                            gameScene.Render();
-                        })));
+                    .OnEscape(() => SetNewScene(
+                        pauseMenu.WithPreRender(gameScene.Render)
+                    ));
         }
     }
 }

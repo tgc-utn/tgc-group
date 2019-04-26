@@ -37,8 +37,7 @@ namespace TGC.Group.Model.Scenes
         private Dictionary<Key, System.Action> actionByKey = new Dictionary<Key, System.Action>();
 
         public delegate void Callback();
-        public delegate void BackBufferCallback(Surface backBuffer);
-        BackBufferCallback onEscapeCallback = backBuffer => {};
+        Callback onEscapeCallback = () => {};
 
         public GameScene(TgcD3dInput Input, string MediaDir) : base(Input)
         {
@@ -117,7 +116,7 @@ namespace TGC.Group.Model.Scenes
         }
 
 
-        public GameScene OnEscape(BackBufferCallback onEscapeCallback)
+        public GameScene OnEscape(Callback onEscapeCallback)
         {
             this.onEscapeCallback = onEscapeCallback;
             return this;
