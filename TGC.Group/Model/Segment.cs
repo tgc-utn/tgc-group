@@ -10,7 +10,6 @@ namespace TGC.Group.Model
     internal class Segment
     {
         private readonly Cube cube;
-
         private Segment(Cube cube)
         {
             this.cube = cube;

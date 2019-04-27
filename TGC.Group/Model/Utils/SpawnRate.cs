@@ -2,7 +2,7 @@ using System;
 
 namespace TGC.Group.Model.Utils
 {
-    public class SpawnRate
+    class SpawnRate
     {
         private static readonly Random _random = new Random();
         private readonly int _min;

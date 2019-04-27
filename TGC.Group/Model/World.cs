@@ -7,7 +7,7 @@ using TGC.Core.Mathematica;
 
 namespace TGC.Group.Model
 {
-    internal class World
+    class World
     {
         private List<Chunk> chunks;
         private List<Entity> entities;

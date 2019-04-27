@@ -5,8 +5,6 @@ using static TGC.Core.Geometry.TgcPlane;
 using TGC.Core.Mathematica;
 using TGC.Core.Textures;
 using TGC.Core.Direct3D;
-using TGC.Core.SceneLoader;
-using TGC.Group.Model.Resources;
 using TGC.Group.Model.Resources.Meshes;
 using TGC.Group.Model.Utils;
 

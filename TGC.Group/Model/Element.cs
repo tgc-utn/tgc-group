@@ -1,5 +1,4 @@
-﻿using System;
-using TGC.Core.BoundingVolumes;
+﻿using TGC.Core.BoundingVolumes;
 using TGC.Core.SceneLoader;
 using TGC.Core.Mathematica;
 

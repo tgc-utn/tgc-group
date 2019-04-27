@@ -1,18 +1,8 @@
-using Microsoft.DirectX.DirectInput;
-using System.Drawing;
-using System.Collections;
-using System.Linq;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
-using TGC.Core.Geometry;
-using TGC.Core.Input;
-using TGC.Core.Mathematica;
-using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
-using System.Collections.Generic;
 using System;
 using TGC.Group.Model.Scenes;
-using TGC.Core.Text;
 using TGC.Group.Form;
 using System.Windows.Forms;
 
@@ -20,7 +10,7 @@ namespace TGC.Group.Model
 {
     /// <summary>
     ///     Ejemplo para implementar el TP.
-    ///     Inicialmente puede ser renombrado o copiado para hacer más ejemplos chicos, en el caso de copiar para que se
+    ///     Inicialmente puede ser renombrado o copiado para hacer mï¿½s ejemplos chicos, en el caso de copiar para que se
     ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
     ///     line 97.
     /// </summary>

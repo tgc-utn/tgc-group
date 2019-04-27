@@ -1,22 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Collections;
 using TGC.Core.Input;
 using TGC.Core.Text;
 using Microsoft.DirectX.DirectInput;
 using TGC.Core.Direct3D;
-using TGC.Core.Example;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
-using TGC.Group.Model.Scenes;
-using TGC.Core.Camara;
-using Microsoft.DirectX.Direct3D;
 
 namespace TGC.Group.Model.Scenes
 {
