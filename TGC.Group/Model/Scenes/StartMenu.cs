@@ -7,6 +7,8 @@ using TGC.Core.Text;
 using System;
 using TGC.Group.TGCUtils;
 using Microsoft.DirectX.Direct3D;
+using TGC.Group.Model.Utils;
+using TGC.Group.Model.Resources.Sprites;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -22,9 +24,9 @@ namespace TGC.Group.Model.Scenes
         private Callback onGameStartCallback, onGameExitCallback;
         TgcText2D DrawTextBig, DrawTextSmall;
         Drawer2D drawer;
-        CustomSprite sprite;
-        private double x = 600;
-        private int yBase = 600;
+        CustomSprite spriteSubnautica, spriteBlackRectangle;
+        private double x;
+        private int yBase;
         private Pointer pointer = Pointer.UP;
         public StartMenu(TgcD3dInput Input) : base(Input)
         {
@@ -36,12 +38,21 @@ namespace TGC.Group.Model.Scenes
             DrawTextSmall.changeFont(new System.Drawing.Font("Arial Black", 25f));
 
             drawer = new Drawer2D();
-            sprite = new CustomSprite();
 
-            sprite.Bitmap = new CustomBitmap("../../../res/subnautica-portada.png", D3DDevice.Instance.Device);
+            spriteSubnautica = BitmapRepository.CreateSpriteFromPath(BitmapRepository.SubnauticaPortrait);
+            spriteBlackRectangle = BitmapRepository.CreateSpriteFromPath(BitmapRepository.BlackRectangle);
+            spriteBlackRectangle.Color = Color.FromArgb(188, 0, 0, 0);
 
-            float size = .3335f;
-            sprite.Scaling = new TGCVector2(size, size);
+            Screen.FitSpriteToScreen(spriteSubnautica);
+            spriteBlackRectangle.Scaling = new TGCVector2(1, .1f);
+            Screen.CenterSprite(spriteBlackRectangle);
+            spriteBlackRectangle.Position = new TGCVector2(
+                spriteBlackRectangle.Position.X,
+                Screen.Height * (3f / 5)
+            );
+
+            x = spriteBlackRectangle.Position.X + 200;
+            yBase = (int)(spriteBlackRectangle.Position.Y + 10);
         }
 
         override public void Update()
@@ -55,7 +66,8 @@ namespace TGC.Group.Model.Scenes
             ClearScreen();
 
             drawer.BeginDrawSprite();
-            drawer.DrawSprite(sprite);
+            drawer.DrawSprite(spriteSubnautica);
+            drawer.DrawSprite(spriteBlackRectangle);
             drawer.EndDrawSprite();
 
             DrawTextSmall.drawText("Start", (int)x, yBase, pointer == Pointer.DOWN ? Color.AliceBlue : Color.OrangeRed);

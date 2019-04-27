@@ -57,6 +57,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <PlatformTarget>x86</PlatformTarget>
     <OutputPath>bin\x86\Debug\</OutputPath>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <PlatformTarget>x86</PlatformTarget>
@@ -104,7 +105,14 @@
     <Compile Include="Model\Chunk.cs" />
     <Compile Include="Model\Collisionable.cs" />
     <Compile Include="Model\CollisionManager.cs" />
+    <Compile Include="Model\Resources\Meshes\CoralMeshes.cs" />
+    <Compile Include="Model\Resources\Meshes\FishMeshes.cs" />
+    <Compile Include="Model\Resources\Sprites\SpriteRepository.cs" />
+    <Compile Include="Model\Segment.cs" />
+    <Compile Include="Model\Utils\Cube.cs" />
     <Compile Include="Model\Scenes\PauseMenu.cs" />
+    <Compile Include="Model\Utils\Screen.cs" />
+    <Compile Include="Model\Utils\SpawnRate.cs" />
     <Compile Include="TGCUtils\CustomBitmap.cs" />
     <Compile Include="TGCUtils\CustomSprite.cs" />
     <Compile Include="TGCUtils\Drawer2D.cs" />
@@ -114,7 +122,7 @@
     <Compile Include="Model\Scenes\GameScene.cs" />
     <Compile Include="Model\Scenes\Scene.cs" />
     <Compile Include="Model\Scenes\StartMenu.cs" />
-    <Compile Include="Model\Scenary.cs" />
+    <Compile Include="Model\World.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

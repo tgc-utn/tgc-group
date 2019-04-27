@@ -15,6 +15,8 @@ using TGC.Group.Model.Scenes;
 using TGC.Core.Text;
 using TGC.Group.Form;
 using System.Windows.Forms;
+using TGC.Group.TGCUtils;
+using TGC.Group.Model.Resources.Sprites;
 
 namespace TGC.Group.Model
 {
@@ -44,6 +46,9 @@ namespace TGC.Group.Model
 
         private Scene nextScene;
 
+        Drawer2D drawerPause;
+        CustomSprite spritePause;
+
         /// <summary>
         ///     Constructor del juego.
         /// </summary>
@@ -55,6 +60,9 @@ namespace TGC.Group.Model
             Category = Game.Default.Category;
             Name = Game.Default.Name;
             Description = Game.Default.Description;
+
+            drawerPause = new Drawer2D();
+            spritePause = BitmapRepository.CreateSpriteFromPath(BitmapRepository.BlackRectangle);
         }
 
         public override void Init()
@@ -65,7 +73,7 @@ namespace TGC.Group.Model
                     .onGameStart(() => SetNextScene(gameScene))
                     .onGameExit(StopGame);
 
-            pauseMenu = new PauseMenu(Input)
+            pauseMenu = new PauseMenu(Input, drawerPause, spritePause)
                 .OnGoToStartMenu(() => {
                     ResetGame();
                     SetNextScene(startMenu);
