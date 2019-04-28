@@ -27,21 +27,21 @@ namespace TGC.Group.Model.Scenes
         }
         public override void Update()
         {
-            if (Input.keyPressed(Key.Return))
+            if (GameInput.Enter.IsPressed(Input))
             {
                 Decide();
                 pointer = Pointer.UP;
             }
-            if (Input.keyPressed(Key.Escape))
+            if (GameInput.Escape.IsPressed(Input))
             {
                 onReturnToGameCallback();
                 pointer = Pointer.UP;
             }
-            if (Input.keyPressed(Key.UpArrow))
+            if (GameInput.Up.IsPressed(Input))
             {
                 pointer = Pointer.UP;
             }
-            if (Input.keyPressed(Key.DownArrow))
+            if (GameInput.Down.IsPressed(Input))
             {
                 pointer = Pointer.DOWN;
             }

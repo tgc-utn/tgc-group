@@ -68,11 +68,11 @@ namespace TGC.Group.Model.Scenes
 
             this.World.Update();
             //Capturar Input teclado
-            if (this.Input.keyPressed(Key.F))
+            if (GameInput.Statictis.IsPressed(Input))
             {
                 this.BoundingBox = !this.BoundingBox;
             }
-            if (Input.keyPressed(Key.Escape))
+            if (GameInput.Escape.IsPressed(Input))
             {
                 onEscapeCallback();
             }

@@ -44,9 +44,9 @@ namespace TGC.Group.Model.Scenes
 
         override public void Update()
         {
-            if (Input.keyPressed(Key.DownArrow)) pointer = Pointer.DOWN;
-            if (Input.keyPressed(Key.UpArrow)) pointer = Pointer.UP;
-            if (Input.keyPressed(Key.Return)) fireAction();
+            if (GameInput.Down.IsPressed(Input)) pointer = Pointer.DOWN;
+            if (GameInput.Up.IsPressed(Input)) pointer = Pointer.UP;
+            if (GameInput.Enter.IsPressed(Input)) fireAction();
         }
         override public void Render()
         {
