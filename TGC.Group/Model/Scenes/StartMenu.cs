@@ -4,6 +4,7 @@ using TGC.Core.Direct3D;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.Text;
+using TGC.Group.Model.Input;
 using TGC.Group.TGCUtils;
 
 namespace TGC.Group.Model.Scenes

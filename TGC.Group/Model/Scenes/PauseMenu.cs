@@ -2,6 +2,7 @@
 using System.Drawing;
 using TGC.Core.Input;
 using TGC.Core.Text;
+using TGC.Group.Model.Input;
 
 namespace TGC.Group.Model.Scenes
 {

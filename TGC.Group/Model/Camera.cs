@@ -5,6 +5,7 @@ using TGC.Core.Camara;
 using TGC.Core.Direct3D;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
+using TGC.Group.Model.Input;
 
 namespace TGC.Group.Model
 {

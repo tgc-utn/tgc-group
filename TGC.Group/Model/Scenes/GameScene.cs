@@ -8,6 +8,7 @@ using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
+using TGC.Group.Model.Input;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -68,7 +69,7 @@ namespace TGC.Group.Model.Scenes
 
             this.World.Update();
             //Capturar Input teclado
-            if (GameInput.Statictis.IsPressed(Input))
+            if (GameInput.Statistic.IsPressed(Input))
             {
                 this.BoundingBox = !this.BoundingBox;
             }

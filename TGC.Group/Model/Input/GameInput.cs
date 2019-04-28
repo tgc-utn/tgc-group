@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.DirectX.DirectInput;
 using TGC.Core.Input;
 
-namespace TGC.Group.Model
+namespace TGC.Group.Model.Input
 {
     public class GameInput
     {
@@ -14,7 +14,7 @@ namespace TGC.Group.Model
         public static readonly GameInput Float = new GameInput(new List<Key>{Key.Space});
         public static readonly GameInput Escape = new GameInput(new List<Key>{Key.Escape});
         public static readonly GameInput Enter = new GameInput(new List<Key>{Key.Return});
-        public static readonly GameInput Statictis = new GameInput(new List<Key>{Key.F});
+        public static readonly GameInput Statistic = new GameInput(new List<Key>{Key.F});
 
         private readonly List<Key> keys;
 
