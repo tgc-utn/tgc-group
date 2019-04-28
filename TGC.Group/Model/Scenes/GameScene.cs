@@ -24,8 +24,6 @@ namespace TGC.Group.Model.Scenes
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
 
-        private Dictionary<Key, System.Action> actionByKey = new Dictionary<Key, System.Action>();
-
         public delegate void Callback();
         Callback onEscapeCallback = () => {};
 
@@ -67,7 +65,7 @@ namespace TGC.Group.Model.Scenes
         {
             CollisionManager.CheckCollitions(this.World.GetCollisionables());
 
-            this.World.Update();
+            this.World.Update(this.Camera.Position);
             //Capturar Input teclado
             if (GameInput.Statistic.IsPressed(Input))
             {
@@ -88,7 +86,7 @@ namespace TGC.Group.Model.Scenes
             //Render del mesh
             this.Box.Render();
             this.TgcLogo.Render();
-            this.World.Render();
+            this.World.Render(this.Camera.Position);
 
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (this.BoundingBox) {
@@ -98,7 +96,7 @@ namespace TGC.Group.Model.Scenes
                 this.DrawText.drawText("Pmax: " + this.Box.getCollisionVolume().PMax.ToString(), 0, 90, Color.White);
                 this.DrawText.drawText("Position: " + this.Box.getCollisionVolume().Position.ToString(), 0, 140, Color.White);
                 this.Box.getCollisionVolume().PMax.ToString();
-                this.World.RenderBoundingBox();
+                this.World.RenderBoundingBox(this.Camera.Position);
             }
         }
 
@@ -108,6 +106,8 @@ namespace TGC.Group.Model.Scenes
             this.Box.Dispose();
             //Dispose del mesh.
             this.TgcLogo.Dispose();
+            //World dispose
+            this.World.Dispose();
         }
 
 

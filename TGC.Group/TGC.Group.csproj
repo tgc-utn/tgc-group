@@ -101,7 +101,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
-    <Compile Include="Model\Chunk.cs" />
+    <Compile Include="Model\Chunks\AquaticChunk.cs" />
+    <Compile Include="Model\Chunks\FloorChunk.cs" />
+    <Compile Include="Model\Chunks\Chunk.cs" />
+    <Compile Include="Model\Chunks\NoneChunk.cs" />
     <Compile Include="Model\Collisionable.cs" />
     <Compile Include="Model\CollisionManager.cs" />
     <Compile Include="Model\Input\GameInput.cs" />
