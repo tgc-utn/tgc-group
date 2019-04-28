@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-
 using TGC.Core.Geometry;
 using static TGC.Core.Geometry.TgcPlane;
 using TGC.Core.Mathematica;
@@ -28,16 +27,13 @@ namespace TGC.Group.Model
 
             var divisions = (int) (DefaultSize.X / 100);
 
-            var fishes = FishMeshes.All().ConvertAll(x => new Element(x));
-            var coralElements = CoralMeshes.All().ConvertAll(x => new Element(x));
-
             this.Elements = new List<Element>();
             
-            this.Elements.AddRange(segments[0].GenerateElements(divisions/2, SpawnRate.Of(1,1), coralElements));
+            this.Elements.AddRange(segments[0].GenerateElements(divisions/2, SpawnRate.Of(1,1), CoralMeshes.All()));
 
             segments.FindAll(segment => segment != segments[0])
                 .ForEach(segment => 
-                    this.Elements.AddRange(segment.GenerateElements(divisions/2, SpawnRate.Of(1,100), fishes))
+                    this.Elements.AddRange(segment.GenerateElements(divisions/2, SpawnRate.Of(1,100), FishMeshes.All()))
                     );
             
             this.floor = new TgcPlane(origin, DefaultSize, Orientations.XZplane, FloorTexture);
