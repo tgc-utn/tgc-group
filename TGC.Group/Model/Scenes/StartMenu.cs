@@ -4,9 +4,8 @@ using TGC.Core.Direct3D;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.Text;
-using System;
+using TGC.Group.Model.Input;
 using TGC.Group.TGCUtils;
-using Microsoft.DirectX.Direct3D;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -46,9 +45,9 @@ namespace TGC.Group.Model.Scenes
 
         override public void Update()
         {
-            if (Input.keyPressed(Key.DownArrow)) pointer = Pointer.DOWN;
-            if (Input.keyPressed(Key.UpArrow)) pointer = Pointer.UP;
-            if (Input.keyPressed(Key.Return)) fireAction();
+            if (GameInput.Down.IsPressed(Input)) pointer = Pointer.DOWN;
+            if (GameInput.Up.IsPressed(Input)) pointer = Pointer.UP;
+            if (GameInput.Enter.IsPressed(Input)) fireAction();
         }
         override public void Render()
         {

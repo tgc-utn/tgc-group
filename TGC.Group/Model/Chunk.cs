@@ -5,8 +5,6 @@ using static TGC.Core.Geometry.TgcPlane;
 using TGC.Core.Mathematica;
 using TGC.Core.Textures;
 using TGC.Core.Direct3D;
-using TGC.Core.SceneLoader;
-using TGC.Group.Model.Resources;
 using TGC.Group.Model.Resources.Meshes;
 using TGC.Group.Model.Utils;
 
@@ -26,7 +24,7 @@ namespace TGC.Group.Model
         {
             var max = origin + DefaultSize;
 
-            var segments = Segment.GenerateSegments(origin, max, 3);
+            var segments = Segment.GenerateSegments(origin, max, 10);
 
             var divisions = (int) (DefaultSize.X / 100);
 
@@ -35,9 +33,12 @@ namespace TGC.Group.Model
 
             this.Elements = new List<Element>();
             
-            this.Elements.AddRange(segments[0].GenerateElements(divisions/2, SpawnRate.of(1,10), coralElements));
-            this.Elements.AddRange(segments[1].GenerateElements(divisions/2, SpawnRate.of(1,100), fishes));
-            this.Elements.AddRange(segments[2].GenerateElements(divisions/2, SpawnRate.of(1,100), fishes));
+            this.Elements.AddRange(segments[0].GenerateElements(divisions/2, SpawnRate.Of(1,1), coralElements));
+
+            segments.FindAll(segment => segment != segments[0])
+                .ForEach(segment => 
+                    this.Elements.AddRange(segment.GenerateElements(divisions/2, SpawnRate.Of(1,100), fishes))
+                    );
             
             this.floor = new TgcPlane(origin, DefaultSize, Orientations.XZplane, FloorTexture);
         }

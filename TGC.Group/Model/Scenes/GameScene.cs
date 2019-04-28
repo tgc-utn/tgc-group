@@ -1,22 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Collections;
 using TGC.Core.Input;
 using TGC.Core.Text;
 using Microsoft.DirectX.DirectInput;
 using TGC.Core.Direct3D;
-using TGC.Core.Example;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
-using TGC.Group.Model.Scenes;
-using TGC.Core.Camara;
-using Microsoft.DirectX.Direct3D;
+using TGC.Group.Model.Input;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -77,11 +69,11 @@ namespace TGC.Group.Model.Scenes
 
             this.World.Update();
             //Capturar Input teclado
-            if (this.Input.keyPressed(Key.F))
+            if (GameInput.Statistic.IsPressed(Input))
             {
                 this.BoundingBox = !this.BoundingBox;
             }
-            if (Input.keyPressed(Key.Escape))
+            if (GameInput.Escape.IsPressed(Input))
             {
                 onEscapeCallback();
             }
