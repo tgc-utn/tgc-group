@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
@@ -15,13 +16,13 @@ namespace TGC.Group.Model
             this.cube = cube;
         }
 
-        public IEnumerable<Element> GenerateElements(int divisions, SpawnRate spawnRate, List<Element> list)
+        public IEnumerable<Element> GenerateElements(int divisions, SpawnRate spawnRate, List<TgcMesh> list)
         {
             var random = new Random();
 
             return GenerateXzCubes(this.cube.PMin, this.cube.PMax, divisions)
                 .FindAll(scaleBox => spawnRate.HasToSpawn())
-                .ConvertAll(scaleBox => ScaleMesh(scaleBox,list[random.Next(list.Count)].Mesh))
+                .ConvertAll(scaleBox => ScaleMesh(scaleBox,list[random.Next(list.Count)]))
                 .ConvertAll(scaledMesh => new Element(scaledMesh));
         }
 
@@ -69,11 +70,9 @@ namespace TGC.Group.Model
 
         private static TgcMesh ScaleMesh(Cube scaleCube, TgcMesh mesh)
         {
-            var newMesh = mesh.clone(mesh.Name);
-            var boundingBox = newMesh.BoundingBox ?? newMesh.createBoundingBox();
+            var newMesh = mesh.createMeshInstance(mesh.Name);
             
-            newMesh.changeD3dMesh(mesh.D3dMesh);
-            newMesh.Scale = ScaleOfBoxToBox(boundingBox, scaleCube);
+            newMesh.Scale = ScaleOfBoxToBox(newMesh.BoundingBox, scaleCube);
             newMesh.Position = scaleCube.PMin;
 
             newMesh.updateBoundingBox();
@@ -85,10 +84,14 @@ namespace TGC.Group.Model
             var boundingBoxMax = boundingBox.PMax - boundingBox.PMin;
             var scaleBoxMax = scaleCube.PMax - scaleCube.PMin;
 
-            return new TGCVector3(
+            var minScale = new[]
+            {
                 scaleBoxMax.X / boundingBoxMax.X,
                 scaleBoxMax.Y / boundingBoxMax.Y,
-                scaleBoxMax.Z / boundingBoxMax.Z);
+                scaleBoxMax.Z / boundingBoxMax.Z
+            }.Min();
+            
+            return new TGCVector3(minScale,minScale,minScale);
         }
     }
 }
