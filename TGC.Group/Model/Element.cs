@@ -5,7 +5,7 @@ using TGC.Core.Mathematica;
 
 namespace TGC.Group.Model
 {
-    class Element : Collisionable
+    public class Element : Collisionable
     {
         public TgcMesh Mesh { get; }
 

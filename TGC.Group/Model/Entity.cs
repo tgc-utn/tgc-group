@@ -3,7 +3,7 @@ using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Model
 {
-    class Entity : Collisionable
+    public class Entity : Collisionable
     {
         public void Render()
         {

@@ -2,7 +2,7 @@
 
 namespace TGC.Group.Model
 {
-    abstract class Collisionable
+    public abstract class Collisionable
     {
         public bool CheckCollision { get; set; } = true;
 
