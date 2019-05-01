@@ -34,7 +34,7 @@ namespace TGC.Group.Model.Scenes
 
         private TGCVector3 viewDirectionStart = new TGCVector3(-1, 0.25f, 0);
 
-        private float rot = 1;
+        private float rotation = 0;
 
         public StartMenu(TgcD3dInput Input) : base(Input)
         {
@@ -65,7 +65,6 @@ namespace TGC.Group.Model.Scenes
             x = spriteBlackRectangle.Position.X + 200;
             yBase = (int)(spriteBlackRectangle.Position.Y + 10);
 
-
             Screen.CenterSprite(title);
             title.Position = new TGCVector2(
                 title.Position.X,
@@ -92,8 +91,8 @@ namespace TGC.Group.Model.Scenes
             if (Input.keyPressed(Key.UpArrow)) pointer = Pointer.UP;
             if (Input.keyPressed(Key.Return)) fireAction();
 
-            TGCVector3 lookAt  = skyBox.Center + TGCVector3.TransformNormal(viewDirectionStart, TGCMatrix.RotationY(rot));
-            rot += .0001f;
+            TGCVector3 lookAt  = skyBox.Center + TGCVector3.TransformNormal(viewDirectionStart, TGCMatrix.RotationY(rotation));
+            rotation += .0001f;
             Camera.SetCamera(skyBox.Center, lookAt);
         }
         override public void Render()
