@@ -13,11 +13,11 @@ namespace TGC.Group.Model.Utils
     {
         public static int Width
         {
-            get { return D3DDevice.Instance.Device.DisplayMode.Width; }
+            get { return D3DDevice.Instance.Device.Viewport.Width; }
         }
         public static int Height
         {
-            get { return D3DDevice.Instance.Device.DisplayMode.Height; }
+            get { return D3DDevice.Instance.Device.Viewport.Height; }
         }
         public static void CenterSprite(CustomSprite sprite)
         {
