@@ -9,15 +9,15 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Group.Model.Input;
+using TGC.Core.SkeletalAnimation;
 
 namespace TGC.Group.Model.Scenes
 {
     class GameScene : Scene
     {
         TgcText2D DrawText = new TgcText2D();
-        private Element Box { get; }
-        private Element TgcLogo { get; }
-
+        //private Element Box { get; }
+      
         //Scenary
         private World World { get; }
 
@@ -49,16 +49,18 @@ namespace TGC.Group.Model.Scenes
             //Construimos una caja según los parámetros, por defecto la misma se crea con centro en el origen y se recomienda así para facilitar las transformaciones.
             //Posición donde quiero que este la caja, es común que se utilicen estructuras internas para las transformaciones.
             //Entonces actualizamos la posición lógica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
-            Box = new Element(new TGCVector3(-25, 0, 0), TGCBox.fromSize(size, texture).ToMesh("caja"));
+           // Box = new Element(new TGCVector3(-25, 0, 0), TGCBox.fromSize(size, texture).ToMesh("caja"));
 
             //Cargo el unico mesh que tiene la escena.
             TgcMesh Mesh = new TgcSceneLoader().loadSceneFromFile(mediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
             //Defino una escala en el modelo logico del mesh que es muy grande.
             Mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
 
-            this.TgcLogo = new Element(TGCVector3.Empty, Mesh);
+            //this.TgcLogo = new Element(TGCVector3.Empty, Mesh);
 
             this.Camera = new Camera(new TGCVector3(30, 30, 200), input);
+
+
         }
 
         public override void Update()
@@ -66,7 +68,7 @@ namespace TGC.Group.Model.Scenes
             CollisionManager.CheckCollitions(this.World.GetCollisionables());
 
             this.World.Update(this.Camera.Position);
-            //Capturar Input teclado
+
             if (GameInput.Statistic.IsPressed(Input))
             {
                 this.BoundingBox = !this.BoundingBox;
@@ -79,34 +81,27 @@ namespace TGC.Group.Model.Scenes
         public override void Render()
         {
             ClearScreen();
-            //Dibuja un texto por pantalla
             this.DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
             this.DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(this.Camera.Position), 0, 30, Color.OrangeRed);
 
-            //Render del mesh
-            this.Box.Render();
-            this.TgcLogo.Render();
+            //this.Box.Render();
             this.World.Render(this.Camera.Position);
+
 
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (this.BoundingBox) {
-                this.Box.getCollisionVolume().Render();
-                this.TgcLogo.getCollisionVolume().Render();
-                this.DrawText.drawText("Pmin: "+ this.Box.getCollisionVolume().PMin.ToString(), 0, 40, Color.White);
-                this.DrawText.drawText("Pmax: " + this.Box.getCollisionVolume().PMax.ToString(), 0, 90, Color.White);
-                this.DrawText.drawText("Position: " + this.Box.getCollisionVolume().Position.ToString(), 0, 140, Color.White);
-                this.Box.getCollisionVolume().PMax.ToString();
+               // this.Box.getCollisionVolume().Render();
+               // this.DrawText.drawText("Pmin: "+ this.Box.getCollisionVolume().PMin.ToString(), 0, 40, Color.White);
+                //this.DrawText.drawText("Pmax: " + this.Box.getCollisionVolume().PMax.ToString(), 0, 90, Color.White);
+                //this.DrawText.drawText("Position: " + this.Box.getCollisionVolume().Position.ToString(), 0, 140, Color.White);
+                //this.Box.getCollisionVolume().PMax.ToString();
                 this.World.RenderBoundingBox(this.Camera.Position);
             }
         }
 
         public override void Dispose()
         {
-            //Dispose de la caja.
-            this.Box.Dispose();
-            //Dispose del mesh.
-            this.TgcLogo.Dispose();
-            //World dispose
+            //this.Box.Dispose();
             this.World.Dispose();
         }
 

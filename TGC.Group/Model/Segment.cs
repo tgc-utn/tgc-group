@@ -20,10 +20,20 @@ namespace TGC.Group.Model
         {
             var random = new Random();
 
+            return ElementsToSpawn(divisions, spawnRate)
+                .ConvertAll(scaleBox => ScaleMesh(scaleBox, list[random.Next(list.Count)]))
+                .ConvertAll(scaledMesh => generateElement(scaledMesh));
+        }
+
+        private static Element generateElement(TgcMesh scaledMesh)
+        {
+            return new Element(scaledMesh);
+        }
+
+        private List<Cube> ElementsToSpawn(int divisions, SpawnRate spawnRate)
+        {
             return GenerateXzCubes(this.cube.PMin, this.cube.PMax, divisions)
-                .FindAll(scaleBox => spawnRate.HasToSpawn())
-                .ConvertAll(scaleBox => ScaleMesh(scaleBox,list[random.Next(list.Count)]))
-                .ConvertAll(scaledMesh => new Element(scaledMesh));
+                            .FindAll(scaleBox => spawnRate.HasToSpawn());
         }
 
         public static List<Segment> GenerateSegments(TGCVector3 pMin, TGCVector3 pMax, int divisions)

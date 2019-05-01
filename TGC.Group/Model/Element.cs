@@ -1,23 +1,20 @@
 ﻿using TGC.Core.BoundingVolumes;
 using TGC.Core.SceneLoader;
 using TGC.Core.Mathematica;
-
+using BulletSharp;
 
 namespace TGC.Group.Model
 {
     public class Element : Collisionable
     {
         public TgcMesh Mesh { get; }
+        public RigidBody RidigBody { get; set; }
 
 
         public Element(TgcMesh model)
         {
             this.Mesh = model;
-        }
-
-        public Element(TGCVector3 origin, TgcMesh model) : this(model)
-        {
-            model.Position = origin;
+           //this.RidigBody = rigidBody;
         }
 
         public void Update()
