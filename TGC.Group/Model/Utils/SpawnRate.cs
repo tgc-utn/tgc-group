@@ -2,26 +2,26 @@ using System;
 
 namespace TGC.Group.Model.Utils
 {
-    public class SpawnRate
+    class SpawnRate
     {
-        private static readonly Random _random = new Random();
-        private readonly int _min;
-        private readonly int _max;
+        private static readonly Random Random = new Random();
+        private readonly int min;
+        private readonly int max;
 
         private SpawnRate(int min, int max)
         {
-            this._min = min;
-            this._max = max;
+            this.min = min;
+            this.max = max;
         }
 
-        public static SpawnRate of(int min, int max)
+        public static SpawnRate Of(int min, int max)
         {
             return new SpawnRate(min, max);
         }
 
-        public bool hasToSpawn()
+        public bool HasToSpawn()
         {
-            return this._min >= _random.Next(this._max);
+            return this.min >= Random.Next(this.max);
         }
     }
 }

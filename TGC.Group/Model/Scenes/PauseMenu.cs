@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.DirectX.DirectInput;
-using Microsoft.DirectX.Direct3D;
-using System.Drawing;
+﻿using System.Drawing;
 using TGC.Core.Input;
 using TGC.Core.Text;
-using TGC.Core.Direct3D;
-using Microsoft.DirectX;
 using TGC.Core.Mathematica;
 using TGC.Group.TGCUtils;
 using TGC.Group.Model.Utils;
+using TGC.Group.Model.Input;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -53,21 +45,21 @@ namespace TGC.Group.Model.Scenes
         }
         public override void Update()
         {
-            if (Input.keyPressed(Key.Return))
+            if (GameInput.Enter.IsPressed(Input))
             {
                 Decide();
                 pointer = Pointer.UP;
             }
-            if (Input.keyPressed(Key.Escape))
+            if (GameInput.Escape.IsPressed(Input))
             {
                 onReturnToGameCallback();
                 pointer = Pointer.UP;
             }
-            if (Input.keyPressed(Key.UpArrow))
+            if (GameInput.Up.IsPressed(Input))
             {
                 pointer = Pointer.UP;
             }
-            if (Input.keyPressed(Key.DownArrow))
+            if (GameInput.Down.IsPressed(Input))
             {
                 pointer = Pointer.DOWN;
             }

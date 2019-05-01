@@ -1,22 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Collections;
 using TGC.Core.Input;
 using TGC.Core.Text;
 using Microsoft.DirectX.DirectInput;
 using TGC.Core.Direct3D;
-using TGC.Core.Example;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
-using TGC.Group.Model.Scenes;
-using TGC.Core.Camara;
-using Microsoft.DirectX.Direct3D;
+using TGC.Group.Model.Input;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -31,8 +23,6 @@ namespace TGC.Group.Model.Scenes
 
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
-
-        private Dictionary<Key, System.Action> actionByKey = new Dictionary<Key, System.Action>();
 
         public delegate void Callback();
         Callback onEscapeCallback = () => {};
@@ -75,13 +65,13 @@ namespace TGC.Group.Model.Scenes
         {
             CollisionManager.CheckCollitions(this.World.GetCollisionables());
 
-            this.World.Update();
+            this.World.Update(this.Camera.Position);
             //Capturar Input teclado
-            if (this.Input.keyPressed(Key.F))
+            if (GameInput.Statistic.IsPressed(Input))
             {
                 this.BoundingBox = !this.BoundingBox;
             }
-            if (Input.keyPressed(Key.Escape))
+            if (GameInput.Escape.IsPressed(Input))
             {
                 onEscapeCallback();
             }
@@ -96,7 +86,7 @@ namespace TGC.Group.Model.Scenes
             //Render del mesh
             this.Box.Render();
             this.TgcLogo.Render();
-            this.World.Render();
+            this.World.Render(this.Camera.Position);
 
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (this.BoundingBox) {
@@ -106,7 +96,7 @@ namespace TGC.Group.Model.Scenes
                 this.DrawText.drawText("Pmax: " + this.Box.getCollisionVolume().PMax.ToString(), 0, 90, Color.White);
                 this.DrawText.drawText("Position: " + this.Box.getCollisionVolume().Position.ToString(), 0, 140, Color.White);
                 this.Box.getCollisionVolume().PMax.ToString();
-                this.World.RenderBoundingBox();
+                this.World.RenderBoundingBox(this.Camera.Position);
             }
         }
 
@@ -116,6 +106,8 @@ namespace TGC.Group.Model.Scenes
             this.Box.Dispose();
             //Dispose del mesh.
             this.TgcLogo.Dispose();
+            //World dispose
+            this.World.Dispose();
         }
 
 

@@ -1,11 +1,11 @@
 ﻿using Microsoft.DirectX.DirectInput;
-using System;
 using System.Drawing;
 using System.Windows.Forms;
 using TGC.Core.Camara;
 using TGC.Core.Direct3D;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
+using TGC.Group.Model.Input;
 
 namespace TGC.Group.Model
 {
@@ -66,27 +66,27 @@ namespace TGC.Group.Model
         {
             var moveVector = TGCVector3.Empty;
 
-            if (Input.keyDown(Key.W))
+            if (GameInput.Up.IsDown(Input))
             {
                 moveVector += new TGCVector3(0, 0, -1) * MovementSpeed;
             }
 
-            if (Input.keyDown(Key.S))
+            if (GameInput.Down.IsDown(Input))
             {
                 moveVector += new TGCVector3(0, 0, 1) * MovementSpeed;
             }
 
-            if (Input.keyDown(Key.D))
+            if (GameInput.Right.IsDown(Input))
             {
                 moveVector += new TGCVector3(-1, 0, 0) * MovementSpeed;
             }
 
-            if (Input.keyDown(Key.A))
+            if (GameInput.Left.IsDown(Input))
             {
                 moveVector += new TGCVector3(1, 0, 0) * MovementSpeed;
             }
             
-            if (Input.keyDown(Key.Space))
+            if (GameInput.Float.IsDown(Input))
             {
                 moveVector += new TGCVector3(0, 1, 0) * MovementSpeed;
             }

@@ -3,7 +3,7 @@ using TGC.Core.SceneLoader;
 
 namespace TGC.Group.Model.Resources.Meshes
 {
-    public static class CoralMeshes
+    static class CoralMeshes
     {
         private static readonly TgcMesh BrainCoral = new TgcSceneLoader()
             .loadSceneFromFile(Game.Default.MediaDirectory + "brain_coral-TgcScene.xml").Meshes[0];

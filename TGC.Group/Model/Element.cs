@@ -1,12 +1,11 @@
-﻿using System;
-using TGC.Core.BoundingVolumes;
+﻿using TGC.Core.BoundingVolumes;
 using TGC.Core.SceneLoader;
 using TGC.Core.Mathematica;
 
 
 namespace TGC.Group.Model
 {
-    class Element : Collisionable
+    public class Element : Collisionable
     {
         public TgcMesh Mesh { get; }
 
