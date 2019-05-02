@@ -1,6 +1,8 @@
-﻿using TGC.Core.Direct3D;
+﻿using BulletSharp;
+using TGC.Core.Direct3D;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
+using TGC.Core.Terrain;
 using TGC.Core.Textures;
 using TGC.Group.Model.Elements;
 using TGC.Group.Model.Elements.RigidBodyFactories;
@@ -14,7 +16,8 @@ namespace TGC.Group.Model.Chunks
         private static readonly TgcTexture FloorTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, 
             Game.Default.MediaDirectory + Game.Default.TexturaTierra);
 
-        private readonly TgcPlane floor;
+        private readonly TgcPlane Floor;
+        private readonly RigidBody FloorRigidBody;
 
         public FloorChunk(TGCVector3 origin) : base(origin)
         {            
@@ -34,20 +37,21 @@ namespace TGC.Group.Model.Chunks
                     this.Elements.AddRange(segment.GenerateElements(divisions/2, SpawnRate.Of(1,750), 
                     new ElementFactory(FishMeshes.All(), new CapsuleFactory()))));
 
-            this.floor = new TgcPlane(origin, DefaultSize, TgcPlane.Orientations.XZplane, FloorTexture);
-            new BoxFactory().CreatePlane(this.floor);
+            this.Floor = new TgcPlane(origin, DefaultSize, TgcPlane.Orientations.XZplane, FloorTexture);
+            this.FloorRigidBody = new BoxFactory().CreatePlane(this.Floor);
         }
         
         public override void Render()
         {
             base.Render();
-            this.floor.updateValues();
-            this.floor.Render();
+            this.Floor.updateValues();
+            this.Floor.Render();
         }
 
         public override void Dispose()
         {
-            this.floor.Dispose();
+            this.FloorRigidBody.Dispose();
+            this.Floor.Dispose();
             base.Dispose();
         }
     }

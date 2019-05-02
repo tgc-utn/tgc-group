@@ -11,17 +11,14 @@ using TGC.Core.Textures;
 using TGC.Group.Model.Input;
 using TGC.Core.SkeletalAnimation;
 using TGC.Group.Model.Elements.RigidBodyFactories;
+using TGC.Core.Terrain;
 
 namespace TGC.Group.Model.Scenes
 {
     class GameScene : Scene
     {
-        TgcText2D DrawText = new TgcText2D();
-      
-        //Scenary
+        readonly TgcText2D DrawText = new TgcText2D();
         private World World { get; }
-
-        //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
 
         public delegate void Callback();
@@ -37,6 +34,7 @@ namespace TGC.Group.Model.Scenes
 
         public override void Update(float elapsedTime)
         {
+
             PhysicsWorld.DynamicsWorld.StepSimulation(elapsedTime);
 
             CollisionManager.CheckCollitions(this.World.GetCollisionables());
@@ -57,7 +55,6 @@ namespace TGC.Group.Model.Scenes
             ClearScreen();
             this.DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
             this.DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(this.Camera.Position), 0, 30, Color.OrangeRed);
-
             this.World.Render(this.Camera.Position);
 
             if (this.BoundingBox) {
