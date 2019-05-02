@@ -108,13 +108,17 @@
     <Compile Include="Model\Chunks\NoneChunk.cs" />
     <Compile Include="Model\Collisionable.cs" />
     <Compile Include="Model\CollisionManager.cs" />
+    <Compile Include="Model\Elements\ElementFactory.cs" />
+    <Compile Include="Model\Elements\RigidBodyFactories\CapsuleFactory.cs" />
+    <Compile Include="Model\Elements\RigidBodyFactories\BoxFactory.cs" />
+    <Compile Include="Model\Elements\RigidBodyFactories\FloorFactory.cs" />
     <Compile Include="Model\Input\GameInput.cs" />
     <Compile Include="Model\PhysicsWorld.cs" />
     <Compile Include="Model\Resources\Meshes\CoralMeshes.cs" />
     <Compile Include="Model\Resources\Meshes\FishMeshes.cs" />
     <Compile Include="Model\Resources\Sprites\SpriteRepository.cs" />
     <Compile Include="Model\Segment.cs" />
-    <Compile Include="Model\RigidBodyFactory.cs" />
+    <Compile Include="Model\Elements\RigidBodyFactories\IRigidBodyFactory.cs" />
     <Compile Include="Model\Utils\Cube.cs" />
     <Compile Include="Model\Scenes\PauseMenu.cs" />
     <Compile Include="Model\Utils\Screen.cs" />
@@ -122,7 +126,7 @@
     <Compile Include="TGCUtils\CustomBitmap.cs" />
     <Compile Include="TGCUtils\CustomSprite.cs" />
     <Compile Include="TGCUtils\Drawer2D.cs" />
-    <Compile Include="Model\Element.cs" />
+    <Compile Include="Model\Elements\Element.cs" />
     <Compile Include="Model\Entity.cs" />
     <Compile Include="Model\Camera.cs" />
     <Compile Include="Model\Scenes\GameScene.cs" />
@@ -204,6 +208,7 @@
     <Content Include="Media\LogoTGC-TgcScene.xml" />
     <Content Include="res\subnautica-portada.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

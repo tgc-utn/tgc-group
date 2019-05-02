@@ -10,6 +10,7 @@ using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Group.Model.Input;
 using TGC.Core.SkeletalAnimation;
+using TGC.Group.Model.Elements.RigidBodyFactories;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -58,7 +59,7 @@ namespace TGC.Group.Model.Scenes
 
             //this.TgcLogo = new Element(TGCVector3.Empty, Mesh);
             this.Camera = new Camera(new TGCVector3(30, 30, 200), input);
-
+            new FloorFactory().CreatePlaneBody(null);
 
         }
 
