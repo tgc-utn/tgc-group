@@ -33,8 +33,9 @@ namespace TGC.Group.Model.Chunks
                 .ForEach(segment => 
                     this.Elements.AddRange(segment.GenerateElements(divisions/2, SpawnRate.Of(1,750), 
                     new ElementFactory(FishMeshes.All(), new CapsuleFactory()))));
+
             this.floor = new TgcPlane(origin, DefaultSize, TgcPlane.Orientations.XZplane, FloorTexture);
-            //RigidBodyFactory.CreateFloor(this.floor);
+            new BoxFactory().CreatePlane(this.floor);
         }
         
         public override void Render()

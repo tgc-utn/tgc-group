@@ -59,7 +59,6 @@ namespace TGC.Group.Model.Scenes
 
             //this.TgcLogo = new Element(TGCVector3.Empty, Mesh);
             this.Camera = new Camera(new TGCVector3(30, 30, 200), input);
-            new FloorFactory().CreatePlaneBody(null);
 
         }
 

@@ -111,7 +111,6 @@
     <Compile Include="Model\Elements\ElementFactory.cs" />
     <Compile Include="Model\Elements\RigidBodyFactories\CapsuleFactory.cs" />
     <Compile Include="Model\Elements\RigidBodyFactories\BoxFactory.cs" />
-    <Compile Include="Model\Elements\RigidBodyFactories\FloorFactory.cs" />
     <Compile Include="Model\Input\GameInput.cs" />
     <Compile Include="Model\PhysicsWorld.cs" />
     <Compile Include="Model\Resources\Meshes\CoralMeshes.cs" />
