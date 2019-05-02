@@ -19,22 +19,16 @@ namespace TGC.Group.Model
 
         public void Update()
         {
-            //Mesh.Transform =  new TGCMatrix(PhysicsBody.InterpolationWorldTransform);
             Mesh.Position = new TGCVector3(PhysicsBody.CenterOfMassPosition.X, PhysicsBody.CenterOfMassPosition.Y, PhysicsBody.CenterOfMassPosition.Z);
             Mesh.Transform = 
                 TGCMatrix.Scaling(Mesh.Scale) *
-                TGCMatrix.Translation(PhysicsBody.CenterOfMassPosition.X, PhysicsBody.CenterOfMassPosition.Y, PhysicsBody.CenterOfMassPosition.Z);
+                TGCMatrix.Translation(new TGCVector3(PhysicsBody.CenterOfMassPosition));
 
-            
             return;
         }
 
         public void Render()
         {
-            //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
-            //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
-
-           // Mesh.UpdateMeshTransform();
             Mesh.Render();
             return;
         }
@@ -42,6 +36,7 @@ namespace TGC.Group.Model
         public void Dispose()
         {
             Mesh.Dispose();
+            PhysicsWorld.DynamicsWorld.RemoveRigidBody(PhysicsBody);
             return;
         }
 
