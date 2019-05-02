@@ -43,7 +43,7 @@ namespace TGC.Group.Model.Scenes
             sprite.Scaling = new TGCVector2(size, size);
         }
 
-        override public void Update()
+        override public void Update(float elapsedTime)
         {
             if (GameInput.Down.IsPressed(Input)) pointer = Pointer.DOWN;
             if (GameInput.Up.IsPressed(Input)) pointer = Pointer.UP;

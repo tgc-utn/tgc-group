@@ -10,7 +10,7 @@ namespace TGC.Group.Model
 {
     class PhysicsWorld
     {
-        private static DiscreteDynamicsWorld DynamicsWorld;
+        public static DiscreteDynamicsWorld DynamicsWorld;
 
         public static void Init()
         {

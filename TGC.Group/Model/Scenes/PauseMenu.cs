@@ -26,7 +26,7 @@ namespace TGC.Group.Model.Scenes
             textBig.changeFont(new System.Drawing.Font("Arial Black", 40f));
             textSmall.changeFont(new System.Drawing.Font("Arial Black", 20f));
         }
-        public override void Update()
+        public override void Update(float elapsedTime)
         {
             if (GameInput.Enter.IsPressed(Input))
             {

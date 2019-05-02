@@ -73,7 +73,7 @@ namespace TGC.Group.Model
 
             PreUpdate();
 
-            CurrentScene.Update();
+            CurrentScene.Update(this.ElapsedTime);
 
             if(CurrentScene.Uses3DCamera)
             {

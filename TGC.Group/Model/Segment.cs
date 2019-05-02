@@ -5,6 +5,7 @@ using TGC.Core.BoundingVolumes;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Group.Model.Utils;
+using BulletSharp;
 
 namespace TGC.Group.Model
 {
@@ -22,12 +23,12 @@ namespace TGC.Group.Model
 
             return ElementsToSpawn(divisions, spawnRate)
                 .ConvertAll(scaleBox => ScaleMesh(scaleBox, list[random.Next(list.Count)]))
-                .ConvertAll(scaledMesh => generateElement(scaledMesh));
+                .ConvertAll(scaledMesh => GenerateElement(scaledMesh));
         }
 
-        private static Element generateElement(TgcMesh scaledMesh)
+        private static Element GenerateElement(TgcMesh scaledMesh)
         {
-            return new Element(scaledMesh);
+            return new Element(scaledMesh, RigidBodyFactory.CreateCapsule(scaledMesh));
         }
 
         private List<Cube> ElementsToSpawn(int divisions, SpawnRate spawnRate)
@@ -84,8 +85,12 @@ namespace TGC.Group.Model
             
             newMesh.Scale = ScaleOfBoxToBox(newMesh.BoundingBox, scaleCube);
             newMesh.Position = scaleCube.PMin;
-
+            newMesh.UpdateMeshTransform();
             newMesh.updateBoundingBox();
+
+
+
+
             return newMesh;
         }
 

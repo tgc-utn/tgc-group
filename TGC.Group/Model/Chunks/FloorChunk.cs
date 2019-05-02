@@ -21,6 +21,7 @@ namespace TGC.Group.Model.Chunks
             var segments = Segment.GenerateSegments(origin, max, 10);
 
             var divisions = (int) (DefaultSize.X / 100);
+
             
             this.Elements.AddRange(segments[0].GenerateElements(divisions/2, SpawnRate.Of(1,25), CoralMeshes.All()));
 
@@ -29,8 +30,8 @@ namespace TGC.Group.Model.Chunks
                 .ForEach(segment => 
                     this.Elements.AddRange(segment.GenerateElements(divisions/2, SpawnRate.Of(1,750), FishMeshes.All()))
                     );
-            
             this.floor = new TgcPlane(origin, DefaultSize, TgcPlane.Orientations.XZplane, FloorTexture);
+            RigidBodyFactory.CreateFloor(this.floor);
         }
         
         public override void Render()

@@ -16,7 +16,6 @@ namespace TGC.Group.Model.Scenes
     class GameScene : Scene
     {
         TgcText2D DrawText = new TgcText2D();
-        //private Element Box { get; }
       
         //Scenary
         private World World { get; }
@@ -28,7 +27,8 @@ namespace TGC.Group.Model.Scenes
         Callback onEscapeCallback = () => {};
 
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
-        {
+        { 
+            PhysicsWorld.Init();
             backgroundColor = Color.FromArgb(1, 78, 129, 179);
 
             this.World = new World(new TGCVector3(0, 0, 0));
@@ -57,14 +57,15 @@ namespace TGC.Group.Model.Scenes
             Mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
 
             //this.TgcLogo = new Element(TGCVector3.Empty, Mesh);
-
             this.Camera = new Camera(new TGCVector3(30, 30, 200), input);
 
 
         }
 
-        public override void Update()
+        public override void Update(float elapsedTime)
         {
+            PhysicsWorld.DynamicsWorld.StepSimulation(elapsedTime);
+
             CollisionManager.CheckCollitions(this.World.GetCollisionables());
 
             this.World.Update(this.Camera.Position);
@@ -90,11 +91,6 @@ namespace TGC.Group.Model.Scenes
 
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (this.BoundingBox) {
-               // this.Box.getCollisionVolume().Render();
-               // this.DrawText.drawText("Pmin: "+ this.Box.getCollisionVolume().PMin.ToString(), 0, 40, Color.White);
-                //this.DrawText.drawText("Pmax: " + this.Box.getCollisionVolume().PMax.ToString(), 0, 90, Color.White);
-                //this.DrawText.drawText("Position: " + this.Box.getCollisionVolume().Position.ToString(), 0, 140, Color.White);
-                //this.Box.getCollisionVolume().PMax.ToString();
                 this.World.RenderBoundingBox(this.Camera.Position);
             }
         }

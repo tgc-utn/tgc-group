@@ -24,7 +24,7 @@ namespace TGC.Group.Model.Scenes
             this.Input = Input;
         }
 
-        abstract public void Update();
+        abstract public void Update(float elapsedTime);
         abstract public void Render();
         virtual public void Dispose() {}
         protected void ClearScreen()

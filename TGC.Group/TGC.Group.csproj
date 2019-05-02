@@ -112,6 +112,7 @@
     <Compile Include="Model\Resources\Meshes\CoralMeshes.cs" />
     <Compile Include="Model\Resources\Meshes\FishMeshes.cs" />
     <Compile Include="Model\Segment.cs" />
+    <Compile Include="Model\RigidBodyFactory.cs" />
     <Compile Include="Model\Utils\Cube.cs" />
     <Compile Include="Model\Scenes\PauseMenu.cs" />
     <Compile Include="Model\Utils\SpawnRate.cs" />
