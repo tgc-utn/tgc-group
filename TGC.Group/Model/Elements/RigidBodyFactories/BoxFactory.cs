@@ -21,7 +21,7 @@ namespace TGC.Group.Model.Elements.RigidBodyFactories
 
         public RigidBody CreatePlane(TgcPlane plane)
         {
-            var halfSize = new TGCVector3(plane.Size.X, 0, plane.Size.Z).ToBulletVector3();
+            var halfSize = new TGCVector3(plane.Size.X / 2 , 0, plane.Size.Z / 2 ).ToBulletVector3();
             return CreateRigidBody(plane.Position, halfSize);
 
         }
