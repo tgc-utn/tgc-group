@@ -29,8 +29,7 @@ namespace TGC.Group.Model.Elements.RigidBodyFactories
         private RigidBody CreateRigidBody(TGCVector3 position, Vector3 halfSize)
         {
             var boxShape = new BoxShape(halfSize);
-            var transform = TGCMatrix.Identity;
-            transform.Origin = position;
+            var transform = TGCMatrix.Translation(position);
             var motionState = new DefaultMotionState(transform.ToBsMatrix);
             var rigidBody = new RigidBody(new RigidBodyConstructionInfo(0, motionState, boxShape));
             return rigidBody;

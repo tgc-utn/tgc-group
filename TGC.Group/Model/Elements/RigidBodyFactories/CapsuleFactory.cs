@@ -26,8 +26,7 @@ namespace TGC.Group.Model.Elements.RigidBodyFactories
                 capsule = new CapsuleShape(radius.X, radius.Y - radius.X);
             }
             var inertia = capsule.CalculateLocalInertia(mass);
-            var transform = TGCMatrix.Identity;
-            transform.Origin = mesh.Position;
+            var transform = TGCMatrix.Translation(mesh.Position);
 
             var motionState = new DefaultMotionState(transform.ToBsMatrix);
             var rigidBodyInfo = new RigidBodyConstructionInfo(mass, motionState, capsule, inertia);
