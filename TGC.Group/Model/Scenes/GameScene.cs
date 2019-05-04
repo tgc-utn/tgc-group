@@ -26,7 +26,6 @@ namespace TGC.Group.Model.Scenes
 
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         { 
-            PhysicsWorld.Init();
             backgroundColor = Color.FromArgb(1, 78, 129, 179);
             World = new World(new TGCVector3(0, 0, 0));
             Camera = new Camera(new TGCVector3(30, 30, 200), input);
@@ -35,7 +34,7 @@ namespace TGC.Group.Model.Scenes
         public override void Update(float elapsedTime)
         {
 
-            PhysicsWorld.DynamicsWorld.StepSimulation(elapsedTime);
+            AquaticPhysics.Instance.DynamicsWorld.StepSimulation(elapsedTime);
 
             CollisionManager.CheckCollitions(this.World.GetCollisionables());
 

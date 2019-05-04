@@ -33,7 +33,6 @@ namespace TGC.Group.Model.Elements.RigidBodyFactories
             transform.Origin = position;
             var motionState = new DefaultMotionState(transform.ToBsMatrix);
             var rigidBody = new RigidBody(new RigidBodyConstructionInfo(0, motionState, boxShape));
-            PhysicsWorld.DynamicsWorld.AddRigidBody(rigidBody);
             return rigidBody;
         }
 

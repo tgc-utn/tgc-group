@@ -36,7 +36,6 @@ namespace TGC.Group.Model
         public void Dispose()
         {
             Mesh.Dispose();
-            PhysicsWorld.DynamicsWorld.RemoveRigidBody(PhysicsBody);
             PhysicsBody.Dispose();
             return;
         }

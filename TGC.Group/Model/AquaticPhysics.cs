@@ -8,11 +8,28 @@ using TGC.Core.Mathematica;
 
 namespace TGC.Group.Model
 {
-    class PhysicsWorld
-    {
-        public static DiscreteDynamicsWorld DynamicsWorld;
+    public class AquaticPhysics
+    { 
+        private static AquaticPhysics instance = null;
 
-        public static void Init()
+        public static AquaticPhysics Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new AquaticPhysics();
+                    instance.Init();
+                }
+                return instance;
+            }
+        }
+
+        public DiscreteDynamicsWorld DynamicsWorld;
+        private AquaticPhysics() {}
+
+        
+        private void Init()
         {
             var collisionConfiguration = new DefaultCollisionConfiguration();
             var dispatcher = new CollisionDispatcher(collisionConfiguration);
@@ -27,6 +44,16 @@ namespace TGC.Group.Model
                 Gravity = new TGCVector3(0, -10f, 0).ToBulletVector3(),
             };
 
+        }
+
+        public void Add(RigidBody physicsBody)
+        {
+            DynamicsWorld.AddRigidBody(physicsBody);   
+        }
+
+        internal void Remove(RigidBody physicsBody)
+        {
+            DynamicsWorld.RemoveRigidBody(physicsBody);
         }
     }
 }

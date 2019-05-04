@@ -32,7 +32,6 @@ namespace TGC.Group.Model.Elements.RigidBodyFactories
             var motionState = new DefaultMotionState(transform.ToBsMatrix);
             var rigidBodyInfo = new RigidBodyConstructionInfo(mass, motionState, capsule, inertia);
             var rigidBody = new RigidBody(rigidBodyInfo);
-            PhysicsWorld.DynamicsWorld.AddRigidBody(rigidBody);
 
             return rigidBody;
         }
