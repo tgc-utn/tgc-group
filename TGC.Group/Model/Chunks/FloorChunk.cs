@@ -58,7 +58,12 @@ namespace TGC.Group.Model.Chunks
         {
             this.Floor = new TgcPlane(origin, DefaultSize, TgcPlane.Orientations.XZplane, FloorTexture);
             this.FloorRigidBody = new BoxFactory().CreatePlane(this.Floor);
-            Physics.Add(FloorRigidBody);
+        }
+
+        protected new void AddElementsToPhysicsWorld()
+        {
+            base.AddElementsToPhysicsWorld();
+            this.Physics.Add(this.FloorRigidBody);
         }
 
         public override void Render()

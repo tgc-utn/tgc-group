@@ -26,14 +26,10 @@ namespace TGC.Group.Model.Elements
                 return instance;
             }
         }
-
-        private CoralFactory() : base(CoralMeshes.All(), new BoxFactory())
+        private CoralFactory() : base(CoralMeshes.All(), new BoxFactory()){}
+        protected override Element CreateSpecificElement(TgcMesh mesh, RigidBody rigidBody)
         {
-        }
-
-        protected new Element Generate(TgcMesh mesh, RigidBody rigid)
-        {
-            return new Coral(mesh, rigid);
+            return new Coral(mesh, rigidBody);
         }
     }
 }

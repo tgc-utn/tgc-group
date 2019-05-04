@@ -10,7 +10,7 @@ using TGC.Group.Model.Utils;
 
 namespace TGC.Group.Model.Elements
 {
-    class ElementFactory
+    abstract class ElementFactory
     {
         private readonly List<TgcMesh> Meshes;
         private readonly IRigidBodyFactory BodyFactory; 
@@ -25,12 +25,7 @@ namespace TGC.Group.Model.Elements
         {
             var mesh = CreateCompletedMesh(cube);
             var rigidBody = BodyFactory.Create(mesh);
-            return Generate(mesh, rigidBody);
-        }
-
-        protected Element Generate(TgcMesh mesh, BulletSharp.RigidBody rigidBody)
-        {
-            return new Element(mesh, rigidBody);
+            return CreateSpecificElement(mesh, rigidBody);
         }
 
         private TgcMesh CreateCompletedMesh(Cube cube)
@@ -39,7 +34,6 @@ namespace TGC.Group.Model.Elements
             newMesh.Scale = ScaleOfBoxToBox(newMesh.BoundingBox, cube);
             newMesh.Position = cube.PMin;
             newMesh.UpdateMeshTransform();
-            newMesh.updateBoundingBox();
             return newMesh;
         }
         private TGCVector3 ScaleOfBoxToBox(TgcBoundingAxisAlignBox boundingBox, Cube scaleCube)
@@ -67,6 +61,8 @@ namespace TGC.Group.Model.Elements
         {
             return Meshes[new Random().Next(Meshes.Count())];
         }
+
+        protected abstract Element CreateSpecificElement(TgcMesh mesh, BulletSharp.RigidBody rigidBody);
     }
 
 }

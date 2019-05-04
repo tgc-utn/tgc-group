@@ -28,8 +28,7 @@ namespace TGC.Group.Model.Elements.ElementFactories
         private FishFactory() : base(FishMeshes.All(), new CapsuleFactory())
         {
         }
-
-        protected new Element Generate(TgcMesh mesh, RigidBody rigidBody)
+        protected override Element CreateSpecificElement(TgcMesh mesh, RigidBody rigidBody)
         {
             return new Fish(mesh, rigidBody);
         }
