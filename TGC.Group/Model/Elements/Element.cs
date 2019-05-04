@@ -22,7 +22,7 @@ namespace TGC.Group.Model
             Mesh.Position = new TGCVector3(PhysicsBody.CenterOfMassPosition.X, PhysicsBody.CenterOfMassPosition.Y, PhysicsBody.CenterOfMassPosition.Z);
             Mesh.Transform = 
                 TGCMatrix.Scaling(Mesh.Scale) *
-                TGCMatrix.Translation(new TGCVector3(PhysicsBody.CenterOfMassPosition));
+                new TGCMatrix(PhysicsBody.CenterOfMassTransform);
 
             return;
         }
