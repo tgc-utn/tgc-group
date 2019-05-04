@@ -5,6 +5,8 @@ using TGC.Core.BoundingVolumes;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Group.Model.Utils;
+using BulletSharp;
+using TGC.Group.Model.Elements;
 
 namespace TGC.Group.Model
 {
@@ -16,14 +18,18 @@ namespace TGC.Group.Model
             this.cube = cube;
         }
 
-        public IEnumerable<Element> GenerateElements(int divisions, SpawnRate spawnRate, List<TgcMesh> list)
+        public IEnumerable<Element> GenerateElements(int divisions, SpawnRate spawnRate, ElementFactory elementFactory)
         {
             var random = new Random();
 
+            return ElementsToSpawn(divisions, spawnRate)
+                .ConvertAll(scaleBox => elementFactory.Create(scaleBox));
+        }
+
+        private List<Cube> ElementsToSpawn(int divisions, SpawnRate spawnRate)
+        {
             return GenerateXzCubes(this.cube.PMin, this.cube.PMax, divisions)
-                .FindAll(scaleBox => spawnRate.HasToSpawn())
-                .ConvertAll(scaleBox => ScaleMesh(scaleBox,list[random.Next(list.Count)]))
-                .ConvertAll(scaledMesh => new Element(scaledMesh));
+                            .FindAll(scaleBox => spawnRate.HasToSpawn());
         }
 
         public static List<Segment> GenerateSegments(TGCVector3 pMin, TGCVector3 pMax, int divisions)
@@ -68,30 +74,5 @@ namespace TGC.Group.Model
             return res;
         }
 
-        private static TgcMesh ScaleMesh(Cube scaleCube, TgcMesh mesh)
-        {
-            var newMesh = mesh.createMeshInstance(mesh.Name);
-            
-            newMesh.Scale = ScaleOfBoxToBox(newMesh.BoundingBox, scaleCube);
-            newMesh.Position = scaleCube.PMin;
-
-            newMesh.updateBoundingBox();
-            return newMesh;
-        }
-
-        private static TGCVector3 ScaleOfBoxToBox(TgcBoundingAxisAlignBox boundingBox, Cube scaleCube)
-        {
-            var boundingBoxMax = boundingBox.PMax - boundingBox.PMin;
-            var scaleBoxMax = scaleCube.PMax - scaleCube.PMin;
-
-            var minScale = new[]
-            {
-                scaleBoxMax.X / boundingBoxMax.X,
-                scaleBoxMax.Y / boundingBoxMax.Y,
-                scaleBoxMax.Z / boundingBoxMax.Z
-            }.Min();
-            
-            return new TGCVector3(minScale,minScale,minScale);
-        }
     }
 }
