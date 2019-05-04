@@ -25,6 +25,11 @@ namespace TGC.Group.Model.Elements
         {
             var mesh = CreateCompletedMesh(cube);
             var rigidBody = BodyFactory.Create(mesh);
+            return Generate(mesh, rigidBody);
+        }
+
+        protected Element Generate(TgcMesh mesh, BulletSharp.RigidBody rigidBody)
+        {
             return new Element(mesh, rigidBody);
         }
 

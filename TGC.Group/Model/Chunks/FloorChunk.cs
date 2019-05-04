@@ -5,6 +5,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.Terrain;
 using TGC.Core.Textures;
 using TGC.Group.Model.Elements;
+using TGC.Group.Model.Elements.ElementFactories;
 using TGC.Group.Model.Elements.RigidBodyFactories;
 using TGC.Group.Model.Resources.Meshes;
 using TGC.Group.Model.Utils;
@@ -28,14 +29,12 @@ namespace TGC.Group.Model.Chunks
             var divisions = (int) (DefaultSize.X / 100);
 
             
-            this.Elements.AddRange(segments[0].GenerateElements(divisions/2, SpawnRate.Of(1,25), 
-                new ElementFactory(CoralMeshes.All(), new BoxFactory())));
+            this.Elements.AddRange(segments[0].GenerateElements(divisions/2, SpawnRate.Of(1,25), CoralFactory.Instance));
 
             segments.Remove(segments[0]);
             segments
                 .ForEach(segment => 
-                    this.Elements.AddRange(segment.GenerateElements(divisions/2, SpawnRate.Of(1,750), 
-                    new ElementFactory(FishMeshes.All(), new CapsuleFactory()))));
+                    this.Elements.AddRange(segment.GenerateElements(divisions/2, SpawnRate.Of(1,750), FishFactory.Instance)));
 
             this.Floor = new TgcPlane(origin, DefaultSize, TgcPlane.Orientations.XZplane, FloorTexture);
             this.FloorRigidBody = new BoxFactory().CreatePlane(this.Floor);

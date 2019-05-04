@@ -108,7 +108,12 @@
     <Compile Include="Model\Chunks\NoneChunk.cs" />
     <Compile Include="Model\Collisionable.cs" />
     <Compile Include="Model\CollisionManager.cs" />
-    <Compile Include="Model\Elements\ElementFactory.cs" />
+    <Compile Include="Model\Elements\Character.cs" />
+    <Compile Include="Model\Elements\ElementFactories\ElementFactory.cs" />
+    <Compile Include="Model\Elements\ElementFactories\FishFactory.cs" />
+    <Compile Include="Model\Elements\Fish.cs" />
+    <Compile Include="Model\Elements\Coral.cs" />
+    <Compile Include="Model\Elements\ElementFactories\CoralFactory.cs" />
     <Compile Include="Model\Elements\RigidBodyFactories\CapsuleFactory.cs" />
     <Compile Include="Model\Elements\RigidBodyFactories\BoxFactory.cs" />
     <Compile Include="Model\Input\GameInput.cs" />

@@ -24,8 +24,7 @@ namespace TGC.Group.Model
                 collisionConfiguration
             )
             {
-                Gravity = new TGCVector3(0, -10f, 0).ToBulletVector3()
-
+                Gravity = new TGCVector3(0, -10f, 0).ToBulletVector3(),
             };
 
         }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TGC.Core.Mathematica;
 using TGC.Group.Model.Elements;
+using TGC.Group.Model.Elements.ElementFactories;
 using TGC.Group.Model.Elements.RigidBodyFactories;
 using TGC.Group.Model.Resources.Meshes;
 using TGC.Group.Model.Utils;
@@ -22,12 +23,8 @@ namespace TGC.Group.Model.Chunks
 
         private static IEnumerable<Element> GenerateElements(Segment segment, int divisions)
         {
-            return segment.GenerateElements(divisions / 2, SpawnRate.Of(1, 750), GetElementFactory());
+            return segment.GenerateElements(divisions / 2, SpawnRate.Of(1, 750), FishFactory.Instance);
         }
 
-        private static ElementFactory GetElementFactory()
-        {
-            return new ElementFactory(FishMeshes.All(), new CapsuleFactory());
-        }
     }
 }
