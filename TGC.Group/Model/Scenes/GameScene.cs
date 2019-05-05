@@ -119,18 +119,18 @@ namespace TGC.Group.Model.Scenes
             this.skyBox.Render();
             this.World.Render(this.Camera.Position);
 
+            this.World.Render(this.Camera.Position);
+
+            stateDependentRenderLogic();
+
             drawer.BeginDrawSprite();
             drawer.DrawSprite(waterVision);
             drawer.EndDrawSprite();
-
-            this.World.Render(this.Camera.Position);
 
             if (this.BoundingBox)
             {
                 this.World.RenderBoundingBox(this.Camera.Position);
             }
-
-            stateDependentRenderLogic();
         }
 
         public override void Dispose()
