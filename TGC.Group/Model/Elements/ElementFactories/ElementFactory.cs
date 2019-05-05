@@ -12,8 +12,9 @@ namespace TGC.Group.Model.Elements
 {
     abstract class ElementFactory
     {
+        private static Random Random = new Random();
         private readonly List<TgcMesh> Meshes;
-        private readonly IRigidBodyFactory BodyFactory; 
+        private readonly IRigidBodyFactory BodyFactory;
 
         public ElementFactory(List<TgcMesh> meshes, IRigidBodyFactory rigidBodyFactory)
         {
@@ -59,7 +60,7 @@ namespace TGC.Group.Model.Elements
 
         private TgcMesh GetRandomMesh()
         {
-            return Meshes[new Random().Next(Meshes.Count())];
+            return Meshes[Random.Next(Meshes.Count())];
         }
 
         protected abstract Element CreateSpecificElement(TgcMesh mesh, BulletSharp.RigidBody rigidBody);
