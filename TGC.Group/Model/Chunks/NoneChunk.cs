@@ -7,7 +7,7 @@ namespace TGC.Group.Model.Chunks
     public class NoneChunk : Chunk
 
     {
-        public NoneChunk() : base(TGCVector3.Empty)
+        public NoneChunk() : base(TGCVector3.Empty, AquaticPhysics.Instance)
         {
         }
         

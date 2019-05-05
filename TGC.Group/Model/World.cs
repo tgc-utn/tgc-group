@@ -47,7 +47,7 @@ namespace TGC.Group.Model
             return res;
         }
 
-        private List<Chunk> getChunksByRadius(TGCVector3 origin, int radius)
+        private List<Chunk> GetChunksByRadius(TGCVector3 origin, int radius)
         {
             var toUpdate = new List<Chunk>();
             var intOrigin = new TGCVector3(
@@ -76,12 +76,12 @@ namespace TGC.Group.Model
         
         private List<Chunk> ToUpdate(TGCVector3 cameraPosition)
         {
-            return getChunksByRadius(cameraPosition, UpdateRadius);
+            return GetChunksByRadius(cameraPosition, UpdateRadius);
         }
 
         private List<Chunk> ToRender(TGCVector3 cameraPosition)
         {
-            return getChunksByRadius(cameraPosition, RenderRadius);
+            return GetChunksByRadius(cameraPosition, RenderRadius);
         }
 
         public void Update(TGCVector3 cameraPosition)

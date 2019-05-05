@@ -81,7 +81,7 @@ namespace TGC.Group.Model.Scenes
             Camera = new TgcCamera();
         }
 
-        override public void Update()
+        override public void Update(float elapsedTime)
         {
             if (GameInput.Down.IsPressed(Input)) pointer = Pointer.DOWN;
             if (GameInput.Up.IsPressed(Input)) pointer = Pointer.UP;

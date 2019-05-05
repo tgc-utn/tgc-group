@@ -15,20 +15,16 @@ using TGC.Group.TGCUtils;
 using TGC.Group.Model.Resources.Sprites;
 using TGC.Group.Model.Utils;
 using Microsoft.DirectX.Direct3D;
-using System;
+using TGC.Core.SkeletalAnimation;
+using TGC.Group.Model.Elements.RigidBodyFactories;
+using TGC.Core.Terrain;
 
 namespace TGC.Group.Model.Scenes
 {
     class GameScene : Scene
     {
-        TgcText2D DrawText = new TgcText2D();
-        private Element Box { get; }
-        private Element TgcLogo { get; }
-
-        //Scenary
+        readonly TgcText2D DrawText = new TgcText2D();
         private World World { get; }
-
-        //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
 
         public delegate void Callback();
@@ -38,8 +34,9 @@ namespace TGC.Group.Model.Scenes
         Drawer2D drawer = new Drawer2D();
 
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
-        {
+        { 
             backgroundColor = Color.FromArgb(1, 78, 129, 179);
+<<<<<<< HEAD
 
             this.World = new World(new TGCVector3(0, 0, 0));
             
@@ -115,14 +112,20 @@ namespace TGC.Group.Model.Scenes
             D3DDevice.Instance.Device.SamplerState[0].AddressW = TextureAddress.Clamp;
             D3DDevice.Instance.Device.SamplerState[0].MinFilter = TextureFilter.Point;
             D3DDevice.Instance.Device.SetRenderState(RenderStates.Lighting, false);
+            World = new World(new TGCVector3(0, 0, 0));
+            Camera = new Camera(new TGCVector3(30, 30, 200), input);
         }
 
-        public override void Update()
+        public override void Update(float elapsedTime)
         {
+
+            AquaticPhysics.Instance.DynamicsWorld.StepSimulation(elapsedTime);
+
             CollisionManager.CheckCollitions(this.World.GetCollisionables());
 
             this.World.Update(this.Camera.Position);
-            //skyBox.Center = new TGCVector3(Camera.Position.X, 4000, Camera.Position.Z);
+
+            skyBox.Center = new TGCVector3(Camera.Position);
             skyBox.Center = Camera.Position;
             //Capturar Input teclado
             if (GameInput.Statistic.IsPressed(Input))
@@ -137,39 +140,25 @@ namespace TGC.Group.Model.Scenes
         public override void Render()
         {
             ClearScreen();
-            //Dibuja un texto por pantalla
             this.DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
             this.DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(this.Camera.Position), 0, 30, Color.OrangeRed);
 
-            //Render del mesh
             this.skyBox.Render();
-            this.Box.Render();
-            this.TgcLogo.Render();
             this.World.Render(this.Camera.Position);
 
             drawer.BeginDrawSprite();
             drawer.DrawSprite(waterVision);
             drawer.EndDrawSprite();
 
-            //Render de BoundingBox, muy útil para debug de colisiones.
+            this.World.Render(this.Camera.Position);
+
             if (this.BoundingBox) {
-                this.Box.getCollisionVolume().Render();
-                this.TgcLogo.getCollisionVolume().Render();
-                this.DrawText.drawText("Pmin: "+ this.Box.getCollisionVolume().PMin.ToString(), 0, 40, Color.White);
-                this.DrawText.drawText("Pmax: " + this.Box.getCollisionVolume().PMax.ToString(), 0, 90, Color.White);
-                this.DrawText.drawText("Position: " + this.Box.getCollisionVolume().Position.ToString(), 0, 140, Color.White);
-                this.Box.getCollisionVolume().PMax.ToString();
                 this.World.RenderBoundingBox(this.Camera.Position);
             }
         }
 
         public override void Dispose()
         {
-            //Dispose de la caja.
-            this.Box.Dispose();
-            //Dispose del mesh.
-            this.TgcLogo.Dispose();
-            //World dispose
             this.World.Dispose();
         }
 
