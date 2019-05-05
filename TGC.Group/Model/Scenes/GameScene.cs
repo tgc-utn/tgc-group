@@ -9,6 +9,13 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Group.Model.Input;
+using TGC.Core.Terrain;
+using Microsoft.DirectX;
+using TGC.Group.TGCUtils;
+using TGC.Group.Model.Resources.Sprites;
+using TGC.Group.Model.Utils;
+using Microsoft.DirectX.Direct3D;
+using System;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -25,7 +32,10 @@ namespace TGC.Group.Model.Scenes
         private bool BoundingBox { get; set; }
 
         public delegate void Callback();
-        Callback onEscapeCallback = () => {};
+        Callback onPauseCallback = () => {};
+        TgcSkyBox skyBox;
+        CustomSprite waterVision;
+        Drawer2D drawer = new Drawer2D();
 
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         {
@@ -59,6 +69,52 @@ namespace TGC.Group.Model.Scenes
             this.TgcLogo = new Element(TGCVector3.Empty, Mesh);
 
             this.Camera = new Camera(new TGCVector3(30, 30, 200), input);
+
+            string baseDir = "../../../res/";
+
+            skyBox = new TgcSkyBox();
+            skyBox.SkyEpsilon = 0;
+            //skyBox.Color = Color.FromArgb(188, 76, 100, 160);
+            skyBox.Center = Camera.Position;
+            skyBox.Size = new TGCVector3(30000, 30000, 30000);
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, baseDir +    "underwater_skybox-up.jpg"   );
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, baseDir + "underwater_skybox-down.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left, baseDir + "underwater_skybox-left.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, baseDir + "underwater_skybox-right.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, baseDir + "underwater_skybox-front.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, baseDir + "underwater_skybox-back.jpg");
+            skyBox.Init();
+            D3DDevice.Instance.Device.Transform.Projection =
+                Matrix.PerspectiveFovLH(
+                    45,
+                    D3DDevice.Instance.AspectRatio,
+                    D3DDevice.Instance.ZNearPlaneDistance,
+                    D3DDevice.Instance.ZFarPlaneDistance * 3f
+                );
+
+            waterVision = BitmapRepository.CreateSpriteFromPath(BitmapRepository.WaterRectangle);
+            Screen.FitSpriteToScreen(waterVision);
+            waterVision.Color = Color.FromArgb(120, 76, 100, 160);
+
+            //for(int i = 0; i < 100; ++i)
+            //{
+            //    try
+            //    {
+            //        D3DDevice.Instance.Device.SamplerState[i].AddressU = TextureAddress.Clamp;
+            //        D3DDevice.Instance.Device.SamplerState[i].AddressV = TextureAddress.Clamp;
+            //        D3DDevice.Instance.Device.SamplerState[i].AddressW = TextureAddress.Clamp;
+            //        D3DDevice.Instance.Device.SamplerState[i].BorderColor = Color.Black;
+            //    } catch(Exception e)
+            //    {
+
+            //    }
+            //}
+
+            D3DDevice.Instance.Device.SamplerState[0].AddressU = TextureAddress.Clamp;
+            D3DDevice.Instance.Device.SamplerState[0].AddressV = TextureAddress.Clamp;
+            D3DDevice.Instance.Device.SamplerState[0].AddressW = TextureAddress.Clamp;
+            D3DDevice.Instance.Device.SamplerState[0].MinFilter = TextureFilter.Point;
+            D3DDevice.Instance.Device.SetRenderState(RenderStates.Lighting, false);
         }
 
         public override void Update()
@@ -66,6 +122,8 @@ namespace TGC.Group.Model.Scenes
             CollisionManager.CheckCollitions(this.World.GetCollisionables());
 
             this.World.Update(this.Camera.Position);
+            //skyBox.Center = new TGCVector3(Camera.Position.X, 4000, Camera.Position.Z);
+            skyBox.Center = Camera.Position;
             //Capturar Input teclado
             if (GameInput.Statistic.IsPressed(Input))
             {
@@ -73,7 +131,7 @@ namespace TGC.Group.Model.Scenes
             }
             if (GameInput.Escape.IsPressed(Input))
             {
-                onEscapeCallback();
+                onPauseCallback();
             }
         }
         public override void Render()
@@ -84,9 +142,14 @@ namespace TGC.Group.Model.Scenes
             this.DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(this.Camera.Position), 0, 30, Color.OrangeRed);
 
             //Render del mesh
+            this.skyBox.Render();
             this.Box.Render();
             this.TgcLogo.Render();
             this.World.Render(this.Camera.Position);
+
+            drawer.BeginDrawSprite();
+            drawer.DrawSprite(waterVision);
+            drawer.EndDrawSprite();
 
             //Render de BoundingBox, muy útil para debug de colisiones.
             if (this.BoundingBox) {
@@ -111,9 +174,9 @@ namespace TGC.Group.Model.Scenes
         }
 
 
-        public GameScene OnEscape(Callback onEscapeCallback)
+        public GameScene OnPause(Callback onPauseCallback)
         {
-            this.onEscapeCallback = onEscapeCallback;
+            this.onPauseCallback = onPauseCallback;
             return this;
         }
     }

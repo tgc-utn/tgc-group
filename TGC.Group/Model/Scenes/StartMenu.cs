@@ -24,7 +24,7 @@ namespace TGC.Group.Model.Scenes
         private Callback onGameStartCallback, onGameExitCallback;
         TgcText2D DrawTextBig, DrawTextSmall;
         Drawer2D drawer;
-        CustomSprite spriteSubnautica, spriteBlackRectangle, title;
+        CustomSprite spriteBlackRectangle, title;
         private double x;
         private int yBase;
         private Pointer pointer = Pointer.UP;
@@ -45,14 +45,12 @@ namespace TGC.Group.Model.Scenes
 
             drawer = new Drawer2D();
 
-            spriteSubnautica = BitmapRepository.CreateSpriteFromPath(BitmapRepository.SubnauticaPortrait);
             spriteBlackRectangle = BitmapRepository.CreateSpriteFromPath(BitmapRepository.BlackRectangle);
             title = BitmapRepository.CreateSpriteFromPath(BitmapRepository.Title);
             title.Scaling = new TGCVector2(.15f, .25f);
             title.Position = new TGCVector2(200, 250);
             spriteBlackRectangle.Color = Color.FromArgb(188, 0, 0, 0);
 
-            Screen.FitSpriteToScreen(spriteSubnautica);
             spriteBlackRectangle.Scaling = new TGCVector2(1, .1f);
             Screen.CenterSprite(spriteBlackRectangle);
             spriteBlackRectangle.Position = new TGCVector2(
