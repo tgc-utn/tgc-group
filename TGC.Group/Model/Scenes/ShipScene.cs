@@ -48,7 +48,7 @@ namespace TGC.Group.Model.Scenes
             walls.Render();
         }
 
-        public override void Update()
+        public override void Update(float elapsedTime)
         {
             if(Input.keyPressed(Key.Return))
             {

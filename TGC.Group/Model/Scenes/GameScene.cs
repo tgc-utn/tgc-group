@@ -17,7 +17,6 @@ using TGC.Group.Model.Utils;
 using Microsoft.DirectX.Direct3D;
 using TGC.Core.SkeletalAnimation;
 using TGC.Group.Model.Elements.RigidBodyFactories;
-using TGC.Core.Terrain;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -36,7 +35,6 @@ namespace TGC.Group.Model.Scenes
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         { 
             backgroundColor = Color.FromArgb(1, 78, 129, 179);
-<<<<<<< HEAD
 
             this.World = new World(new TGCVector3(0, 0, 0));
             
@@ -56,14 +54,11 @@ namespace TGC.Group.Model.Scenes
             //Construimos una caja según los parámetros, por defecto la misma se crea con centro en el origen y se recomienda así para facilitar las transformaciones.
             //Posición donde quiero que este la caja, es común que se utilicen estructuras internas para las transformaciones.
             //Entonces actualizamos la posición lógica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
-            Box = new Element(new TGCVector3(-25, 0, 0), TGCBox.fromSize(size, texture).ToMesh("caja"));
 
             //Cargo el unico mesh que tiene la escena.
             TgcMesh Mesh = new TgcSceneLoader().loadSceneFromFile(mediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
             //Defino una escala en el modelo logico del mesh que es muy grande.
             Mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
-
-            this.TgcLogo = new Element(TGCVector3.Empty, Mesh);
 
             this.Camera = new Camera(new TGCVector3(30, 30, 200), input);
 

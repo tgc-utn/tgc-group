@@ -60,10 +60,6 @@ namespace TGC.Group.Model
         {
             //note(fede): Only at this point the Input field has been initialized by the form
 
-            shipScene = new ShipScene(Input)
-                .OnGoToWater(() => SetNextScene(gameScene))
-                .OnPause(() => PauseScene(shipScene));
-
             startMenu = new StartMenu(Input)
                     .onGameStart(() => SetNextScene(shipScene))
                     .onGameExit(StopGame);
@@ -132,6 +128,10 @@ namespace TGC.Group.Model
         {
             gameScene = new GameScene(Input, MediaDir)
                     .OnPause(() => PauseScene(gameScene));
+
+            shipScene = new ShipScene(Input)
+                .OnGoToWater(() => SetNextScene(gameScene))
+                .OnPause(() => PauseScene(shipScene));
         }
 
         private void PauseScene(Scene scene)
