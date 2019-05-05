@@ -26,10 +26,12 @@ namespace TGC.Group.Model.Scenes
         private World World { get; }
         private bool BoundingBox { get; set; }
 
+        string baseDir = "../../../res/";
+
         public delegate void Callback();
         Callback onPauseCallback = () => {};
         TgcSkyBox skyBox;
-        CustomSprite waterVision, blackRectangle;
+        CustomSprite waterVision, darknessCover;
         Drawer2D drawer = new Drawer2D();
         CustomSprite PDA;
         float PDAPositionX, finalPDAPositionX, PDAMoveCoefficient;
@@ -39,7 +41,6 @@ namespace TGC.Group.Model.Scenes
         InteractionLogic currentInteractionLogic, newUpdateLogic;
         delegate void RenderLogic();
         RenderLogic stateDependentRenderLogic, newRenderLogic;
-
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         { 
             backgroundColor = Color.FromArgb(1, 78, 129, 179);
@@ -48,41 +49,13 @@ namespace TGC.Group.Model.Scenes
 
             this.Camera = new Camera(new TGCVector3(30, 30, 200), input);
 
-            string baseDir = "../../../res/";
+            IncrementFarPlane(3f);
+            SetClampTextureAddressing();
 
-            skyBox = new TgcSkyBox();
-            skyBox.SkyEpsilon = 0;
-            //skyBox.Color = Color.FromArgb(188, 76, 100, 160);
-            skyBox.Center = Camera.Position;
-            skyBox.Size = new TGCVector3(30000, 30000, 30000);
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, baseDir +    "underwater_skybox-up.jpg"   );
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, baseDir + "underwater_skybox-down.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left, baseDir + "underwater_skybox-left.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, baseDir + "underwater_skybox-right.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, baseDir + "underwater_skybox-front.jpg");
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, baseDir + "underwater_skybox-back.jpg");
-            skyBox.Init();
-            D3DDevice.Instance.Device.Transform.Projection =
-                Matrix.PerspectiveFovLH(
-                    45,
-                    D3DDevice.Instance.AspectRatio,
-                    D3DDevice.Instance.ZNearPlaneDistance,
-                    D3DDevice.Instance.ZFarPlaneDistance * 3f
-                );
+            InitSkyBox();
+            InitWaterVision();
+            InitDarknessCover();
 
-            waterVision = BitmapRepository.CreateSpriteFromPath(BitmapRepository.WaterRectangle);
-            Screen.FitSpriteToScreen(waterVision);
-            waterVision.Color = Color.FromArgb(120, 10, 70, 164);
-
-            blackRectangle = BitmapRepository.CreateSpriteFromPath(BitmapRepository.BlackRectangle);
-            Screen.FitSpriteToScreen(blackRectangle);
-            blackRectangle.Color = Color.FromArgb(188, 0, 0, 0);
-
-            D3DDevice.Instance.Device.SamplerState[0].AddressU = TextureAddress.Clamp;
-            D3DDevice.Instance.Device.SamplerState[0].AddressV = TextureAddress.Clamp;
-            D3DDevice.Instance.Device.SamplerState[0].AddressW = TextureAddress.Clamp;
-            D3DDevice.Instance.Device.SamplerState[0].MinFilter = TextureFilter.Point;
-            D3DDevice.Instance.Device.SetRenderState(RenderStates.Lighting, false);
             World = new World(new TGCVector3(0, 0, 0));
             Camera = new Camera(new TGCVector3(30, 30, 200), input);
 
@@ -94,6 +67,52 @@ namespace TGC.Group.Model.Scenes
 
             currentInteractionLogic = WorldInteractionLogic;
             stateDependentRenderLogic = () => {};
+        }
+
+        private void IncrementFarPlane(float scale)
+        {
+            D3DDevice.Instance.Device.Transform.Projection =
+                Matrix.PerspectiveFovLH(
+                    45,
+                    D3DDevice.Instance.AspectRatio,
+                    D3DDevice.Instance.ZNearPlaneDistance,
+                    D3DDevice.Instance.ZFarPlaneDistance * scale
+                );
+        }
+
+        private void InitWaterVision()
+        {
+            waterVision = BitmapRepository.CreateSpriteFromPath(BitmapRepository.WaterRectangle);
+            Screen.FitSpriteToScreen(waterVision);
+            waterVision.Color = Color.FromArgb(120, 10, 70, 164);
+        }
+        private void InitDarknessCover()
+        {
+            darknessCover = BitmapRepository.CreateSpriteFromPath(BitmapRepository.BlackRectangle);
+            Screen.FitSpriteToScreen(darknessCover);
+            darknessCover.Color = Color.FromArgb(188, 0, 0, 0);
+        }
+
+        private void InitSkyBox()
+        {
+            skyBox = new TgcSkyBox();
+            skyBox.SkyEpsilon = 0;
+            skyBox.Center = Camera.Position;
+            skyBox.Size = new TGCVector3(30000, 30000, 30000);
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up   , baseDir + "underwater_skybox-up.jpg"    );
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down , baseDir + "underwater_skybox-down.jpg"  );
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left , baseDir + "underwater_skybox-left.jpg"  );
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, baseDir + "underwater_skybox-right.jpg" );
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, baseDir + "underwater_skybox-front.jpg" );
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back , baseDir + "underwater_skybox-back.jpg"  );
+            skyBox.Init();
+        }
+
+        private void SetClampTextureAddressing()
+        {
+            D3DDevice.Instance.Device.SamplerState[0].AddressU = TextureAddress.Clamp;
+            D3DDevice.Instance.Device.SamplerState[0].AddressV = TextureAddress.Clamp;
+            D3DDevice.Instance.Device.SamplerState[0].AddressW = TextureAddress.Clamp;
         }
 
         private bool HasToChangeInteractionLogic()
@@ -127,7 +146,6 @@ namespace TGC.Group.Model.Scenes
 
             this.World.Update(this.Camera.Position);
 
-            skyBox.Center = new TGCVector3(Camera.Position);
             skyBox.Center = Camera.Position;
 
             if (GameInput.Statistic.IsPressed(Input))
@@ -237,7 +255,7 @@ namespace TGC.Group.Model.Scenes
             }
             PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
             PDA.Color = Color.FromArgb(PDATransparency, PDA.Color.R, PDA.Color.G, PDA.Color.B);
-            blackRectangle.Color = Color.FromArgb(CalculaterBlacknessTransparency(), blackRectangle.Color.R, blackRectangle.Color.G, blackRectangle.Color.B);
+            darknessCover.Color = Color.FromArgb(CalculaterBlacknessTransparency(), darknessCover.Color.R, darknessCover.Color.G, darknessCover.Color.B);
         }
         private void TakePDAOut(float elapsedTime)
         {
@@ -259,12 +277,12 @@ namespace TGC.Group.Model.Scenes
             }
             PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
             PDA.Color = Color.FromArgb(PDATransparency, PDA.Color.R, PDA.Color.G, PDA.Color.B);
-            blackRectangle.Color = Color.FromArgb(CalculaterBlacknessTransparency(), blackRectangle.Color.R, blackRectangle.Color.G, blackRectangle.Color.B);
+            darknessCover.Color = Color.FromArgb(CalculaterBlacknessTransparency(), darknessCover.Color.R, darknessCover.Color.G, darknessCover.Color.B);
         }
         private void RenderInventory()
         {
             drawer.BeginDrawSprite();
-            drawer.DrawSprite(blackRectangle);
+            drawer.DrawSprite(darknessCover);
             drawer.DrawSprite(PDA);
             drawer.EndDrawSprite();
         }
