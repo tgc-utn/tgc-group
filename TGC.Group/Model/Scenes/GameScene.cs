@@ -32,13 +32,14 @@ namespace TGC.Group.Model.Scenes
         CustomSprite waterVision, blackRectangle;
         Drawer2D drawer = new Drawer2D();
         CustomSprite PDA;
-        float PDAPositionX, finalPDAPositionX;
+        float PDAPositionX, finalPDAPositionX, PDAMoveCoefficient;
         int PDATransparency;
 
         delegate void InteractionLogic(float elapsedTime);
-        InteractionLogic currentInteractionLogic;
+        InteractionLogic currentInteractionLogic, newUpdateLogic;
         delegate void RenderLogic();
-        RenderLogic stateDependentRenderLogic;
+        RenderLogic stateDependentRenderLogic, newRenderLogic;
+
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         { 
             backgroundColor = Color.FromArgb(1, 78, 129, 179);
@@ -89,13 +90,36 @@ namespace TGC.Group.Model.Scenes
             PDA.Scaling = new TGCVector2(.5f, .35f);
             Screen.CenterSprite(PDA);
             finalPDAPositionX = PDA.Position.X;
+            PDAMoveCoefficient = (finalPDAPositionX - GetPDAInitialPosition()) * 4;
 
             currentInteractionLogic = WorldInteractionLogic;
             stateDependentRenderLogic = () => {};
         }
 
+        private bool HasToChangeInteractionLogic()
+        {
+            return newUpdateLogic != null;
+        }
+        private bool HasToChangeStateDependentRenderLogic()
+        {
+            return newRenderLogic != null;
+        }
+        private void UpdateLogic()
+        {
+            if (HasToChangeStateDependentRenderLogic())
+            {
+                stateDependentRenderLogic = newRenderLogic;
+                newRenderLogic = null;
+            }
+            if (HasToChangeInteractionLogic())
+            {
+                currentInteractionLogic = newUpdateLogic;
+                newUpdateLogic = null;
+            }
+        }
         public override void Update(float elapsedTime)
         {
+            UpdateLogic();
 
             AquaticPhysics.Instance.DynamicsWorld.StepSimulation(elapsedTime);
 
@@ -148,16 +172,23 @@ namespace TGC.Group.Model.Scenes
             this.onPauseCallback = onPauseCallback;
             return this;
         }
+        private void ChangeInteractionLogic(InteractionLogic newLogic)
+        {
+            newUpdateLogic = newLogic;
+        }
+        private void ChangeStateDependentRenderLogic(RenderLogic newLogic)
+        {
+            newRenderLogic = newLogic;
+        }
 
         private float GetPDAInitialPosition() { return -PDA.Bitmap.Width * PDA.Scaling.X; }
         private void WorldInteractionLogic(float elapsedTime)
         {
             if (Input.keyPressed(Key.I))
             {
-                currentInteractionLogic = TakePDAIn;
-                stateDependentRenderLogic = RenderInventory;
+                ChangeInteractionLogic(TakePDAIn);
+                ChangeStateDependentRenderLogic(RenderInventory);
                 PDAPositionX = GetPDAInitialPosition();
-                PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
                 ((Camera)Camera).Freeze();
                 return;
             }
@@ -166,11 +197,11 @@ namespace TGC.Group.Model.Scenes
         {
             if (Input.keyPressed(Key.I))
             {
-                currentInteractionLogic = TakePDAOut;
+                ChangeInteractionLogic(TakePDAOut);
                 return;
             }
         }
-        private int CalculateTransparency()
+        private int CalculateTransparency(int limit)
         {
             return FastMath.Max(
                 FastMath.Min((int)
@@ -178,47 +209,57 @@ namespace TGC.Group.Model.Scenes
                     1 - (
                             (finalPDAPositionX - PDAPositionX) / (finalPDAPositionX - GetPDAInitialPosition())
                         )
-                ) * 255), 140), 0);
+                ) * limit), 255), 0);
+        }
+        private int CalculatePDATransparency()
+        {
+            return CalculateTransparency(140);
+        }
+        private int CalculaterBlacknessTransparency()
+        {
+            return CalculateTransparency(188);
         }
         private void TakePDAIn(float elapsedTime)
         {
             if (Input.keyPressed(Key.I))
             {
-                currentInteractionLogic = TakePDAOut;
+                ChangeInteractionLogic(TakePDAOut);
                 return;
             }
 
-            PDAPositionX += 4000f * elapsedTime;
-            PDATransparency = CalculateTransparency();
+            PDAPositionX += PDAMoveCoefficient * elapsedTime;
+            PDATransparency = CalculatePDATransparency();
 
             if (PDAPositionX > finalPDAPositionX)
             {
                 PDAPositionX = finalPDAPositionX;
-                currentInteractionLogic = InventoryInteractionLogic;
+                ChangeInteractionLogic(InventoryInteractionLogic);
             }
             PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
             PDA.Color = Color.FromArgb(PDATransparency, PDA.Color.R, PDA.Color.G, PDA.Color.B);
+            blackRectangle.Color = Color.FromArgb(CalculaterBlacknessTransparency(), blackRectangle.Color.R, blackRectangle.Color.G, blackRectangle.Color.B);
         }
         private void TakePDAOut(float elapsedTime)
         {
             if (Input.keyPressed(Key.I))
             {
-                currentInteractionLogic = TakePDAIn;
+                ChangeInteractionLogic(TakePDAIn);
                 return;
             }
 
-            PDAPositionX -= 4000f * elapsedTime;
-            PDATransparency = CalculateTransparency();
+            PDAPositionX -= PDAMoveCoefficient * elapsedTime;
+            PDATransparency = CalculatePDATransparency();
 
             if (PDAPositionX + PDA.Bitmap.Width * PDA.Scaling.X < 0)
             {
                 PDAPositionX = finalPDAPositionX;
-                currentInteractionLogic = WorldInteractionLogic;
+                ChangeInteractionLogic(WorldInteractionLogic);
                 stateDependentRenderLogic = () => {};
                 ((Camera)Camera).Unfreeze();
             }
             PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
             PDA.Color = Color.FromArgb(PDATransparency, PDA.Color.R, PDA.Color.G, PDA.Color.B);
+            blackRectangle.Color = Color.FromArgb(CalculaterBlacknessTransparency(), blackRectangle.Color.R, blackRectangle.Color.G, blackRectangle.Color.B);
         }
         private void RenderInventory()
         {
