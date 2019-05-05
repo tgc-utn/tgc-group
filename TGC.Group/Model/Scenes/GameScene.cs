@@ -31,34 +31,18 @@ namespace TGC.Group.Model.Scenes
         TgcSkyBox skyBox;
         CustomSprite waterVision;
         Drawer2D drawer = new Drawer2D();
+        CustomSprite PDA;
+        float PDAPositionX, finalPDAPositionX;
 
+        delegate void InteractionLogic(float elapsedTime);
+        InteractionLogic currentInteractionLogic;
+        delegate void RenderLogic();
+        RenderLogic stateDependentRenderLogic;
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         { 
             backgroundColor = Color.FromArgb(1, 78, 129, 179);
 
             this.World = new World(new TGCVector3(0, 0, 0));
-            
-            //Device de DirectX para crear primitivas.
-            var d3dDevice = D3DDevice.Instance.Device;
-
-            //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
-            //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
-            var pathTexturaCaja = mediaDir + Game.Default.TexturaCaja;
-
-            //Cargamos una textura, tener en cuenta que cargar una textura significa crear una copia en memoria.
-            //Es importante cargar texturas en Init, si se hace en el render loop podemos tener grandes problemas si instanciamos muchas.
-            var texture = TgcTexture.createTexture(pathTexturaCaja);
-
-            //Creamos una caja 3D ubicada de dimensiones (5, 10, 5) y la textura como color.
-            var size = new TGCVector3(5, 10, 5);
-            //Construimos una caja según los parámetros, por defecto la misma se crea con centro en el origen y se recomienda así para facilitar las transformaciones.
-            //Posición donde quiero que este la caja, es común que se utilicen estructuras internas para las transformaciones.
-            //Entonces actualizamos la posición lógica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
-
-            //Cargo el unico mesh que tiene la escena.
-            TgcMesh Mesh = new TgcSceneLoader().loadSceneFromFile(mediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
-            //Defino una escala en el modelo logico del mesh que es muy grande.
-            Mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
 
             this.Camera = new Camera(new TGCVector3(30, 30, 200), input);
 
@@ -88,20 +72,6 @@ namespace TGC.Group.Model.Scenes
             Screen.FitSpriteToScreen(waterVision);
             waterVision.Color = Color.FromArgb(120, 76, 100, 160);
 
-            //for(int i = 0; i < 100; ++i)
-            //{
-            //    try
-            //    {
-            //        D3DDevice.Instance.Device.SamplerState[i].AddressU = TextureAddress.Clamp;
-            //        D3DDevice.Instance.Device.SamplerState[i].AddressV = TextureAddress.Clamp;
-            //        D3DDevice.Instance.Device.SamplerState[i].AddressW = TextureAddress.Clamp;
-            //        D3DDevice.Instance.Device.SamplerState[i].BorderColor = Color.Black;
-            //    } catch(Exception e)
-            //    {
-
-            //    }
-            //}
-
             D3DDevice.Instance.Device.SamplerState[0].AddressU = TextureAddress.Clamp;
             D3DDevice.Instance.Device.SamplerState[0].AddressV = TextureAddress.Clamp;
             D3DDevice.Instance.Device.SamplerState[0].AddressW = TextureAddress.Clamp;
@@ -109,6 +79,14 @@ namespace TGC.Group.Model.Scenes
             D3DDevice.Instance.Device.SetRenderState(RenderStates.Lighting, false);
             World = new World(new TGCVector3(0, 0, 0));
             Camera = new Camera(new TGCVector3(30, 30, 200), input);
+
+            PDA = BitmapRepository.CreateSpriteFromPath(BitmapRepository.PDA);
+            PDA.Scaling = new TGCVector2(.5f, .35f);
+            Screen.CenterSprite(PDA);
+            finalPDAPositionX = PDA.Position.X;
+
+            currentInteractionLogic = WorldInteractionLogic;
+            stateDependentRenderLogic = () => {};
         }
 
         public override void Update(float elapsedTime)
@@ -122,7 +100,7 @@ namespace TGC.Group.Model.Scenes
 
             skyBox.Center = new TGCVector3(Camera.Position);
             skyBox.Center = Camera.Position;
-            //Capturar Input teclado
+
             if (GameInput.Statistic.IsPressed(Input))
             {
                 this.BoundingBox = !this.BoundingBox;
@@ -131,12 +109,12 @@ namespace TGC.Group.Model.Scenes
             {
                 onPauseCallback();
             }
+
+            currentInteractionLogic(elapsedTime);
         }
         public override void Render()
         {
             ClearScreen();
-            this.DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
-            this.DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(this.Camera.Position), 0, 30, Color.OrangeRed);
 
             this.skyBox.Render();
             this.World.Render(this.Camera.Position);
@@ -147,9 +125,12 @@ namespace TGC.Group.Model.Scenes
 
             this.World.Render(this.Camera.Position);
 
-            if (this.BoundingBox) {
+            if (this.BoundingBox)
+            {
                 this.World.RenderBoundingBox(this.Camera.Position);
             }
+
+            stateDependentRenderLogic();
         }
 
         public override void Dispose()
@@ -157,11 +138,72 @@ namespace TGC.Group.Model.Scenes
             this.World.Dispose();
         }
 
-
         public GameScene OnPause(Callback onPauseCallback)
         {
             this.onPauseCallback = onPauseCallback;
             return this;
+        }
+        private void WorldInteractionLogic(float elapsedTime)
+        {
+            if (Input.keyPressed(Key.I))
+            {
+                currentInteractionLogic = TakePDAIn;
+                stateDependentRenderLogic = RenderInventory;
+                PDAPositionX = -PDA.Bitmap.Width * PDA.Scaling.X;
+                PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
+                ((Camera)Camera).Freeze();
+                return;
+            }
+        }
+        private void InventoryInteractionLogic(float elapsedTime)
+        {
+            if (Input.keyPressed(Key.I))
+            {
+                currentInteractionLogic = TakePDAOut;
+                return;
+            }
+        }
+        private void TakePDAIn(float elapsedTime)
+        {
+            if (Input.keyPressed(Key.I))
+            {
+                currentInteractionLogic = TakePDAOut;
+                return;
+            }
+
+            PDAPositionX += 4000f * elapsedTime;
+
+            if (PDAPositionX > finalPDAPositionX)
+            {
+                PDAPositionX = finalPDAPositionX;
+                currentInteractionLogic = InventoryInteractionLogic;
+            }
+            PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
+        }
+        private void TakePDAOut(float elapsedTime)
+        {
+            if (Input.keyPressed(Key.I))
+            {
+                currentInteractionLogic = TakePDAIn;
+                return;
+            }
+
+            PDAPositionX -= 4000f * elapsedTime;
+
+            if (PDAPositionX + PDA.Bitmap.Width < 0)
+            {
+                PDAPositionX = finalPDAPositionX;
+                currentInteractionLogic = WorldInteractionLogic;
+                stateDependentRenderLogic = () => {};
+                ((Camera)Camera).Unfreeze();
+            }
+            PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
+        }
+        private void RenderInventory()
+        {
+            drawer.BeginDrawSprite();
+            drawer.DrawSprite(PDA);
+            drawer.EndDrawSprite();
         }
     }
 }

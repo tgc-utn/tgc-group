@@ -17,6 +17,9 @@ namespace TGC.Group.Model
         private float leftrightRot;
         private float updownRot;
 
+        delegate void CameraUpdateLogic(float elapsedTime);
+        CameraUpdateLogic currentUpdateLogic;
+
         private TgcD3dInput Input { get; }
         public float MovementSpeed { get; set; }
         public float RotationSpeed { get; set; }
@@ -32,6 +35,7 @@ namespace TGC.Group.Model
             leftrightRot = 0;
             updownRot = 0;
             Cursor.Hide();
+            currentUpdateLogic = MoveNormally;
         }
 
         private static Point GetMouseCenter()
@@ -42,16 +46,7 @@ namespace TGC.Group.Model
 
         public override void UpdateCamera(float elapsedTime)
         {
-            cameraRotation = CalculateCameraRotation();
-
-            Position += TGCVector3.TransformNormal(CalculateInputTranslation() * elapsedTime, cameraRotation);
-
-            LookAt = Position + TGCVector3.TransformNormal(initialDirectionView, cameraRotation);
-
-            UpVector = TGCVector3.TransformNormal(DEFAULT_UP_VECTOR, cameraRotation);
-
-            Cursor.Position = mouseCenter;
-            base.SetCamera(Position, LookAt, UpVector);
+            currentUpdateLogic(elapsedTime);
         }
 
         public TGCMatrix CalculateCameraRotation()
@@ -93,6 +88,28 @@ namespace TGC.Group.Model
 
             return moveVector;
         }
+        void MoveNormally(float elapsedTime)
+        {
+            cameraRotation = CalculateCameraRotation();
 
+            Position += TGCVector3.TransformNormal(CalculateInputTranslation() * elapsedTime, cameraRotation);
+
+            LookAt = Position + TGCVector3.TransformNormal(initialDirectionView, cameraRotation);
+
+            UpVector = TGCVector3.TransformNormal(DEFAULT_UP_VECTOR, cameraRotation);
+
+            Cursor.Position = mouseCenter;
+            base.SetCamera(Position, LookAt, UpVector);
+        }
+
+        public void Freeze()
+        {
+            currentUpdateLogic = (elapsedTime) => {};
+        }
+
+        public void Unfreeze()
+        {
+            currentUpdateLogic = MoveNormally;
+        }
     }
 }
