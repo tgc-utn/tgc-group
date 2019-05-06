@@ -11,6 +11,7 @@ using TGC.Group.Model.Elements.ElementFactories;
 using TGC.Group.Model.Elements.RigidBodyFactories;
 using TGC.Group.Model.Resources.Meshes;
 using TGC.Group.Model.Utils;
+using Element = TGC.Group.Model.Elements.Element;
 
 namespace TGC.Group.Model.Chunks
 {

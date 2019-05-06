@@ -1,7 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using TGC.Core.Camara;
+using TGC.Core.Collision;
+using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Group.Model.Chunks;
+using TGC.Group.Model.Elements;
+using TGC.Group.Model.Input;
 
 namespace TGC.Group.Model
 {
@@ -9,14 +15,16 @@ namespace TGC.Group.Model
     {
         private const int RenderRadius = 5;
         private const int UpdateRadius = RenderRadius + 1;
+        private const int InteractionRadius = 490000; // Math.pow(700, 2)
         
         private readonly Dictionary<TGCVector3, Chunk> chunks;
         private readonly List<Entity> entities;
+        public Element SelectableElement { get; private set; }
 
         public World(TGCVector3 initialPoint)
         {
             this.chunks = new Dictionary<TGCVector3, Chunk>();
-
+            
             this.entities = new List<Entity>();
 
             AddChunk(initialPoint);
@@ -84,28 +92,54 @@ namespace TGC.Group.Model
             return GetChunksByRadius(cameraPosition, RenderRadius);
         }
 
-        public void Update(TGCVector3 cameraPosition)
+        public void Update(TgcCamera camera)
         {
-            ToUpdate(cameraPosition).ForEach(chunk => chunk.Update());
+            var toUpdate = ToUpdate(camera.Position);
+            toUpdate.ForEach(chunk => chunk.Update());
+            this.SelectableElement = GetSelectableElement(camera, toUpdate);
             this.entities.ForEach(entity => entity.Update());
         }
-
-        public void Render(TGCVector3 cameraPosition)
+        
+        public void Render(TgcCamera camera)
         {
-            ToRender(cameraPosition).ForEach(chunk => chunk.Render());
+            ToRender(camera.Position).ForEach(chunk => chunk.Render());
             this.entities.ForEach(entity => entity.Render());
-
         }
 
-        public void RenderBoundingBox(TGCVector3 cameraPosition)
+        public void RenderBoundingBox(TgcCamera camera)
         {
-            ToRender(cameraPosition).ForEach(chunk => chunk.RenderBoundingBox());
+            ToRender(camera.Position).ForEach(chunk => chunk.RenderBoundingBox());
         }
 
         public void Dispose()
         {
             this.chunks.Values.ToList().ForEach(chunk => chunk.Dispose());
             this.entities.ForEach(entity => entity.Dispose());
+        }
+        private static Element GetSelectableElement(TgcCamera camera, List<Chunk> toUpdate)
+        {            
+            var direction = camera.LookAt - camera.Position;
+            direction.Normalize();
+
+            var intersectedElements =
+                toUpdate
+                    .SelectMany(chunk => chunk.Elements)
+                    .ToList()
+                    .FindAll(element => element.isIntersectedBy(new TgcRay(camera.Position, direction)));
+            
+            intersectedElements.Sort((element1, element2) => 
+                (int) TGCVector3.LengthSq(camera.Position, element1.Mesh.Position) <
+                (int) TGCVector3.LengthSq(camera.Position, element2.Mesh.Position) ? -1 : 1);
+
+            return intersectedElements.Find(element => 
+                Math.Abs(TGCVector3.LengthSq(camera.Position, element.Mesh.Position)) < InteractionRadius);
+        }
+        public void Remove(Element selectableElement)
+        {
+            foreach (var chunk in this.chunks.Values)
+            {
+                chunk.Remove(selectableElement);
+            }
         }
     }
 }
