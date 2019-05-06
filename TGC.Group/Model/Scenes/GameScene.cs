@@ -17,8 +17,6 @@ namespace TGC.Group.Model.Scenes
         private World World { get; }
         private bool BoundingBox { get; set; }
         
-        private string mediaDir;
-
         public delegate void Callback();
         Callback onEscapeCallback = () => {};
         
@@ -29,7 +27,6 @@ namespace TGC.Group.Model.Scenes
 
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         {
-            this.mediaDir = mediaDir;
             backgroundColor = Color.FromArgb(1, 78, 129, 179);
             World = new World(new TGCVector3(0, 0, 0));
             Camera = new Camera(new TGCVector3(30, 30, 200), input);
@@ -51,7 +48,7 @@ namespace TGC.Group.Model.Scenes
                 this.character.GiveItem(item);
 
             //TODO crafter logic, move to crafter when coded
-            if (OxygenTank.Recipe.CanCraft(this.character.inventory.AsIngredients()) && !this.gaveOxygenTank)
+            if (OxygenTank.Recipe.CanCraft(this.character.Inventory.AsIngredients()) && !this.gaveOxygenTank)
             {
                 this.character.RemoveIngredients(OxygenTank.Recipe.Ingredients);
                 var oxygenTank = new OxygenTank();

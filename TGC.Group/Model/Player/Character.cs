@@ -17,9 +17,8 @@ namespace TGC.Group.Model.Player
         public Stats MaxStats => BaseStats + this.equipment.ExtraStats();
 
         public Stats ActualStats { get; }
-        public int Oxygen => this.MaxStats.Oxygen;
+        public Inventory Inventory { get; } = new Inventory(30);
 
-        public Inventory inventory { get; } = new Inventory(30);
         private Equipment equipment = new Equipment();
         
         public Character()
@@ -39,23 +38,23 @@ namespace TGC.Group.Model.Player
 
         public void GiveItem(IItem item)
         {
-            this.inventory.AddItem(item);
+            this.Inventory.AddItem(item);
         }
 
         public void Equip(IEquipable equipable)
         {
-            this.inventory.RemoveItem(equipable);
+            this.Inventory.RemoveItem(equipable);
             this.equipment.AddEquipable(equipable);
         }
 
         public void RemoveIngredients(IEnumerable<Ingredient> recipeIngredients)
         {
-            this.inventory.RemoveIngredients(recipeIngredients);
+            this.Inventory.RemoveIngredients(recipeIngredients);
         }
 
         public void RemoveItem(IItem item)
         {
-            this.inventory.RemoveItem(item);
+            this.Inventory.RemoveItem(item);
         }
     }
 }
