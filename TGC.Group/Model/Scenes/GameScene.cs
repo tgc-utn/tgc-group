@@ -31,7 +31,7 @@ namespace TGC.Group.Model.Scenes
         public delegate void Callback();
         Callback onPauseCallback = () => {};
         TgcSkyBox skyBox;
-        CustomSprite waterVision, darknessCover, mask, aim;
+        CustomSprite waterVision, darknessCover, mask, aim, cursor;
         Drawer2D drawer = new Drawer2D();
         CustomSprite PDA;
         float PDAPositionX, finalPDAPositionX, PDAMoveCoefficient;
@@ -66,6 +66,8 @@ namespace TGC.Group.Model.Scenes
             Screen.CenterSprite(PDA);
             finalPDAPositionX = PDA.Position.X;
             PDAMoveCoefficient = (finalPDAPositionX - GetPDAInitialPosition()) * 4;
+
+            cursor = aim;
 
             currentInteractionLogic = WorldInteractionLogic;
             stateDependentRenderLogic = () => {};
@@ -188,7 +190,7 @@ namespace TGC.Group.Model.Scenes
 
             drawer.BeginDrawSprite();
             drawer.DrawSprite(mask);
-            drawer.DrawSprite(aim);
+            drawer.DrawSprite(cursor);
             drawer.EndDrawSprite();
 
             if (this.BoundingBox)
