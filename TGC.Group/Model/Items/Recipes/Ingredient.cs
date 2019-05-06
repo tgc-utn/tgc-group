@@ -15,13 +15,12 @@ namespace TGC.Group.Model.Items.Recipes
 
         public override bool Equals(object o)
         {
-            if (ReferenceEquals(this, o)) return true;
-            if (ReferenceEquals(this, null)) return false;
-            if (ReferenceEquals(o, null)) return false;
-            if (this.GetType() != o.GetType()) return false;
-            var oo = (Ingredient) o;
-
-            return Equals(this.Item.Name, oo.Item.Name) && this.Quantity == oo.Quantity;
+            return 
+                ReferenceEquals(this, o) ||
+                !ReferenceEquals(this, null) &&
+                !ReferenceEquals(o, null) &&
+                this.GetType() == o.GetType() &&
+                Equals(this.Item.Name, ((Ingredient) o).Item.Name) && this.Quantity == ((Ingredient) o).Quantity;
         }
 
         public override int GetHashCode()

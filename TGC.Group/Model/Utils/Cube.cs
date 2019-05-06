@@ -56,18 +56,7 @@ namespace TGC.Group.Model.Utils
                 tzMax = aux;
             };
 
-            if ((tMin > tzMax) || (tzMin > tMax))
-                return false;
-
-            /*
-            if (tzMin > tMin)
-                tMin = tzMin;
-
-            if (tzMax < tMax)
-                tMax = tzMax;
-            */
-            
-            return true;
+            return !(tMin > tzMax) && !(tzMin > tMax);
         } 
     }
 }
