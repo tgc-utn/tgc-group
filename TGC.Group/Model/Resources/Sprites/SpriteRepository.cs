@@ -14,6 +14,7 @@ namespace TGC.Group.Model.Resources.Sprites
         public static CustomBitmap WaterRectangle = new CustomBitmap("../../../res/rectWater.png", D3DDevice.Instance.Device);
         public static CustomBitmap Title = new CustomBitmap("../../../res/title.png", D3DDevice.Instance.Device);
         public static CustomBitmap PDA = new CustomBitmap("../../../res/PDA.png", D3DDevice.Instance.Device);
+        public static CustomBitmap Mask = new CustomBitmap("../../../res/mask.png", D3DDevice.Instance.Device);
         public static CustomSprite CreateSpriteFromPath(CustomBitmap bitmap)
         {
             CustomSprite ret = new CustomSprite();
