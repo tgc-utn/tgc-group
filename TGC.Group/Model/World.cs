@@ -128,8 +128,8 @@ namespace TGC.Group.Model
                     .FindAll(element => element.isIntersectedBy(new TgcRay(camera.Position, direction)));
             
             intersectedElements.Sort((element1, element2) => 
-                (int) TGCVector3.LengthSq(camera.Position, element1.Mesh.Position) <
-                (int) TGCVector3.LengthSq(camera.Position, element2.Mesh.Position) ? -1 : 1);
+                (int) TGCVector3.LengthSq(camera.Position, element1.Mesh.Position) -
+                (int) TGCVector3.LengthSq(camera.Position, element2.Mesh.Position));
 
             return intersectedElements.Find(element => 
                 Math.Abs(TGCVector3.LengthSq(camera.Position, element.Mesh.Position)) < InteractionRadius);
