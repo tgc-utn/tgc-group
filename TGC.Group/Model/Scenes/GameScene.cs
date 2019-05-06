@@ -31,7 +31,7 @@ namespace TGC.Group.Model.Scenes
         public delegate void Callback();
         Callback onPauseCallback = () => {};
         TgcSkyBox skyBox;
-        CustomSprite waterVision, darknessCover, mask;
+        CustomSprite waterVision, darknessCover, mask, aim;
         Drawer2D drawer = new Drawer2D();
         CustomSprite PDA;
         float PDAPositionX, finalPDAPositionX, PDAMoveCoefficient;
@@ -56,6 +56,7 @@ namespace TGC.Group.Model.Scenes
             InitWaterVision();
             InitDarknessCover();
             InitMask();
+            InitAim();
 
             World = new World(new TGCVector3(0, 0, 0));
             Camera = new Camera(new TGCVector3(30, 30, 200), input);
@@ -97,6 +98,11 @@ namespace TGC.Group.Model.Scenes
         {
             mask = BitmapRepository.CreateSpriteFromPath(BitmapRepository.Mask);
             Screen.FitSpriteToScreen(mask);
+        }
+        private void InitAim()
+        {
+            aim = BitmapRepository.CreateSpriteFromPath(BitmapRepository.Aim);
+            Screen.CenterSprite(aim);
         }
 
         private void InitSkyBox()
@@ -182,6 +188,7 @@ namespace TGC.Group.Model.Scenes
 
             drawer.BeginDrawSprite();
             drawer.DrawSprite(mask);
+            drawer.DrawSprite(aim);
             drawer.EndDrawSprite();
 
             if (this.BoundingBox)
