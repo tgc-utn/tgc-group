@@ -31,7 +31,7 @@ namespace TGC.Group.Model.Chunks
 
         private static IEnumerable<Element> GenerateElementsBySegment(Segment segment, int divisions)
         {
-            return segment.GenerateElements(divisions / 2, SpawnRate.Of(1, 750), FishFactory.Instance);
+            return segment.GenerateElements(divisions / 2, SpawnRate.Of(1, 1000), FishFactory.Instance);
         }
 
     }

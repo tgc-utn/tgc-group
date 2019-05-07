@@ -1,6 +1,8 @@
 ﻿using BulletSharp;
+using BulletSharp.Math;
 using System;
 using System.Collections.Generic;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.Direct3D;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
@@ -64,7 +66,7 @@ namespace TGC.Group.Model.Chunks
         protected new void AddElementsToPhysicsWorld()
         {
             base.AddElementsToPhysicsWorld();
-            this.Physics.Add(this.FloorRigidBody);
+            this.Physics.Add(FloorRigidBody);
         }
 
         public override void Render()

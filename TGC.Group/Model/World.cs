@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BulletSharp.Math;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TGC.Core.Camara;
@@ -7,7 +8,10 @@ using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Group.Model.Chunks;
 using TGC.Group.Model.Elements;
+using TGC.Group.Model.Elements.ElementFactories;
+using TGC.Group.Model.Elements.RigidBodyFactories;
 using TGC.Group.Model.Input;
+using TGC.Group.Model.Resources.Meshes;
 
 namespace TGC.Group.Model
 {
@@ -28,8 +32,22 @@ namespace TGC.Group.Model
             this.entities = new List<Entity>();
 
             AddChunk(initialPoint);
+            AddShark();
         }
-        
+
+        protected void AddShark()
+        {
+            var mesh = SharkMesh.All()[0];
+            mesh.Position = new TGCVector3(30, 1000, -2000);
+            mesh.UpdateMeshTransform();
+            var rigidBody = new CapsuleFactory().Create(mesh);
+            TGCVector3 scaled = new TGCVector3(10, 10, 10);
+            rigidBody.CollisionShape.LocalScaling = new Vector3(scaled.X * 3f, scaled.Y, scaled.Z * 1.5f);
+            mesh.Scale = scaled;
+            var shark = new Shark(mesh, rigidBody);
+            this.entities.Add(shark);
+        }
+
         private Chunk AddChunk(TGCVector3 origin)
         {
             var chunk = Chunk.ByYAxis(origin);
@@ -92,12 +110,12 @@ namespace TGC.Group.Model
             return GetChunksByRadius(cameraPosition, RenderRadius);
         }
 
-        public void Update(TgcCamera camera)
+        public void Update(Camera camera)
         {
             var toUpdate = ToUpdate(camera.Position);
-            toUpdate.ForEach(chunk => chunk.Update());
+            toUpdate.ForEach(chunk => chunk.Update(camera));
             this.SelectableElement = GetSelectableElement(camera, toUpdate);
-            this.entities.ForEach(entity => entity.Update());
+            this.entities.ForEach(entity => entity.Update(camera));
         }
         
         public void Render(TgcCamera camera)

@@ -43,9 +43,9 @@ namespace TGC.Group.Model.Chunks
             return new List<Entity>();
         }
 
-        public virtual void Update()
+        public virtual void Update(Camera camera)
         {
-            this.Elements.ForEach(element => element.Update());
+            this.Elements.ForEach(element => element.Update(camera));
         }
 
         public virtual void Render()

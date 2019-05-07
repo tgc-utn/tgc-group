@@ -1,4 +1,6 @@
-﻿using Microsoft.DirectX.DirectInput;
+﻿using BulletSharp;
+using Microsoft.DirectX.DirectInput;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using TGC.Core.Camara;
@@ -11,6 +13,8 @@ namespace TGC.Group.Model
 {
     public class Camera : TgcCamera
     {
+        public RigidBody RigidBody { get; }
+
         private readonly Point mouseCenter;
         private TGCMatrix cameraRotation;
         private TGCVector3 initialDirectionView;
@@ -21,10 +25,11 @@ namespace TGC.Group.Model
         public float MovementSpeed { get; set; }
         public float RotationSpeed { get; set; }
 
-        public Camera(TGCVector3 position, TgcD3dInput input)
+        public Camera(TGCVector3 position, TgcD3dInput input, RigidBody rigidBody)
         {
             Input = input;
             Position = position;
+            RigidBody = rigidBody;
             mouseCenter = GetMouseCenter();
             RotationSpeed = 0.1f;
             MovementSpeed = 500f;
@@ -44,7 +49,7 @@ namespace TGC.Group.Model
         {
             cameraRotation = CalculateCameraRotation();
 
-            Position += TGCVector3.TransformNormal(CalculateInputTranslation() * elapsedTime, cameraRotation);
+            Position = CalculateTranslation(elapsedTime, cameraRotation);
 
             LookAt = Position + TGCVector3.TransformNormal(initialDirectionView, cameraRotation);
 
@@ -54,11 +59,18 @@ namespace TGC.Group.Model
             base.SetCamera(Position, LookAt, UpVector);
         }
 
+        private TGCVector3 CalculateTranslation(float elapsedTime, TGCMatrix cameraRotation)
+        {
+            var normalizedTranslation =  TGCVector3.TransformNormal(CalculateInputTranslation() * elapsedTime, cameraRotation);
+            RigidBody.CenterOfMassTransform *= TGCMatrix.Translation(normalizedTranslation).ToBsMatrix;
+            return new TGCVector3(RigidBody.CenterOfMassPosition);
+        }
+
         public TGCMatrix CalculateCameraRotation()
         {
             leftrightRot += Input.XposRelative * RotationSpeed;
             updownRot = FastMath.Clamp( updownRot - Input.YposRelative * RotationSpeed, -FastMath.PI_HALF, FastMath.PI_HALF);
-
+                
             return TGCMatrix.RotationX(updownRot) * TGCMatrix.RotationY(leftrightRot);
         }
 

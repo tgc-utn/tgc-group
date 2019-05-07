@@ -8,6 +8,7 @@ using TGC.Group.Model.Input;
 using TGC.Group.Model.Items;
 using TGC.Group.Model.Items.Equipment;
 using TGC.Group.Model.Player;
+using TGC.Group.Model.Elements.RigidBodyFactories;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -29,7 +30,15 @@ namespace TGC.Group.Model.Scenes
         {
             backgroundColor = Color.FromArgb(1, 78, 129, 179);
             World = new World(new TGCVector3(0, 0, 0));
-            Camera = new Camera(new TGCVector3(30, 30, 200), input);
+            SetCamera(input);
+        }
+
+        private void SetCamera(TgcD3dInput input)
+        {
+            var position = new TGCVector3(30, 30, 200);
+            var rigidBody = new CapsuleFactory().Create(position, 100, 60);
+            AquaticPhysics.Instance.Add(rigidBody);
+            Camera = new Camera(position, input, rigidBody);
         }
 
         public override void Update(float elapsedTime)
@@ -40,7 +49,7 @@ namespace TGC.Group.Model.Scenes
 
             CollisionManager.CheckCollitions(this.World.GetCollisionables());
 
-            this.World.Update(this.Camera);
+            this.World.Update((Camera)this.Camera);
 
             var item = manageSelectableElement(this.World.SelectableElement); // Important: get this AFTER updating the world
             

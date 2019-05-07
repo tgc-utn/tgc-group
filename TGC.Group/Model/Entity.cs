@@ -1,28 +1,37 @@
-﻿using System;
+﻿using BulletSharp;
+using Microsoft.DirectX.Direct3D;
+using System;
 using TGC.Core.BoundingVolumes;
+using TGC.Core.Mathematica;
+using TGC.Core.SceneLoader;
 
 namespace TGC.Group.Model
 {
-    public class Entity : Collisionable
+    public abstract class Entity : Collisionable
     {
-        public void Render()
+        public TgcMesh Mesh { get; }
+        public RigidBody RigidBody { get; }
+
+        public Entity(TgcMesh mesh, RigidBody rigid)
         {
-            return;
+            Mesh = mesh;
+            RigidBody = rigid;
         }
 
-        public void Update()
-        {
-            return;
-        }
 
-        public void Dispose()
+        public virtual void Render()
         {
-            return;
-        }
+            this.Mesh.Render();
 
-        public override TgcBoundingAxisAlignBox getCollisionVolume()
-        {
-            throw new NotImplementedException();
         }
+        public virtual void Update(Camera camera)
+        {
+            this.Mesh.Position = new TGCVector3(this.RigidBody.CenterOfMassPosition);
+            this.Mesh.Transform =
+                TGCMatrix.Scaling(this.Mesh.Scale) *
+                new TGCMatrix(this.RigidBody.CenterOfMassTransform);
+        }
+        public abstract void Dispose();
+        public override abstract IRenderObject getCollisionVolume();
     }
 }

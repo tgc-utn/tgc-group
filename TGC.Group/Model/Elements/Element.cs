@@ -2,35 +2,34 @@
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Collision;
 using TGC.Core.Mathematica;
+using BulletSharp.Math;
+using TGC.Group.Model.Utils;
 using TGC.Core.SceneLoader;
 using TGC.Group.Model.Items;
-using TGC.Group.Model.Utils;
-
 namespace TGC.Group.Model.Elements
 {
-    public abstract class Element : Collisionable
+    public abstract class Element: Collisionable
     {
+
         public TgcMesh Mesh { get; }
         public RigidBody PhysicsBody { get; set; }
         public bool Selectable { get; set; }
 
         public abstract IItem item { get; }
 
-
         public Element(TgcMesh model, RigidBody rigidBody)
         {
             this.Mesh = model;
             this.PhysicsBody = rigidBody;
         }
-
         public bool isIntersectedBy(TgcRay ray)
         {
-            var aabb = getCollisionVolume();
+            var aabb = (TgcBoundingAxisAlignBox) getCollisionVolume();
             var toTest = new Cube(aabb.PMin, aabb.PMax);
             return toTest.isIntersectedBy(ray);
         }
 
-        public void Update()
+        public virtual void Update(Camera camera)
         {
             this.Mesh.Position = new TGCVector3(this.PhysicsBody.CenterOfMassPosition.X, this.PhysicsBody.CenterOfMassPosition.Y, this.PhysicsBody.CenterOfMassPosition.Z);
             this.Mesh.Transform = 
@@ -39,7 +38,7 @@ namespace TGC.Group.Model.Elements
             this.Selectable = false;
         }
 
-        public void Render()
+        public virtual void Render()
         {
             this.Mesh.Render();
             
@@ -53,9 +52,11 @@ namespace TGC.Group.Model.Elements
             this.PhysicsBody.Dispose();
         }
 
-        public override TgcBoundingAxisAlignBox getCollisionVolume()
-        {
-            return this.Mesh.BoundingBox;
+        public override IRenderObject getCollisionVolume() 
+        { 
+            Vector3 aabbMin, aabbMax;
+            PhysicsBody.GetAabb(out aabbMin, out aabbMax);
+            return new TgcBoundingAxisAlignBox(new TGCVector3(aabbMin), new TGCVector3(aabbMax));
         }
     }
 }
