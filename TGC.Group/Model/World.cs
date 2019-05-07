@@ -40,7 +40,7 @@ namespace TGC.Group.Model
             var mesh = SharkMesh.All()[0];
             mesh.Position = new TGCVector3(30, 1000, -2000);
             mesh.UpdateMeshTransform();
-            var rigidBody = new CapsuleFactory().Create(mesh);
+            var rigidBody = new CapsuleFactory().CreateShark(mesh);
             TGCVector3 scaled = new TGCVector3(10, 10, 10);
             AquaticPhysics.Instance.Add(rigidBody);
             var shark = new Shark(mesh, rigidBody);

@@ -27,14 +27,10 @@ namespace TGC.Group.Model.Elements.ElementFactories
         public override void Update(Camera camera)
         {
 
-            var vector = camera.Position.ToBulletVector3() - RigidBody.CenterOfMassPosition;
-            vector.Normalize();
-            RigidBody.Translate(vector * DefaultVelocity);
+            var difference = camera.Position.ToBulletVector3() - RigidBody.CenterOfMassPosition;
 
             var sharkBody = (CapsuleShapeX)RigidBody.CollisionShape;
             var cameraBody = (CapsuleShape)camera.RigidBody.CollisionShape;
-
-            var difference = RigidBody.CenterOfMassPosition - camera.RigidBody.CenterOfMassPosition;
 
             if (
             FastMath.Pow2(difference.X) <= FastMath.Pow2(sharkBody.Radius + sharkBody.HalfHeight - cameraBody.Radius) &&
@@ -45,6 +41,10 @@ namespace TGC.Group.Model.Elements.ElementFactories
                 dead = true;
 
             }
+
+            difference.Normalize();
+            RigidBody.Translate(difference * DefaultVelocity);
+
 
             base.Update(camera);
 
