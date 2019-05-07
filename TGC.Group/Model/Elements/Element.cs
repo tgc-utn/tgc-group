@@ -1,14 +1,20 @@
-﻿using TGC.Core.BoundingVolumes;
-using TGC.Core.SceneLoader;
+﻿using BulletSharp;
+using TGC.Core.BoundingVolumes;
+using TGC.Core.Collision;
 using TGC.Core.Mathematica;
-using BulletSharp;
+using TGC.Core.SceneLoader;
+using TGC.Group.Model.Items;
+using TGC.Group.Model.Utils;
 
-namespace TGC.Group.Model
+namespace TGC.Group.Model.Elements
 {
-    public class Element : Collisionable
+    public abstract class Element : Collisionable
     {
         public TgcMesh Mesh { get; }
         public RigidBody PhysicsBody { get; set; }
+        public bool Selectable { get; set; }
+
+        public abstract IItem item { get; }
 
 
         public Element(TgcMesh model, RigidBody rigidBody)
@@ -17,32 +23,39 @@ namespace TGC.Group.Model
             this.PhysicsBody = rigidBody;
         }
 
+        public bool isIntersectedBy(TgcRay ray)
+        {
+            var aabb = getCollisionVolume();
+            var toTest = new Cube(aabb.PMin, aabb.PMax);
+            return toTest.isIntersectedBy(ray);
+        }
+
         public void Update()
         {
-            Mesh.Position = new TGCVector3(PhysicsBody.CenterOfMassPosition.X, PhysicsBody.CenterOfMassPosition.Y, PhysicsBody.CenterOfMassPosition.Z);
-            Mesh.Transform = 
-                TGCMatrix.Scaling(Mesh.Scale) *
-                new TGCMatrix(PhysicsBody.CenterOfMassTransform);
-
-            return;
+            this.Mesh.Position = new TGCVector3(this.PhysicsBody.CenterOfMassPosition.X, this.PhysicsBody.CenterOfMassPosition.Y, this.PhysicsBody.CenterOfMassPosition.Z);
+            this.Mesh.Transform = 
+                TGCMatrix.Scaling(this.Mesh.Scale) *
+                new TGCMatrix(this.PhysicsBody.CenterOfMassTransform);
+            this.Selectable = false;
         }
 
         public void Render()
         {
-            Mesh.Render();
-            return;
+            this.Mesh.Render();
+            
+            if(this.Selectable)
+                getCollisionVolume().Render();
         }
 
         public void Dispose()
         {
-            Mesh.Dispose();
-            PhysicsBody.Dispose();
-            return;
+            this.Mesh.Dispose();
+            this.PhysicsBody.Dispose();
         }
 
         public override TgcBoundingAxisAlignBox getCollisionVolume()
         {
-            return Mesh.BoundingBox;
+            return this.Mesh.BoundingBox;
         }
     }
 }
