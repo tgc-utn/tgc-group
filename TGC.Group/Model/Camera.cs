@@ -104,7 +104,7 @@ namespace TGC.Group.Model
         {
             cameraRotation = CalculateCameraRotation();
 
-            Position += TGCVector3.TransformNormal(CalculateInputTranslation() * elapsedTime, cameraRotation);
+            Position = CalculateTranslation(elapsedTime, cameraRotation);
 
             LookAt = Position + TGCVector3.TransformNormal(initialDirectionView, cameraRotation);
 
