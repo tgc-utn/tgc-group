@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using TGC.Core.Mathematica;
+using TGC.Group.Model.Elements;
 
 namespace TGC.Group.Model.Chunks
 {
@@ -42,9 +43,9 @@ namespace TGC.Group.Model.Chunks
             return new List<Entity>();
         }
 
-        public virtual void Update()
+        public virtual void Update(Camera camera)
         {
-            this.Elements.ForEach(element => element.Update());
+            this.Elements.ForEach(element => element.Update(camera));
         }
 
         public virtual void Render()
@@ -63,6 +64,15 @@ namespace TGC.Group.Model.Chunks
                 Physics.Remove(element.PhysicsBody);
                 element.Dispose();
             });
+        }
+
+        public void Remove(Element selectableElement)
+        {
+            if (!this.Elements.Contains(selectableElement)) return;
+
+            Physics.Remove(selectableElement.PhysicsBody);
+            this.Elements.Remove(selectableElement);
+            selectableElement.Dispose();
         }
     }
 }

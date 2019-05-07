@@ -30,6 +30,7 @@
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -109,9 +110,9 @@
     <Compile Include="Model\Chunks\NoneChunk.cs" />
     <Compile Include="Model\Collisionable.cs" />
     <Compile Include="Model\CollisionManager.cs" />
-    <Compile Include="Model\Elements\Character.cs" />
     <Compile Include="Model\Elements\ElementFactories\ElementFactory.cs" />
     <Compile Include="Model\Elements\ElementFactories\FishFactory.cs" />
+    <Compile Include="Model\Elements\Shark.cs" />
     <Compile Include="Model\Elements\Fish.cs" />
     <Compile Include="Model\Elements\Coral.cs" />
     <Compile Include="Model\Elements\ElementFactories\CoralFactory.cs" />
@@ -119,8 +120,22 @@
     <Compile Include="Model\Elements\RigidBodyFactories\BoxFactory.cs" />
     <Compile Include="Model\Input\GameInput.cs" />
     <Compile Include="Model\AquaticPhysics.cs" />
+    <Compile Include="Model\Items\Equipment\IEquipable.cs" />
+    <Compile Include="Model\Items\Equipment\OxygenTank.cs" />
+    <Compile Include="Model\Items\Fish.cs" />
+    <Compile Include="Model\Items\Gold.cs" />
+    <Compile Include="Model\Items\ICrafteable.cs" />
+    <Compile Include="Model\Items\IItem.cs" />
+    <Compile Include="Model\Items\Recipes\Ingredient.cs" />
+    <Compile Include="Model\Items\Recipes\Recipe.cs" />
+    <Compile Include="Model\Items\Type\ItemType.cs" />
+    <Compile Include="Model\Player\Character.cs" />
+    <Compile Include="Model\Player\Equipment.cs" />
+    <Compile Include="Model\Player\Inventory.cs" />
+    <Compile Include="Model\Player\Stats.cs" />
     <Compile Include="Model\Resources\Meshes\CoralMeshes.cs" />
     <Compile Include="Model\Resources\Meshes\FishMeshes.cs" />
+    <Compile Include="Model\Resources\Meshes\SharkMesh.cs" />
     <Compile Include="Model\Resources\Sprites\SpriteRepository.cs" />
     <Compile Include="Model\Scenes\ShipScene.cs" />
     <Compile Include="Model\Segment.cs" />
@@ -215,7 +230,6 @@
     <Content Include="Media\LogoTGC-TgcScene.xml" />
     <Content Include="res\subnautica-portada.png" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

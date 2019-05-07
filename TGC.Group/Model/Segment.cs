@@ -7,6 +7,7 @@ using TGC.Core.SceneLoader;
 using TGC.Group.Model.Utils;
 using BulletSharp;
 using TGC.Group.Model.Elements;
+using Element = TGC.Group.Model.Elements.Element;
 
 namespace TGC.Group.Model
 {

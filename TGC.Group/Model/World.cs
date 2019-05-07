@@ -1,7 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using BulletSharp.Math;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using TGC.Core.Camara;
+using TGC.Core.Collision;
+using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Group.Model.Chunks;
+using TGC.Group.Model.Elements;
+using TGC.Group.Model.Elements.ElementFactories;
+using TGC.Group.Model.Elements.RigidBodyFactories;
+using TGC.Group.Model.Input;
+using TGC.Group.Model.Resources.Meshes;
 
 namespace TGC.Group.Model
 {
@@ -9,19 +19,35 @@ namespace TGC.Group.Model
     {
         private const int RenderRadius = 5;
         private const int UpdateRadius = RenderRadius + 1;
+        private const int InteractionRadius = 490000; // Math.pow(700, 2)
         
         private readonly Dictionary<TGCVector3, Chunk> chunks;
         private readonly List<Entity> entities;
+        public Element SelectableElement { get; private set; }
 
         public World(TGCVector3 initialPoint)
         {
             this.chunks = new Dictionary<TGCVector3, Chunk>();
-
+            
             this.entities = new List<Entity>();
 
             AddChunk(initialPoint);
+            AddShark();
         }
-        
+
+        protected void AddShark()
+        {
+            var mesh = SharkMesh.All()[0];
+            mesh.Position = new TGCVector3(30, 1000, -2000);
+            mesh.UpdateMeshTransform();
+            var rigidBody = new CapsuleFactory().Create(mesh);
+            TGCVector3 scaled = new TGCVector3(10, 10, 10);
+            rigidBody.CollisionShape.LocalScaling = new Vector3(scaled.X * 3f, scaled.Y, scaled.Z * 1.5f);
+            mesh.Scale = scaled;
+            var shark = new Shark(mesh, rigidBody);
+            this.entities.Add(shark);
+        }
+
         private Chunk AddChunk(TGCVector3 origin)
         {
             var chunk = Chunk.ByYAxis(origin);
@@ -84,28 +110,54 @@ namespace TGC.Group.Model
             return GetChunksByRadius(cameraPosition, RenderRadius);
         }
 
-        public void Update(TGCVector3 cameraPosition)
+        public void Update(Camera camera)
         {
-            ToUpdate(cameraPosition).ForEach(chunk => chunk.Update());
-            this.entities.ForEach(entity => entity.Update());
+            var toUpdate = ToUpdate(camera.Position);
+            toUpdate.ForEach(chunk => chunk.Update(camera));
+            this.SelectableElement = GetSelectableElement(camera, toUpdate);
+            this.entities.ForEach(entity => entity.Update(camera));
         }
-
-        public void Render(TGCVector3 cameraPosition)
+        
+        public void Render(TgcCamera camera)
         {
-            ToRender(cameraPosition).ForEach(chunk => chunk.Render());
+            ToRender(camera.Position).ForEach(chunk => chunk.Render());
             this.entities.ForEach(entity => entity.Render());
-
         }
 
-        public void RenderBoundingBox(TGCVector3 cameraPosition)
+        public void RenderBoundingBox(TgcCamera camera)
         {
-            ToRender(cameraPosition).ForEach(chunk => chunk.RenderBoundingBox());
+            ToRender(camera.Position).ForEach(chunk => chunk.RenderBoundingBox());
         }
 
         public void Dispose()
         {
             this.chunks.Values.ToList().ForEach(chunk => chunk.Dispose());
             this.entities.ForEach(entity => entity.Dispose());
+        }
+        private static Element GetSelectableElement(TgcCamera camera, List<Chunk> toUpdate)
+        {            
+            var direction = camera.LookAt - camera.Position;
+            direction.Normalize();
+
+            var intersectedElements =
+                toUpdate
+                    .SelectMany(chunk => chunk.Elements)
+                    .ToList()
+                    .FindAll(element => element.isIntersectedBy(new TgcRay(camera.Position, direction)));
+            
+            intersectedElements.Sort((element1, element2) => 
+                (int) TGCVector3.LengthSq(camera.Position, element1.Mesh.Position) -
+                (int) TGCVector3.LengthSq(camera.Position, element2.Mesh.Position));
+
+            return intersectedElements.Find(element => 
+                Math.Abs(TGCVector3.LengthSq(camera.Position, element.Mesh.Position)) < InteractionRadius);
+        }
+        public void Remove(Element selectableElement)
+        {
+            foreach (var chunk in this.chunks.Values)
+            {
+                chunk.Remove(selectableElement);
+            }
         }
     }
 }

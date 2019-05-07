@@ -16,7 +16,7 @@ namespace TGC.Group.Model.Chunks
             return Enumerable.Empty<Entity>();
         }
 
-        public override void Update()
+        public override void Update(Camera camera)
         {
         }
 
