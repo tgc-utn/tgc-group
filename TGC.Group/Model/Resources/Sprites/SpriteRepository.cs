@@ -16,6 +16,7 @@ namespace TGC.Group.Model.Resources.Sprites
         public static CustomBitmap PDA = new CustomBitmap("../../../res/PDA.png", D3DDevice.Instance.Device);
         public static CustomBitmap Mask = new CustomBitmap("../../../res/mask.png", D3DDevice.Instance.Device);
         public static CustomBitmap Aim = new CustomBitmap("../../../res/aim.png", D3DDevice.Instance.Device);
+        public static CustomBitmap Hand = new CustomBitmap("../../../res/hand.png", D3DDevice.Instance.Device);
         public static CustomSprite CreateSpriteFromPath(CustomBitmap bitmap)
         {
             CustomSprite ret = new CustomSprite();

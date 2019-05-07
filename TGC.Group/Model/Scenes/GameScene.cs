@@ -31,7 +31,7 @@ namespace TGC.Group.Model.Scenes
         public delegate void Callback();
         Callback onPauseCallback = () => {};
         TgcSkyBox skyBox;
-        CustomSprite waterVision, darknessCover, mask, aim, cursor;
+        CustomSprite waterVision, darknessCover, mask, aim, hand, cursor;
         Drawer2D drawer = new Drawer2D();
         CustomSprite PDA;
         float PDAPositionX, finalPDAPositionX, PDAMoveCoefficient;
@@ -57,6 +57,7 @@ namespace TGC.Group.Model.Scenes
             InitDarknessCover();
             InitMask();
             InitAim();
+            InitHand();
 
             World = new World(new TGCVector3(0, 0, 0));
             Camera = new Camera(new TGCVector3(30, 30, 200), input);
@@ -71,6 +72,14 @@ namespace TGC.Group.Model.Scenes
 
             currentInteractionLogic = WorldInteractionLogic;
             stateDependentRenderLogic = () => {};
+
+            // This will be useful for the fog effect
+            D3DDevice.Instance.Device.RenderState.FogEnable = true;
+            D3DDevice.Instance.Device.RenderState.RangeFogEnable = true;
+            D3DDevice.Instance.Device.RenderState.FogColor = Color.FromArgb(255, 10, 70, 164);
+            D3DDevice.Instance.Device.RenderState.FogTableMode = FogMode.Exp;
+            D3DDevice.Instance.Device.RenderState.FogVertexMode = FogMode.Exp;
+            D3DDevice.Instance.Device.RenderState.FogDensity = .66f;
         }
 
         private void IncrementFarPlane(float scale)
@@ -106,11 +115,16 @@ namespace TGC.Group.Model.Scenes
             aim = BitmapRepository.CreateSpriteFromPath(BitmapRepository.Aim);
             Screen.CenterSprite(aim);
         }
+        private void InitHand()
+        {
+            hand = BitmapRepository.CreateSpriteFromPath(BitmapRepository.Hand);
+            Screen.CenterSprite(hand);
+        }
 
         private void InitSkyBox()
         {
             skyBox = new TgcSkyBox();
-            skyBox.SkyEpsilon = 0;
+            skyBox.SkyEpsilon = 50;
             skyBox.Center = Camera.Position;
             skyBox.Size = new TGCVector3(30000, 30000, 30000);
             skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up   , baseDir + "underwater_skybox-up.jpg"    );
@@ -234,6 +248,7 @@ namespace TGC.Group.Model.Scenes
         {
             if (Input.keyPressed(Key.I))
             {
+                cursor = aim;
                 ChangeInteractionLogic(TakePDAOut);
                 return;
             }
@@ -270,6 +285,7 @@ namespace TGC.Group.Model.Scenes
             if (PDAPositionX > finalPDAPositionX)
             {
                 PDAPositionX = finalPDAPositionX;
+                cursor = hand;
                 ChangeInteractionLogic(InventoryInteractionLogic);
             }
             PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
