@@ -14,7 +14,7 @@ namespace TGC.Group.Model.Scenes
         private Callback preRender = () => {};
         private Callback onReturnToGameCallback = () => {}, onGoToStartMenuCallback = () => {};
 
-        private int x, y;
+        private int xTitle, yTitle, yOffsetFirstOption = 250, ySecondOption = 50;
 
         TgcText2D textBig = new TgcText2D(), textSmall = new TgcText2D();
 
@@ -24,6 +24,7 @@ namespace TGC.Group.Model.Scenes
             DOWN
         }
         Pointer pointer = Pointer.UP;
+        Color[] colors = { Color.White, Color.DarkGray };
 
         Drawer2D drawer;
         CustomSprite sprite;
@@ -36,8 +37,8 @@ namespace TGC.Group.Model.Scenes
 
             Screen.CenterSprite(sprite);
 
-            x = (int)(sprite.Position.X + 60);
-            y = (int)(sprite.Position.Y + 80);
+            xTitle = (int)(sprite.Position.X + 60);
+            yTitle = (int)(sprite.Position.Y + 80);
 
             _uses3DCamera = false;
             textBig.changeFont(new System.Drawing.Font("Arial Black", 40f));
@@ -72,10 +73,10 @@ namespace TGC.Group.Model.Scenes
             drawer.DrawSprite(sprite);
             drawer.EndDrawSprite();
 
-            textBig.drawText("PAUSE", x + 50, y, Color.DarkGray);
-            textSmall.drawText("BACK TO THE GAME", x, y + 250, pointer == Pointer.UP ? Color.White : Color.DarkGray);
-            textSmall.drawText("GO TO START MENU", x, y + 300, pointer == Pointer.UP ? Color.DarkGray : Color.White);
-            textSmall.drawText("->", x - 45, y + 250 + (int)pointer * 50, Color.White);
+            textBig.drawText("PAUSE", xTitle + 50, yTitle, Color.DarkGray);
+            textSmall.drawText("BACK TO THE GAME", xTitle, yTitle + yOffsetFirstOption, colors[(int)pointer]);
+            textSmall.drawText("GO TO START MENU", xTitle, yTitle + yOffsetFirstOption + ySecondOption, colors[(((int)pointer) + 1) % 2]);
+            textSmall.drawText("->", xTitle - 45, yTitle + yOffsetFirstOption + (int)pointer * ySecondOption, Color.White);
         }
         public PauseMenu OnReturnToGame(Callback onEnterCallback)
         {

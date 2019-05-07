@@ -11,8 +11,12 @@ namespace TGC.Group.Model.Resources.Sprites
     class BitmapRepository
     {
         public static CustomBitmap BlackRectangle = new CustomBitmap("../../../res/rectPause.png", D3DDevice.Instance.Device);
-        public static CustomBitmap SubnauticaPortrait = new CustomBitmap("../../../res/subnautica-portada.png", D3DDevice.Instance.Device);
+        public static CustomBitmap WaterRectangle = new CustomBitmap("../../../res/rectWater.png", D3DDevice.Instance.Device);
         public static CustomBitmap Title = new CustomBitmap("../../../res/title.png", D3DDevice.Instance.Device);
+        public static CustomBitmap PDA = new CustomBitmap("../../../res/PDA.png", D3DDevice.Instance.Device);
+        public static CustomBitmap Mask = new CustomBitmap("../../../res/mask.png", D3DDevice.Instance.Device);
+        public static CustomBitmap Aim = new CustomBitmap("../../../res/aim.png", D3DDevice.Instance.Device);
+        public static CustomBitmap Hand = new CustomBitmap("../../../res/hand.png", D3DDevice.Instance.Device);
         public static CustomSprite CreateSpriteFromPath(CustomBitmap bitmap)
         {
             CustomSprite ret = new CustomSprite();

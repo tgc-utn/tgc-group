@@ -21,6 +21,7 @@ namespace TGC.Group.Model
         private GameScene gameScene;
         private StartMenu startMenu;
         private PauseMenu pauseMenu;
+        private ShipScene shipScene;
 
         private Scene _curentScene = null;
         private Scene CurrentScene
@@ -60,19 +61,19 @@ namespace TGC.Group.Model
             //note(fede): Only at this point the Input field has been initialized by the form
 
             startMenu = new StartMenu(Input)
-                    .onGameStart(() => SetNextScene(gameScene))
+                    .onGameStart(() => SetNextScene(shipScene))
                     .onGameExit(StopGame);
 
             pauseMenu = new PauseMenu(Input, drawerPause, spritePause)
                 .OnGoToStartMenu(() => {
                     ResetGame();
                     SetNextScene(startMenu);
-                })
-                .OnReturnToGame(() => SetNextScene(gameScene));
+                });
 
             ResetGame();
 
             SetNextScene(startMenu);
+
         }
 
         public override void Update()
@@ -126,9 +127,19 @@ namespace TGC.Group.Model
         private void ResetGame()
         {
             gameScene = new GameScene(Input, MediaDir)
-                    .OnEscape(() => SetNextScene(
-                        pauseMenu.WithPreRender(gameScene.Render)
-                    ));
+                    .OnPause(() => PauseScene(gameScene));
+
+            shipScene = new ShipScene(Input)
+                .OnGoToWater(() => SetNextScene(gameScene))
+                .OnPause(() => PauseScene(shipScene));
+        }
+
+        private void PauseScene(Scene scene)
+        {
+            SetNextScene(pauseMenu
+                    .WithPreRender(scene.Render)
+                    .OnReturnToGame(() => SetNextScene(scene))
+                 );
         }
     }
 }
