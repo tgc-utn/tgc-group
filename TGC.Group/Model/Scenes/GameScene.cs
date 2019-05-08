@@ -284,6 +284,8 @@ namespace TGC.Group.Model.Scenes
             this.DrawText.drawText(
                 "Oxygen = " + this.character.ActualStats.Oxygen + "/" + this.character.MaxStats.Oxygen, 0, 60,
                 Color.Bisque);
+            this.DrawText.drawText(
+                "When highlighted, you can pick corals and fishes! (Pressing click)", 0, 90,Color.Bisque);
         }
 
         public override void Dispose()
