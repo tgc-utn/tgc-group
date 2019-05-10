@@ -30,8 +30,8 @@ namespace TGC.Group.Model.Scenes
         string baseDir = "../../../res/";
 
         public delegate void Callback();
-        CommandList.Command onPauseCallback = () => {};
-        //public bool inventoryOpen = false;
+        Callback onPauseCallback = () => {};
+
         Scene subScene;
         InventoryScene inventoryScene;
 
@@ -240,7 +240,7 @@ namespace TGC.Group.Model.Scenes
             this.World.Dispose();
         }
 
-        public GameScene OnPause(CommandList.Command onPauseCallback)
+        public GameScene OnPause(Callback onPauseCallback)
         {
             this.onPauseCallback = onPauseCallback;
             return this;

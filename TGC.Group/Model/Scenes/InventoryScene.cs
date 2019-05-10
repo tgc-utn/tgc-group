@@ -12,21 +12,30 @@ namespace TGC.Group.Model.Scenes
 {
     class InventoryScene : Scene
     {
-        enum State
+        enum StateID
         {
             IN,
             INVENTORY,
             OUT
         }
-
-        CommandList.Command[] stateSetters = new CommandList.Command[3];
+        struct State
+        {
+            public StateID id, nextStateID;
+            public UpdateLogic updateLogic;
+            public State(StateID id, UpdateLogic updateLogic, StateID nextStateID)
+            {
+                this.id = id;
+                this.updateLogic = updateLogic;
+                this.nextStateID = nextStateID;
+            }
+        }
+        private State[] states = new State[3];
+        private StateID stateID;
 
         private GameScene gameScene;
 
         public delegate void UpdateLogic(float elapsedTime);
-        public delegate void RenderLogic();
         public UpdateLogic updateLogic = time => {};
-        public RenderLogic renderLogic = () => {};
 
         private TgcText2D text = new TgcText2D();
         private Drawer2D drawer = new Drawer2D();
@@ -42,22 +51,23 @@ namespace TGC.Group.Model.Scenes
             InitDarknessCover();
             InitCursor();
 
-            BindStateWithStateSetter(State.IN, TakePDAIn, State.OUT);
-            BindStateWithStateSetter(State.INVENTORY, InventoryInteraction, State.OUT);
-            BindStateWithStateSetter(State.OUT, TakePDAOut, State.IN);
+            BindState(StateID.IN, TakePDAIn, StateID.OUT);
+            BindState(StateID.INVENTORY, InventoryInteraction, StateID.OUT);
+            BindState(StateID.OUT, TakePDAOut, StateID.IN);
 
-            SetState(State.IN);
+            SetState(StateID.IN);
         }
-        private void SetState(State newState)
+        private void SetState(StateID newStateID)
         {
-            stateSetters[(int)newState]();
+            State newState = states[(int)newStateID];
+
+            this.stateID = newState.id;
+            this.updateLogic = newState.updateLogic;
+            pressed[Key.I] = () => SetState(newState.nextStateID);
         }
-        private void BindStateWithStateSetter(State state, UpdateLogic newUpdateLogic, State nextState)
+        private void BindState(StateID stateID, UpdateLogic stateUpdateLogic, StateID nextStateID)
         {
-            stateSetters[(int)state] = () => {
-                this.updateLogic = newUpdateLogic;
-                pressed[Key.I] = () => SetState(nextState);
-            };
+            states[(int)stateID] = new State(stateID, stateUpdateLogic, nextStateID);
         }
         private void InitPDA()
         {
@@ -88,7 +98,7 @@ namespace TGC.Group.Model.Scenes
             drawer.BeginDrawSprite();
             drawer.DrawSprite(darknessCover);
             drawer.DrawSprite(PDA);
-            if(updateLogic == InventoryInteraction) drawer.DrawSprite(cursor);
+            if(stateID == StateID.INVENTORY) drawer.DrawSprite(cursor);
             drawer.EndDrawSprite();
         }
         private float GetPDAInitialPosition() { return -PDA.Bitmap.Width * PDA.Scaling.X; }
@@ -122,7 +132,7 @@ namespace TGC.Group.Model.Scenes
             if (PDAPositionX > finalPDAPositionX)
             {
                 PDAPositionX = finalPDAPositionX;
-                SetState(State.INVENTORY);
+                SetState(StateID.INVENTORY);
             }
             PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
             PDA.Color = Color.FromArgb(PDATransparency, PDA.Color.R, PDA.Color.G, PDA.Color.B);
@@ -140,7 +150,7 @@ namespace TGC.Group.Model.Scenes
             if (PDAPositionX + PDA.Bitmap.Width * PDA.Scaling.X < 0)
             {
                 PDAPositionX = GetPDAInitialPosition();
-                SetState(State.IN);
+                SetState(StateID.IN);
                 gameScene.CloseInventory();
 
             }
