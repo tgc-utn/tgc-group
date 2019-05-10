@@ -15,7 +15,7 @@ namespace TGC.Group.Model.Scenes
         protected CommandList down = new CommandList();
 
         private static Scene emptySceneSingleInstance;
-        public static Scene Empty => emptySceneSingleInstance ?? (emptySceneSingleInstance = new EmptyScene(null));
+        public static Scene Empty => emptySceneSingleInstance ?? (emptySceneSingleInstance = new EmptyScene());
         protected Color backgroundColor = Color.Black;
         protected bool _uses3DCamera = true;
         public bool Uses3DCamera { get { return _uses3DCamera; } }
@@ -74,7 +74,7 @@ namespace TGC.Group.Model.Scenes
 
     class EmptyScene : Scene
     {
-        public EmptyScene(TgcD3dInput input) : base(input) {}
+        public EmptyScene() : base(null) {}
         public override void Render() {}
         public override void Update(float elapsedTime) {}
     }
