@@ -18,6 +18,11 @@ namespace TGC.Group.Model.Input
         public static readonly GameInput Enter = new GameInput(new List<Key>{Key.Return}, new List<MouseButtons> {MouseButtons.BUTTON_LEFT});
         public static readonly GameInput Statistic = new GameInput(new List<Key>{Key.F});
 
+        public static readonly List<object> _Up = new List<object> { Key.Up, Key.W };
+        public static readonly List<object> _Down = new List<object> { Key.Down, Key.S };
+        public static readonly List<object> _Enter = new List<object> { Key.Return, MouseButtons.BUTTON_LEFT };
+        public static readonly List<object> _Escape = new List<object> { Key.Escape };
+
         private readonly IEnumerable<Key> keys;
         private readonly IEnumerable<MouseButtons> buttons;
 
@@ -29,6 +34,7 @@ namespace TGC.Group.Model.Input
         
         private GameInput(IEnumerable<Key> keys) : this(keys, Enumerable.Empty<MouseButtons>())
         {
+
         }
 
 

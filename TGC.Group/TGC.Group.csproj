@@ -137,6 +137,7 @@
     <Compile Include="Model\Resources\Meshes\FishMeshes.cs" />
     <Compile Include="Model\Resources\Meshes\SharkMesh.cs" />
     <Compile Include="Model\Resources\Sprites\SpriteRepository.cs" />
+    <Compile Include="Model\Scenes\InventoryScene.cs" />
     <Compile Include="Model\Scenes\ShipScene.cs" />
     <Compile Include="Model\Segment.cs" />
     <Compile Include="Model\Elements\RigidBodyFactories\IRigidBodyFactory.cs" />

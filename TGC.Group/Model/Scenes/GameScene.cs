@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using System.Windows.Forms;
 using TGC.Core.Input;
 using TGC.Core.Text;
 using TGC.Core.Mathematica;
@@ -9,17 +8,16 @@ using TGC.Core.Terrain;
 using Microsoft.DirectX;
 using TGC.Group.TGCUtils;
 using TGC.Group.Model.Resources.Sprites;
-using TGC.Group.Model.Utils;
 using Microsoft.DirectX.Direct3D;
-using TGC.Core.SkeletalAnimation;
 using TGC.Group.Model.Items;
-using TGC.Group.Model.Utils;
 using TGC.Group.Model.Items.Equipment;
 using TGC.Group.Model.Player;
 using TGC.Group.Model.Elements.RigidBodyFactories;
 using TGC.Core.Direct3D;
-using Microsoft.DirectX.DirectInput;
+using Key = Microsoft.DirectX.DirectInput.Key;
 using Screen = TGC.Group.Model.Utils.Screen;
+using static TGC.Core.Input.TgcD3dInput;
+using System.Collections.Generic;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -32,23 +30,21 @@ namespace TGC.Group.Model.Scenes
         string baseDir = "../../../res/";
 
         public delegate void Callback();
-        Callback onPauseCallback = () => {};
+        CommandList.Command onPauseCallback = () => {};
+        //public bool inventoryOpen = false;
+        Scene subScene;
+        InventoryScene inventoryScene;
+
         TgcSkyBox skyBox;
-        CustomSprite waterVision, darknessCover, mask, aim, hand, cursor;
+        CustomSprite waterVision, mask, aim, cursor;
         Drawer2D drawer = new Drawer2D();
-        CustomSprite PDA;
-        float PDAPositionX, finalPDAPositionX, PDAMoveCoefficient;
-        int PDATransparency;
         
         private Character character = new Character();
 
         private float oneSecond = 0; //TODO remove
         private bool gaveOxygenTank = false; //TODO remove
+        private bool aimFired = false;
 
-        delegate void InteractionLogic(float elapsedTime);
-        InteractionLogic currentInteractionLogic, newUpdateLogic;
-        delegate void RenderLogic();
-        RenderLogic stateDependentRenderLogic, newRenderLogic;
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         {
             backgroundColor = Color.FromArgb(1, 78, 129, 179);
@@ -60,33 +56,43 @@ namespace TGC.Group.Model.Scenes
             IncrementFarPlane(3f);
             SetClampTextureAddressing();
 
+            InitInventoryScene();
             InitSkyBox();
             InitWaterVision();
-            InitDarknessCover();
             InitMask();
             InitAim();
-            InitHand();
 
             World = new World(new TGCVector3(0, 0, 0));
 
-            PDA = BitmapRepository.CreateSpriteFromPath(BitmapRepository.PDA);
-            PDA.Scaling = new TGCVector2(.5f, .35f);
-            Screen.CenterSprite(PDA);
-            finalPDAPositionX = PDA.Position.X;
-            PDAMoveCoefficient = (finalPDAPositionX - GetPDAInitialPosition()) * 4;
-
             cursor = aim;
 
-            currentInteractionLogic = WorldInteractionLogic;
-            stateDependentRenderLogic = () => {};
+            subScene = Scene.Empty;
+            
+            pressed[Key.Escape] = () => {
+                onPauseCallback();
+            };
 
-            // This will be useful for the fog effect
-            D3DDevice.Instance.Device.RenderState.FogEnable = true;
-            D3DDevice.Instance.Device.RenderState.RangeFogEnable = true;
-            D3DDevice.Instance.Device.RenderState.FogColor = Color.FromArgb(255, 10, 70, 164);
-            D3DDevice.Instance.Device.RenderState.FogTableMode = FogMode.Exp;
-            D3DDevice.Instance.Device.RenderState.FogVertexMode = FogMode.Exp;
-            D3DDevice.Instance.Device.RenderState.FogDensity = .66f;
+            pressed[Key.F] = () => {
+                this.BoundingBox = !this.BoundingBox;
+            };
+
+            TurnExploreCommandsOn();
+        }
+        private void TurnExploreCommandsOn()
+        {
+            pressed[Key.I] = OpenInventory;
+            pressed[GameInput._Enter] = () => aimFired = true;
+        }
+        private void TurnExploreCommandsOff()
+        {
+            pressed[Key.I] = pressed[GameInput._Enter] = () => { };
+        }
+        private void OpenInventory()
+        {
+            ((Camera)Camera).Freeze();
+            subScene = inventoryScene;
+            Input.update();
+            TurnExploreCommandsOff();
         }
 
         private void IncrementFarPlane(float scale)
@@ -99,18 +105,15 @@ namespace TGC.Group.Model.Scenes
                     D3DDevice.Instance.ZFarPlaneDistance * scale
                 );
         }
-
+        private void InitInventoryScene()
+        {
+            inventoryScene = new InventoryScene(Input, this);
+        }
         private void InitWaterVision()
         {
             waterVision = BitmapRepository.CreateSpriteFromPath(BitmapRepository.WaterRectangle);
             Screen.FitSpriteToScreen(waterVision);
             waterVision.Color = Color.FromArgb(120, 10, 70, 164);
-        }
-        private void InitDarknessCover()
-        {
-            darknessCover = BitmapRepository.CreateSpriteFromPath(BitmapRepository.BlackRectangle);
-            Screen.FitSpriteToScreen(darknessCover);
-            darknessCover.Color = Color.FromArgb(188, 0, 0, 0);
         }
         private void InitMask()
         {
@@ -122,16 +125,11 @@ namespace TGC.Group.Model.Scenes
             aim = BitmapRepository.CreateSpriteFromPath(BitmapRepository.Aim);
             Screen.CenterSprite(aim);
         }
-        private void InitHand()
-        {
-            hand = BitmapRepository.CreateSpriteFromPath(BitmapRepository.Hand);
-            Screen.CenterSprite(hand);
-        }
 
         private void InitSkyBox()
         {
             skyBox = new TgcSkyBox();
-            skyBox.SkyEpsilon = 50;
+            skyBox.SkyEpsilon = 0;
             skyBox.Center = Camera.Position;
             skyBox.Size = new TGCVector3(30000, 30000, 30000);
             skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up   , baseDir + "underwater_skybox-up.jpg"    );
@@ -149,28 +147,6 @@ namespace TGC.Group.Model.Scenes
             D3DDevice.Instance.Device.SamplerState[0].AddressV = TextureAddress.Clamp;
             D3DDevice.Instance.Device.SamplerState[0].AddressW = TextureAddress.Clamp;
         }
-
-        private bool HasToChangeInteractionLogic()
-        {
-            return newUpdateLogic != null;
-        }
-        private bool HasToChangeStateDependentRenderLogic()
-        {
-            return newRenderLogic != null;
-        }
-        private void UpdateLogic()
-        {
-            if (HasToChangeStateDependentRenderLogic())
-            {
-                stateDependentRenderLogic = newRenderLogic;
-                newRenderLogic = null;
-            }
-            if (HasToChangeInteractionLogic())
-            {
-                currentInteractionLogic = newUpdateLogic;
-                newUpdateLogic = null;
-            }
-        }
         private void SetCamera(TgcD3dInput input)
         {
             var position = new TGCVector3(30, 30, 200);
@@ -178,11 +154,24 @@ namespace TGC.Group.Model.Scenes
             AquaticPhysics.Instance.Add(rigidBody);
             Camera = new Camera(position, input, rigidBody);
         }
+        private IItem manageSelectableElement(Element element)
+        {
+            if (element == null) return null;
+            IItem item = null;
 
+            element.Selectable = true;
+
+            if (aimFired)
+            {
+                this.World.Remove(element);
+                item = element.item;
+                aimFired = false;
+            }
+
+            return item;
+        }
         public override void Update(float elapsedTime)
         {
-            UpdateLogic();
-
             this.oneSecond += elapsedTime;
             
             AquaticPhysics.Instance.DynamicsWorld.StepSimulation(elapsedTime);
@@ -216,33 +205,8 @@ namespace TGC.Group.Model.Scenes
                 this.oneSecond = 0;
                 this.character.UpdateStats(new Stats(-1,0));
             }
-            
-            if (GameInput.Statistic.IsPressed(this.Input))
-            {
-                this.BoundingBox = !this.BoundingBox;
-            }
-            if (GameInput.Escape.IsPressed(this.Input))
-            {
-                onPauseCallback();
-            }
 
-            currentInteractionLogic(elapsedTime);
-        }
-
-        private IItem manageSelectableElement(Element element)
-        {
-            if (element == null) return null;
-            IItem item = null;
-
-            element.Selectable = true;
-            
-            if (GameInput.Enter.IsPressed(this.Input))
-            {
-                this.World.Remove(element);
-                item = element.item;
-            }
-
-            return item;
+            subScene.Update(elapsedTime);
         }
 
         public override void Render()
@@ -261,15 +225,14 @@ namespace TGC.Group.Model.Scenes
 
             drawer.BeginDrawSprite();
             drawer.DrawSprite(waterVision);
-            drawer.EndDrawSprite();
-
-            stateDependentRenderLogic();
-
-            drawer.BeginDrawSprite();
-            drawer.DrawSprite(mask);
             drawer.DrawSprite(cursor);
             drawer.EndDrawSprite();
 
+            subScene.Render();
+
+            drawer.BeginDrawSprite();
+            drawer.DrawSprite(mask);
+            drawer.EndDrawSprite();
         }
 
         public override void Dispose()
@@ -277,108 +240,21 @@ namespace TGC.Group.Model.Scenes
             this.World.Dispose();
         }
 
-        public GameScene OnPause(Callback onPauseCallback)
+        public GameScene OnPause(CommandList.Command onPauseCallback)
         {
             this.onPauseCallback = onPauseCallback;
             return this;
         }
-        private void ChangeInteractionLogic(InteractionLogic newLogic)
+        public void CloseInventory()
         {
-            newUpdateLogic = newLogic;
+            subScene = Scene.Empty;
+            TurnExploreCommandsOn();
+            ((Camera)Camera).Unfreeze();
         }
-        private void ChangeStateDependentRenderLogic(RenderLogic newLogic)
+        public override void ReactToInput()
         {
-            newRenderLogic = newLogic;
-        }
-
-        private float GetPDAInitialPosition() { return -PDA.Bitmap.Width * PDA.Scaling.X; }
-        private void WorldInteractionLogic(float elapsedTime)
-        {
-            if (Input.keyPressed(Key.I))
-            {
-                ChangeInteractionLogic(TakePDAIn);
-                ChangeStateDependentRenderLogic(RenderInventory);
-                PDAPositionX = GetPDAInitialPosition();
-                ((Camera)Camera).Freeze();
-                return;
-            }
-        }
-        private void InventoryInteractionLogic(float elapsedTime)
-        {
-            if (Input.keyPressed(Key.I))
-            {
-                cursor = aim;
-                ChangeInteractionLogic(TakePDAOut);
-                return;
-            }
-        }
-        private int CalculateTransparency(int limit)
-        {
-            return FastMath.Max(
-                FastMath.Min((int)
-                ((
-                    1 - (
-                            (finalPDAPositionX - PDAPositionX) / (finalPDAPositionX - GetPDAInitialPosition())
-                        )
-                ) * limit), 255), 0);
-        }
-        private int CalculatePDATransparency()
-        {
-            return CalculateTransparency(140);
-        }
-        private int CalculaterBlacknessTransparency()
-        {
-            return CalculateTransparency(188);
-        }
-        private void TakePDAIn(float elapsedTime)
-        {
-            if (Input.keyPressed(Key.I))
-            {
-                ChangeInteractionLogic(TakePDAOut);
-                return;
-            }
-
-            PDAPositionX += PDAMoveCoefficient * elapsedTime;
-            PDATransparency = CalculatePDATransparency();
-
-            if (PDAPositionX > finalPDAPositionX)
-            {
-                PDAPositionX = finalPDAPositionX;
-                cursor = hand;
-                ChangeInteractionLogic(InventoryInteractionLogic);
-            }
-            PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
-            PDA.Color = Color.FromArgb(PDATransparency, PDA.Color.R, PDA.Color.G, PDA.Color.B);
-            darknessCover.Color = Color.FromArgb(CalculaterBlacknessTransparency(), darknessCover.Color.R, darknessCover.Color.G, darknessCover.Color.B);
-        }
-        private void TakePDAOut(float elapsedTime)
-        {
-            if (Input.keyPressed(Key.I))
-            {
-                ChangeInteractionLogic(TakePDAIn);
-                return;
-            }
-
-            PDAPositionX -= PDAMoveCoefficient * elapsedTime;
-            PDATransparency = CalculatePDATransparency();
-
-            if (PDAPositionX + PDA.Bitmap.Width * PDA.Scaling.X < 0)
-            {
-                PDAPositionX = finalPDAPositionX;
-                ChangeInteractionLogic(WorldInteractionLogic);
-                stateDependentRenderLogic = () => {};
-                ((Camera)Camera).Unfreeze();
-            }
-            PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
-            PDA.Color = Color.FromArgb(PDATransparency, PDA.Color.R, PDA.Color.G, PDA.Color.B);
-            darknessCover.Color = Color.FromArgb(CalculaterBlacknessTransparency(), darknessCover.Color.R, darknessCover.Color.G, darknessCover.Color.B);
-        }
-        private void RenderInventory()
-        {
-            drawer.BeginDrawSprite();
-            drawer.DrawSprite(darknessCover);
-            drawer.DrawSprite(PDA);
-            drawer.EndDrawSprite();
+            base.ReactToInput();
+            subScene.ReactToInput();
         }
     }
 }
