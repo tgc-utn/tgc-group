@@ -9,6 +9,7 @@ using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.Terrain;
 using Microsoft.DirectX.DirectInput;
+using TGC.Core.Text;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -16,6 +17,7 @@ namespace TGC.Group.Model.Scenes
     {
         TgcSkyBox walls;
         float rotation = 0;
+        readonly TgcText2D DrawText = new TgcText2D();
         TGCVector3 viewDirectionStart = new TGCVector3(-1, 0.25f, 0);
         public delegate void Callback();
         private Callback onGoToWaterCallback = () => {}, onPauseCallback = () => {};

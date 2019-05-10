@@ -18,6 +18,7 @@ using Key = Microsoft.DirectX.DirectInput.Key;
 using Screen = TGC.Group.Model.Utils.Screen;
 using static TGC.Core.Input.TgcD3dInput;
 using System.Collections.Generic;
+using Microsoft.DirectX.DirectInput;
 
 namespace TGC.Group.Model.Scenes
 {
@@ -38,12 +39,19 @@ namespace TGC.Group.Model.Scenes
         TgcSkyBox skyBox;
         CustomSprite waterVision, mask, aim, cursor;
         Drawer2D drawer = new Drawer2D();
-        
         private Character character = new Character();
 
         private float oneSecond = 0; //TODO remove
         private bool gaveOxygenTank = false; //TODO remove
         private bool aimFired = false;
+
+        delegate void InteractionLogic(float elapsedTime);
+
+        InteractionLogic currentInteractionLogic, newUpdateLogic;
+
+        delegate void RenderLogic();
+
+        RenderLogic stateDependentRenderLogic, newRenderLogic;
 
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         {
@@ -55,7 +63,6 @@ namespace TGC.Group.Model.Scenes
 
             IncrementFarPlane(3f);
             SetClampTextureAddressing();
-
             InitInventoryScene();
             InitSkyBox();
             InitWaterVision();
@@ -173,16 +180,17 @@ namespace TGC.Group.Model.Scenes
         public override void Update(float elapsedTime)
         {
             this.oneSecond += elapsedTime;
-            
+
             AquaticPhysics.Instance.DynamicsWorld.StepSimulation(elapsedTime);
 
             CollisionManager.CheckCollitions(this.World.GetCollisionables());
 
-            this.World.Update((Camera)this.Camera);
+            this.World.Update((Camera) this.Camera);
 
-            var item = manageSelectableElement(this.World.SelectableElement); // Important: get this AFTER updating the world
-            
-            if(item != null)
+            var item = manageSelectableElement(this.World
+                .SelectableElement); // Important: get this AFTER updating the world
+
+            if (item != null)
                 this.character.GiveItem(item);
 
             //TODO crafter logic, move to crafter when coded
@@ -191,7 +199,7 @@ namespace TGC.Group.Model.Scenes
                 this.character.RemoveIngredients(OxygenTank.Recipe.Ingredients);
                 var oxygenTank = new OxygenTank();
                 this.character.GiveItem(oxygenTank);
-                
+
                 ///////TODO when UI is ready, the selected element will be equipped
                 this.character.Equip(oxygenTank);
 
@@ -203,7 +211,7 @@ namespace TGC.Group.Model.Scenes
             if (this.oneSecond > 1.0f)
             {
                 this.oneSecond = 0;
-                this.character.UpdateStats(new Stats(-1,0));
+                this.character.UpdateStats(new Stats(-1, 0));
             }
 
             subScene.Update(elapsedTime);
@@ -216,10 +224,8 @@ namespace TGC.Group.Model.Scenes
             this.skyBox.Render();
             this.World.Render(this.Camera);
 
-
             if (this.BoundingBox)
             {
-                this.DrawText.drawText("Oxygen = " + this.character.ActualStats.Oxygen + "/" + this.character.MaxStats.Oxygen, 0, 60, Color.Bisque);
                 this.World.RenderBoundingBox(this.Camera);
             }
 
@@ -233,6 +239,9 @@ namespace TGC.Group.Model.Scenes
             drawer.BeginDrawSprite();
             drawer.DrawSprite(mask);
             drawer.EndDrawSprite();
+            this.DrawText.drawText(
+                "Oxygen = " + this.character.ActualStats.Oxygen + "/" + this.character.MaxStats.Oxygen, 0, 60,
+                Color.Bisque);
         }
 
         public override void Dispose()

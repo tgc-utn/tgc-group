@@ -104,7 +104,7 @@ namespace TGC.Group.Model
         {
             cameraRotation = CalculateCameraRotation();
 
-            Position += TGCVector3.TransformNormal(CalculateInputTranslation() * elapsedTime, cameraRotation);
+            Position = CalculateTranslation(elapsedTime, cameraRotation);
 
             LookAt = Position + TGCVector3.TransformNormal(initialDirectionView, cameraRotation);
 
@@ -113,12 +113,10 @@ namespace TGC.Group.Model
             Cursor.Position = mouseCenter;
             base.SetCamera(Position, LookAt, UpVector);
         }
-
         public void Freeze()
         {
             currentUpdateLogic = (elapsedTime) => {};
         }
-
         public void Unfreeze()
         {
             currentUpdateLogic = MoveNormally;

@@ -29,7 +29,7 @@ namespace TGC.Group.Model.Elements.RigidBodyFactories
 
             return rigidBody;
         }
-
+        
         private static RigidBody CreateRigidBody(TGCVector3 position, float mass, CapsuleShape capsule)
         {
             var inertia = capsule.CalculateLocalInertia(mass);
@@ -41,11 +41,23 @@ namespace TGC.Group.Model.Elements.RigidBodyFactories
             return rigidBody;
         }
 
-        internal RigidBody Create(TGCVector3 position, float radius, float height)
+        public RigidBody Create(TGCVector3 position, float radius, float height)
         {
             var mass = 60f;
             var capsule = new CapsuleShape(radius, height);
             return CreateRigidBody(position, mass, capsule);
+        }
+
+        public RigidBody CreateShark(TgcMesh mesh)
+        {
+            var mass = 1000f;
+            var radius = mesh.BoundingBox.calculateAxisRadius();
+
+            CapsuleShape capsule;
+            capsule = new CapsuleShapeX(radius.Y, radius.X * 1.5f - radius.Y);
+            RigidBody rigidBody = CreateRigidBody(mesh.Position, mass, capsule);
+
+            return rigidBody;
         }
     }
 }
