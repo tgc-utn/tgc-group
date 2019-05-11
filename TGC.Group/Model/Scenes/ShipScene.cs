@@ -15,8 +15,9 @@ namespace TGC.Group.Model.Scenes
 {
     class ShipScene : Scene
     {
-        readonly TgcText2D DrawText = new TgcText2D();
         TgcSkyBox walls;
+        float rotation = 0;
+        readonly TgcText2D DrawText = new TgcText2D();
         TGCVector3 viewDirectionStart = new TGCVector3(-1, 0.25f, 0);
         public delegate void Callback();
         private Callback onGoToWaterCallback = () => {}, onPauseCallback = () => {};
@@ -47,8 +48,6 @@ namespace TGC.Group.Model.Scenes
             ClearScreen();
 
             walls.Render();
-            
-            this.DrawText.drawText("Press ENTER to start", 320, 240, Color.Bisque);
         }
 
         public override void Update(float elapsedTime)

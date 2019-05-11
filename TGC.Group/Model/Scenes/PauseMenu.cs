@@ -43,27 +43,29 @@ namespace TGC.Group.Model.Scenes
             _uses3DCamera = false;
             textBig.changeFont(new System.Drawing.Font("Arial Black", 40f));
             textSmall.changeFont(new System.Drawing.Font("Arial Black", 20f));
+
+            InitInput();
+        }
+        private void InitInput()
+        {
+            pressed[GameInput._Enter] = () => {
+                Decide();
+                pointer = Pointer.UP;
+            };
+            pressed[GameInput._Escape] = () => {
+                onReturnToGameCallback();
+                pointer = Pointer.UP;
+            };
+            pressed[GameInput._Up] = () => {
+                pointer = Pointer.UP;
+            };
+            pressed[GameInput._Down] = () => {
+                pointer = Pointer.DOWN;
+            };
         }
         public override void Update(float elapsedTime)
         {
-            if (GameInput.Enter.IsPressed(Input))
-            {
-                Decide();
-                pointer = Pointer.UP;
-            }
-            if (GameInput.Escape.IsPressed(Input))
-            {
-                onReturnToGameCallback();
-                pointer = Pointer.UP;
-            }
-            if (GameInput.Up.IsPressed(Input))
-            {
-                pointer = Pointer.UP;
-            }
-            if (GameInput.Down.IsPressed(Input))
-            {
-                pointer = Pointer.DOWN;
-            }
+            
         }
         public override void Render()
         {

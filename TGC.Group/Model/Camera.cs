@@ -113,12 +113,10 @@ namespace TGC.Group.Model
             Cursor.Position = mouseCenter;
             base.SetCamera(Position, LookAt, UpVector);
         }
-
         public void Freeze()
         {
             currentUpdateLogic = (elapsedTime) => {};
         }
-
         public void Unfreeze()
         {
             currentUpdateLogic = MoveNormally;
