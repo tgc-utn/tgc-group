@@ -40,6 +40,7 @@ namespace TGC.Group.Model.Scenes
         CustomSprite waterVision, mask, aim, cursor;
         Drawer2D drawer = new Drawer2D();
         private Character character = new Character();
+        internal Character Character { get { return character; } }
 
         private float oneSecond = 0; //TODO remove
         private bool gaveOxygenTank = false; //TODO remove

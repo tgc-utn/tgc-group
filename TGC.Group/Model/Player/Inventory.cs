@@ -12,7 +12,7 @@ namespace TGC.Group.Model.Player
 {
     public class Inventory
     {
-        private List<IItem> Items { get; }
+        public List<IItem> Items { get; }
         private readonly int size;
 
         public Inventory(int size)

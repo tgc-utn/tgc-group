@@ -10,32 +10,10 @@ using TGC.Group.TGCUtils;
 
 namespace TGC.Group.Model.Scenes
 {
-    class InventoryScene : Scene
+    partial class InventoryScene : Scene
     {
-        enum StateID
-        {
-
-            IN,
-            INVENTORY,
-            OUT
-        }
-        struct State
-        {
-            public StateID nextStateID;
-            public UpdateLogic updateLogic;
-            public State(UpdateLogic updateLogic, StateID nextStateID)
-            {
-                this.updateLogic = updateLogic;
-                this.nextStateID = nextStateID;
-            }
-        }
-        private State[] states = new State[3];
-        private StateID stateID;
-
         private GameScene gameScene;
-
-        public delegate void UpdateLogic(float elapsedTime);
-        public UpdateLogic updateLogic = time => {};
+        private int count;
 
         private TgcText2D text = new TgcText2D();
         private Drawer2D drawer = new Drawer2D();
@@ -56,18 +34,6 @@ namespace TGC.Group.Model.Scenes
             BindState(StateID.OUT, TakePDAOut, StateID.IN);
 
             SetState(StateID.IN);
-        }
-        private void SetState(StateID newStateID)
-        {
-            State newState = states[(int)newStateID];
-
-            this.stateID = newStateID;
-            this.updateLogic = newState.updateLogic;
-            pressed[Key.I] = () => SetState(newState.nextStateID);
-        }
-        private void BindState(StateID stateID, UpdateLogic stateUpdateLogic, StateID nextStateID)
-        {
-            states[(int)stateID] = new State(stateUpdateLogic, nextStateID);
         }
         private void InitPDA()
         {
@@ -91,6 +57,11 @@ namespace TGC.Group.Model.Scenes
         }
         public override void Update(float elapsedTime)
         {
+            if(nextStateID != StateID.NULL)
+            {
+                SetState(nextStateID);
+                nextStateID = StateID.NULL;
+            }
             updateLogic(elapsedTime);
         }
         public override void Render()
@@ -98,8 +69,15 @@ namespace TGC.Group.Model.Scenes
             drawer.BeginDrawSprite();
             drawer.DrawSprite(darknessCover);
             drawer.DrawSprite(PDA);
-            if(stateID == StateID.INVENTORY) drawer.DrawSprite(cursor);
+            if (stateID == StateID.INVENTORY)
+            {
+                drawer.DrawSprite(cursor);
+            }
             drawer.EndDrawSprite();
+
+            if (stateID == StateID.INVENTORY)
+                text.drawText("count: " + count, 500, 300, Color.White);
+
         }
         private float GetPDAInitialPosition() { return -PDA.Bitmap.Width * PDA.Scaling.X; }
         private int CalculateTransparency(int limit)
@@ -120,10 +98,6 @@ namespace TGC.Group.Model.Scenes
         {
             return CalculateTransparency(188);
         }
-        public void ChangeUpdateLogic(UpdateLogic updateLogic)
-        {
-            this.updateLogic = updateLogic;
-        }
         public void TakePDAIn(float elapsedTime)
         {
             PDAPositionX += PDAMoveCoefficient * elapsedTime;
@@ -132,7 +106,7 @@ namespace TGC.Group.Model.Scenes
             if (PDAPositionX > finalPDAPositionX)
             {
                 PDAPositionX = finalPDAPositionX;
-                SetState(StateID.INVENTORY);
+                SetNextState(StateID.INVENTORY);
             }
             PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
             PDA.Color = Color.FromArgb(PDATransparency, PDA.Color.R, PDA.Color.G, PDA.Color.B);
@@ -140,7 +114,7 @@ namespace TGC.Group.Model.Scenes
         }
         public void InventoryInteraction(float elapsedTime)
         {
-
+            count = gameScene.Character.Inventory.Items.Count;
         }
         public void TakePDAOut(float elapsedTime)
         {
@@ -150,7 +124,7 @@ namespace TGC.Group.Model.Scenes
             if (PDAPositionX + PDA.Bitmap.Width * PDA.Scaling.X < 0)
             {
                 PDAPositionX = GetPDAInitialPosition();
-                SetState(StateID.IN);
+                SetNextState(StateID.IN);
                 gameScene.CloseInventory();
 
             }
