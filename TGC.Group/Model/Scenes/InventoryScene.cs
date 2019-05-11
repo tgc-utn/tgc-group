@@ -14,17 +14,17 @@ namespace TGC.Group.Model.Scenes
     {
         enum StateID
         {
+
             IN,
             INVENTORY,
             OUT
         }
         struct State
         {
-            public StateID id, nextStateID;
+            public StateID nextStateID;
             public UpdateLogic updateLogic;
-            public State(StateID id, UpdateLogic updateLogic, StateID nextStateID)
+            public State(UpdateLogic updateLogic, StateID nextStateID)
             {
-                this.id = id;
                 this.updateLogic = updateLogic;
                 this.nextStateID = nextStateID;
             }
@@ -61,13 +61,13 @@ namespace TGC.Group.Model.Scenes
         {
             State newState = states[(int)newStateID];
 
-            this.stateID = newState.id;
+            this.stateID = newStateID;
             this.updateLogic = newState.updateLogic;
             pressed[Key.I] = () => SetState(newState.nextStateID);
         }
         private void BindState(StateID stateID, UpdateLogic stateUpdateLogic, StateID nextStateID)
         {
-            states[(int)stateID] = new State(stateID, stateUpdateLogic, nextStateID);
+            states[(int)stateID] = new State(stateUpdateLogic, nextStateID);
         }
         private void InitPDA()
         {
