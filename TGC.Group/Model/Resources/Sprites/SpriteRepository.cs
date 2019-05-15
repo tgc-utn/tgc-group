@@ -17,7 +17,11 @@ namespace TGC.Group.Model.Resources.Sprites
         public static CustomBitmap Mask = new CustomBitmap("../../../res/mask.png", D3DDevice.Instance.Device);
         public static CustomBitmap Aim = new CustomBitmap("../../../res/aim.png", D3DDevice.Instance.Device);
         public static CustomBitmap Hand = new CustomBitmap("../../../res/hand.png", D3DDevice.Instance.Device);
-        public static CustomSprite CreateSpriteFromPath(CustomBitmap bitmap)
+        public static CustomBitmap ArrowPointer = new CustomBitmap("../../../res/arrow-pointer.png", D3DDevice.Instance.Device);
+        public static CustomBitmap Bubble = new CustomBitmap("../../../res/bubble.png", D3DDevice.Instance.Device);
+        public static CustomBitmap Fish = new CustomBitmap("../../../res/fish.png", D3DDevice.Instance.Device);
+        public static CustomBitmap Plant = new CustomBitmap("../../../res/plant.png", D3DDevice.Instance.Device);
+        public static CustomSprite CreateSpriteFromBitmap(CustomBitmap bitmap)
         {
             CustomSprite ret = new CustomSprite();
             ret.Bitmap = bitmap;

@@ -1,11 +1,7 @@
-﻿using Microsoft.DirectX.DirectInput;
-using System.Collections.Generic;
-using System.Drawing;
-using TGC.Core.Input;
+﻿using System.Drawing;
+using System.Windows.Forms;
 using TGC.Core.Mathematica;
 using TGC.Core.Text;
-using TGC.Group.Model.Resources.Sprites;
-using TGC.Group.Model.Utils;
 using TGC.Group.TGCUtils;
 
 namespace TGC.Group.Model.Scenes
@@ -17,43 +13,18 @@ namespace TGC.Group.Model.Scenes
 
         private TgcText2D text = new TgcText2D();
         private Drawer2D drawer = new Drawer2D();
-        private CustomSprite PDA, darknessCover, cursor;
+        private CustomSprite PDA, darknessCover, cursor, bubble, fish, plant;
+        private Color cursorDefaultColor;
         float PDAPositionX, finalPDAPositionX, PDAMoveCoefficient;
         int PDATransparency;
 
-        public InventoryScene(TgcD3dInput input, GameScene gameScene) : base(input)
+        private TGCVector2 GetScaleForSpriteByPixels(CustomSprite sprite, int xPixels, int yPixels)
         {
-            this.gameScene = gameScene;
-
-            InitPDA();
-            InitDarknessCover();
-            InitCursor();
-
-            BindState(StateID.IN, TakePDAIn, StateID.OUT);
-            BindState(StateID.INVENTORY, InventoryInteraction, StateID.OUT);
-            BindState(StateID.OUT, TakePDAOut, StateID.IN);
-
-            SetState(StateID.IN);
-        }
-        private void InitPDA()
-        {
-            PDA = BitmapRepository.CreateSpriteFromPath(BitmapRepository.PDA);
-            PDA.Scaling = new TGCVector2(.5f, .35f);
-            Screen.CenterSprite(PDA);
-            finalPDAPositionX = PDA.Position.X;
-            PDAPositionX = GetPDAInitialPosition();
-            PDAMoveCoefficient = (finalPDAPositionX - GetPDAInitialPosition()) * 4;
-        }
-        private void InitDarknessCover()
-        {
-            darknessCover = BitmapRepository.CreateSpriteFromPath(BitmapRepository.BlackRectangle);
-            Screen.FitSpriteToScreen(darknessCover);
-            darknessCover.Color = Color.FromArgb(0, 0, 0, 0);
-        }
-        private void InitCursor()
-        {
-            cursor = BitmapRepository.CreateSpriteFromPath(BitmapRepository.Hand);
-            Screen.CenterSprite(cursor);
+            float pixelWidth = sprite.Bitmap.Width;
+            float pixelHeight = sprite.Bitmap.Height;
+            float xScale = xPixels / pixelWidth;
+            float yScale = yPixels / pixelHeight;
+            return new TGCVector2(xScale, yScale);
         }
         public override void Update(float elapsedTime)
         {
@@ -69,34 +40,63 @@ namespace TGC.Group.Model.Scenes
             drawer.BeginDrawSprite();
             drawer.DrawSprite(darknessCover);
             drawer.DrawSprite(PDA);
+            drawer.EndDrawSprite();
             if (stateID == StateID.INVENTORY)
             {
+                bool hovering = false;
+                TGCVector2 baseVector = PDA.Position + new TGCVector2(375, 175);
+                drawer.BeginDrawSprite();
+                byte xOffset = 110;
+                byte yOffset = 110;
+                byte maxItemsPerLine = 5;
+                byte i = 0;
+                foreach (var item in gameScene.Character.Inventory.Items)
+                {
+                    int x = i % maxItemsPerLine;
+                    int y = i / maxItemsPerLine;
+                    //text.drawText("-" + i++ + ": " + item.Name + " | " + item.Description + " | " + item.type.ToString(), 500, 300 + 30 * i, Color.White);
+                    bubble.Position = baseVector + new TGCVector2(xOffset * x, yOffset * y);
+                    if(
+                        Cursor.Position.X >= bubble.Position.X
+                        && Cursor.Position.X <= bubble.Position.X + bubble.Bitmap.Width * bubble.Scaling.X
+                        && Cursor.Position.Y >= bubble.Position.Y
+                        && Cursor.Position.Y <= bubble.Position.Y + bubble.Bitmap.Height * bubble.Scaling.Y
+                       )
+                    {
+                        bubble.Scaling = bubbleScale + GetScaleForSpriteByPixels(bubble, 10, 10);
+                        item.Icon.Scaling = item.DefaultScale + GetScaleForSpriteByPixels(item.Icon, 10, 10);
+                        hovering = true;
+                    }
+                    else
+                    {
+                        bubble.Scaling = bubbleScale;
+                        item.Icon.Scaling = item.DefaultScale;
+                    }
+                    item.Icon.Position = bubble.Position + new TGCVector2(7, 19);
+                    drawer.DrawSprite(bubble);
+                    drawer.DrawSprite(item.Icon);
+                    ++i;
+                }
+
+
+                cursor.Color = hovering ? Color.Yellow : cursorDefaultColor;
                 drawer.DrawSprite(cursor);
+                drawer.EndDrawSprite();
             }
-            drawer.EndDrawSprite();
 
-            if (stateID == StateID.INVENTORY)
-                text.drawText("count: " + count, 500, 300, Color.White);
+            //if (stateID == StateID.INVENTORY)
+            //{
+            //    //text.drawText("count: " + count, 500, 270, Color.White);
+            //    drawer.BeginDrawSprite();
+            //    //int i = 1;
+            //    foreach (var item in gameScene.Character.Inventory.Items)
+            //    {
+            //        //text.drawText("-" + i++ + ": " + item.Name + " | " + item.Description + " | " + item.type.ToString(), 500, 300 + 30 * i, Color.White);
+            //        drawer.DrawSprite(bubble);
+            //    }
+            //    drawer.DrawSprite(PDA);
+            //}
 
-        }
-        private float GetPDAInitialPosition() { return -PDA.Bitmap.Width * PDA.Scaling.X; }
-        private int CalculateTransparency(int limit)
-        {
-            return FastMath.Max(
-                FastMath.Min((int)
-                ((
-                    1 - (
-                            (finalPDAPositionX - PDAPositionX) / (finalPDAPositionX - GetPDAInitialPosition())
-                        )
-                ) * limit), 255), 0);
-        }
-        private int CalculatePDATransparency()
-        {
-            return CalculateTransparency(140);
-        }
-        private int CalculaterBlacknessTransparency()
-        {
-            return CalculateTransparency(188);
         }
         public void TakePDAIn(float elapsedTime)
         {
@@ -108,6 +108,7 @@ namespace TGC.Group.Model.Scenes
                 PDAPositionX = finalPDAPositionX;
                 SetNextState(StateID.INVENTORY);
             }
+
             PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
             PDA.Color = Color.FromArgb(PDATransparency, PDA.Color.R, PDA.Color.G, PDA.Color.B);
             darknessCover.Color = Color.FromArgb(CalculaterBlacknessTransparency(), darknessCover.Color.R, darknessCover.Color.G, darknessCover.Color.B);
@@ -115,6 +116,7 @@ namespace TGC.Group.Model.Scenes
         public void InventoryInteraction(float elapsedTime)
         {
             count = gameScene.Character.Inventory.Items.Count;
+            cursor.Position = new TGCVector2(Cursor.Position.X, Cursor.Position.Y);
         }
         public void TakePDAOut(float elapsedTime)
         {
@@ -126,8 +128,8 @@ namespace TGC.Group.Model.Scenes
                 PDAPositionX = GetPDAInitialPosition();
                 SetNextState(StateID.IN);
                 gameScene.CloseInventory();
-
             }
+
             PDA.Position = new TGCVector2(PDAPositionX, PDA.Position.Y);
             PDA.Color = Color.FromArgb(PDATransparency, PDA.Color.R, PDA.Color.G, PDA.Color.B);
             darknessCover.Color = Color.FromArgb(CalculaterBlacknessTransparency(), darknessCover.Color.R, darknessCover.Color.G, darknessCover.Color.B);

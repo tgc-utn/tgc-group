@@ -37,8 +37,9 @@ namespace TGC.Group.Model.Scenes
         InventoryScene inventoryScene;
 
         TgcSkyBox skyBox;
-        CustomSprite waterVision, mask, aim, cursor;
+        CustomSprite waterVision, mask, aim, hand, cursor, dialogBox;
         Drawer2D drawer = new Drawer2D();
+        string dialogName, dialogDescription;
         private Character character = new Character();
         internal Character Character { get { return character; } }
 
@@ -60,6 +61,8 @@ namespace TGC.Group.Model.Scenes
 
             this.World = new World(new TGCVector3(0, 0, 0));
 
+            //DrawText.changeFont(new System.Drawing.Font("Arial Black", 10f));
+
             SetCamera(input);
 
             IncrementFarPlane(3f);
@@ -69,6 +72,8 @@ namespace TGC.Group.Model.Scenes
             InitWaterVision();
             InitMask();
             InitAim();
+            InitHand();
+            InitDialogBox();
 
             World = new World(new TGCVector3(0, 0, 0));
 
@@ -119,19 +124,33 @@ namespace TGC.Group.Model.Scenes
         }
         private void InitWaterVision()
         {
-            waterVision = BitmapRepository.CreateSpriteFromPath(BitmapRepository.WaterRectangle);
+            waterVision = BitmapRepository.CreateSpriteFromBitmap(BitmapRepository.WaterRectangle);
             Screen.FitSpriteToScreen(waterVision);
             waterVision.Color = Color.FromArgb(120, 10, 70, 164);
         }
         private void InitMask()
         {
-            mask = BitmapRepository.CreateSpriteFromPath(BitmapRepository.Mask);
+            mask = BitmapRepository.CreateSpriteFromBitmap(BitmapRepository.Mask);
             Screen.FitSpriteToScreen(mask);
         }
         private void InitAim()
         {
-            aim = BitmapRepository.CreateSpriteFromPath(BitmapRepository.Aim);
+            aim = BitmapRepository.CreateSpriteFromBitmap(BitmapRepository.Aim);
             Screen.CenterSprite(aim);
+        }
+        private void InitHand()
+        {
+            hand = BitmapRepository.CreateSpriteFromBitmap(BitmapRepository.Hand);
+            hand.Scaling = new TGCVector2(.75f, .75f);
+            Screen.CenterSprite(hand);
+        }
+        private void InitDialogBox()
+        {
+            dialogBox = BitmapRepository.CreateSpriteFromBitmap(BitmapRepository.BlackRectangle);
+            dialogBox.Scaling = new TGCVector2(.35f, .05f);
+            dialogBox.Color = Color.FromArgb(188, dialogBox.Color.R, dialogBox.Color.G, dialogBox.Color.B);
+            Screen.CenterSprite(dialogBox);
+            dialogBox.Position = new TGCVector2(dialogBox.Position.X + 120, dialogBox.Position.Y + 80);
         }
 
         private void InitSkyBox()
@@ -164,10 +183,19 @@ namespace TGC.Group.Model.Scenes
         }
         private IItem manageSelectableElement(Element element)
         {
-            if (element == null) return null;
+            if (element == null)
+            {
+                cursor = aim;
+                dialogName = dialogDescription = "";
+                return null;
+            }
+            cursor = hand;
             IItem item = null;
 
             element.Selectable = true;
+
+            dialogName = element.item.Name;
+            dialogDescription = element.item.Description;
 
             if (aimFired)
             {
@@ -213,9 +241,11 @@ namespace TGC.Group.Model.Scenes
             {
                 this.oneSecond = 0;
                 this.character.UpdateStats(new Stats(-1, 0));
+                this.character.UpdateStats(new Stats(-1, 0));
             }
 
             subScene.Update(elapsedTime);
+            aimFired = false;
         }
 
         public override void Render()
@@ -233,6 +263,10 @@ namespace TGC.Group.Model.Scenes
             drawer.BeginDrawSprite();
             drawer.DrawSprite(waterVision);
             drawer.DrawSprite(cursor);
+            if(dialogName != "")
+            {
+                drawer.DrawSprite(dialogBox);
+            }
             drawer.EndDrawSprite();
 
             subScene.Render();
@@ -240,6 +274,11 @@ namespace TGC.Group.Model.Scenes
             drawer.BeginDrawSprite();
             drawer.DrawSprite(mask);
             drawer.EndDrawSprite();
+            if (dialogName != "")
+            {
+                DrawText.drawText(dialogName, (int)dialogBox.Position.X, (int)dialogBox.Position.Y, Color.White);
+                DrawText.drawText(dialogDescription, (int)dialogBox.Position.X, (int)dialogBox.Position.Y + 15, Color.White);
+            }
             this.DrawText.drawText(
                 "Oxygen = " + this.character.ActualStats.Oxygen + "/" + this.character.MaxStats.Oxygen, 0, 60,
                 Color.Bisque);
