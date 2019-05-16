@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BulletSharp.Math;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 
@@ -37,8 +38,11 @@ namespace TGC.Group.Model.Elements.RigidBodyFactories
 
             var motionState = new DefaultMotionState(transform.ToBsMatrix);
             var rigidBodyInfo = new RigidBodyConstructionInfo(mass, motionState, capsule, inertia);
-            var rigidBody = new RigidBody(rigidBodyInfo);
-            return rigidBody;
+            return new RigidBody(rigidBodyInfo)
+            {
+                AngularFactor = Vector3.UnitY
+            };
+
         }
 
         public RigidBody Create(TGCVector3 position, float radius, float height)
@@ -52,12 +56,13 @@ namespace TGC.Group.Model.Elements.RigidBodyFactories
         {
             var mass = 1000f;
             var radius = mesh.BoundingBox.calculateAxisRadius();
+;
+            return CreateRigidBody(
+                mesh.Position, 
+                mass, 
+                new CapsuleShapeX(radius.Y, radius.X * 1.5f - radius.Y)
+            );
 
-            CapsuleShape capsule;
-            capsule = new CapsuleShapeX(radius.Y, radius.X * 1.5f - radius.Y);
-            RigidBody rigidBody = CreateRigidBody(mesh.Position, mass, capsule);
-
-            return rigidBody;
         }
     }
 }
