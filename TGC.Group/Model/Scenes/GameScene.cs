@@ -17,7 +17,6 @@ using TGC.Core.Direct3D;
 using Key = Microsoft.DirectX.DirectInput.Key;
 using Screen = TGC.Group.Model.Utils.Screen;
 using System;
-using TGC.Core.Shaders;
 
 namespace TGC.Group.Model.Scenes
 {

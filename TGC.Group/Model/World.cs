@@ -6,14 +6,11 @@ using System.Linq;
 using TGC.Core.Camara;
 using TGC.Core.Collision;
 using TGC.Core.Direct3D;
-using TGC.Core.Input;
 using TGC.Core.Mathematica;
-using TGC.Core.Shaders;
 using TGC.Group.Model.Chunks;
 using TGC.Group.Model.Elements;
 using TGC.Group.Model.Elements.ElementFactories;
 using TGC.Group.Model.Elements.RigidBodyFactories;
-using TGC.Group.Model.Input;
 using TGC.Group.Model.Resources.Meshes;
 
 namespace TGC.Group.Model
