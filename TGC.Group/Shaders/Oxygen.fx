@@ -66,7 +66,7 @@ float4 main_pixel(PixelInput input) : COLOR
 
 	float transparency = (cos(radialDist * 15.6) * isGraterThanZero(radialDist * 15.6 - PI / 2)) * isLowerThanZero(realAngle - oxygen * 2 * PI);
 
-	return float4(0, 1, colorIntensity, transparency);
+	return float4(1 - oxygen, oxygen, colorIntensity, transparency);
 }
 
 technique OxygenTechnique
