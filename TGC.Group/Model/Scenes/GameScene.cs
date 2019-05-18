@@ -57,6 +57,10 @@ namespace TGC.Group.Model.Scenes
 
         CustomVertex.TransformedColored[] vertices;
 
+        const int o2MeterSize = 120;
+        const int o2MeterX0 = 110;
+        const int o2MeterY0 = 475;
+
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         {
             backgroundColor = Color.FromArgb(1, 78, 129, 179);
@@ -81,7 +85,7 @@ namespace TGC.Group.Model.Scenes
 
             blackCircle = BitmapRepository.CreateSpriteFromBitmap(BitmapRepository.BlackCircle);
             blackCircle.Scaling = new TGCVector2(.275f, .275f);
-            blackCircle.Position = new TGCVector2(140, 440);
+            blackCircle.Position = new TGCVector2(o2MeterX0 - 10, o2MeterY0 - 10);
             blackCircle.Color = Color.FromArgb(188, 0, 0, 0);
 
             World = new World(new TGCVector3(0, 0, 0));
@@ -117,10 +121,6 @@ namespace TGC.Group.Model.Scenes
             }
 
             OxygenEffect.Technique = "OxygenTechnique";
-
-            int o2MeterSize = 120;
-            int o2MeterX0 = 150;
-            int o2MeterY0 = 450;
 
             vertices = new CustomVertex.TransformedColored[6];
             vertices[0] = new CustomVertex.TransformedColored(o2MeterX0, o2MeterY0, 0, 1, 0x000000);
@@ -245,6 +245,24 @@ namespace TGC.Group.Model.Scenes
 
             return item;
         }
+        public void RenderO2Meter()
+        {
+            double o2Level = Math.Floor((float)this.character.ActualStats.Oxygen / 100) + 1;
+            this.TextO2Big.drawText("O", o2MeterX0 + 40, o2MeterY0 + 25, Color.Bisque);
+            this.TextO2Small.drawText("2", o2MeterX0 + 65, o2MeterY0 + 38, Color.Bisque);
+            this.TextO2Big.drawText("" + o2Level, o2Level >= 10 ? o2MeterX0 + 42 : o2MeterX0 + 48, o2MeterY0 + 60, Color.Bisque);
+
+            /**********OXYGEN METER SHADER***********/
+            OxygenEffect.Begin(FX.None);
+            OxygenEffect.BeginPass(0);
+            OxygenEffect.SetValue("oxygen", (float)(this.character.ActualStats.Oxygen) / this.character.MaxStats.Oxygen);
+            D3DDevice.Instance.Device.RenderState.AlphaBlendEnable = true;
+            D3DDevice.Instance.Device.VertexFormat = CustomVertex.TransformedColored.Format;
+            D3DDevice.Instance.Device.DrawUserPrimitives(PrimitiveType.TriangleList, vertices.Length / 3, vertices);
+            OxygenEffect.EndPass();
+            OxygenEffect.End();
+            /****************************************/
+        }
         public override void Update(float elapsedTime)
         {
             this.oneSecond += elapsedTime;
@@ -322,22 +340,7 @@ namespace TGC.Group.Model.Scenes
             drawer.DrawSprite(blackCircle);
             drawer.EndDrawSprite();
 
-            double o2Level = Math.Floor((float)this.character.ActualStats.Oxygen / 100) + 1;
-            this.TextO2Big.drawText("O", 190, 475, Color.Bisque);
-            this.TextO2Small.drawText("2", 215, 488, Color.Bisque);
-            this.TextO2Big.drawText("" + o2Level, o2Level >= 10 ? 192 : 198, 510, Color.Bisque);
-
-            /**********OXYGEN METER SHADER***********/
-            OxygenEffect.Begin(FX.None);
-            OxygenEffect.BeginPass(0);
-            OxygenEffect.SetValue("oxygen", (float)(this.character.ActualStats.Oxygen) / this.character.MaxStats.Oxygen);
-            D3DDevice.Instance.Device.RenderState.AlphaBlendEnable = true;
-            D3DDevice.Instance.Device.VertexFormat = CustomVertex.TransformedColored.Format;
-            D3DDevice.Instance.Device.DrawUserPrimitives(PrimitiveType.TriangleList, vertices.Length / 3, vertices);
-            OxygenEffect.EndPass();
-            OxygenEffect.End();
-            /****************************************/
-
+            RenderO2Meter();
         }
 
         public override void Dispose()
