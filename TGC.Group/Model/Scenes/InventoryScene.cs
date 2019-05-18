@@ -57,19 +57,19 @@ namespace TGC.Group.Model.Scenes
                     //text.drawText("-" + i++ + ": " + item.Name + " | " + item.Description + " | " + item.type.ToString(), 500, 300 + 30 * i, Color.White);
                     bubble.Position = baseVector + new TGCVector2(xOffset * x, yOffset * y);
                     if(
-                        Cursor.Position.X >= bubble.Position.X
-                        && Cursor.Position.X <= bubble.Position.X + bubble.Bitmap.Width * bubble.Scaling.X
-                        && Cursor.Position.Y >= bubble.Position.Y
-                        && Cursor.Position.Y <= bubble.Position.Y + bubble.Bitmap.Height * bubble.Scaling.Y
+                        Cursor.Position.X >= bubble.Position.X &&
+                        Cursor.Position.X <= bubble.Position.X + bubble.Bitmap.Width * bubble.Scaling.X &&
+                        Cursor.Position.Y >= bubble.Position.Y &&
+                        Cursor.Position.Y <= bubble.Position.Y + bubble.Bitmap.Height * bubble.Scaling.Y
                        )
                     {
-                        bubble.Scaling = bubbleScale + GetScaleForSpriteByPixels(bubble, 10, 10);
+                        bubble.Scaling = bubbleDefaultScale + GetScaleForSpriteByPixels(bubble, 10, 10);
                         item.Icon.Scaling = item.DefaultScale + GetScaleForSpriteByPixels(item.Icon, 10, 10);
                         hovering = true;
                     }
                     else
                     {
-                        bubble.Scaling = bubbleScale;
+                        bubble.Scaling = bubbleDefaultScale;
                         item.Icon.Scaling = item.DefaultScale;
                     }
                     item.Icon.Position = bubble.Position + new TGCVector2(7, 19);
@@ -77,7 +77,6 @@ namespace TGC.Group.Model.Scenes
                     drawer.DrawSprite(item.Icon);
                     ++i;
                 }
-
 
                 cursor.Color = hovering ? Color.Yellow : cursorDefaultColor;
                 drawer.DrawSprite(cursor);

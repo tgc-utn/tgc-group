@@ -32,7 +32,7 @@ namespace TGC.Group.Model.Scenes
         private State[] states = new State[3];
         private StateID stateID, nextStateID;
 
-        private TGCVector2 bubbleScale = new TGCVector2(.5f, .5f);
+        private TGCVector2 bubbleDefaultScale = new TGCVector2(.5f, .5f);
         public InventoryScene(TgcD3dInput input, GameScene gameScene) : base(input)
         {
             this.gameScene = gameScene;
@@ -90,7 +90,7 @@ namespace TGC.Group.Model.Scenes
         private void InitBubble()
         {
             bubble = BitmapRepository.CreateSpriteFromBitmap(BitmapRepository.Bubble);
-            bubble.Scaling = bubbleScale;
+            bubble.Scaling = bubbleDefaultScale;
         }
         private void InitFish()
         {

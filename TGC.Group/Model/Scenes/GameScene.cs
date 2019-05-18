@@ -16,15 +16,15 @@ using TGC.Group.Model.Elements.RigidBodyFactories;
 using TGC.Core.Direct3D;
 using Key = Microsoft.DirectX.DirectInput.Key;
 using Screen = TGC.Group.Model.Utils.Screen;
-using static TGC.Core.Input.TgcD3dInput;
-using System.Collections.Generic;
-using Microsoft.DirectX.DirectInput;
+using System;
+using TGC.Core.Shaders;
 
 namespace TGC.Group.Model.Scenes
 {
     class GameScene : Scene
     {
-        readonly TgcText2D DrawText = new TgcText2D();
+        private Effect OxygenEffect;
+        readonly TgcText2D DrawText = new TgcText2D(), TextO2Big = new TgcText2D(), TextO2Small = new TgcText2D();
         private World World { get; }
         private bool BoundingBox { get; set; }
 
@@ -37,7 +37,7 @@ namespace TGC.Group.Model.Scenes
         InventoryScene inventoryScene;
 
         TgcSkyBox skyBox;
-        CustomSprite waterVision, mask, aim, hand, cursor, dialogBox;
+        CustomSprite waterVision, mask, aim, hand, cursor, dialogBox, blackCircle;
         Drawer2D drawer = new Drawer2D();
         string dialogName, dialogDescription;
         private Character character = new Character();
@@ -55,13 +55,16 @@ namespace TGC.Group.Model.Scenes
 
         RenderLogic stateDependentRenderLogic, newRenderLogic;
 
+        CustomVertex.TransformedColored[] vertices;
+
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         {
             backgroundColor = Color.FromArgb(1, 78, 129, 179);
 
             this.World = new World(new TGCVector3(0, 0, 0));
 
-            //DrawText.changeFont(new System.Drawing.Font("Arial Black", 10f));
+            TextO2Big.changeFont(new System.Drawing.Font("Arial Narrow Bold", 25f));
+            TextO2Small.changeFont(new System.Drawing.Font("Arial Narrow Bold", 15f));
 
             SetCamera(input);
 
@@ -74,6 +77,12 @@ namespace TGC.Group.Model.Scenes
             InitAim();
             InitHand();
             InitDialogBox();
+            InitEffect();
+
+            blackCircle = BitmapRepository.CreateSpriteFromBitmap(BitmapRepository.BlackCircle);
+            blackCircle.Scaling = new TGCVector2(.275f, .275f);
+            blackCircle.Position = new TGCVector2(140, 440);
+            blackCircle.Color = Color.FromArgb(188, 0, 0, 0);
 
             World = new World(new TGCVector3(0, 0, 0));
 
@@ -90,6 +99,36 @@ namespace TGC.Group.Model.Scenes
             };
 
             TurnExploreCommandsOn();
+        }
+        private void InitEffect()
+        {
+            string compilationErrors;
+            try
+            {
+                OxygenEffect = Effect.FromFile(D3DDevice.Instance.Device, "../../../Shaders/Oxygen.fx", null, null, ShaderFlags.None, null, out compilationErrors);
+            }
+            catch(Exception e)
+            {
+                throw new Exception("No pudo cargar el archivo csm");
+            }
+            if(OxygenEffect == null)
+            {
+                throw new Exception("Errores de compilación oxigen.fx: " + compilationErrors);
+            }
+
+            OxygenEffect.Technique = "OxygenTechnique";
+
+            int o2MeterSize = 120;
+            int o2MeterX0 = 150;
+            int o2MeterY0 = 450;
+
+            vertices = new CustomVertex.TransformedColored[6];
+            vertices[0] = new CustomVertex.TransformedColored(o2MeterX0, o2MeterY0, 0, 1, 0x000000);
+            vertices[1] = new CustomVertex.TransformedColored(o2MeterX0 + o2MeterSize, o2MeterY0, 0, 1, 0xFF0000);
+            vertices[2] = new CustomVertex.TransformedColored(o2MeterX0, o2MeterY0 + o2MeterSize, 0, 1, 0x00FF00);
+            vertices[3] = new CustomVertex.TransformedColored(o2MeterX0, o2MeterY0 + o2MeterSize, 0, 1, 0x00FF00);
+            vertices[4] = new CustomVertex.TransformedColored(o2MeterX0 + o2MeterSize, o2MeterY0  , 0, 1, 0xFF0000);
+            vertices[5] = new CustomVertex.TransformedColored(o2MeterX0 + o2MeterSize, o2MeterY0 + o2MeterSize, 0, 1, 0xFFFF00);
         }
         private void TurnExploreCommandsOn()
         {
@@ -237,7 +276,7 @@ namespace TGC.Group.Model.Scenes
             //***********************************************
 
             skyBox.Center = Camera.Position;
-            if (this.oneSecond > 1.0f)
+            if (this.oneSecond > 0.01f)
             {
                 this.oneSecond = 0;
                 this.character.UpdateStats(new Stats(-1, 0));
@@ -263,7 +302,7 @@ namespace TGC.Group.Model.Scenes
             drawer.BeginDrawSprite();
             drawer.DrawSprite(waterVision);
             drawer.DrawSprite(cursor);
-            if(dialogName != "")
+            if (dialogName != "")
             {
                 drawer.DrawSprite(dialogBox);
             }
@@ -271,17 +310,34 @@ namespace TGC.Group.Model.Scenes
 
             subScene.Render();
 
-            drawer.BeginDrawSprite();
-            drawer.DrawSprite(mask);
-            drawer.EndDrawSprite();
+
             if (dialogName != "")
             {
                 DrawText.drawText(dialogName, (int)dialogBox.Position.X, (int)dialogBox.Position.Y, Color.White);
                 DrawText.drawText(dialogDescription, (int)dialogBox.Position.X, (int)dialogBox.Position.Y + 15, Color.White);
             }
-            this.DrawText.drawText(
-                "Oxygen = " + this.character.ActualStats.Oxygen + "/" + this.character.MaxStats.Oxygen, 0, 60,
-                Color.Bisque);
+
+            drawer.BeginDrawSprite();
+            drawer.DrawSprite(mask);
+            drawer.DrawSprite(blackCircle);
+            drawer.EndDrawSprite();
+
+            float o2Level = this.character.ActualStats.Oxygen / 100 + 1;
+            this.TextO2Big.drawText("O", 190, 475, Color.Bisque);
+            this.TextO2Small.drawText("2", 215, 488, Color.Bisque);
+            this.TextO2Big.drawText("" + o2Level, o2Level > 10 ? 192 : 198, 510, Color.Bisque);
+
+            /**********OXYGEN METER SHADER***********/
+            OxygenEffect.Begin(FX.None);
+            OxygenEffect.BeginPass(0);
+            OxygenEffect.SetValue("oxygen", (float)(this.character.ActualStats.Oxygen) / this.character.MaxStats.Oxygen);
+            D3DDevice.Instance.Device.RenderState.AlphaBlendEnable = true;
+            D3DDevice.Instance.Device.VertexFormat = CustomVertex.TransformedColored.Format;
+            D3DDevice.Instance.Device.DrawUserPrimitives(PrimitiveType.TriangleList, vertices.Length / 3, vertices);
+            OxygenEffect.EndPass();
+            OxygenEffect.End();
+            /****************************************/
+
         }
 
         public override void Dispose()

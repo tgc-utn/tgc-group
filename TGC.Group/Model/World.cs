@@ -1,11 +1,14 @@
 ﻿using BulletSharp.Math;
+using Microsoft.DirectX.Direct3D;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TGC.Core.Camara;
 using TGC.Core.Collision;
+using TGC.Core.Direct3D;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
+using TGC.Core.Shaders;
 using TGC.Group.Model.Chunks;
 using TGC.Group.Model.Elements;
 using TGC.Group.Model.Elements.ElementFactories;
@@ -25,6 +28,8 @@ namespace TGC.Group.Model
         private readonly List<Entity> entities;
         public Element SelectableElement { get; private set; }
 
+        private Effect effect;
+
         public World(TGCVector3 initialPoint)
         {
             this.chunks = new Dictionary<TGCVector3, Chunk>();
@@ -33,6 +38,31 @@ namespace TGC.Group.Model
 
             AddChunk(initialPoint);
             AddShark();
+
+
+            /* This is how to add a shader to the entities */
+            /*
+            string path = "../../../Shaders/Fede.fx", compilationErrors;
+            try
+            {
+                effect = Effect.FromFile(D3DDevice.Instance.Device, path, null, null, ShaderFlags.None, null, out compilationErrors);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error al cargar shader: " + path + ". Errores: Ni lo cargó xd");
+            }
+
+            if (effect == null)
+            {
+                throw new Exception("Error al cargar shader: " + path + ". Errores: " + compilationErrors);
+            }
+
+            foreach (var e in this.entities)
+            {
+                e.Mesh.Effect = effect;
+                e.Mesh.Technique = "FedeTechnique";
+            }
+            */
         }
 
         protected void AddShark()
