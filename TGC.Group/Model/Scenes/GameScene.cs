@@ -322,7 +322,7 @@ namespace TGC.Group.Model.Scenes
             drawer.DrawSprite(blackCircle);
             drawer.EndDrawSprite();
 
-            float o2Level = this.character.ActualStats.Oxygen / 100 + 1;
+            double o2Level = Math.Floor((float)this.character.ActualStats.Oxygen / 100) + 1;
             this.TextO2Big.drawText("O", 190, 475, Color.Bisque);
             this.TextO2Small.drawText("2", 215, 488, Color.Bisque);
             this.TextO2Big.drawText("" + o2Level, o2Level >= 10 ? 192 : 198, 510, Color.Bisque);
