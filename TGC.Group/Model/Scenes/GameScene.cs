@@ -56,7 +56,7 @@ namespace TGC.Group.Model.Scenes
 
         CustomVertex.TransformedColored[] vertices;
 
-        const int o2MeterSize = 120;
+        const int o2MeterSize = 145;
         const int o2MeterX0 = 110;
         const int o2MeterY0 = 475;
 
@@ -83,9 +83,9 @@ namespace TGC.Group.Model.Scenes
             InitEffect();
 
             blackCircle = BitmapRepository.CreateSpriteFromBitmap(BitmapRepository.BlackCircle);
-            blackCircle.Scaling = new TGCVector2(.275f, .275f);
-            blackCircle.Position = new TGCVector2(o2MeterX0 - 10, o2MeterY0 - 10);
-            blackCircle.Color = Color.FromArgb(188, 0, 0, 0);
+            blackCircle.Scaling = new TGCVector2(.295f, .295f);
+            blackCircle.Position = new TGCVector2(o2MeterX0 - 3, o2MeterY0 - 3);
+            blackCircle.Color = Color.FromArgb(120, 0, 0, 0);
 
             World = new World(new TGCVector3(0, 0, 0));
 
@@ -247,9 +247,9 @@ namespace TGC.Group.Model.Scenes
         public void RenderO2Meter()
         {
             double o2Level = Math.Floor((float)this.character.ActualStats.Oxygen / 100) + 1;
-            this.TextO2Big.drawText("O", o2MeterX0 + 40, o2MeterY0 + 25, Color.Bisque);
-            this.TextO2Small.drawText("2", o2MeterX0 + 65, o2MeterY0 + 38, Color.Bisque);
-            this.TextO2Big.drawText("" + o2Level, o2Level >= 10 ? o2MeterX0 + 42 : o2MeterX0 + 48, o2MeterY0 + 60, Color.Bisque);
+            this.TextO2Big.drawText("O", o2MeterX0 + 54, o2MeterY0 + 32, Color.Bisque);
+            this.TextO2Small.drawText("2", o2MeterX0 + 79, o2MeterY0 + 45, Color.Bisque);
+            this.TextO2Big.drawText("" + o2Level, o2Level >= 10 ? o2MeterX0 + 55 : o2MeterX0 + 61, o2MeterY0 + 74, Color.Bisque);
 
             /**********OXYGEN METER SHADER***********/
             OxygenEffect.Begin(FX.None);

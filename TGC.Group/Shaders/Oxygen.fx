@@ -62,11 +62,12 @@ float4 main_pixel(PixelInput input) : COLOR
 	float angleForColor = (PI * isGraterThanZero(pos.y) - signOf(pos.y) * asin(abs(pos.x) / radialDist));
 	float primitiveAngle = (PI * isGraterThanZero(pos.y) - signOf(pos.y) * asin(abs(pos.x) / radialDist));
 	float realAngle = modulus(primitiveAngle - isLowerThanZero(pos.x) * 2 * primitiveAngle, 2 * PI);
-	float colorIntensity = angleForColor / PI;
+	float blueIntensity = angleForColor / PI;
 
-	float transparency = (cos(radialDist * 15.6) * isGraterThanZero(radialDist * 15.6 - PI / 2)) * isLowerThanZero(realAngle - oxygen * 2 * PI);
+	float transparency = ((0.8 + cos(radialDist * 25 + 2.5)) * (isGraterThanZero(radialDist * 25 + 2.5 - (3.5)*PI + 2) && isLowerThanZero(radialDist * 10 - 1.7 * PI))) * isLowerThanZero(realAngle - oxygen * 2 * PI);
+	
 
-	return float4(1 - oxygen, oxygen, colorIntensity, transparency);
+	return float4(1 - oxygen, oxygen, blueIntensity, transparency);
 }
 
 technique OxygenTechnique
