@@ -25,10 +25,14 @@ namespace TGC.Group.Model.Chunks
         
         public static Chunk ByYAxis(TGCVector3 origin)
         {
-            if (origin.Y < 0)
+            const int surface = 0;
+            const int seaFloor = surface - 2;
+            const int underSeaLimit = seaFloor - 1;
+
+            if (origin.Y < DefaultSize.Y * underSeaLimit || origin.Y > surface)
                 return None;
             
-            if (Math.Abs(origin.Y) < DefaultSize.Y)
+            if (origin.Y < DefaultSize.Y * seaFloor)
                 return new FloorChunk(origin);
             
             return new AquaticChunk(origin);

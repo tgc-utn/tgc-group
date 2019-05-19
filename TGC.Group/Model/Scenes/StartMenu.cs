@@ -57,7 +57,7 @@ namespace TGC.Group.Model.Scenes
             skyBox = new TgcSkyBox();
             skyBox.Center = new TGCVector3(0, 500, 0);
             skyBox.Size = new TGCVector3(10000, 10000, 10000);
-            string baseDir = "../../../res/";
+            var baseDir = Game.Default.ResDirectory;
             skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up   , baseDir +  "skybox-up.jpg"    );
             skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down , baseDir +  "skybox-down.jpg"  );
             skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left , baseDir +  "skybox-left.jpg"  );

@@ -22,8 +22,8 @@ namespace TGC.Group.Model.Chunks
         private static readonly TgcTexture FloorTexture = TgcTexture.createTexture(D3DDevice.Instance.Device, 
             Game.Default.MediaDirectory + Game.Default.TexturaTierra);
 
-        private TgcPlane Floor;
-        private RigidBody FloorRigidBody;
+        private TgcPlane floor;
+        private RigidBody floorRigidBody;
 
         public FloorChunk(TGCVector3 origin) : base(origin, AquaticPhysics.Instance)
         {
@@ -33,10 +33,9 @@ namespace TGC.Group.Model.Chunks
 
             var divisions = (int)(DefaultSize.X / 100);
 
-            CreateElements(segments, divisions);
-            CreateFloor(origin);
-            AddElementsToPhysicsWorld();
-
+            this.CreateElements(segments, divisions);
+            this.CreateFloor(origin);
+            this.AddElementsToPhysicsWorld();
         }
 
         private void CreateElements(List<Segment> segments, int divisions)
@@ -45,41 +44,41 @@ namespace TGC.Group.Model.Chunks
             segments.ForEach(segment => this.Elements.AddRange(CreateFishes(segment, divisions)));
         }
 
-        private IEnumerable<Element> CreateFishes(Segment segment, int divisions)
+        private void CreateFloor(TGCVector3 origin)
+        {
+            this.floor = new TgcPlane(origin, DefaultSize, TgcPlane.Orientations.XZplane, FloorTexture);
+            this.floorRigidBody = new BoxFactory().CreatePlane(this.floor);
+        }
+
+        private static IEnumerable<Element> CreateFishes(Segment segment, int divisions)
         {
             return segment.GenerateElements(divisions / 2, SpawnRate.Of(1, 750), FishFactory.Instance);
         }
 
-        private IEnumerable<Element> CreateCorals(List<Segment> segments, int divisions)
+        private static IEnumerable<Element> CreateCorals(List<Segment> segments, int divisions)
         {
             var corals = segments[0].GenerateElements(divisions / 2, SpawnRate.Of(1, 25), CoralFactory.Instance);
             segments.Remove(segments[0]);
             return corals;
         }
 
-        private void CreateFloor(TGCVector3 origin)
-        {
-            this.Floor = new TgcPlane(origin, DefaultSize, TgcPlane.Orientations.XZplane, FloorTexture);
-            this.FloorRigidBody = new BoxFactory().CreatePlane(this.Floor);
-        }
-
-        protected new void AddElementsToPhysicsWorld()
+        private new void AddElementsToPhysicsWorld()
         {
             base.AddElementsToPhysicsWorld();
-            this.Physics.Add(FloorRigidBody);
+            this.Physics.Add(this.floorRigidBody);
         }
 
         public override void Render()
         {
             base.Render();
-            this.Floor.updateValues();
-            this.Floor.Render();
+            this.floor.updateValues();
+            this.floor.Render();
         }
 
         public override void Dispose()
         {
-            this.FloorRigidBody.Dispose();
-            this.Floor.Dispose();
+            this.floorRigidBody.Dispose();
+            this.floor.Dispose();
             base.Dispose();
         }
     }
