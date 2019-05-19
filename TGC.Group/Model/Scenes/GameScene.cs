@@ -35,7 +35,7 @@ namespace TGC.Group.Model.Scenes
         Scene subScene;
         InventoryScene inventoryScene;
 
-        TgcSkyBox skyBox;
+        TgcSkyBox skyBoxUnderwater, skyBoxOutside;
         CustomSprite waterVision, mask, aim, hand, cursor, dialogBox, blackCircle;
         Drawer2D drawer = new Drawer2D();
         string dialogName, dialogDescription;
@@ -62,7 +62,8 @@ namespace TGC.Group.Model.Scenes
 
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         {
-            backgroundColor = Color.FromArgb(1, 78, 129, 179);
+            //backgroundColor = Color.FromArgb(1, 78, 129, 179);
+            backgroundColor = Color.Yellow;
 
             this.World = new World(new TGCVector3(0, 0, 0));
 
@@ -74,7 +75,7 @@ namespace TGC.Group.Model.Scenes
             IncrementFarPlane(3f);
             SetClampTextureAddressing();
             InitInventoryScene();
-            InitSkyBox();
+            InitSkyBoxes();
             InitWaterVision();
             InitMask();
             InitAim();
@@ -191,19 +192,36 @@ namespace TGC.Group.Model.Scenes
             dialogBox.Position = new TGCVector2(dialogBox.Position.X + 120, dialogBox.Position.Y + 80);
         }
 
-        private void InitSkyBox()
+        private void InitSkyBoxes()
         {
-            skyBox = new TgcSkyBox();
-            skyBox.SkyEpsilon = 0;
-            skyBox.Center = Camera.Position;
-            skyBox.Size = new TGCVector3(30000, 30000, 30000);
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up   , baseDir + "underwater_skybox-up.jpg"    );
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down , baseDir + "underwater_skybox-down.jpg"  );
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left , baseDir + "underwater_skybox-left.jpg"  );
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, baseDir + "underwater_skybox-right.jpg" );
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, baseDir + "underwater_skybox-front.jpg" );
-            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back , baseDir + "underwater_skybox-back.jpg"  );
-            skyBox.Init();
+            skyBoxUnderwater = new TgcSkyBox();
+            skyBoxUnderwater.Color = Color.FromArgb(255, 2, 37, 91);
+            skyBoxUnderwater.SkyEpsilon = 30;
+            skyBoxUnderwater.Center = Camera.Position;
+            skyBoxUnderwater.Size = new TGCVector3(30000, 8000, 30000);
+            skyBoxUnderwater.setFaceTexture(TgcSkyBox.SkyFaces.Up   , baseDir + "underwater_skybox-up.jpg"    );
+            skyBoxUnderwater.setFaceTexture(TgcSkyBox.SkyFaces.Down , baseDir + "underwater_skybox-down.jpg"  );
+            skyBoxUnderwater.setFaceTexture(TgcSkyBox.SkyFaces.Left , baseDir + "underwater_skybox-left.jpg"  );
+            skyBoxUnderwater.setFaceTexture(TgcSkyBox.SkyFaces.Right, baseDir + "underwater_skybox-right.jpg" );
+            skyBoxUnderwater.setFaceTexture(TgcSkyBox.SkyFaces.Front, baseDir + "underwater_skybox-front.jpg" );
+            skyBoxUnderwater.setFaceTexture(TgcSkyBox.SkyFaces.Back , baseDir + "underwater_skybox-back.jpg"  );
+            skyBoxUnderwater.Init();
+
+            skyBoxOutside = new TgcSkyBox();
+            skyBoxOutside.SkyEpsilon = 50;
+            skyBoxOutside.Size = new TGCVector3(30000, 8000, 30000);
+            skyBoxOutside.Center = new TGCVector3(
+                skyBoxUnderwater.Center.X,
+                skyBoxUnderwater.Center.Y + skyBoxUnderwater.Size.Y / 2 + 30,
+                skyBoxUnderwater.Center.Z
+                );
+            skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Up, baseDir +    "skybox-up.jpg");
+            skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Down, baseDir +  "skybox-down.jpg");
+            skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Left, baseDir +  "skybox-left.jpg");
+            skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Right, baseDir + "skybox-right.jpg");
+            skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Front, baseDir + "skybox-front.jpg");
+            skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Back, baseDir +  "skybox-back.jpg");
+            skyBoxOutside.Init();
         }
 
         private void SetClampTextureAddressing()
@@ -297,12 +315,19 @@ namespace TGC.Group.Model.Scenes
             }
             //***********************************************
 
-            skyBox.Center = Camera.Position;
+            skyBoxUnderwater.Center = new TGCVector3(Camera.Position.X, skyBoxUnderwater.Center.Y, Camera.Position.Z);
+            skyBoxOutside.Center = new TGCVector3(Camera.Position.X, skyBoxOutside.Center.Y, Camera.Position.Z);
+
             if (this.oneSecond > 0.01f)
             {
                 this.oneSecond = 0;
                 this.character.UpdateStats(new Stats(-1, 0));
                 this.character.UpdateStats(new Stats(-1, 0));
+            }
+
+            if(Camera.Position.Y > skyBoxUnderwater.Center.Y + skyBoxUnderwater.Size.Y / 2)
+            {
+                character.UpdateStats(new Stats(character.MaxStats.Oxygen, 0));
             }
 
             subScene.Update(elapsedTime);
@@ -313,7 +338,8 @@ namespace TGC.Group.Model.Scenes
         {
             ClearScreen();
 
-            this.skyBox.Render();
+            this.skyBoxUnderwater.Render();
+            this.skyBoxOutside.Render();
             this.World.Render(this.Camera);
 
             if (this.BoundingBox)
@@ -322,7 +348,7 @@ namespace TGC.Group.Model.Scenes
             }
 
             drawer.BeginDrawSprite();
-            drawer.DrawSprite(waterVision);
+            //drawer.DrawSprite(waterVision);
             drawer.DrawSprite(cursor);
             if (dialogName != "")
             {
