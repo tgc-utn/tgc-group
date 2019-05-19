@@ -70,11 +70,26 @@ float4 main_pixel(PixelInput input) : COLOR
 	return float4(1 - oxygen, oxygen, blueIntensity, transparency);
 }
 
+float4 main_pixel2(PixelInput input) : COLOR
+{
+	float2 absolutePos = input.Color.rg;
+	float2 center = float2(0.5, 0.5);
+	float2 pos = absolutePos - center;
+	float radialDist = sqrt(pow(pos.x, 2) + pow(pos.y, 2));
+	float k = 1 - radialDist * 2.5;
+	return float4(k, k, k, isLowerThanZero(radialDist - 0.3) * (120.0 / 255.0));
+}
+
 technique OxygenTechnique
 {
 	pass Pass_0
 	{
 		VertexShader = compile vs_3_0 main_vertex();
 		PixelShader = compile ps_3_0 main_pixel();
+	}
+	pass Pass_1
+	{
+		VertexShader = compile vs_3_0 main_vertex();
+		PixelShader = compile ps_3_0 main_pixel2();
 	}
 };

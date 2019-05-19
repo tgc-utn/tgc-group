@@ -249,12 +249,17 @@ namespace TGC.Group.Model.Scenes
             double o2Level = Math.Floor((float)this.character.ActualStats.Oxygen / 100) + 1;
             this.TextO2Big.drawText("O", o2MeterX0 + 54, o2MeterY0 + 32, Color.Bisque);
             this.TextO2Small.drawText("2", o2MeterX0 + 79, o2MeterY0 + 45, Color.Bisque);
-            this.TextO2Big.drawText("" + o2Level, o2Level >= 10 ? o2MeterX0 + 55 : o2MeterX0 + 61, o2MeterY0 + 74, Color.Bisque);
+            this.TextO2Big.drawText("" + o2Level, o2Level >= 10 ? o2MeterX0 + 55 : o2MeterX0 + 65, o2MeterY0 + 74, Color.Bisque);
 
             /**********OXYGEN METER SHADER***********/
             OxygenEffect.Begin(FX.None);
             OxygenEffect.BeginPass(0);
             OxygenEffect.SetValue("oxygen", (float)(this.character.ActualStats.Oxygen) / this.character.MaxStats.Oxygen);
+            D3DDevice.Instance.Device.RenderState.AlphaBlendEnable = true;
+            D3DDevice.Instance.Device.VertexFormat = CustomVertex.TransformedColored.Format;
+            D3DDevice.Instance.Device.DrawUserPrimitives(PrimitiveType.TriangleList, vertices.Length / 3, vertices);
+            OxygenEffect.EndPass();
+            OxygenEffect.BeginPass(1);
             D3DDevice.Instance.Device.RenderState.AlphaBlendEnable = true;
             D3DDevice.Instance.Device.VertexFormat = CustomVertex.TransformedColored.Format;
             D3DDevice.Instance.Device.DrawUserPrimitives(PrimitiveType.TriangleList, vertices.Length / 3, vertices);
