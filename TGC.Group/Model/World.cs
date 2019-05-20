@@ -50,12 +50,12 @@ namespace TGC.Group.Model
             //}
             //catch (Exception e)
             //{
-            //    throw new Exception("Error al cargar shader: " + path + ". Errores: Ni lo cargó xd");
+            //    throw new Exception("Error loading shader: " + path + ". Errors: File could not be loaded");
             //}
 
             //if (effect == null)
             //{
-            //    throw new Exception("Error al cargar shader: " + path + ". Errores: " + compilationErrors);
+            //    throw new Exception("Error loading shader: " + path + ". Errors: " + compilationErrors);
             //}
 
             //foreach (var e in this.entities)
@@ -150,19 +150,8 @@ namespace TGC.Group.Model
         
         public void Render(TgcCamera camera)
         {
-            ToRender(camera.Position).ForEach(chunk => {
-                chunk.camera = camera;
-                chunk.Effect = effect;
-                chunk.Render();
-            });
-            this.entities.ForEach(entity => {
-                Vector3 diff = entity.Position - camera.Position.ToBulletVector3();
-                D3DDevice.Instance.Device.RenderState.AlphaBlendEnable = true;
-                effect.SetValue("farness", diff.Length);
-                effect.SetValue("maxFarness", D3DDevice.Instance.ZFarPlaneDistance);
-                //Console.WriteLine("prop " + diff.Length / D3DDevice.Instance.ZFarPlaneDistance);
-                entity.Render();
-            });
+            ToRender(camera.Position).ForEach(chunk => chunk.Render());
+            this.entities.ForEach(entity => entity.Render());
             //this.waterSurface.Render(camera.Position);
         }
 
