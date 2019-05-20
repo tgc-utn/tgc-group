@@ -196,9 +196,9 @@ namespace TGC.Group.Model.Scenes
             //TODO crafter logic, move to crafter when coded
             if (OxygenTank.Recipe.CanCraft(this.character.Inventory.AsIngredients()) && !this.gaveOxygenTank)
             {
-                this.character.RemoveIngredients(OxygenTank.Recipe.Ingredients);
+                character.RemoveIngredients(OxygenTank.Recipe.Ingredients);
                 var oxygenTank = new OxygenTank();
-                this.character.GiveItem(oxygenTank);
+                character.GiveItem(oxygenTank);
 
                 ///////TODO when UI is ready, the selected element will be equipped
                 this.character.Equip(oxygenTank);
