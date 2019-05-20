@@ -5,10 +5,10 @@ namespace TGC.Group.Model.Player
 {
     public class Stats
     {
-        public int Oxygen { get; set; }
+        public float Oxygen { get; set; }
         public int Life { get; set; }
 
-        public Stats(int oxygen, int life)
+        public Stats(float oxygen, int life)
         {
             this.Oxygen = oxygen;
             this.Life = life;
