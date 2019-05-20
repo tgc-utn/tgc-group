@@ -19,19 +19,20 @@ namespace TGC.Group.Model.Elements.ElementFactories
         private static TgcText2D DrawText = new TgcText2D();
         private bool dead = false;
         public Shark(TgcMesh model, RigidBody rigidBody) : base(model, rigidBody)
-        { 
+        {
+            this.Position = RigidBody.CenterOfMassPosition;
         }
 
 
 
         public override void Update(Camera camera)
         {
-
+            Position = RigidBody.CenterOfMassPosition;
             var difference = camera.Position.ToBulletVector3() - RigidBody.CenterOfMassPosition;
 
             var sharkBody = (CapsuleShapeX)RigidBody.CollisionShape;
             var cameraBody = (CapsuleShape)camera.RigidBody.CollisionShape;
-
+            
             if (
             FastMath.Pow2(difference.X) <= FastMath.Pow2(sharkBody.Radius + sharkBody.HalfHeight - cameraBody.Radius) &&
             FastMath.Pow2(difference.Y) <= FastMath.Pow2(sharkBody.Radius - (cameraBody.Radius + cameraBody.HalfHeight)) &&

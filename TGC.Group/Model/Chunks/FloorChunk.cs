@@ -71,9 +71,14 @@ namespace TGC.Group.Model.Chunks
 
         public override void Render()
         {
+            //if (this.Effect != null)
+            //{
+            //    this.Floor.Effect = this.Effect;
+            //    this.Floor.Technique = "FedeTechnique";
+            //}
             base.Render();
-            this.Floor.updateValues();
-            this.Floor.Render();
+            //this.Floor.updateValues();
+            //this.Floor.Render();
         }
 
         public override void Dispose()

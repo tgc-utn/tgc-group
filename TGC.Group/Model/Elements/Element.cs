@@ -6,6 +6,8 @@ using BulletSharp.Math;
 using TGC.Group.Model.Utils;
 using TGC.Core.SceneLoader;
 using TGC.Group.Model.Items;
+using Microsoft.DirectX.Direct3D;
+
 namespace TGC.Group.Model.Elements
 {
     public abstract class Element: Collisionable
@@ -16,6 +18,21 @@ namespace TGC.Group.Model.Elements
         public bool Selectable { get; set; }
 
         public abstract IItem item { get; }
+
+        public Vector3 Position { get; protected set; }
+        private Effect effect;
+        public Effect Effect
+        {
+            set
+            {
+                this.Mesh.Effect = effect = value;
+                this.Mesh.Technique = "FedeTechnique";
+            }
+            get
+            {
+                return effect;
+            }
+        }
 
         public Element(TgcMesh model, RigidBody rigidBody)
         {
@@ -31,6 +48,7 @@ namespace TGC.Group.Model.Elements
 
         public virtual void Update(Camera camera)
         {
+            this.Position = this.Mesh.Position.ToBulletVector3();
             this.Mesh.Position = new TGCVector3(this.PhysicsBody.CenterOfMassPosition.X, this.PhysicsBody.CenterOfMassPosition.Y, this.PhysicsBody.CenterOfMassPosition.Z);
             this.Mesh.Transform = 
                 TGCMatrix.Scaling(this.Mesh.Scale) *

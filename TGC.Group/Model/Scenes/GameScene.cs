@@ -63,7 +63,8 @@ namespace TGC.Group.Model.Scenes
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         {
             //backgroundColor = Color.FromArgb(1, 78, 129, 179);
-            backgroundColor = Color.Yellow;
+            //backgroundColor = Color.FromArgb(255, 1, 20, 43);
+            backgroundColor = Color.FromArgb(255, 90, 106, 165);
 
             this.World = new World(new TGCVector3(0, 0, 0));
 
@@ -195,7 +196,7 @@ namespace TGC.Group.Model.Scenes
         private void InitSkyBoxes()
         {
             skyBoxUnderwater = new TgcSkyBox();
-            skyBoxUnderwater.Color = Color.FromArgb(255, 2, 37, 91);
+            skyBoxUnderwater.Color = backgroundColor;
             skyBoxUnderwater.SkyEpsilon = 30;
             skyBoxUnderwater.Center = Camera.Position;
             skyBoxUnderwater.Size = new TGCVector3(30000, 8000, 30000);
@@ -208,6 +209,7 @@ namespace TGC.Group.Model.Scenes
             skyBoxUnderwater.Init();
 
             skyBoxOutside = new TgcSkyBox();
+            skyBoxOutside.Color = Color.FromArgb(255, 71, 96, 164);
             skyBoxOutside.SkyEpsilon = 50;
             skyBoxOutside.Size = new TGCVector3(30000, 8000, 30000);
             skyBoxOutside.Center = new TGCVector3(
