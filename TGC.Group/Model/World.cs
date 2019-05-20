@@ -43,26 +43,26 @@ namespace TGC.Group.Model
 
             /* This is how to add a shader to the entities */
             
-            string path = "../../../Shaders/Fede.fx", compilationErrors;
-            try
-            {
-                effect = Effect.FromFile(D3DDevice.Instance.Device, path, null, null, ShaderFlags.None, null, out compilationErrors);
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Error al cargar shader: " + path + ". Errores: Ni lo cargó xd");
-            }
+            //string path = "../../../Shaders/Fede.fx", compilationErrors;
+            //try
+            //{
+            //    effect = Effect.FromFile(D3DDevice.Instance.Device, path, null, null, ShaderFlags.None, null, out compilationErrors);
+            //}
+            //catch (Exception e)
+            //{
+            //    throw new Exception("Error al cargar shader: " + path + ". Errores: Ni lo cargó xd");
+            //}
 
-            if (effect == null)
-            {
-                throw new Exception("Error al cargar shader: " + path + ". Errores: " + compilationErrors);
-            }
+            //if (effect == null)
+            //{
+            //    throw new Exception("Error al cargar shader: " + path + ". Errores: " + compilationErrors);
+            //}
 
-            foreach (var e in this.entities)
-            {
-                e.Mesh.Effect = effect;
-                e.Mesh.Technique = "FedeTechnique";
-            }
+            //foreach (var e in this.entities)
+            //{
+            //    e.Mesh.Effect = effect;
+            //    e.Mesh.Technique = "FedeTechnique";
+            //}
             
         }
 
