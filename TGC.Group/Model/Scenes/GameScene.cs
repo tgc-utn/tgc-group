@@ -196,7 +196,7 @@ namespace TGC.Group.Model.Scenes
         private void InitSkyBoxes()
         {
             skyBoxUnderwater = new TgcSkyBox();
-            skyBoxUnderwater.Color = backgroundColor;
+            skyBoxUnderwater.Color = Color.Green;
             skyBoxUnderwater.SkyEpsilon = 30;
             skyBoxUnderwater.Center = Camera.Position;
             skyBoxUnderwater.Size = new TGCVector3(30000, 8000, 30000);
@@ -297,10 +297,9 @@ namespace TGC.Group.Model.Scenes
 
             this.World.Update((Camera) this.Camera);
 
-            var item = manageSelectableElement(this.World
-                .SelectableElement); // Important: get this AFTER updating the world
-
-            if (item != null)
+            var item = this.manageSelectableElement(this.World.SelectableElement); // Important: get this AFTER updating the world
+            
+            if(item != null)
                 this.character.GiveItem(item);
 
             //TODO crafter logic, move to crafter when coded

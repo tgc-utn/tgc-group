@@ -12,17 +12,19 @@ using TGC.Group.Model.Elements;
 using TGC.Group.Model.Elements.ElementFactories;
 using TGC.Group.Model.Elements.RigidBodyFactories;
 using TGC.Group.Model.Resources.Meshes;
+using TGC.Group.Model.Utils;
 
 namespace TGC.Group.Model
 {
     internal class World
     {
-        private const int RenderRadius = 5;
-        private const int UpdateRadius = RenderRadius + 1;
+        public const int RenderRadius = 5;
+        public const int UpdateRadius = RenderRadius + 1;
         private const int InteractionRadius = 490000; // Math.pow(700, 2)
         
         private readonly Dictionary<TGCVector3, Chunk> chunks;
         private readonly List<Entity> entities;
+        private readonly WaterSurface waterSurface;
         public Element SelectableElement { get; private set; }
 
         private Effect effect;
@@ -33,6 +35,8 @@ namespace TGC.Group.Model
             
             this.entities = new List<Entity>();
 
+            this.waterSurface = new WaterSurface(initialPoint);
+            
             AddChunk(initialPoint);
             AddShark();
 
@@ -159,6 +163,7 @@ namespace TGC.Group.Model
                 //Console.WriteLine("prop " + diff.Length / D3DDevice.Instance.ZFarPlaneDistance);
                 entity.Render();
             });
+            //this.waterSurface.Render(camera.Position);
         }
 
         public void RenderBoundingBox(TgcCamera camera)

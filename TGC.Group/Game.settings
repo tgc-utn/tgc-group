@@ -26,5 +26,11 @@
     <Setting Name="TexturaFish" Type="System.String" Scope="User">
       <Value Profile="(Default)">fish.jpg</Value>
     </Setting>
+    <Setting Name="TexturaAgua" Type="System.String" Scope="User">
+      <Value Profile="(Default)">underwater_skybox-up.jpg</Value>
+    </Setting>
+    <Setting Name="ResDirectory" Type="System.String" Scope="User">
+      <Value Profile="(Default)">..\..\..\res\</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
