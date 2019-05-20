@@ -1,5 +1,4 @@
 ﻿using BulletSharp;
-using BulletSharp.Math;
 using Microsoft.DirectX.Direct3D;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
@@ -10,8 +9,6 @@ namespace TGC.Group.Model
     {
         public TgcMesh Mesh { get; }
         public RigidBody RigidBody { get; }
-
-        public Vector3 Position { get; protected set; }
 
         public Entity(TgcMesh mesh, RigidBody rigid)
         {

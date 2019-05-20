@@ -48,7 +48,6 @@ namespace TGC.Group.Model.Elements
 
         public virtual void Update(Camera camera)
         {
-            this.Position = this.Mesh.Position.ToBulletVector3();
             this.Mesh.Position = new TGCVector3(this.PhysicsBody.CenterOfMassPosition.X, this.PhysicsBody.CenterOfMassPosition.Y, this.PhysicsBody.CenterOfMassPosition.Z);
             this.Mesh.Transform = 
                 TGCMatrix.Scaling(this.Mesh.Scale) *

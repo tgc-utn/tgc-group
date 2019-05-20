@@ -43,26 +43,26 @@ namespace TGC.Group.Model
 
             /* This is how to add a shader to the entities */
             
-            string path = "../../../Shaders/Fede.fx", compilationErrors;
-            try
-            {
-                effect = Effect.FromFile(D3DDevice.Instance.Device, path, null, null, ShaderFlags.None, null, out compilationErrors);
-            }
-            catch (Exception e)
-            {
-                throw new Exception("Error al cargar shader: " + path + ". Errores: Ni lo cargó xd");
-            }
+            //string path = "../../../Shaders/Fede.fx", compilationErrors;
+            //try
+            //{
+            //    effect = Effect.FromFile(D3DDevice.Instance.Device, path, null, null, ShaderFlags.None, null, out compilationErrors);
+            //}
+            //catch (Exception e)
+            //{
+            //    throw new Exception("Error loading shader: " + path + ". Errors: File could not be loaded");
+            //}
 
-            if (effect == null)
-            {
-                throw new Exception("Error al cargar shader: " + path + ". Errores: " + compilationErrors);
-            }
+            //if (effect == null)
+            //{
+            //    throw new Exception("Error loading shader: " + path + ". Errors: " + compilationErrors);
+            //}
 
-            foreach (var e in this.entities)
-            {
-                e.Mesh.Effect = effect;
-                e.Mesh.Technique = "FedeTechnique";
-            }
+            //foreach (var e in this.entities)
+            //{
+            //    e.Mesh.Effect = effect;
+            //    e.Mesh.Technique = "FedeTechnique";
+            //}
             
         }
 
@@ -150,19 +150,8 @@ namespace TGC.Group.Model
         
         public void Render(TgcCamera camera)
         {
-            ToRender(camera.Position).ForEach(chunk => {
-                chunk.camera = camera;
-                chunk.Effect = effect;
-                chunk.Render();
-            });
-            this.entities.ForEach(entity => {
-                Vector3 diff = entity.Position - camera.Position.ToBulletVector3();
-                D3DDevice.Instance.Device.RenderState.AlphaBlendEnable = true;
-                effect.SetValue("farness", diff.Length);
-                effect.SetValue("maxFarness", D3DDevice.Instance.ZFarPlaneDistance);
-                //Console.WriteLine("prop " + diff.Length / D3DDevice.Instance.ZFarPlaneDistance);
-                entity.Render();
-            });
+            ToRender(camera.Position).ForEach(chunk => chunk.Render());
+            this.entities.ForEach(entity => entity.Render());
             //this.waterSurface.Render(camera.Position);
         }
 

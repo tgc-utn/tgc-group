@@ -20,14 +20,12 @@ namespace TGC.Group.Model.Elements.ElementFactories
         private bool dead = false;
         public Shark(TgcMesh model, RigidBody rigidBody) : base(model, rigidBody)
         {
-            this.Position = RigidBody.CenterOfMassPosition;
         }
 
 
 
         public override void Update(Camera camera)
         {
-            Position = RigidBody.CenterOfMassPosition;
             var difference = camera.Position.ToBulletVector3() - RigidBody.CenterOfMassPosition;
 
             var sharkBody = (CapsuleShapeX)RigidBody.CollisionShape;
