@@ -62,9 +62,7 @@ namespace TGC.Group.Model.Scenes
 
         public GameScene(TgcD3dInput input, string mediaDir) : base(input)
         {
-            //backgroundColor = Color.FromArgb(1, 78, 129, 179);
-            //backgroundColor = Color.FromArgb(255, 1, 20, 43);
-            backgroundColor = Color.FromArgb(255, 90, 106, 165);
+            backgroundColor = Color.FromArgb(255, 78, 129, 179);
 
             this.World = new World(new TGCVector3(0, 0, 0));
 
@@ -196,7 +194,7 @@ namespace TGC.Group.Model.Scenes
         private void InitSkyBoxes()
         {
             skyBoxUnderwater = new TgcSkyBox();
-            skyBoxUnderwater.Color = Color.Green;
+            skyBoxUnderwater.Color = backgroundColor;
             skyBoxUnderwater.SkyEpsilon = 30;
             skyBoxUnderwater.Center = Camera.Position;
             skyBoxUnderwater.Size = new TGCVector3(30000, 8000, 30000);
@@ -219,10 +217,10 @@ namespace TGC.Group.Model.Scenes
                 );
             skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Up, baseDir +    "skybox-up.jpg");
             skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Down, baseDir +  "skybox-down.jpg");
-            skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Left, baseDir +  "skybox-left.jpg");
-            skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Right, baseDir + "skybox-right.jpg");
-            skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Front, baseDir + "skybox-front.jpg");
-            skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Back, baseDir +  "skybox-back.jpg");
+            skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Left, baseDir +  "skybox-left-middle.jpg");
+            skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Right, baseDir + "skybox-right-middle.jpg");
+            skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Front, baseDir + "skybox-front-middle.jpg");
+            skyBoxOutside.setFaceTexture(TgcSkyBox.SkyFaces.Back, baseDir + "skybox-back-middle.jpg");
             skyBoxOutside.Init();
         }
 
