@@ -264,7 +264,7 @@ namespace TGC.Group.Model.Scenes
         }
         public void RenderO2Meter()
         {
-            double o2Level = Math.Floor((float)this.character.ActualStats.Oxygen / 100) + 1;
+            double o2Level = Math.Floor((float)this.character.ActualStats.Oxygen);
             this.TextO2Big.drawText("O", o2MeterX0 + 54, o2MeterY0 + 32, Color.Bisque);
             this.TextO2Small.drawText("2", o2MeterX0 + 79, o2MeterY0 + 45, Color.Bisque);
             this.TextO2Big.drawText("" + o2Level, o2Level >= 10 ? o2MeterX0 + 55 : o2MeterX0 + 65, o2MeterY0 + 74, Color.Bisque);
@@ -317,12 +317,7 @@ namespace TGC.Group.Model.Scenes
             skyBoxUnderwater.Center = new TGCVector3(Camera.Position.X, skyBoxUnderwater.Center.Y, Camera.Position.Z);
             skyBoxOutside.Center = new TGCVector3(Camera.Position.X, skyBoxOutside.Center.Y, Camera.Position.Z);
 
-            if (this.oneSecond > 0.01f)
-            {
-                this.oneSecond = 0;
-                this.character.UpdateStats(new Stats(-1, 0));
-                this.character.UpdateStats(new Stats(-1, 0));
-            }
+            this.character.UpdateStats(new Stats(-elapsedTime, 0));
 
             if(Camera.Position.Y > skyBoxUnderwater.Center.Y + skyBoxUnderwater.Size.Y / 2)
             {
