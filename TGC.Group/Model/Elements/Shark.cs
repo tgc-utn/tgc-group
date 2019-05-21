@@ -19,7 +19,7 @@ namespace TGC.Group.Model.Elements
 
         public Shark(TgcMesh model, RigidBody rigidBody) : base(model, rigidBody)
         {
-            MovementToCamera = new MovementToEntity(new Vector3(1f, 0f, 0f), FastMath.PI / 100f);
+            MovementToCamera = new MovementToEntity(new Vector3(1f, 0f, 0f), FastMath.PI / 100f, 10f);
         }
 
 
@@ -34,18 +34,10 @@ namespace TGC.Group.Model.Elements
             VerifyCollision(difference, sharkBody, cameraBody);
 
             difference.Normalize();
-            RigidBody.Translate(difference * 5f);
-
            
-            Mesh.RotateY(
-                MovementToCamera.Rotation(
-                    Mesh.Position.ToBulletVector3(),
-                    camera.Position.ToBulletVector3()
-                    )
-            );
-            
-                                         
-            //base.Update(camera);
+            MovementToCamera.Move(Mesh, RigidBody, camera.Position, difference);
+
+            base.Update(camera);
         }
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
         private void VerifyCollision(Vector3 difference, CapsuleShapeX sharkBody, CapsuleShape cameraBody)

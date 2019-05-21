@@ -119,8 +119,10 @@
     <Compile Include="Model\Elements\RigidBodyFactories\CapsuleFactory.cs" />
     <Compile Include="Model\Elements\RigidBodyFactories\BoxFactory.cs" />
     <Compile Include="Model\Entities\MovementToEntity.cs" />
+    <Compile Include="Model\Elements\WaterSurface.cs" />
     <Compile Include="Model\Input\GameInput.cs" />
     <Compile Include="Model\AquaticPhysics.cs" />
+    <Compile Include="Model\Items\Crafter.cs" />
     <Compile Include="Model\Items\Equipment\IEquipable.cs" />
     <Compile Include="Model\Items\Equipment\OxygenTank.cs" />
     <Compile Include="Model\Items\Fish.cs" />

@@ -1,38 +1,83 @@
-﻿using BulletSharp.Math;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BulletSharp;
+using BulletSharp.Math;
+using Microsoft.DirectX.Direct3D;
 using TGC.Core.Camara;
 using TGC.Core.Collision;
-using TGC.Core.Input;
 using TGC.Core.Mathematica;
-using TGC.Group.Model.Chunks;
+using TGC.Core.Terrain;
 using TGC.Group.Model.Elements;
-using TGC.Group.Model.Elements.ElementFactories;
 using TGC.Group.Model.Elements.RigidBodyFactories;
-using TGC.Group.Model.Input;
 using TGC.Group.Model.Resources.Meshes;
+using Chunk = TGC.Group.Model.Chunks.Chunk;
+using Element = TGC.Group.Model.Elements.Element;
 
 namespace TGC.Group.Model
 {
     internal class World
     {
-        private const int RenderRadius = 5;
-        private const int UpdateRadius = RenderRadius + 1;
+        public const int RenderRadius = 5;
+        public const int UpdateRadius = RenderRadius + 1;
         private const int InteractionRadius = 490000; // Math.pow(700, 2)
         
         private readonly Dictionary<TGCVector3, Chunk> chunks;
         private readonly List<Entity> entities;
+        private readonly WaterSurface waterSurface;
         public Element SelectableElement { get; private set; }
-
+        public TgcSimpleTerrain Floor { get; set; }
+        
         public World(TGCVector3 initialPoint)
         {
-            this.chunks = new Dictionary<TGCVector3, Chunk>();
+            chunks = new Dictionary<TGCVector3, Chunk>();
             
-            this.entities = new List<Entity>();
+            entities = new List<Entity>();
 
+            waterSurface = new WaterSurface(initialPoint);
+            
             AddChunk(initialPoint);
             AddShark();
+            AddHeightMap();
+        }
+
+        private void AddHeightMap()
+        {
+            Floor = new TgcSimpleTerrain();
+            Floor.loadHeightmap(Game.Default.MediaDirectory + "Heightmap3.jpg", 1000, 100, 
+                new TGCVector3(0,-100,0));
+            Floor.loadTexture(Game.Default.MediaDirectory + Game.Default.TexturaTierra);
+            CreateSurfaceFromHeighMap(Floor.getData());
+
+        }
+        
+        public RigidBody CreateSurfaceFromHeighMap(CustomVertex.PositionTextured[] triangleDataVB)
+        {
+            //Triangulos
+            var triangleMesh = new TriangleMesh();
+            int i = 0;
+            TGCVector3 vector0;
+            TGCVector3 vector1;
+            TGCVector3 vector2;
+
+            while (i < triangleDataVB.Length)
+            {
+                vector0 = new TGCVector3(triangleDataVB[i].X, triangleDataVB[i].Y, triangleDataVB[i].Z);
+                vector1 = new TGCVector3(triangleDataVB[i + 1].X, triangleDataVB[i + 1].Y, triangleDataVB[i + 1].Z);
+                vector2 = new TGCVector3(triangleDataVB[i + 2].X, triangleDataVB[i + 2].Y, triangleDataVB[i + 2].Z);
+
+                i = i + 3;
+
+                triangleMesh.AddTriangle(vector0.ToBulletVector3(), vector1.ToBulletVector3(), vector2.ToBulletVector3());
+            }
+
+            CollisionShape meshCollisionShape = new BvhTriangleMeshShape(triangleMesh, true);
+            var meshMotionState = new DefaultMotionState();
+            var meshRigidBodyInfo = new RigidBodyConstructionInfo(0, meshMotionState, meshCollisionShape);
+            RigidBody meshRigidBody = new RigidBody(meshRigidBodyInfo);
+            AquaticPhysics.Instance.Add(meshRigidBody);
+
+            return meshRigidBody;
         }
 
         protected void AddShark()
@@ -52,9 +97,9 @@ namespace TGC.Group.Model
         {
             var chunk = Chunk.ByYAxis(origin);
             
-            this.chunks.Add(origin, chunk);
+            chunks.Add(origin, chunk);
 
-            this.entities.AddRange(chunk.Init());
+            entities.AddRange(chunk.Init());
 
             return chunk;
         }
@@ -63,9 +108,9 @@ namespace TGC.Group.Model
         {
             var res = new List<Collisionable>();
 
-            res.AddRange(this.entities);
+            res.AddRange(entities);
 
-            foreach (var chunk in this.chunks.Values)
+            foreach (var chunk in chunks.Values)
             {
                 res.AddRange(chunk.Elements);
             }
@@ -92,7 +137,7 @@ namespace TGC.Group.Model
                             Chunk.DefaultSize.Y * (intOrigin.Y + j),
                             Chunk.DefaultSize.Z * (intOrigin.Z + k));
                         
-                        toUpdate.Add(this.chunks.ContainsKey(position) ? this.chunks[position] : AddChunk(position));
+                        toUpdate.Add(chunks.ContainsKey(position) ? chunks[position] : AddChunk(position));
                     }
                 }
             }
@@ -114,14 +159,16 @@ namespace TGC.Group.Model
         {
             var toUpdate = ToUpdate(camera.Position);
             toUpdate.ForEach(chunk => chunk.Update(camera));
-            this.SelectableElement = GetSelectableElement(camera, toUpdate);
-            this.entities.ForEach(entity => entity.Update(camera));
+            SelectableElement = GetSelectableElement(camera, toUpdate);
+            entities.ForEach(entity => entity.Update(camera));
         }
         
         public void Render(TgcCamera camera)
         {
             ToRender(camera.Position).ForEach(chunk => chunk.Render());
-            this.entities.ForEach(entity => entity.Render());
+            entities.ForEach(entity => entity.Render());
+            waterSurface.Render(camera.Position);
+            Floor.Render();
         }
 
         public void RenderBoundingBox(TgcCamera camera)
@@ -131,8 +178,8 @@ namespace TGC.Group.Model
 
         public void Dispose()
         {
-            this.chunks.Values.ToList().ForEach(chunk => chunk.Dispose());
-            this.entities.ForEach(entity => entity.Dispose());
+            chunks.Values.ToList().ForEach(chunk => chunk.Dispose());
+            entities.ForEach(entity => entity.Dispose());
         }
         private static Element GetSelectableElement(TgcCamera camera, List<Chunk> toUpdate)
         {            
@@ -154,7 +201,7 @@ namespace TGC.Group.Model
         }
         public void Remove(Element selectableElement)
         {
-            foreach (var chunk in this.chunks.Values)
+            foreach (var chunk in chunks.Values)
             {
                 chunk.Remove(selectableElement);
             }

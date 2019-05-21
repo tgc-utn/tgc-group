@@ -3,6 +3,7 @@ using BulletSharp;
 using BulletSharp.Math;
 using TGC.Core.Direct3D;
 using TGC.Core.Mathematica;
+using TGC.Core.SceneLoader;
 
 namespace TGC.Group.Model.Entities
 {
@@ -10,30 +11,60 @@ namespace TGC.Group.Model.Entities
     {
         private Vector3 LookAt;
         private float RotationVelocity;
-
-        public MovementToEntity(Vector3 lookAt, float rotationVelocity)
+        private float TranslationVelocity;
+        
+        public MovementToEntity(Vector3 lookAt, float rotationVelocity, float translationVelocity)
         {
             LookAt = lookAt;
             RotationVelocity = rotationVelocity;
+            TranslationVelocity = translationVelocity;
         }
 
-        public float Rotation(Vector3 myPosition, Vector3 destination)
+        
+        
+        public void Move(TgcMesh mesh, RigidBody rigidBody, TGCVector3 destination, Vector3 difference)
+        {
+            var angles = AnglesToRotate(mesh, destination);
+            UpdateLookAtVector(Matrix.RotationY(angles.Y));
+            mesh.RotateY(angles.Y);
+            rigidBody.Translate(- LookAt * TranslationVelocity);
+
+        }
+
+        private Vector3 AnglesToRotate(TgcMesh mesh, TGCVector3 destination)
+        {
+            return SenseOfRotation(mesh.Position.ToBulletVector3(), destination.ToBulletVector3()) * RotationVelocity;
+        }
+
+        public Matrix CalculateRotation(Vector3 myPosition, Vector3 destination)
         {
             LookAt.Normalize();
-            var angleToRotate = SenseOfRotation(myPosition, destination) * RotationVelocity;
-            LookAt = Vector3.TransformNormal(LookAt, Matrix.RotationY(angleToRotate));
-            return angleToRotate;
+            var axisOfRotation = CalculateRotationY(myPosition, destination);
+            UpdateLookAtVector(axisOfRotation);
+            return axisOfRotation;
 
         }
-        
 
-        private int SenseOfRotation(Vector3 myPosition, Vector3 destination)
+        private void UpdateLookAtVector(Matrix axisOfRotation)
         {
-            var positionTranslation = Matrix.Translation(myPosition);
-            var normalizedDestination = Vector3.TransformNormal(destination, positionTranslation);
-            var normalizedLookAt = Vector3.TransformNormal(LookAt, positionTranslation);
-            return Math.Sign(Vector3.Cross(normalizedDestination , normalizedLookAt ).Y);
-            
+            LookAt = Vector3.TransformNormal(LookAt, axisOfRotation);
         }
+
+        private Matrix CalculateRotationY(Vector3 myPosition, Vector3 destination)
+        {
+            return Matrix.RotationY(SenseOfRotation(myPosition, destination).Y * RotationVelocity);
+        }
+
+
+        private Vector3 SenseOfRotation(Vector3 myPosition, Vector3 destination)
+        { 
+            var normal = Vector3.Cross( destination - myPosition, LookAt);
+            return new Vector3(
+                Math.Sign(normal.X),
+                Math.Sign(normal.Y),
+                Math.Sign(normal.Z)
+                );
+        }
+
     }
 }
