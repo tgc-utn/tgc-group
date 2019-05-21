@@ -82,14 +82,14 @@ namespace TGC.Group.Model.Scenes
 
         private void InitTitle()
         {
-            title = BitmapRepository.CreateSpriteFromPath(BitmapRepository.Title);
+            title = BitmapRepository.CreateSpriteFromBitmap(BitmapRepository.Title);
             title.Scaling = new TGCVector2(.15f, .25f);
             title.Position = new TGCVector2(200, 250);
         }
 
         private void InitBlackRectangle()
         {
-            spriteBlackRectangle = BitmapRepository.CreateSpriteFromPath(BitmapRepository.BlackRectangle);
+            spriteBlackRectangle = BitmapRepository.CreateSpriteFromBitmap(BitmapRepository.BlackRectangle);
             spriteBlackRectangle.Color = Color.FromArgb(188, 0, 0, 0);
             spriteBlackRectangle.Scaling = new TGCVector2(1, .1f);
             Screen.CenterSprite(spriteBlackRectangle);

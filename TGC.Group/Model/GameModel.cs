@@ -53,7 +53,7 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
 
             drawerPause = new Drawer2D();
-            spritePause = BitmapRepository.CreateSpriteFromPath(BitmapRepository.BlackRectangle);
+            spritePause = BitmapRepository.CreateSpriteFromBitmap(BitmapRepository.BlackRectangle);
         }
 
         public override void Init()

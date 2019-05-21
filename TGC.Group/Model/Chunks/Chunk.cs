@@ -1,5 +1,9 @@
+using BulletSharp.Math;
+using Microsoft.DirectX.Direct3D;
 using System;
 using System.Collections.Generic;
+using TGC.Core.Camara;
+using TGC.Core.Direct3D;
 using TGC.Core.Mathematica;
 using TGC.Group.Model.Elements;
 
@@ -13,8 +17,23 @@ namespace TGC.Group.Model.Chunks
         protected AquaticPhysics Physics { get; }
 
         public static readonly Chunk None = new NoneChunk();
-        
+
         public static TGCVector3 DefaultSize { get; } = new TGCVector3(1000, 1000, 1000);
+
+        private Effect effect;
+        public Effect Effect
+        {
+            get
+            {
+                return effect;
+            }
+            set
+            {
+                effect = value;
+                this.Elements.ForEach(e => e.Effect = value);
+            }
+        }
+        public TgcCamera camera;
 
         protected Chunk(TGCVector3 origin, AquaticPhysics physicsWorld)
         {
@@ -54,7 +73,13 @@ namespace TGC.Group.Model.Chunks
 
         public virtual void Render()
         {
-            this.Elements.ForEach(element => element.Render());
+            this.Elements.ForEach(element => {
+                Vector3 diff = element.Position - camera.Position.ToBulletVector3();
+                D3DDevice.Instance.Device.RenderState.AlphaBlendEnable = true; 
+                effect.SetValue("farness", diff.Length);
+                effect.SetValue("maxFarness", D3DDevice.Instance.ZFarPlaneDistance);
+                element.Render();
+            });
         }
 
         public virtual void RenderBoundingBox()

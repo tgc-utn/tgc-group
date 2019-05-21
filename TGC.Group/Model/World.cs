@@ -1,4 +1,8 @@
+﻿
 ﻿using System;
+using BulletSharp.Math;
+using Microsoft.DirectX.Direct3D;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BulletSharp;
@@ -6,6 +10,7 @@ using BulletSharp.Math;
 using Microsoft.DirectX.Direct3D;
 using TGC.Core.Camara;
 using TGC.Core.Collision;
+using TGC.Core.Direct3D;
 using TGC.Core.Mathematica;
 using TGC.Core.Terrain;
 using TGC.Group.Model.Elements;
@@ -28,6 +33,8 @@ namespace TGC.Group.Model
         public Element SelectableElement { get; private set; }
         public TgcSimpleTerrain Floor { get; set; }
         
+        private Effect effect;
+
         public World(TGCVector3 initialPoint)
         {
             chunks = new Dictionary<TGCVector3, Chunk>();
@@ -38,7 +45,7 @@ namespace TGC.Group.Model
             
             AddChunk(initialPoint);
             AddShark();
-            AddHeightMap();
+        //  AddHeightMap();
         }
 
         private void AddHeightMap()
@@ -78,6 +85,31 @@ namespace TGC.Group.Model
             AquaticPhysics.Instance.Add(meshRigidBody);
 
             return meshRigidBody;
+
+
+            /* This is how to add a shader to the entities */
+            
+            string path = "../../../Shaders/Fede.fx", compilationErrors;
+            try
+            {
+                effect = Effect.FromFile(D3DDevice.Instance.Device, path, null, null, ShaderFlags.None, null, out compilationErrors);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error al cargar shader: " + path + ". Errores: Ni lo cargó xd");
+            }
+
+            if (effect == null)
+            {
+                throw new Exception("Error al cargar shader: " + path + ". Errores: " + compilationErrors);
+            }
+
+            foreach (var e in this.entities)
+            {
+                e.Mesh.Effect = effect;
+                e.Mesh.Technique = "FedeTechnique";
+            }
+            
         }
 
         protected void AddShark()
@@ -165,10 +197,20 @@ namespace TGC.Group.Model
         
         public void Render(TgcCamera camera)
         {
-            ToRender(camera.Position).ForEach(chunk => chunk.Render());
-            entities.ForEach(entity => entity.Render());
-            waterSurface.Render(camera.Position);
-            Floor.Render();
+            ToRender(camera.Position).ForEach(chunk => {
+                chunk.camera = camera;
+                chunk.Effect = effect;
+                chunk.Render();
+            });
+            entities.ForEach(entity => {
+                Vector3 diff = entity.Position - camera.Position.ToBulletVector3();
+                D3DDevice.Instance.Device.RenderState.AlphaBlendEnable = true;
+                effect.SetValue("farness", diff.Length);
+                effect.SetValue("maxFarness", D3DDevice.Instance.ZFarPlaneDistance);
+                //Console.WriteLine("prop " + diff.Length / D3DDevice.Instance.ZFarPlaneDistance);
+                entity.Render();
+            });
+            //this.waterSurface.Render(camera.Position);
         }
 
         public void RenderBoundingBox(TgcCamera camera)

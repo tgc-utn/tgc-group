@@ -1,4 +1,6 @@
+using TGC.Core.Mathematica;
 using TGC.Group.Model.Items.Type;
+using TGC.Group.TGCUtils;
 
 namespace TGC.Group.Model.Items
 {
@@ -8,6 +10,9 @@ namespace TGC.Group.Model.Items
         string Description { get; }
 
         ItemType type { get; }
-        //TODO icon
+        
+        CustomSprite Icon { get; }
+
+        TGCVector2 DefaultScale { get; }
     }
 }
