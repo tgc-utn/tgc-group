@@ -150,10 +150,20 @@ namespace TGC.Group.Model.Scenes
         {
             D3DDevice.Instance.Device.Transform.Projection =
                 Matrix.PerspectiveFovLH(
-                    45,
+                    D3DDevice.Instance.FieldOfView,
                     D3DDevice.Instance.AspectRatio,
                     D3DDevice.Instance.ZNearPlaneDistance,
                     D3DDevice.Instance.ZFarPlaneDistance * scale
+                );
+        }
+        private void SetFOV(int fov)
+        {
+            D3DDevice.Instance.Device.Transform.Projection =
+                Matrix.PerspectiveFovLH(
+                    fov,
+                    D3DDevice.Instance.AspectRatio,
+                    D3DDevice.Instance.ZNearPlaneDistance,
+                    D3DDevice.Instance.ZFarPlaneDistance
                 );
         }
         private void InitInventoryScene()

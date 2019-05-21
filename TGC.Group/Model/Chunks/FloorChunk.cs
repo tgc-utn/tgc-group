@@ -51,5 +51,15 @@ namespace TGC.Group.Model.Chunks
         {
             base.AddElementsToPhysicsWorld();
         }
+
+        public override void Render()
+        {
+            base.Render();
+        }
+
+        public override void Dispose()
+        {
+            base.Dispose();
+        }
     }
 }

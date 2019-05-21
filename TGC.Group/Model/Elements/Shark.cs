@@ -19,7 +19,6 @@ namespace TGC.Group.Model.Elements
 
         public Shark(TgcMesh model, RigidBody rigidBody) : base(model, rigidBody)
         {
-
             MovementToCamera = new MovementToEntity(
                 new Vector3(1f, 0f, 0f),
                 FastMath.PI / 100f, 
@@ -30,7 +29,6 @@ namespace TGC.Group.Model.Elements
 
         public override void Update(Camera camera)
         {
-            Position = RigidBody.CenterOfMassPosition;
             var difference = camera.Position.ToBulletVector3() - RigidBody.CenterOfMassPosition;
 
             var sharkBody = (CapsuleShapeX)RigidBody.CollisionShape;

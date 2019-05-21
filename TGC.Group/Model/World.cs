@@ -33,6 +33,7 @@ namespace TGC.Group.Model
         public Element SelectableElement { get; private set; }
         public TgcSimpleTerrain Floor { get; set; }
         
+
         private Effect effect;
 
         public World(TGCVector3 initialPoint)
@@ -45,50 +46,9 @@ namespace TGC.Group.Model
             
             AddChunk(initialPoint);
             AddShark();
-        //  AddHeightMap();
-        }
-
-        private void AddHeightMap()
-        {
-            Floor = new TgcSimpleTerrain();
-            Floor.loadHeightmap(Game.Default.MediaDirectory + "Heightmap3.jpg", 1000, 100, 
-                new TGCVector3(0,-100,0));
-            Floor.loadTexture(Game.Default.MediaDirectory + Game.Default.TexturaTierra);
-            CreateSurfaceFromHeighMap(Floor.getData());
-
-        }
-        
-        public RigidBody CreateSurfaceFromHeighMap(CustomVertex.PositionTextured[] triangleDataVB)
-        {
-            //Triangulos
-            var triangleMesh = new TriangleMesh();
-            int i = 0;
-            TGCVector3 vector0;
-            TGCVector3 vector1;
-            TGCVector3 vector2;
-
-            while (i < triangleDataVB.Length)
-            {
-                vector0 = new TGCVector3(triangleDataVB[i].X, triangleDataVB[i].Y, triangleDataVB[i].Z);
-                vector1 = new TGCVector3(triangleDataVB[i + 1].X, triangleDataVB[i + 1].Y, triangleDataVB[i + 1].Z);
-                vector2 = new TGCVector3(triangleDataVB[i + 2].X, triangleDataVB[i + 2].Y, triangleDataVB[i + 2].Z);
-
-                i = i + 3;
-
-                triangleMesh.AddTriangle(vector0.ToBulletVector3(), vector1.ToBulletVector3(), vector2.ToBulletVector3());
-            }
-
-            CollisionShape meshCollisionShape = new BvhTriangleMeshShape(triangleMesh, true);
-            var meshMotionState = new DefaultMotionState();
-            var meshRigidBodyInfo = new RigidBodyConstructionInfo(0, meshMotionState, meshCollisionShape);
-            RigidBody meshRigidBody = new RigidBody(meshRigidBodyInfo);
-            AquaticPhysics.Instance.Add(meshRigidBody);
-
-            return meshRigidBody;
-
-
-            /* This is how to add a shader to the entities */
+//            AddHeightMap();
             
+            /*
             string path = "../../../Shaders/Fede.fx", compilationErrors;
             try
             {
@@ -109,6 +69,48 @@ namespace TGC.Group.Model
                 e.Mesh.Effect = effect;
                 e.Mesh.Technique = "FedeTechnique";
             }
+            */
+        }
+
+        private void AddHeightMap()
+        {
+            Floor = new TgcSimpleTerrain();
+            Floor.loadHeightmap(Game.Default.MediaDirectory + "Heightmap3.jpg", 1000, 100, 
+                new TGCVector3(0,-100,0));
+            Floor.loadTexture(Game.Default.MediaDirectory + Game.Default.TexturaTierra);
+            CreateSurfaceFromHeighMap(Floor.getData());
+
+        }
+
+        public RigidBody CreateSurfaceFromHeighMap(CustomVertex.PositionTextured[] triangleDataVB)
+        {
+            //Triangulos
+            var triangleMesh = new TriangleMesh();
+            int i = 0;
+            TGCVector3 vector0;
+            TGCVector3 vector1;
+            TGCVector3 vector2;
+
+            while (i < triangleDataVB.Length)
+            {
+                vector0 = new TGCVector3(triangleDataVB[i].X, triangleDataVB[i].Y, triangleDataVB[i].Z);
+                vector1 = new TGCVector3(triangleDataVB[i + 1].X, triangleDataVB[i + 1].Y, triangleDataVB[i + 1].Z);
+                vector2 = new TGCVector3(triangleDataVB[i + 2].X, triangleDataVB[i + 2].Y, triangleDataVB[i + 2].Z);
+
+                i = i + 3;
+
+                triangleMesh.AddTriangle(vector0.ToBulletVector3(), vector1.ToBulletVector3(),
+                    vector2.ToBulletVector3());
+            }
+
+            CollisionShape meshCollisionShape = new BvhTriangleMeshShape(triangleMesh, true);
+            var meshMotionState = new DefaultMotionState();
+            var meshRigidBodyInfo = new RigidBodyConstructionInfo(0, meshMotionState, meshCollisionShape);
+            RigidBody meshRigidBody = new RigidBody(meshRigidBodyInfo);
+            AquaticPhysics.Instance.Add(meshRigidBody);
+
+            return meshRigidBody;
+            
             
         }
 
@@ -197,19 +199,10 @@ namespace TGC.Group.Model
         
         public void Render(TgcCamera camera)
         {
-            ToRender(camera.Position).ForEach(chunk => {
-                chunk.camera = camera;
-                chunk.Effect = effect;
-                chunk.Render();
-            });
-            entities.ForEach(entity => {
-                Vector3 diff = entity.Position - camera.Position.ToBulletVector3();
-                D3DDevice.Instance.Device.RenderState.AlphaBlendEnable = true;
-                effect.SetValue("farness", diff.Length);
-                effect.SetValue("maxFarness", D3DDevice.Instance.ZFarPlaneDistance);
-                //Console.WriteLine("prop " + diff.Length / D3DDevice.Instance.ZFarPlaneDistance);
-                entity.Render();
-            });
+            ToRender(camera.Position).ForEach(chunk => chunk.Render());
+            entities.ForEach(entity => entity.Render());
+            waterSurface.Render(camera.Position);
+        //    Floor.Render();
             //this.waterSurface.Render(camera.Position);
         }
 
