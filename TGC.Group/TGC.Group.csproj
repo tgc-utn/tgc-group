@@ -90,6 +90,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camera\FpsCamera.cs" />
     <Compile Include="Form\GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -102,6 +103,7 @@
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Model\UnderseaModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
@@ -173,8 +175,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Media\cajaMadera4.jpg" />
+    <Content Include="Media\Level1\Heigthmap\hm_level1.jpg" />
+    <Content Include="Media\Level1\Meshes\Textures\10010_Coral_v1_Diffuse.jpg" />
+    <Content Include="Media\Level1\Meshes\Textures\blue.jpg" />
+    <Content Include="Media\Level1\Meshes\Textures\blue_fish.jpg" />
+    <Content Include="Media\Level1\Meshes\vg_level1-TgcScene.xml" />
+    <Content Include="Media\Level1\Textures\level1.PNG" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
