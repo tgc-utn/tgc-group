@@ -102,7 +102,10 @@ namespace TGC.Group.Form
             TGCShaders.Instance.LoadCommonShaders(currentDirectory + Game.Default.ShadersDirectory, D3DDevice.Instance);
 
             //Juego a ejecutar, si quisiéramos tener diferentes modelos aquí podemos cambiar la instancia e invocar a otra clase.
-            Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory,
+            //Modelo = new GameModel(currentDirectory + Game.Default.MediaDirectory,
+            //    currentDirectory + Game.Default.ShadersDirectory);
+
+            Modelo = new UnderseaModel(currentDirectory + Game.Default.MediaDirectory,
                 currentDirectory + Game.Default.ShadersDirectory);
 
             //Cargar juego.
