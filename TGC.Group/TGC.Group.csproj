@@ -91,6 +91,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera\FpsCamera.cs" />
+    <Compile Include="Collision\CollisionManager.cs" />
+    <Compile Include="Entities\HeightmapModel.cs" />
     <Compile Include="Form\GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -102,7 +104,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
-    <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Helpers\HeightmapHelper.cs" />
+    <Compile Include="Helpers\TextureHelper.cs" />
+    <Compile Include="Model\Levels\Level1Model.cs" />
+    <Compile Include="Model\Levels\LevelModel.cs" />
     <Compile Include="Model\UnderseaModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -123,6 +128,13 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Game.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Media\Meshes\arbusto\Arbusto.max" />
+    <None Include="Media\Meshes\esqueletohumano\Esqueleto3.max" />
+    <None Include="Media\Meshes\rock\Roca.max" />
+    <None Include="Media\Meshes\sogaenrollada\SogaEnrollada.max" />
+    <None Include="Media\Meshes\tubometalcurvo\TuboMetal.max" />
+    <None Include="Media\Meshes\tubometalrecto\TuboMetal2.max" />
+    <None Include="Media\Meshes\valvula\ValvulaMetal.max" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -174,14 +186,97 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Media\cajaMadera4.jpg" />
     <Content Include="Media\Level1\Heigthmap\hm_level1.jpg" />
-    <Content Include="Media\Level1\Meshes\Textures\10010_Coral_v1_Diffuse.jpg" />
-    <Content Include="Media\Level1\Meshes\Textures\blue.jpg" />
-    <Content Include="Media\Level1\Meshes\Textures\blue_fish.jpg" />
-    <Content Include="Media\Level1\Meshes\vg_level1-TgcScene.xml" />
+    <Content Include="Media\Level1\Textures\surface.PNG" />
+    <Content Include="Media\Meshes\arbusto\Arbusto-TgcScene.xml" />
+    <Content Include="Media\Meshes\arbusto\preview.jpg" />
+    <Content Include="Media\Meshes\arbusto\Textures\Arbusto.png" />
+    <Content Include="Media\Meshes\boat\boat-TgcScene.xml" />
+    <Content Include="Media\Meshes\boat\Textures\cajaMadera1.jpg" />
+    <Content Include="Media\Meshes\coral\coral-TgcScene.xml" />
+    <Content Include="Media\Meshes\coral\Textures\10010_Coral_v1_Diffuse.jpg" />
+    <Content Include="Media\Meshes\coral\Textures\12960_Shark_diff_v2.jpg" />
+    <Content Include="Media\Meshes\coral\Textures\20941_Brain_Coral_Diff_v1.jpg" />
+    <Content Include="Media\Meshes\coral\Textures\20943_Spiral_Wire_Coral_v1_diff.JPG" />
+    <Content Include="Media\Meshes\coral\Textures\blue.jpg" />
+    <Content Include="Media\Meshes\coral\Textures\blue_fish.jpg" />
+    <Content Include="Media\Meshes\coral\Textures\bodyColor_de_la_Superficie.png" />
+    <Content Include="Media\Meshes\coral\Textures\bodyOclusión_Ambiental.png" />
+    <Content Include="Media\Meshes\coral\Textures\body_normal.png" />
+    <Content Include="Media\Meshes\coral\Textures\Color_helice.png" />
+    <Content Include="Media\Meshes\coral\Textures\difuse_enganche.png" />
+    <Content Include="Media\Meshes\coral\Textures\fish.jpg" />
+    <Content Include="Media\Meshes\coral\Textures\float_texColor_de_la_Superficie.png" />
+    <Content Include="Media\Meshes\coral\Textures\LAMPOclusión_Ambiental.jpg" />
+    <Content Include="Media\Meshes\coral\Textures\LAMP_UVS.png" />
+    <Content Include="Media\Meshes\coral\Textures\normal_enganche.png" />
+    <Content Include="Media\Meshes\coral\Textures\normal_float.png" />
+    <Content Include="Media\Meshes\coral\Textures\red.jpg" />
+    <Content Include="Media\Meshes\coral\Textures\shell_basecolour.jpg" />
+    <Content Include="Media\Meshes\coral\Textures\shell_roughness.png" />
+    <Content Include="Media\Meshes\esqueletohumano\Esqueleto3-TgcScene.xml" />
+    <Content Include="Media\Meshes\esqueletohumano\preview.jpg" />
+    <Content Include="Media\Meshes\esqueletohumano\Textures\skeleton.png" />
+    <Content Include="Media\Meshes\fish\fish-TgcScene.xml" />
+    <Content Include="Media\Meshes\fish\Textures\blue_fish.jpg" />
+    <Content Include="Media\Meshes\pillar_coral\pillar_coral-TgcScene.xml" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\10010_Coral_v1_Diffuse.jpg" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\12960_Shark_diff_v2.jpg" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\20941_Brain_Coral_Diff_v1.jpg" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\20943_Spiral_Wire_Coral_v1_diff.JPG" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\blue.jpg" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\blue_fish.jpg" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\bodyColor_de_la_Superficie.png" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\bodyOclusión_Ambiental.png" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\body_normal.png" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\Color_helice.png" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\difuse_enganche.png" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\fish.jpg" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\float_texColor_de_la_Superficie.png" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\LAMPOclusión_Ambiental.jpg" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\LAMP_UVS.png" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\normal_enganche.png" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\normal_float.png" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\red.jpg" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\shell_basecolour.jpg" />
+    <Content Include="Media\Meshes\pillar_coral\Textures\shell_roughness.png" />
     <Content Include="Media\Level1\Textures\level1.PNG" />
-    <Content Include="Media\LogoTGC-TgcScene.xml" />
+    <Content Include="Media\Level1\Textures\SkyBox\left.PNG" />
+    <Content Include="Media\Level1\Textures\SkyBox\others.PNG" />
+    <Content Include="Media\Level1\Textures\SkyBox\right.PNG" />
+    <Content Include="Media\Level1\Textures\SkyBox\up.PNG" />
+    <Content Include="Media\Meshes\rock\preview.jpg" />
+    <Content Include="Media\Meshes\rock\Roca-TgcScene.xml" />
+    <Content Include="Media\Meshes\rock\Textures\Piedra3.jpg" />
+    <Content Include="Media\Meshes\ship\ship-TgcScene.xml" />
+    <Content Include="Media\Meshes\ship\Textures\10010_Coral_v1_Diffuse.jpg" />
+    <Content Include="Media\Meshes\ship\Textures\12960_Shark_diff_v2.jpg" />
+    <Content Include="Media\Meshes\ship\Textures\20941_Brain_Coral_Diff_v1.jpg" />
+    <Content Include="Media\Meshes\ship\Textures\20943_Spiral_Wire_Coral_v1_diff.JPG" />
+    <Content Include="Media\Meshes\ship\Textures\blue.jpg" />
+    <Content Include="Media\Meshes\ship\Textures\blue_fish.jpg" />
+    <Content Include="Media\Meshes\ship\Textures\bodyColor_de_la_Superficie.png" />
+    <Content Include="Media\Meshes\ship\Textures\bodyOclusión_Ambiental.png" />
+    <Content Include="Media\Meshes\ship\Textures\body_normal.png" />
+    <Content Include="Media\Meshes\ship\Textures\Color_helice.png" />
+    <Content Include="Media\Meshes\ship\Textures\difuse_enganche.png" />
+    <Content Include="Media\Meshes\ship\Textures\fish.jpg" />
+    <Content Include="Media\Meshes\ship\Textures\float_texColor_de_la_Superficie.png" />
+    <Content Include="Media\Meshes\ship\Textures\LAMPOclusión_Ambiental.jpg" />
+    <Content Include="Media\Meshes\ship\Textures\LAMP_UVS.png" />
+    <Content Include="Media\Meshes\ship\Textures\normal_enganche.png" />
+    <Content Include="Media\Meshes\ship\Textures\normal_float.png" />
+    <Content Include="Media\Meshes\ship\Textures\red.jpg" />
+    <Content Include="Media\Meshes\ship\Textures\shell_basecolour.jpg" />
+    <Content Include="Media\Meshes\ship\Textures\shell_roughness.png" />
+    <Content Include="Media\Meshes\sogaenrollada\SogaEnrollada-TgcScene.xml" />
+    <Content Include="Media\Meshes\sogaenrollada\Textures\rope.jpg" />
+    <Content Include="Media\Meshes\tubometalcurvo\Textures\auvBG.png" />
+    <Content Include="Media\Meshes\tubometalcurvo\TuboMetal-TgcScene.xml" />
+    <Content Include="Media\Meshes\tubometalrecto\Textures\auvBG.png" />
+    <Content Include="Media\Meshes\tubometalrecto\TuboMetal2-TgcScene.xml" />
+    <Content Include="Media\Meshes\valvula\Textures\auvBG.png" />
+    <Content Include="Media\Meshes\valvula\ValvulaMetal-TgcScene.xml" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
