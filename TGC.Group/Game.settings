@@ -6,16 +6,16 @@
       <Value Profile="(Default)">Alumnos</Value>
     </Setting>
     <Setting Name="Name" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Grupo 99</Value>
+      <Value Profile="(Default)">BOY BYE</Value>
     </Setting>
     <Setting Name="Description" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Mi idea - Descripción de la idea</Value>
+      <Value Profile="(Default)">STAR FOX 64</Value>
     </Setting>
     <Setting Name="ShadersDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)">..\..\..\Shaders\</Value>
+      <Value Profile="(Default)">..\..\Shaders\</Value>
     </Setting>
     <Setting Name="MediaDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)">..\..\..\Media\</Value>
+      <Value Profile="(Default)">..\..\Media\</Value>
     </Setting>
     <Setting Name="TexturaCaja" Type="System.String" Scope="User">
       <Value Profile="(Default)">cajaMadera4.jpg</Value>
