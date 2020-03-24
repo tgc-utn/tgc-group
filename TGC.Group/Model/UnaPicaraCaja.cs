@@ -4,7 +4,7 @@ using TGC.Core.Textures;
 
 namespace TGC.Group.Model
 {
-    public class UnaPicaraCaja
+    public class UnaPicaraCaja : IRenderizable
     {
 
         private readonly string mediaDir;
