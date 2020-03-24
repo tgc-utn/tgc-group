@@ -101,9 +101,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\IRenderizable.cs" />
+    <Compile Include="Model\GameManager.cs" />
     <Compile Include="Model\UnaPicaraCaja.cs" />
     <Compile Include="Model\TgcThirdPersonCamera.cs" />
-    <Compile Include="Model\Vuelo.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -120,6 +121,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
     <None Include="Game.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Game.Designer.cs</LastGenOutput>

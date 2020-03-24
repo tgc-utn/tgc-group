@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace TGC.Group.Model
 {
 
-    public sealed class GameManager
+    internal class GameManager
     {
-        private readonly List<IRenderizable> Renderizables;
+        private readonly List<IRenderizable> Renderizables = new List<IRenderizable>();
 
 
         public void Update(float elapsedTime)

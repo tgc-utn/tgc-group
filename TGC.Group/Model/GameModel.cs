@@ -67,11 +67,11 @@ namespace TGC.Group.Model
 
             var posicionDeLaPrimeraCajaMeme = posicionInicial + new TGCVector3(5, 0, 0);
             UnaCajameme = new UnaPicaraCaja(MediaDir, posicionDeLaPrimeraCajaMeme);
-            GameManager.AgregarRenderizable(UnaCajameme);
+            GameManager.Instance.AgregarRenderizable(UnaCajameme);
 
             var posicionDeLaSegundaCajaMeme = posicionInicial + new TGCVector3(-5, 0, 0);
             OtraCajaMeme = new UnaPicaraCaja(MediaDir, posicionDeLaSegundaCajaMeme);
-            OtraCajaMeme.Init();
+            GameManager.Instance.AgregarRenderizable(OtraCajaMeme);
         }
 
         public override void Update()
@@ -114,8 +114,7 @@ namespace TGC.Group.Model
             BoxCamera.Position = BoxCamera.Position + cameraMovement;
             BoxCamera.Transform = TGCMatrix.Translation(BoxCamera.Position);
 
-            UnaCajameme.Update(ElapsedTime);
-            OtraCajaMeme.Update(ElapsedTime);
+            GameManager.Instance.Update(ElapsedTime);
 
             CamaraInterna.Target = BoxCamera.Position;
             PostUpdate();
@@ -131,8 +130,7 @@ namespace TGC.Group.Model
             BoxCamera.Render();
             CajaTroll.Render();
 
-            UnaCajameme.Render();
-            OtraCajaMeme.Render();
+            GameManager.Instance.Render();
 
 
 
@@ -145,8 +143,7 @@ namespace TGC.Group.Model
             BoxCamera.Dispose();
             Scene.DisposeAll();
 
-            UnaCajameme.Dispose();
-            OtraCajaMeme.Dispose();
+            GameManager.Instance.Render();
         }
     }
 }
