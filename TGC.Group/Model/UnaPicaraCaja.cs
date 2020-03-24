@@ -1,52 +1,53 @@
-﻿using Microsoft.DirectX.DirectInput;
-using System.Drawing;
-using TGC.Core.Direct3D;
-using TGC.Core.Example;
-using TGC.Core.Geometry;
-using TGC.Core.Input;
+﻿using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
-using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
-using TGC.Examples.Camara;
-
 
 namespace TGC.Group.Model
 {
     public class UnaPicaraCaja
     {
 
-        public UnaPicaraCaja(string mediaDir, string shadersDir)
-        {
-            MediaDir = mediaDir;
-        }
+        private readonly string mediaDir;
+        private readonly TGCVector3 posicionInicial;
 
-        private string MediaDir;
-        private TGCBox Box { get; set; }
+        public UnaPicaraCaja(string mediaDir, TGCVector3 posicionInicial)
+        {
+            this.mediaDir = mediaDir;
+            this.posicionInicial = posicionInicial;
+        }
+        
+        private TGCBox CuboMeme { get; set; } 
 
         public void Init()
         {
-            var pathTexturaCaja = MediaDir + "luciano.jpg";
+            var pathTexturaCaja = mediaDir + "luciano.jpg";
             var texture = TgcTexture.createTexture(pathTexturaCaja);
-            var size = new TGCVector3(-16, 16, 16);
-            Box = TGCBox.fromSize(size, texture);
-            Box.Position = new TGCVector3(0, 200, 10);
+            var size = new TGCVector3(-2, 2, 2);
+
+            CuboMeme = TGCBox.fromSize(size, texture); 
+            CuboMeme.Position = posicionInicial;
         }
 
-        public void Update(float elapsedTime)
-        {
+        /// <summary>
+        /// Estos 3 metodos de Update, Render y Dispose se llaman igual que los de GameModel pero no son llamados cada frame automaticamente.
+        /// Lo que quiero decir es que lo unico que tienen en comun es el nombre y la logica que por convencion llevan adentro.
+        /// El Update y el Render NO tienen que usar PreUpdate() y PostUpdate() ( o PreRender() y PostRender() ) al principio y al final de los metodos.
+        /// <summary>
 
+        public void Update(float elapsedTime) 
+        {
             var movement = new TGCVector3(0, 0, -1);
             movement *= 50f * elapsedTime;
-            Box.Position = Box.Position + movement;
-            Box.Transform = TGCMatrix.Translation(Box.Position);
+            CuboMeme.Position = CuboMeme.Position + movement;
+            CuboMeme.Transform = TGCMatrix.Translation(CuboMeme.Position);
         }
         public void Render()
         {
-            Box.Render();
+            CuboMeme.Render();
         }
         public void Dispose()
         {
-            Box.Dispose();
+            CuboMeme.Dispose();
         }
     }
 }

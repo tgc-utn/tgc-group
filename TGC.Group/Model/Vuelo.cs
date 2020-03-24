@@ -32,15 +32,12 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        //Caja que se muestra en el ejemplo.
-        private TGCBox box { get; set; }
-        private UnaPicaraCaja otraBox { get; set; }
-        private TGCBox boxCamera { get; set; }
+        private TGCBox CajaTroll { get; set; }
+        private UnaPicaraCaja UnaCajameme { get; set; }
+        private UnaPicaraCaja OtraCajaMeme { get; set; }
+        private TGCBox BoxCamera { get; set; }
         private TgcScene scene;
         private TgcThirdPersonCamera camaraInterna;
-
-        //Boleano para ver si dibujamos el boundingbox
-        private bool BoundingBox { get; set; }
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -50,37 +47,36 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Init()
         {
-            //Device de DirectX para crear primitivas.
-            var d3dDevice = D3DDevice.Instance.Device;
 
             scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Ciudad\\Ciudad-TgcScene.xml");
 
-            var pathTexturaCaja = MediaDir + "troll.jpg";
-            var texture = TgcTexture.createTexture(pathTexturaCaja);
-            var color = Color.Red;
+            var pathTexturaTroll = MediaDir + "troll.jpg";
+            var texturaTroll = TgcTexture.createTexture(pathTexturaTroll);
             var size = new TGCVector3(4, 4, 10);
+            CajaTroll = TGCBox.fromSize(size, texturaTroll);
 
-            box = TGCBox.fromSize(size, texture);
-            boxCamera = TGCBox.fromSize(new TGCVector3(1, 1, 1), color);
-            //Posición 
-            box.Position = new TGCVector3(0, 200, 0);
-            boxCamera.Position = new TGCVector3(0, 200, 0);
+            BoxCamera = TGCBox.fromSize(new TGCVector3(1, 1, 1), Color.Red);
 
+            var posicionInicial = new TGCVector3(0, 200, 0); //Asumiendo que la boxCamera tiene que empezar en el mismo lugar que la cajaTroll
+            CajaTroll.Position = posicionInicial;
+            BoxCamera.Position = posicionInicial;
 
-            //Vamos a utilizar la camara en 3ra persona para que siga al objeto principal a medida que se mueve
-            camaraInterna = new TgcThirdPersonCamera(boxCamera.Position, 20, 80);
+            camaraInterna = new TgcThirdPersonCamera(BoxCamera.Position, 20, 80);
             Camara = camaraInterna;
 
-            otraBox = new UnaPicaraCaja(MediaDir, ShadersDir);
-            otraBox.Init();
+
+            var posicionDeLaPrimeraCajaMeme = posicionInicial + new TGCVector3(5, 0, 0);
+            UnaCajameme = new UnaPicaraCaja(MediaDir, posicionDeLaPrimeraCajaMeme);
+            UnaCajameme.Init();
+
+            var posicionDeLaSegundaCajaMeme = posicionInicial + new TGCVector3(-5, 0, 0);
+            OtraCajaMeme = new UnaPicaraCaja(MediaDir, posicionDeLaSegundaCajaMeme);
+            OtraCajaMeme.Init();
         }
 
-
-        /// </summary>
         public override void Update()
         {
             PreUpdate();
-            otraBox.Update(ElapsedTime);
             //Obtenemos acceso al objeto que maneja input de mouse y teclado del framework
             var input = Input;
 
@@ -110,17 +106,18 @@ namespace TGC.Group.Model
                 movement.Y = -1;
             }
 
-            //Guardar posicion original antes de cambiarla
-            var originalPos = box.Position;
-
             //Multiplicar movimiento por velocidad y elapsedTime
             movement *= 50f * ElapsedTime;
-            box.Position = box.Position + movement;
-            box.Transform = TGCMatrix.Translation(box.Position);
+            CajaTroll.Position = CajaTroll.Position + movement;
+            CajaTroll.Transform = TGCMatrix.Translation(CajaTroll.Position);
             cameraMovement *= 50f * ElapsedTime;
-            boxCamera.Position = boxCamera.Position + cameraMovement;
+            BoxCamera.Position = BoxCamera.Position + cameraMovement;
+            BoxCamera.Transform = TGCMatrix.Translation(BoxCamera.Position);
 
-            camaraInterna.Target = boxCamera.Position;
+            UnaCajameme.Update(ElapsedTime);
+            OtraCajaMeme.Update(ElapsedTime);
+
+            camaraInterna.Target = BoxCamera.Position;
             PostUpdate();
         }
 
@@ -131,9 +128,11 @@ namespace TGC.Group.Model
             PreRender();
 
             scene.RenderAll();
-            boxCamera.Render();
-            box.Render();
-            otraBox.Render();
+            BoxCamera.Render();
+            CajaTroll.Render();
+
+            UnaCajameme.Render();
+            OtraCajaMeme.Render();
 
 
 
@@ -142,10 +141,12 @@ namespace TGC.Group.Model
 
         public override void Dispose()
         {
-            box.Dispose();
-            otraBox.Dispose();
-            boxCamera.Dispose();
+            CajaTroll.Dispose();
+            BoxCamera.Dispose();
             scene.DisposeAll();
+
+            UnaCajameme.Dispose();
+            OtraCajaMeme.Dispose();
         }
     }
 }
