@@ -34,6 +34,7 @@ namespace TGC.Group.Model
 
         //Caja que se muestra en el ejemplo.
         private TGCBox box { get; set; }
+        private UnaPicaraCaja otraBox { get; set; }
         private TGCBox boxCamera { get; set; }
         private TgcScene scene;
         private TgcThirdPersonCamera camaraInterna;
@@ -69,6 +70,9 @@ namespace TGC.Group.Model
             //Vamos a utilizar la camara en 3ra persona para que siga al objeto principal a medida que se mueve
             camaraInterna = new TgcThirdPersonCamera(boxCamera.Position, 20, 80);
             Camara = camaraInterna;
+
+            otraBox = new UnaPicaraCaja(MediaDir, ShadersDir);
+            otraBox.Init();
         }
 
 
@@ -76,7 +80,7 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
-
+            otraBox.Update(ElapsedTime);
             //Obtenemos acceso al objeto que maneja input de mouse y teclado del framework
             var input = Input;
 
@@ -129,7 +133,9 @@ namespace TGC.Group.Model
             scene.RenderAll();
             boxCamera.Render();
             box.Render();
-       
+            otraBox.Render();
+
+
 
             PostRender();
         }
@@ -137,6 +143,7 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             box.Dispose();
+            otraBox.Dispose();
             boxCamera.Dispose();
             scene.DisposeAll();
         }
