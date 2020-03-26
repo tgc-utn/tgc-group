@@ -101,9 +101,10 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\Camara.cs" />
     <Compile Include="Model\IRenderizable.cs" />
     <Compile Include="Model\GameManager.cs" />
-    <Compile Include="Model\UnaPicaraCaja.cs" />
+    <Compile Include="Model\PicaraCaja.cs" />
     <Compile Include="Model\TgcThirdPersonCamera.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Program.cs" />

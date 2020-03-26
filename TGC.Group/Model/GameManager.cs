@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TGC.Examples.Camara;
 
 namespace TGC.Group.Model
 {
@@ -10,11 +11,12 @@ namespace TGC.Group.Model
     internal class GameManager
     {
         private readonly List<IRenderizable> Renderizables = new List<IRenderizable>();
-
+        public Camara Camara { get; set; }
 
         public void Update(float elapsedTime)
         {
             Renderizables.ForEach(delegate (IRenderizable unRenderizable) { unRenderizable.Update(elapsedTime); });
+            Camara.Update(elapsedTime);
         }
 
         public void Render()

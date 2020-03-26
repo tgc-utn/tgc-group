@@ -4,13 +4,13 @@ using TGC.Core.Textures;
 
 namespace TGC.Group.Model
 {
-    public class UnaPicaraCaja : IRenderizable
+    public class CajaMeme : IRenderizable
     {
 
         private readonly string mediaDir;
         private readonly TGCVector3 posicionInicial;
 
-        public UnaPicaraCaja(string mediaDir, TGCVector3 posicionInicial)
+        public CajaMeme(string mediaDir, TGCVector3 posicionInicial)
         {
             this.mediaDir = mediaDir;
             this.posicionInicial = posicionInicial;

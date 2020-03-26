@@ -20,11 +20,6 @@ namespace TGC.Group.Model
     /// </summary>
     public class GameModel : TgcExample
     {
-        /// <summary>
-        ///     Constructor del juego.
-        /// </summary>
-        /// <param name="mediaDir">Ruta donde esta la carpeta con los assets</param>
-        /// <param name="shadersDir">Ruta donde esta la carpeta con los shaders</param>
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
@@ -33,18 +28,8 @@ namespace TGC.Group.Model
         }
 
         private TGCBox CajaTroll { get; set; }
-        private UnaPicaraCaja UnaCajameme { get; set; }
-        private UnaPicaraCaja OtraCajaMeme { get; set; }
-        private TGCBox BoxCamera { get; set; }
         private TgcScene Scene;
-        private TgcThirdPersonCamera CamaraInterna;
 
-        /// <summary>
-        ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
-        ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
-        ///     procesamiento que podemos pre calcular para nuestro juego.
-        ///     Borrar el codigo ejemplo no utilizado.
-        /// </summary>
         public override void Init()
         {
 
@@ -55,22 +40,19 @@ namespace TGC.Group.Model
             var size = new TGCVector3(4, 4, 10);
             CajaTroll = TGCBox.fromSize(size, texturaTroll);
 
-            BoxCamera = TGCBox.fromSize(new TGCVector3(1, 1, 1), Color.Red);
-
-            var posicionInicial = new TGCVector3(0, 200, 0); //Asumiendo que la boxCamera tiene que empezar en el mismo lugar que la cajaTroll
+            var posicionInicial = new TGCVector3(0, 200, 0); //Asumiendo que la camara tiene que empezar en el mismo lugar que la cajaTroll
             CajaTroll.Position = posicionInicial;
-            BoxCamera.Position = posicionInicial;
 
-            CamaraInterna = new TgcThirdPersonCamera(BoxCamera.Position, 20, 80);
-            Camara = CamaraInterna;
-
+            Camara unaCamara = new Camara(posicionInicial, 20, 80);
+            Camara = unaCamara;
+            GameManager.Instance.Camara = unaCamara;
 
             var posicionDeLaPrimeraCajaMeme = posicionInicial + new TGCVector3(5, 0, 0);
-            UnaCajameme = new UnaPicaraCaja(MediaDir, posicionDeLaPrimeraCajaMeme);
+            PicaraCaja UnaCajameme = new PicaraCaja(MediaDir, posicionDeLaPrimeraCajaMeme);
             GameManager.Instance.AgregarRenderizable(UnaCajameme);
 
             var posicionDeLaSegundaCajaMeme = posicionInicial + new TGCVector3(-5, 0, 0);
-            OtraCajaMeme = new UnaPicaraCaja(MediaDir, posicionDeLaSegundaCajaMeme);
+            PicaraCaja OtraCajaMeme = new PicaraCaja(MediaDir, posicionDeLaSegundaCajaMeme);
             GameManager.Instance.AgregarRenderizable(OtraCajaMeme);
         }
 
@@ -84,7 +66,6 @@ namespace TGC.Group.Model
             //El movimiento sobre el suelo es sobre el plano XZ.
             //Sobre XZ nos movemos con las flechas del teclado o con las letas WASD.
             var movement = new TGCVector3(0,0,-1);
-            var cameraMovement = new TGCVector3(0, 0, -1);
 
             //Movernos de izquierda a derecha, sobre el eje X.
             if (input.keyDown(Key.Left) || input.keyDown(Key.A))
@@ -106,17 +87,12 @@ namespace TGC.Group.Model
                 movement.Y = -1;
             }
 
-            //Multiplicar movimiento por velocidad y elapsedTime
             movement *= 50f * ElapsedTime;
             CajaTroll.Position = CajaTroll.Position + movement;
             CajaTroll.Transform = TGCMatrix.Translation(CajaTroll.Position);
-            cameraMovement *= 50f * ElapsedTime;
-            BoxCamera.Position = BoxCamera.Position + cameraMovement;
-            BoxCamera.Transform = TGCMatrix.Translation(BoxCamera.Position);
 
             GameManager.Instance.Update(ElapsedTime);
-
-            CamaraInterna.Target = BoxCamera.Position;
+ 
             PostUpdate();
         }
 
@@ -127,7 +103,6 @@ namespace TGC.Group.Model
             PreRender();
 
             Scene.RenderAll();
-            BoxCamera.Render();
             CajaTroll.Render();
 
             GameManager.Instance.Render();
@@ -140,7 +115,6 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             CajaTroll.Dispose();
-            BoxCamera.Dispose();
             Scene.DisposeAll();
 
             GameManager.Instance.Render();
