@@ -54,6 +54,10 @@ namespace TGC.Group.Model
             var posicionDeLaSegundaCajaMeme = posicionInicial + new TGCVector3(-5, 0, 0);
             PicaraCaja OtraCajaMeme = new PicaraCaja(MediaDir, posicionDeLaSegundaCajaMeme);
             GameManager.Instance.AgregarRenderizable(OtraCajaMeme);
+
+            var posicionDeLanNave = posicionInicial + new TGCVector3(0, 5, 0);
+            Nave nave = new Nave(MediaDir, posicionInicial,Input);
+            GameManager.Instance.AgregarRenderizable(nave);
         }
 
         public override void Update()
