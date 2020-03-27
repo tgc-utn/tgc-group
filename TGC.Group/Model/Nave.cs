@@ -42,14 +42,14 @@ namespace TGC.Group.Model
 
         public void Update(float elapsedTime)
         {
-            var movement = new TGCVector3(0, 0, -1);
+            var movement = new TGCVector3(0, 0, 1);
                if (input.keyDown(Key.Left) || input.keyDown(Key.A))
                {
-                   movement.X = 1;
+                   movement.X = -1;
                }
                else if (input.keyDown(Key.Right) || input.keyDown(Key.D))
                {
-                   movement.X = -1;
+                   movement.X = 1;
                }
 
                //Movernos adelante y atras, sobre el eje Z.
