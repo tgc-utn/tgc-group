@@ -33,13 +33,13 @@ namespace TGC.Group.Model
         {
             Scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Ciudad\\Ciudad-TgcScene.xml");
 
-            var posicionInicial = new TGCVector3(0, 200, -100); //Asumiendo que la camara tiene que empezar en el mismo lugar que la cajaTroll
+            var posicionInicialDeNave = new TGCVector3(0, 200, -100); 
 
-            Camara unaCamara = new Camara(posicionInicial, 20, -120);
+            Camara unaCamara = new Camara(posicionInicialDeNave, 20, -120); //Asumiendo que la camara empieza en la misma posicion que la nave. La posicion inicial se puede cambiar.
             Camara = unaCamara;
             GameManager.Instance.Camara = unaCamara;
 
-            Nave nave = new Nave(MediaDir, posicionInicial,Input);
+            Nave nave = new Nave(MediaDir, posicionInicialDeNave,Input);
             GameManager.Instance.AgregarRenderizable(nave);
         }
 

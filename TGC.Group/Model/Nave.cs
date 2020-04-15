@@ -40,32 +40,46 @@ namespace TGC.Group.Model
         /// El Update y el Render NO tienen que usar PreUpdate() y PostUpdate() ( o PreRender() y PostRender() ) al principio y al final de los metodos.
         /// <summary>
 
+
+        private void Moverse(TGCVector3 versorDirector, float elapsedTime)
+        {
+            TGCVector3 movimientoDelFrame = new TGCVector3(0, 0, 0);
+            TGCVector3 movimientoAdelante = new TGCVector3(0, 0, 1);
+
+            movimientoDelFrame += versorDirector + movimientoAdelante;
+            movimientoDelFrame *= 50f * elapsedTime;
+
+            mainMesh.Position += movimientoDelFrame;
+            mainMesh.Transform = TGCMatrix.Translation(mainMesh.Position);
+
+        }
+
         public void Update(float elapsedTime)
         {
-            var movement = new TGCVector3(0, 0, 1);
-               if (input.keyDown(Key.Left) || input.keyDown(Key.A))
-               {
-                   movement.X = -1;
-               }
-               else if (input.keyDown(Key.Right) || input.keyDown(Key.D))
-               {
-                   movement.X = 1;
-               }
+            TGCVector3 direccionDelInput = new TGCVector3(0, 0, 0); //A "direccion" se refiere a direccion y sentido.
 
-               //Movernos adelante y atras, sobre el eje Z.
-               if (input.keyDown(Key.Up) || input.keyDown(Key.W))
-               {
-                   movement.Y = 1;
-               }
-               else if (input.keyDown(Key.Down) || input.keyDown(Key.S))
-               {
-                   movement.Y = -1;
-               }
+            if (input.keyDown(Key.Left) || input.keyDown(Key.A))
+            {
+                direccionDelInput.X = -1;
+            }
+            else if (input.keyDown(Key.Right) || input.keyDown(Key.D))
+            {
+                direccionDelInput.X = 1;
+            }
+
+            if (input.keyDown(Key.Up) || input.keyDown(Key.W))
+            {
+                direccionDelInput.Y = 1;
+            }
+            else if (input.keyDown(Key.Down) || input.keyDown(Key.S))
+            {
+                direccionDelInput.Y = -1;
+            }
+
+            Moverse(direccionDelInput, elapsedTime);
 
 
-            movement *= 50f * elapsedTime;
-            mainMesh.Position = mainMesh.Position + movement;
-            mainMesh.Transform = TGCMatrix.Translation(mainMesh.Position);
+
         }
         public void Render()
         {
