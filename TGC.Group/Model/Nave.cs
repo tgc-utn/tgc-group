@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TGC.Core.Geometry;
-using TGC.Core.Mathematica;
+﻿using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Input;
 using Microsoft.DirectX.DirectInput;
+using TGC.Core.Text;
+using System.Drawing;
+
 namespace TGC.Group.Model
 {
     public class Nave : IRenderizable
@@ -25,21 +22,14 @@ namespace TGC.Group.Model
 
         public void Init()
         {
-            var loader = new TgcSceneLoader();
-            var scene2 = loader.loadSceneFromFile(mediaDir + "StarFox\\Nave+de+foxV7-TgcScene.xml");
+            TgcSceneLoader loader = new TgcSceneLoader();
+            TgcScene scene2 = loader.loadSceneFromFile(mediaDir + "StarFox\\Nave+de+foxV7-TgcScene.xml");
 
             //Solo nos interesa el primer modelo de esta escena (tiene solo uno)
             mainMesh = scene2.Meshes[0];
             mainMesh.Position = posicionInicial;
             mainMesh.Transform = TGCMatrix.Translation(0, 5, 0);
         }
-
-        /// <summary>
-        /// Estos 3 metodos de Update, Render y Dispose se llaman igual que los de GameModel pero no son llamados cada frame automaticamente.
-        /// Lo que quiero decir es que lo unico que tienen en comun es el nombre y la logica que por convencion llevan adentro.
-        /// El Update y el Render NO tienen que usar PreUpdate() y PostUpdate() ( o PreRender() y PostRender() ) al principio y al final de los metodos.
-        /// <summary>
-
 
         private void Moverse(TGCVector3 versorDirector, float elapsedTime)
         {
@@ -53,6 +43,14 @@ namespace TGC.Group.Model
             mainMesh.Transform = TGCMatrix.Translation(mainMesh.Position);
 
         }
+
+
+        /// <summary>
+        /// Estos 3 metodos de Update, Render y Dispose se llaman igual que los de GameModel pero no son llamados cada frame automaticamente.
+        /// Lo que quiero decir es que lo unico que tienen en comun es el nombre y la logica que por convencion llevan adentro.
+        /// El Update y el Render NO tienen que usar PreUpdate() y PostUpdate() ( o PreRender() y PostRender() ) al principio y al final de los metodos.
+        /// <summary>
+
 
         public void Update(float elapsedTime)
         {
@@ -78,12 +76,14 @@ namespace TGC.Group.Model
 
             Moverse(direccionDelInput, elapsedTime);
 
-
-
         }
+
+
         public void Render()
         {
             mainMesh.Render();
+            new TgcText2D().drawText("Posicion de la nave:\n" + mainMesh.Position.ToString(), 5, 20, Color.White);
+            //new TgcText2D().drawText("Rotacion de la nave:\n" + mainMesh.Rotation.ToString(), 5, 100, Color.White);    Esto aparece un por un rato pero despues crashea todo :(
         }
         public void Dispose()
         {
