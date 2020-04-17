@@ -51,7 +51,6 @@ namespace TGC.Group.Model
 
             mainMesh.Position += movimientoDelFrame;
             mainMesh.Transform = TGCMatrix.Translation(mainMesh.Position);
-            mainMesh.Transform = TGCMatrix.RotationY(9.0f);
 
         }
 
