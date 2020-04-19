@@ -1,5 +1,7 @@
 using Microsoft.DirectX.DirectInput;
 using System.Drawing;
+using System.Windows.Forms;
+using TGC.Core.Camara;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
@@ -18,6 +20,7 @@ namespace TGC.Group.Model
     /// </summary>
     public class GameModel : TgcExample
     {
+
         /// <summary>
         ///     Constructor del juego.
         /// </summary>
@@ -30,14 +33,16 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
+
         //Caja que se muestra en el ejemplo.
         private TGCBox Box { get; set; }
-
         //Mesh de TgcLogo.
         private TgcMesh Mesh { get; set; }
 
         //Boleano para ver si dibujamos el boundingbox
         private bool BoundingBox { get; set; }
+
+        private Player Player { get; set; }
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -49,6 +54,7 @@ namespace TGC.Group.Model
         {
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
+
 
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
@@ -82,6 +88,8 @@ namespace TGC.Group.Model
             Camara.SetCamera(cameraPosition, lookAt);
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
+            Player = new Player();
+            Player.InitMesh();
         }
 
         /// <summary>
@@ -99,20 +107,8 @@ namespace TGC.Group.Model
                 BoundingBox = !BoundingBox;
             }
 
-            //Capturar Input Mouse
-            if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
-            {
-                //Como ejemplo podemos hacer un movimiento simple de la cámara.
-                //En este caso le sumamos un valor en Y
-                Camara.SetCamera(Camara.Position + new TGCVector3(0, 10f, 0), Camara.LookAt);
-                //Ver ejemplos de cámara para otras operaciones posibles.
 
-                //Si superamos cierto Y volvemos a la posición original.
-                if (Camara.Position.Y > 300f)
-                {
-                    Camara.SetCamera(new TGCVector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
-                }
-            }
+            Player.CheckInputs(Input, ElapsedTime);
 
             PostUpdate();
         }
@@ -150,6 +146,8 @@ namespace TGC.Group.Model
                 Box.BoundingBox.Render();
                 Mesh.BoundingBox.Render();
             }
+            Player.UpdateTransform();
+            Player.Render();
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
