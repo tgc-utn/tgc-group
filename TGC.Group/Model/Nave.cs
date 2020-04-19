@@ -10,9 +10,10 @@ namespace TGC.Group.Model
     public class Nave : IRenderizable
     {
         private readonly string mediaDir;
-        private readonly TGCVector3 posicionInicial;
+        private readonly TGCVector3 posicionInicial; 
         private TgcMesh mainMesh;
         private TgcD3dInput input;
+
         public Nave(string mediaDir, TGCVector3 posicionInicial, TgcD3dInput input)
         {
             this.mediaDir = mediaDir;
@@ -43,13 +44,6 @@ namespace TGC.Group.Model
             mainMesh.Transform = TGCMatrix.Translation(mainMesh.Position);
 
         }
-
-
-        /// <summary>
-        /// Estos 3 metodos de Update, Render y Dispose se llaman igual que los de GameModel pero no son llamados cada frame automaticamente.
-        /// Lo que quiero decir es que lo unico que tienen en comun es el nombre y la logica que por convencion llevan adentro.
-        /// El Update y el Render NO tienen que usar PreUpdate() y PostUpdate() ( o PreRender() y PostRender() ) al principio y al final de los metodos.
-        /// <summary>
 
 
         public void Update(float elapsedTime)

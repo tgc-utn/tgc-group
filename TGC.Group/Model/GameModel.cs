@@ -35,12 +35,16 @@ namespace TGC.Group.Model
 
             var posicionInicialDeNave = new TGCVector3(0, 200, -100); 
 
-            Camara unaCamara = new Camara(posicionInicialDeNave, 20, -120); //Asumiendo que la camara empieza en la misma posicion que la nave. La posicion inicial se puede cambiar.
-            Camara = unaCamara;
-            GameManager.Instance.Camara = unaCamara;
+            Camara camaraDelJuego = new Camara(posicionInicialDeNave, 20, -120); //Asumiendo que la camara empieza en la misma posicion que la nave. La posicion inicial se puede cambiar.
+            Camara = camaraDelJuego;
+            GameManager.Instance.Camara = camaraDelJuego;
 
-            Nave nave = new Nave(MediaDir, posicionInicialDeNave,Input);
-            GameManager.Instance.AgregarRenderizable(nave);
+            Nave naveDelJuego = new Nave(MediaDir, posicionInicialDeNave,Input);
+            GameManager.Instance.AgregarRenderizable(naveDelJuego);
+
+            Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
+            GameManager.Instance.AgregarRenderizable(skybox);
+
         }
 
         public override void Update()
