@@ -107,6 +107,8 @@ namespace TGC.Group.Model
                 BoundingBox = !BoundingBox;
             }
 
+            TGCVector3 lookAt = TGCVector3.Empty;
+            Camara.SetCamera(Player.Position(), lookAt);
 
             Player.CheckInputs(Input, ElapsedTime);
 

@@ -27,9 +27,8 @@ namespace TGC.Group.Model
 
         public TGCVector3 Position() { return mesh.Position; }
 
-
         public void InitMesh() { mesh = TGCBox.fromSize(size, null); }
-        public void Render() { mesh.Render(); mesh.BoundingBox.Render(); }
+        public void Render() { mesh.BoundingBox.Render(); }
 
         public void CheckInputs(TgcD3dInput Input, float ElapsedTime)
         {
