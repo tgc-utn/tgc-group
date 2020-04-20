@@ -43,6 +43,7 @@ namespace TGC.Group.Model
         private bool BoundingBox { get; set; }
 
         private Player Player { get; set; }
+        
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -107,11 +108,10 @@ namespace TGC.Group.Model
                 BoundingBox = !BoundingBox;
             }
 
-            TGCVector3 lookAt = TGCVector3.Empty;
-            Camara.SetCamera(Player.Position(), lookAt);
+            //TGCVector3 lookAt = TGCVector3.Empty;
+            //Camara.SetCamera(Player.Position(), lookAt);
 
             Player.CheckInputs(Input, ElapsedTime);
-
             PostUpdate();
         }
 
@@ -128,6 +128,10 @@ namespace TGC.Group.Model
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
             DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.OrangeRed);
+            DrawText.drawText("Xpos: " + Input.Xpos,0,50,Color.White);
+            DrawText.drawText("Ypos: " + Input.Ypos,0,40, Color.White);
+            DrawText.drawText("XposRelative: " + Input.XposRelative, 0, 60, Color.White);
+            DrawText.drawText("YposRelative: " + Input.YposRelative, 0, 70, Color.White);
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
@@ -166,6 +170,7 @@ namespace TGC.Group.Model
             Box.Dispose();
             //Dispose del mesh.
             Mesh.Dispose();
+            Player.Dispose();
         }
     }
 }
