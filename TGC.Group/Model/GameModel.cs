@@ -1,4 +1,6 @@
+using BulletSharp.Math;
 using Microsoft.DirectX.DirectInput;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using TGC.Core.Camara;
@@ -33,6 +35,9 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
+        Control focusWindows;
+        Point mousePosition;
+
 
         //Caja que se muestra en el ejemplo.
         private TGCBox Box { get; set; }
@@ -55,7 +60,8 @@ namespace TGC.Group.Model
         {
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
-
+            focusWindows = d3dDevice.CreationParameters.FocusWindow;
+            mousePosition = focusWindows.PointToScreen(new Point(focusWindows.Width / 2, focusWindows.Height / 2));
 
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
@@ -91,6 +97,9 @@ namespace TGC.Group.Model
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
             Player = new Player();
             Player.InitMesh();
+
+            
+            
         }
 
         /// <summary>
@@ -108,10 +117,8 @@ namespace TGC.Group.Model
                 BoundingBox = !BoundingBox;
             }
 
-            //TGCVector3 lookAt = TGCVector3.Empty;
-            //Camara.SetCamera(Player.Position(), lookAt);
-
-            Player.Update(Input, ElapsedTime);
+            Cursor.Position = mousePosition;
+            Player.Update(Input, Camara, ElapsedTime);
             PostUpdate();
         }
 
@@ -130,10 +137,6 @@ namespace TGC.Group.Model
             DrawText.drawText("Player Ypos: " + Player.Position().Y, 0, 33, Color.DarkRed);
             DrawText.drawText("Health: " + Player.Health(), 0, 45, Color.DarkSalmon);
             DrawText.drawText("Oxygen: " + Player.Oxygen(), 0, 55, Color.DarkSalmon);
-          
-            
-            DrawText.drawText("XposRelative: " + Input.XposRelative, 0, 80, Color.White);
-            DrawText.drawText("YposRelative: " + Input.YposRelative, 0, 90, Color.White);
             
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
@@ -155,6 +158,8 @@ namespace TGC.Group.Model
                 Box.BoundingBox.Render();
                 Mesh.BoundingBox.Render();
             }
+
+            
             Player.UpdateTransform();
             Player.Render();
 

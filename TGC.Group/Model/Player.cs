@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TGC.Core.Camara;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
 using TGC.Core.Input;
@@ -35,7 +36,11 @@ namespace TGC.Group.Model
         private TGCQuaternion rotation = TGCQuaternion.Identity;
 
         //Config vars
-        private float sensitivity = 5.5f; //mouse sensitivity
+        private float sensitivity = 53f;
+        private TGCVector2 cam_angles = TGCVector2.Zero;
+        private const float CAMERA_MAX_X_ANGLE = 1.6f;
+
+
         private float speed = 25f; //foward and horizontal speed
         private float vspeed = 10f; //vertical speed
 
@@ -45,11 +50,12 @@ namespace TGC.Group.Model
 
         public void InitMesh() { mesh = TGCBox.fromSize(size, null); }
 
-        public void Update(TgcD3dInput Input, float ElapsedTime) { 
+        public void Update(TgcD3dInput Input,TgcCamera Camara, float ElapsedTime) { 
             CheckInputs(Input, ElapsedTime); 
-            GameplayUpdate(ElapsedTime); 
+            GameplayUpdate(ElapsedTime);
+            UpdateCamera(Input, Camara, ElapsedTime);
         }
-        public void Render() { mesh.BoundingBox.Render(); mesh.Render(); }
+        public void Render() { mesh.BoundingBox.Render(); }
 
         private void CheckInputs(TgcD3dInput Input, float ElapsedTime)
         {
@@ -87,6 +93,21 @@ namespace TGC.Group.Model
 
         public void UpdateTransform() { mesh.Transform = TGCMatrix.Scaling(mesh.Scale) * TGCMatrix.RotationTGCQuaternion(rotation) * TGCMatrix.Translation(mesh.Position); }
 
+        // Camera functions
+        private void UpdateCamera(TgcD3dInput Input, TgcCamera Camara, float ElapsedTime)
+        {
+            cam_angles += new TGCVector2(Input.YposRelative, Input.XposRelative) * sensitivity * ElapsedTime;
+            cam_angles.X = FastMath.Clamp(cam_angles.X, -CAMERA_MAX_X_ANGLE, CAMERA_MAX_X_ANGLE);
+            TGCQuaternion rotationY = TGCQuaternion.RotationAxis(new TGCVector3(0f, 1f, 0f), cam_angles.Y);
+            TGCQuaternion rotationX = TGCQuaternion.RotationAxis(new TGCVector3(1f, 0f, 0f), -cam_angles.X);
+            TGCQuaternion rotation = rotationX * rotationY;
+
+            var init_offset = new TGCVector3(0f,0f,1f);
+            TGCMatrix camera_m = TGCMatrix.Translation(init_offset) * TGCMatrix.RotationTGCQuaternion(rotation) * TGCMatrix.Translation(Position());
+            TGCVector3 pos = new TGCVector3(camera_m.M41, camera_m.M42, camera_m.M43);
+            Camara.SetCamera(pos, Position());
+        }
+
 
 
         //Gameplay functions
@@ -94,7 +115,7 @@ namespace TGC.Group.Model
         {
             if (!godmode)
             {
-                if (IsOutsideWater()) WinOxygen(ElapsedTime); else LoseOxygen(ElapsedTime);
+                if (IsOutsideWater()) RecoverOxygen(ElapsedTime); else LoseOxygen(ElapsedTime);
             }
         }
 
@@ -103,9 +124,9 @@ namespace TGC.Group.Model
             if (oxygen == 0) GetDamage(OXYGEN_DAMAGE * ElapsedTime);
         }
 
-        private void GetHealed(float amount) { health = Math.Min(100f, health + amount); }
+        private void GetHeal(float amount) { health = Math.Min(100f, health + amount); }
         private void GetDamage(float amount) { health = Math.Max(0, health - amount); }
-        private void WinOxygen(float ElapsedTime) { oxygen = Math.Min(100, oxygen + OXYGEN_RECOVER_SPEED * ElapsedTime); }
+        private void RecoverOxygen(float ElapsedTime) { oxygen = Math.Min(100, oxygen + OXYGEN_RECOVER_SPEED * ElapsedTime); }
         private bool IsOutsideWater() { return mesh.Position.Y > WATER_LEVEL; }
 
         public float Oxygen() { return oxygen; }
