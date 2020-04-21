@@ -37,7 +37,7 @@ namespace TGC.Group.Model
 
         //Config vars
         private float sensitivity = 53f;
-        private TGCVector2 cam_angles = TGCVector2.Zero;
+        public TGCVector2 cam_angles = TGCVector2.Zero;
         private const float CAMERA_MAX_X_ANGLE = 1.6f;
 
 
