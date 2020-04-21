@@ -3,13 +3,13 @@
   <Profiles />
   <Settings>
     <Setting Name="Category" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Alumnos</Value>
+      <Value Profile="(Default)">Melany Carla Gassmann, Ivan Gonzalez Martin, Alexander Cristian Martinez, Daiana Kalanit Szwimer</Value>
     </Setting>
     <Setting Name="Name" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Grupo 99</Value>
+      <Value Profile="(Default)">Grupo 07</Value>
     </Setting>
     <Setting Name="Description" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Mi idea - Descripción de la idea</Value>
+      <Value Profile="(Default)">Undersea Survival Craft - Subnautica</Value>
     </Setting>
     <Setting Name="ShadersDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)">..\..\..\Shaders\</Value>
