@@ -50,13 +50,13 @@ namespace TGC.Group.Model
             var pisoTexture = TgcTexture.createTexture(pathTexturaCaja);
 
             //Definimos caracteristicas del suelo
-            suelo = new TgcPlane(new TGCVector3(-500, 0, -500), new TGCVector3(2000, 0, 2000), TgcPlane.Orientations.XZplane, pisoTexture, 10f, 10f);
+            suelo = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(50, 50, 50), TgcPlane.Orientations.XZplane, pisoTexture, 10f, 10f);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
             //El framework maneja una cámara estática, pero debe ser inicializada.
             //Posición de la camara.
-            var cameraPosition = new TGCVector3(0, 0, 125);
+            var cameraPosition = new TGCVector3(0, 10, 125);
             //Quiero que la camara mire hacia el origen (0,0,0).
             var lookAt = TGCVector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
@@ -74,21 +74,34 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
-            
-
-            //Capturar Input Mouse
-            if (Input.buttonUp(TgcD3dInput.MouseButtons.BUTTON_LEFT))
+            if (Input.keyPressed(Key.W))
             {
-                //Como ejemplo podemos hacer un movimiento simple de la cámara.
-                //En este caso le sumamos un valor en Y
-                Camara.SetCamera(Camara.Position + new TGCVector3(0, 10f, 0), Camara.LookAt);
-                //Ver ejemplos de cámara para otras operaciones posibles.
+                Camara.SetCamera(Camara.Position + new TGCVector3(10f, 0, 0), Camara.LookAt);
+            }
 
-                //Si superamos cierto Y volvemos a la posición original.
-                if (Camara.Position.Y > 300f)
-                {
-                    Camara.SetCamera(new TGCVector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
-                }
+            if (Input.keyPressed(Key.S))
+            {
+                Camara.SetCamera(Camara.Position + new TGCVector3(-10f, 0, 0), Camara.LookAt);
+            }
+
+            if (Input.keyPressed(Key.A))
+            {
+                Camara.SetCamera(Camara.Position + new TGCVector3(0, 0, 10f), Camara.LookAt);
+            }
+
+            if (Input.keyPressed(Key.D))
+            {
+                Camara.SetCamera(Camara.Position + new TGCVector3(0, 0, -10), Camara.LookAt);
+            }
+
+            if (Input.keyPressed(Key.Space))
+            {
+                Camara.SetCamera(Camara.Position + new TGCVector3(0f, 10f, 0), Camara.LookAt);
+            }
+
+            if (Input.keyPressed(Key.LeftControl))
+            {
+                Camara.SetCamera(Camara.Position + new TGCVector3(0, -10f, 0), Camara.LookAt);
             }
 
             PostUpdate();
