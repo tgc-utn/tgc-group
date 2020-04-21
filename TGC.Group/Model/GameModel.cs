@@ -34,8 +34,12 @@ namespace TGC.Group.Model
         private TgcPlane suelo;
 
         private TgcPlane[] suelos1;
+        private TgcPlane[] paredes1;
         private TgcPlane[] suelos2;
+        private TgcPlane[] paredes2;
         private TgcPlane[] suelos3;
+        private TgcPlane pared;
+        private TgcPlane pared2;
 
         private TgcPlane[] completarLineaDeSuelosX( int cantidadDeSuelo, string DireccionTextura, float X, float Y,float Z, float escala) {
 
@@ -79,6 +83,51 @@ namespace TGC.Group.Model
 
         }
 
+        private TgcPlane[] completarParedZ(int cantidadDeParedes, string DireccionTextura, float X, float Y, float Z, float escala)
+        {
+
+
+            TgcPlane[] Paredes = new TgcPlane[cantidadDeParedes];
+
+
+            for (int i = 0; i < cantidadDeParedes; i++)
+            {
+
+
+                Paredes[i] = new TgcPlane(new TGCVector3(X, Y, Z), new TGCVector3(escala, escala, escala), TgcPlane.Orientations.XYplane, TgcTexture.createTexture(DireccionTextura), 10f, 10f);
+
+                X += escala;
+
+
+            }
+
+            return Paredes;
+
+        }
+
+
+        private TgcPlane[] completarParedX(int cantidadDeParedes, string DireccionTextura, float X, float Y, float Z, float escala)
+        {
+
+
+            TgcPlane[] Paredes = new TgcPlane[cantidadDeParedes];
+
+
+            for (int i = 0; i < cantidadDeParedes; i++)
+            {
+
+
+                Paredes[i] = new TgcPlane(new TGCVector3(X, Y, Z), new TGCVector3(escala, escala, escala), TgcPlane.Orientations.YZplane, TgcTexture.createTexture(DireccionTextura), 10f, 10f);
+
+                Z += escala;
+
+
+            }
+
+            return Paredes;
+
+        }
+
 
 
 
@@ -110,6 +159,9 @@ namespace TGC.Group.Model
             //Esta textura despues la cambiamos.
             var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
             var pathTexturaCaja2 = MediaDir + "//rocks.jpg";
+            var pathTexturaCaja3 = MediaDir + "//Piso2.jpg";
+            var pathTexturaCaja4 = MediaDir + "//cartelera2.jpg";
+            
             //var pathTexturaCaja3 = MediaDir + "//stones.bpn";
             // var pathTexturaCaja3 = MediaDir + Game.Default.TexturaCaja;
 
@@ -127,6 +179,11 @@ namespace TGC.Group.Model
             suelos2 = completarLineaDeSuelosZ(8, pathTexturaCaja2, posx, 0, 0, escala);
             int posz = 8* escala;
             suelos3 = completarLineaDeSuelosX(cantidad, pathTexturaCaja, posx, 0, posz, escala);
+            pared = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(10, 10, 10), TgcPlane.Orientations.YZplane, TgcTexture.createTexture(pathTexturaCaja), 10f, 10f);
+            pared2 = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(10, 10, 10), TgcPlane.Orientations.XYplane, TgcTexture.createTexture(pathTexturaCaja), 10f, 10f);
+            paredes1= completarParedZ(cantidad, pathTexturaCaja3, 0, 0, 0, escala);
+            paredes2 = completarParedX(8, pathTexturaCaja4, posx+escala, 0, 0, escala);
+
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
@@ -205,7 +262,10 @@ namespace TGC.Group.Model
             mostrarArrayPlano(suelos1);
             mostrarArrayPlano(suelos2);
             mostrarArrayPlano(suelos3);
-
+            pared.Render();
+            pared2.Render();
+            mostrarArrayPlano(paredes1);
+            mostrarArrayPlano(paredes2);
 
 
 
