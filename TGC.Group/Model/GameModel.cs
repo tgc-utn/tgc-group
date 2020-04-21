@@ -6,6 +6,7 @@ using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Core.Terrain;
 using TGC.Core.Textures;
 
 namespace TGC.Group.Model
@@ -40,6 +41,7 @@ namespace TGC.Group.Model
         private TgcPlane[] suelos3;
         private TgcPlane pared;
         private TgcPlane pared2;
+        TgcSkyBox skyBox;
 
         private TgcPlane[] completarLineaDeSuelosX( int cantidadDeSuelo, string DireccionTextura, float X, float Y,float Z, float escala) {
 
@@ -130,6 +132,39 @@ namespace TGC.Group.Model
 
 
 
+        private TgcSkyBox crearcielo() {
+
+            //Crear SkyBox
+            skyBox = new TgcSkyBox();
+            skyBox.Center = TGCVector3.Empty;
+            skyBox.Size = new TGCVector3(10000, 10000, 10000);
+
+            //Configurar color
+            //skyBox.Color = Color.OrangeRed;
+
+            //var texturesPath = MediaDir + "Texturas\\Quake\\SkyBox1\\";
+
+            //Configurar las texturas para cada una de las 6 caras
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, MediaDir + "Color A05.png");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, MediaDir + "Color A05.png");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left, MediaDir + "Color A05.png");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, MediaDir + "Color A05.png");
+
+            //Hay veces es necesario invertir las texturas Front y Back si se pasa de un sistema RightHanded a uno LeftHanded
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, MediaDir + "Color A05.png");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, MediaDir + "Color A05.png");
+            skyBox.SkyEpsilon = 25f;
+            //Inicializa todos los valores para crear el SkyBox
+            skyBox.Init();
+
+
+
+            return skyBox;
+        
+        }
+
+
+
 
 
 
@@ -151,14 +186,27 @@ namespace TGC.Group.Model
         public override void Init()
         {
 
+
+
+
+
+           
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
+
+
+
+
+            //Crear SkyBox
+            skyBox = crearcielo();
 
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
             //Esta textura despues la cambiamos.
             var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
-            var pathTexturaCaja2 = MediaDir + "//rocks.jpg";
+            var pathTexturaCaja2 = MediaDir + "//Metal-floor_.png";
             var pathTexturaCaja3 = MediaDir + "//Piso2.jpg";
             var pathTexturaCaja4 = MediaDir + "//cartelera2.jpg";
             
@@ -254,11 +302,7 @@ namespace TGC.Group.Model
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
             DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.OrangeRed);
 
-            //suelo.Render();
-            //suelos1[0].Render();
-            //suelos1[1].Render();
-            //suelos1[2].Render();
-            //suelos1[3].Render();
+
             mostrarArrayPlano(suelos1);
             mostrarArrayPlano(suelos2);
             mostrarArrayPlano(suelos3);
@@ -266,6 +310,7 @@ namespace TGC.Group.Model
             pared2.Render();
             mostrarArrayPlano(paredes1);
             mostrarArrayPlano(paredes2);
+            skyBox.Render();
 
 
 
