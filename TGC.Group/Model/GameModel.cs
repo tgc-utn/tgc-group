@@ -34,6 +34,8 @@ namespace TGC.Group.Model
         private TgcPlane suelo;
 
         private TgcPlane[] suelos1;
+        private TgcPlane[] suelos2;
+        private TgcPlane[] suelos3;
 
         private TgcPlane[] completarLineaDeSuelosX( int cantidadDeSuelo, string DireccionTextura, float X, float Y,float Z, float escala) {
 
@@ -54,6 +56,33 @@ namespace TGC.Group.Model
             return suelos;
 
         }
+
+        private TgcPlane[] completarLineaDeSuelosZ(int cantidadDeSuelo, string DireccionTextura, float X, float Y, float Z, float escala)
+        {
+
+
+            TgcPlane[] suelos = new TgcPlane[cantidadDeSuelo];
+
+
+            for (int i = 0; i < cantidadDeSuelo; i++)
+            {
+
+
+                suelos[i] = new TgcPlane(new TGCVector3(X, Y, Z), new TGCVector3(escala, escala, escala), TgcPlane.Orientations.XZplane, TgcTexture.createTexture(DireccionTextura), 10f, 10f);
+
+                Z += escala;
+
+
+            }
+
+            return suelos;
+
+        }
+
+
+
+
+
 
         private void mostrarArrayPlano(TgcPlane[] planos) {
 
@@ -88,7 +117,13 @@ namespace TGC.Group.Model
             //Definimos caracteristicas del suelo
             //suelo = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(50, 50, 50), TgcPlane.Orientations.XZplane, pisoTexture, 10f, 10f);
 
-            suelos1 = completarLineaDeSuelosX(10, pathTexturaCaja, 0, 0, 0, 10);
+            int cantidad = 4;
+            int escala = 10;
+            suelos1 = completarLineaDeSuelosX(cantidad, pathTexturaCaja, 0, 0, 0, escala);
+            int posx =cantidad*= escala;
+            suelos2 = completarLineaDeSuelosZ(8, pathTexturaCaja, posx, 0, 0, escala);
+            int posz = 8;
+            suelos3 = completarLineaDeSuelosX(cantidad, pathTexturaCaja, posx, 0, posz, escala);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
@@ -165,6 +200,8 @@ namespace TGC.Group.Model
             //suelos1[2].Render();
             //suelos1[3].Render();
             mostrarArrayPlano(suelos1);
+            mostrarArrayPlano(suelos2);
+            mostrarArrayPlano(suelos3);
 
 
 
