@@ -109,6 +109,9 @@ namespace TGC.Group.Model
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
             //Esta textura despues la cambiamos.
             var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
+            var pathTexturaCaja2 = MediaDir + "//rocks.jpg";
+            //var pathTexturaCaja3 = MediaDir + "//stones.bpn";
+            // var pathTexturaCaja3 = MediaDir + Game.Default.TexturaCaja;
 
             //Cargamos una textura, tener en cuenta que cargar una textura significa crear una copia en memoria.
             //Es importante cargar texturas en Init, si se hace en el render loop podemos tener grandes problemas si instanciamos muchas.
@@ -121,9 +124,9 @@ namespace TGC.Group.Model
             int escala = 10;
             suelos1 = completarLineaDeSuelosX(cantidad, pathTexturaCaja, 0, 0, 0, escala);
             int posx =cantidad*= escala;
-            suelos2 = completarLineaDeSuelosZ(8, pathTexturaCaja, posx, 0, 0, escala);
+            suelos2 = completarLineaDeSuelosZ(8, pathTexturaCaja2, posx, 0, 0, escala);
             int posz = 8;
-            suelos3 = completarLineaDeSuelosX(cantidad, pathTexturaCaja, posx, 0, posz, escala);
+            suelos3 = completarLineaDeSuelosX(cantidad, pathTexturaCaja, posx+6, 0, posz, escala);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
