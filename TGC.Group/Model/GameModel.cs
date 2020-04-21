@@ -33,6 +33,42 @@ namespace TGC.Group.Model
         //Definimos estructuras
         private TgcPlane suelo;
 
+        private TgcPlane[] suelos1;
+
+        private TgcPlane[] completarLineaDeSuelosX( int cantidadDeSuelo, string DireccionTextura, float X, float Y,float Z, float escala) {
+
+
+            TgcPlane[] suelos = new TgcPlane[cantidadDeSuelo];
+
+
+            for (int i = 0; i < cantidadDeSuelo; i++) {
+
+
+                suelos[i] = new TgcPlane(new TGCVector3(X, Y, Z), new TGCVector3(escala, escala, escala), TgcPlane.Orientations.XZplane, TgcTexture.createTexture(DireccionTextura), 10f, 10f);
+                
+                X += escala;
+
+
+            }  
+
+            return suelos;
+
+        }
+
+        private void mostrarArrayPlano(TgcPlane[] planos) {
+
+            foreach (TgcPlane plano in planos) {
+
+
+                plano.Render();
+
+
+            }
+                           
+        }
+
+
+
 
         public override void Init()
         {
@@ -50,7 +86,9 @@ namespace TGC.Group.Model
             var pisoTexture = TgcTexture.createTexture(pathTexturaCaja);
 
             //Definimos caracteristicas del suelo
-            suelo = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(50, 50, 50), TgcPlane.Orientations.XZplane, pisoTexture, 10f, 10f);
+            //suelo = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(50, 50, 50), TgcPlane.Orientations.XZplane, pisoTexture, 10f, 10f);
+
+            suelos1 = completarLineaDeSuelosX(10, pathTexturaCaja, 0, 0, 0, 10);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
@@ -121,7 +159,15 @@ namespace TGC.Group.Model
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
             DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.OrangeRed);
 
-            suelo.Render();
+            //suelo.Render();
+            //suelos1[0].Render();
+            //suelos1[1].Render();
+            //suelos1[2].Render();
+            //suelos1[3].Render();
+            mostrarArrayPlano(suelos1);
+
+
+
 
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
@@ -136,7 +182,7 @@ namespace TGC.Group.Model
         public override void Dispose()
         {
             //Dispose del mesh.
-            suelo.Dispose();
+            //suelo.Dispose();
         }
     }
 }
