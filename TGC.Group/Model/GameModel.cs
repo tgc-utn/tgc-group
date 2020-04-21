@@ -123,10 +123,10 @@ namespace TGC.Group.Model
             int cantidad = 4;
             int escala = 10;
             suelos1 = completarLineaDeSuelosX(cantidad, pathTexturaCaja, 0, 0, 0, escala);
-            int posx =cantidad*= escala;
+            int posx =cantidad* escala;
             suelos2 = completarLineaDeSuelosZ(8, pathTexturaCaja2, posx, 0, 0, escala);
-            int posz = 8;
-            suelos3 = completarLineaDeSuelosX(cantidad, pathTexturaCaja, posx+6, 0, posz, escala);
+            int posz = 8* escala;
+            suelos3 = completarLineaDeSuelosX(cantidad, pathTexturaCaja, posx, 0, posz, escala);
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
