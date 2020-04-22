@@ -16,7 +16,7 @@ namespace TGC.Group.Model
     ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
     ///     line 97.
     /// </summary>
-    public class GameModel : TgcExample
+    public class GameModel : TGCExample
     {
         /// <summary>
         ///     Constructor del juego.
@@ -50,6 +50,11 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
+            //Utilizando esta propiedad puedo activar el update/render a intervalos constantes.
+            FixedTickEnable = true;
+            //Se puede configurar el tiempo en estas propiedades TimeBetweenUpdates y TimeBetweenRenders, por defecto esta puedo en 1F / FPS_60 es a lo minimo que deberia correr el TP.
+            //De no estar a gusto como se ejecuta el metodo Tick (el que maneja el GameLoop) el mismo es virtual con lo cual pueden sobrescribirlo.
+
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
             var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
@@ -79,7 +84,7 @@ namespace TGC.Group.Model
             //Quiero que la camara mire hacia el origen (0,0,0).
             var lookAt = TGCVector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
-            Camara.SetCamera(cameraPosition, lookAt);
+            Camera.SetCamera(cameraPosition, lookAt);
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
         }
@@ -91,8 +96,6 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Update()
         {
-            PreUpdate();
-
             //Capturar Input teclado
             if (Input.keyPressed(Key.F))
             {
@@ -104,17 +107,15 @@ namespace TGC.Group.Model
             {
                 //Como ejemplo podemos hacer un movimiento simple de la cámara.
                 //En este caso le sumamos un valor en Y
-                Camara.SetCamera(Camara.Position + new TGCVector3(0, 10f, 0), Camara.LookAt);
+                Camera.SetCamera(Camera.Position + new TGCVector3(0, 10f, 0), Camera.LookAt);
                 //Ver ejemplos de cámara para otras operaciones posibles.
 
                 //Si superamos cierto Y volvemos a la posición original.
-                if (Camara.Position.Y > 300f)
+                if (Camera.Position.Y > 300f)
                 {
-                    Camara.SetCamera(new TGCVector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
+                    Camera.SetCamera(new TGCVector3(Camera.Position.X, 0f, Camera.Position.Z), Camera.LookAt);
                 }
             }
-
-            PostUpdate();
         }
 
         /// <summary>
@@ -129,7 +130,7 @@ namespace TGC.Group.Model
 
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
-            DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.OrangeRed);
+            DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintTGCVector3(Camera.Position), 0, 30, Color.OrangeRed);
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
