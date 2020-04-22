@@ -206,9 +206,9 @@ namespace TGC.Group.Model
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
             //Esta textura despues la cambiamos.
             var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
-            var pathTexturaCaja2 = MediaDir + "//Metal-floor_.png";
+            var texturaPisoDeMetal = MediaDir + "//Metal-floor_.png";
             var pathTexturaCaja3 = MediaDir + "//Piso2.jpg";
-            var pathTexturaCaja4 = MediaDir + "//cartelera2.jpg";
+            var texturaEstrella = MediaDir + "//Color_002.jpg";
             
             //var pathTexturaCaja3 = MediaDir + "//stones.bpn";
             // var pathTexturaCaja3 = MediaDir + Game.Default.TexturaCaja;
@@ -224,13 +224,13 @@ namespace TGC.Group.Model
             int escala = 10;
             suelos1 = completarLineaDeSuelosX(cantidad, pathTexturaCaja, 0, 0, 0, escala);
             int posx =cantidad* escala;
-            suelos2 = completarLineaDeSuelosZ(8, pathTexturaCaja2, posx, 0, 0, escala);
+            suelos2 = completarLineaDeSuelosZ(8, texturaPisoDeMetal, posx, 0, 0, escala);
             int posz = 8* escala;
             suelos3 = completarLineaDeSuelosX(cantidad, pathTexturaCaja, posx, 0, posz, escala);
             pared = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(10, 10, 10), TgcPlane.Orientations.YZplane, TgcTexture.createTexture(pathTexturaCaja), 10f, 10f);
             pared2 = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(10, 10, 10), TgcPlane.Orientations.XYplane, TgcTexture.createTexture(pathTexturaCaja), 10f, 10f);
             paredes1= completarParedZ(cantidad, pathTexturaCaja3, 0, 0, 0, escala);
-            paredes2 = completarParedX(8, pathTexturaCaja4, posx+escala, 0, 0, escala);
+            paredes2 = completarParedX(8, texturaEstrella, posx+escala, 0, 0, escala);
 
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
