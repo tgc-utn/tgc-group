@@ -38,7 +38,7 @@ namespace TGC.Group.Model
         //Config vars
         private float sensitivity = 53f;
         public TGCVector2 cam_angles = TGCVector2.Zero;
-        private const float CAMERA_MAX_X_ANGLE = 1.6f;
+        private const float CAMERA_MAX_X_ANGLE = 1.5f;
 
 
         private float speed = 25f; //foward and horizontal speed
@@ -55,7 +55,7 @@ namespace TGC.Group.Model
             GameplayUpdate(ElapsedTime);
             UpdateCamera(Input, Camara, ElapsedTime);
         }
-        public void Render() { mesh.BoundingBox.Render(); }
+        public void Render() { }
 
         private void CheckInputs(TgcD3dInput Input,TgcCamera Camara, float ElapsedTime)
         {
@@ -71,11 +71,11 @@ namespace TGC.Group.Model
             float hmov = d - a; //horizontal movement
             float vmov = space - ctrl; //vertical movement
 
-            TGCVector3 movement = GetCameraLookDir(Camara) * fmov + GetCameraLeftDir(Camara) * hmov + TGCVector3.Up * vmov;
-            movement *= speed * ElapsedTime;
+            TGCVector3 movement = GetCameraLookDir(Camara) * fmov * speed + GetCameraLeftDir(Camara) * hmov * speed + TGCVector3.Up * vmov * vspeed;
+            movement *= ElapsedTime;
             Move(movement);
 
-            Rotate(new TGCVector2(Input.XposRelative, Input.YposRelative) * sensitivity * ElapsedTime);
+            Rotate(new TGCVector2(Input.XposRelative, Input.YposRelative) * sensitivity * ElapsedTime); //De momento no sirve para nada
 
             //Dev
             bool p = Input.keyPressed(Key.P);

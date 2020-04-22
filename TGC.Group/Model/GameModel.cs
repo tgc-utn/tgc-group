@@ -60,8 +60,7 @@ namespace TGC.Group.Model
         {
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
-            focusWindows = d3dDevice.CreationParameters.FocusWindow;
-            mousePosition = focusWindows.PointToScreen(new Point(focusWindows.Width / 2, focusWindows.Height / 2));
+            
 
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
@@ -95,11 +94,13 @@ namespace TGC.Group.Model
             Camara.SetCamera(cameraPosition, lookAt);
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
+
+            focusWindows = d3dDevice.CreationParameters.FocusWindow;
+            mousePosition = focusWindows.PointToScreen(new Point(focusWindows.Width / 2, focusWindows.Height / 2));
+            Cursor.Hide();
+
             Player = new Player();
             Player.InitMesh();
-
-            
-            
         }
 
         /// <summary>
@@ -133,11 +134,12 @@ namespace TGC.Group.Model
             PreRender();
 
             //Dibuja un texto por pantalla
-            DrawText.drawText("Con la tecla P se activa el GodMode", 0, 20, Color.OrangeRed);
-            DrawText.drawText("Player Ypos: " + Player.Position().Y, 0, 35, Color.DarkRed);
-            DrawText.drawText("Health: " + Player.Health(), 0, 50, Color.DarkSalmon);
-            DrawText.drawText("Oxygen: " + Player.Oxygen(), 0, 60, Color.DarkSalmon);
-            DrawText.drawText("Camera: \n" + Player.cam_angles, 0, 80, Color.DarkGreen);
+            DrawText.drawText("Con la tecla P se activa el GodMode", 5, 20, Color.DarkKhaki);
+            DrawText.drawText("A,S,D,W para moverse, Ctrl y Espacio para subir o bajar.", 5, 35, Color.DarkKhaki);
+            DrawText.drawText("Player Ypos: " + Player.Position().Y, 5, 50, Color.DarkRed);
+            DrawText.drawText("Health: " + Player.Health(), 5, 70, Color.DarkSalmon);
+            DrawText.drawText("Oxygen: " + Player.Oxygen(), 5, 80, Color.DarkSalmon);
+            DrawText.drawText("Camera: \n" + Player.cam_angles, 5, 100, Color.DarkSalmon);
 
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
