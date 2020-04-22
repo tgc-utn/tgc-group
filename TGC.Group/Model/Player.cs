@@ -50,14 +50,14 @@ namespace TGC.Group.Model
 
         public void InitMesh() { mesh = TGCBox.fromSize(size, null); }
 
-        public void Update(TgcD3dInput Input,TgcCamera Camara, float ElapsedTime) { 
-            CheckInputs(Input, ElapsedTime); 
+        public void Update(TgcD3dInput Input,TgcCamera Camara, float ElapsedTime) {
+            CheckInputs(Input, Camara, ElapsedTime);
             GameplayUpdate(ElapsedTime);
             UpdateCamera(Input, Camara, ElapsedTime);
         }
         public void Render() { mesh.BoundingBox.Render(); }
 
-        private void CheckInputs(TgcD3dInput Input, float ElapsedTime)
+        private void CheckInputs(TgcD3dInput Input,TgcCamera Camara, float ElapsedTime)
         {
             //Gameplay
             int w = Input.keyDown(Key.W) ? 1 : 0;
@@ -67,11 +67,14 @@ namespace TGC.Group.Model
             int space = Input.keyDown(Key.Space) ? 1 : 0;
             int ctrl = Input.keyDown(Key.LeftControl) ? 1 : 0;
 
-            int fmov = s - w; //foward movement
-            int hmov = d - a; //horizontal movement
-            int vmov = space - ctrl; //vertical movement
+            float fmov = w - s; //foward movement
+            float hmov = d - a; //horizontal movement
+            float vmov = space - ctrl; //vertical movement
 
-            Move(new TGCVector3(hmov * speed, vmov * vspeed, fmov * speed) * ElapsedTime);
+            TGCVector3 movement = GetCameraLookDir(Camara) * fmov + GetCameraLeftDir(Camara) * hmov + TGCVector3.Up * vmov;
+            movement *= speed * ElapsedTime;
+            Move(movement);
+
             Rotate(new TGCVector2(Input.XposRelative, Input.YposRelative) * sensitivity * ElapsedTime);
 
             //Dev
@@ -109,6 +112,8 @@ namespace TGC.Group.Model
             Camara.SetCamera(pos, Position());
         }
 
+        private TGCVector3 GetCameraLookDir(TgcCamera Camara) { return TGCVector3.Normalize(Camara.LookAt - Camara.Position); }
+        private TGCVector3 GetCameraLeftDir(TgcCamera Camara) { return TGCVector3.Cross(GetCameraLookDir(Camara), Camara.UpVector); }
 
 
         //Gameplay functions
