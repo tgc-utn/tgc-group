@@ -15,7 +15,7 @@ namespace TGC.Group.Model
     ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
     ///     line 97.
     /// </summary>
-    public class GameModel : TgcExample
+    public class GameModel : TGCExample
     {
 
         /// <summary>
@@ -56,6 +56,11 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
             
+
+            //Utilizando esta propiedad puedo activar el update/render a intervalos constantes.
+            FixedTickEnable = true;
+            //Se puede configurar el tiempo en estas propiedades TimeBetweenUpdates y TimeBetweenRenders, por defecto esta puedo en 1F / FPS_60 es a lo minimo que deberia correr el TP.
+            //De no estar a gusto como se ejecuta el metodo Tick (el que maneja el GameLoop) el mismo es virtual con lo cual pueden sobrescribirlo.
 
             //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
             //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
@@ -108,7 +113,7 @@ namespace TGC.Group.Model
         ///     ante ellas.
         /// </summary>
         public override void Update()
-        {
+        { 
             PreUpdate();
 
             oceano.Update();
@@ -119,6 +124,7 @@ namespace TGC.Group.Model
             Cursor.Position = mousePosition;
             Player.Update(Input, Camara, ElapsedTime);
             PostUpdate();
+
         }
 
         /// <summary>
@@ -140,7 +146,6 @@ namespace TGC.Group.Model
             DrawText.drawText("Health: " + Player.Health(), 5, 70, Color.DarkSalmon);
             DrawText.drawText("Oxygen: " + Player.Oxygen(), 5, 80, Color.DarkSalmon);
             DrawText.drawText("Camera: \n" + Player.cam_angles, 5, 100, Color.DarkSalmon);
-
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
