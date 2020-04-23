@@ -1,16 +1,10 @@
 ﻿using Microsoft.DirectX.DirectInput;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TGC.Core.Camara;
-using TGC.Core.Example;
 using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
-using TGC.Core.Textures;
 
 namespace TGC.Group.Model
 {
@@ -55,7 +49,9 @@ namespace TGC.Group.Model
             GameplayUpdate(ElapsedTime);
             UpdateCamera(Input, Camara, ElapsedTime);
         }
-        public void Render() { mesh.BoundingBox.Render(); }
+        public void Render() {
+            
+        }
 
         private void CheckInputs(TgcD3dInput Input,TgcCamera Camara, float ElapsedTime)
         {
