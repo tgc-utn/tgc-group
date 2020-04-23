@@ -91,11 +91,11 @@ namespace TGC.Group.Model
             //Quiero que la camara mire hacia el origen (0,0,0).
             var lookAt = TGCVector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
-            Camara.SetCamera(cameraPosition, lookAt);
+            Camera.SetCamera(cameraPosition, lookAt);
 
             oceano = new Fondo(MediaDir, ShadersDir);
             oceano.Init();
-            oceano.Camara = Camara;
+            oceano.Camera = Camera;
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
 
@@ -122,7 +122,7 @@ namespace TGC.Group.Model
          
 
             Cursor.Position = mousePosition;
-            Player.Update(Input, Camara, ElapsedTime);
+            Player.Update(Input, Camera, ElapsedTime);
             PostUpdate();
 
         }
