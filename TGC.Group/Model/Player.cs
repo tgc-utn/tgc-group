@@ -1,16 +1,10 @@
 ﻿using Microsoft.DirectX.DirectInput;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TGC.Core.Camara;
-using TGC.Core.Example;
 using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
-using TGC.Core.Textures;
 
 namespace TGC.Group.Model
 {
@@ -55,6 +49,7 @@ namespace TGC.Group.Model
             GameplayUpdate(ElapsedTime);
             UpdateCamera(Input, Camara, ElapsedTime);
         }
+
         public void Render() { }
 
         private void CheckInputs(TgcD3dInput Input,TgcCamera Camara, float ElapsedTime)
@@ -62,13 +57,13 @@ namespace TGC.Group.Model
             //Gameplay
             int w = Input.keyDown(Key.W) ? 1 : 0;
             int s = Input.keyDown(Key.S) ? 1 : 0;
-            int d = Input.keyDown(Key.A) ? 1 : 0;
-            int a = Input.keyDown(Key.D) ? 1 : 0;
+            int d = Input.keyDown(Key.D) ? 1 : 0;
+            int a = Input.keyDown(Key.A) ? 1 : 0;
             int space = Input.keyDown(Key.Space) ? 1 : 0;
             int ctrl = Input.keyDown(Key.LeftControl) ? 1 : 0;
 
             float fmov = w - s; //foward movement
-            float hmov = d - a; //horizontal movement
+            float hmov = a - d; //horizontal movement
             float vmov = space - ctrl; //vertical movement
 
             TGCVector3 movement = GetCameraLookDir(Camara) * fmov * speed + GetCameraLeftDir(Camara) * hmov * speed + TGCVector3.Up * vmov * vspeed;

@@ -1,13 +1,8 @@
-using BulletSharp.Math;
-using Microsoft.DirectX.DirectInput;
-using System;
 using System.Drawing;
 using System.Windows.Forms;
-using TGC.Core.Camara;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
-using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
@@ -35,9 +30,9 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
+        Fondo oceano;
         Control focusWindows;
         Point mousePosition;
-
 
         //Caja que se muestra en el ejemplo.
         private TGCBox Box { get; set; }
@@ -48,7 +43,7 @@ namespace TGC.Group.Model
         private bool BoundingBox { get; set; }
 
         private Player Player { get; set; }
-        
+
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -57,7 +52,7 @@ namespace TGC.Group.Model
         ///     Borrar el codigo ejemplo no utilizado.
         /// </summary>
         public override void Init()
-        {
+        { 
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
             
@@ -92,6 +87,10 @@ namespace TGC.Group.Model
             var lookAt = TGCVector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara.SetCamera(cameraPosition, lookAt);
+
+            oceano = new Fondo(MediaDir, ShadersDir);
+            oceano.Init();
+            oceano.Camara = Camara;
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
 
@@ -112,11 +111,10 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
-            //Capturar Input teclado
-            if (Input.keyPressed(Key.F))
-            {
-                BoundingBox = !BoundingBox;
-            }
+            oceano.Update();
+           
+            BoundingBox = false;
+         
 
             Cursor.Position = mousePosition;
             Player.Update(Input, Camara, ElapsedTime);
@@ -132,6 +130,8 @@ namespace TGC.Group.Model
         {
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
+
+            oceano.Render();
 
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla P se activa el GodMode", 5, 20, Color.DarkKhaki);
@@ -177,11 +177,10 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Dispose()
         {
-            //Dispose de la caja.
             Box.Dispose();
-            //Dispose del mesh.
             Mesh.Dispose();
             Player.Dispose();
+            oceano.Dispose();
         }
     }
 }
