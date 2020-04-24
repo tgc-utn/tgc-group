@@ -30,7 +30,7 @@ namespace TGC.Group.Model
         private TGCQuaternion rotation = TGCQuaternion.Identity;
 
         //Config vars
-        private float sensitivity = 53f;
+        private float sensitivity = 10f;
         public TGCVector2 cam_angles = TGCVector2.Zero;
         private const float CAMERA_MAX_X_ANGLE = 1.5f;
 

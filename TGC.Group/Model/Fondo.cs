@@ -6,7 +6,7 @@ using TGC.Core.Mathematica;
 
 namespace TGC.Group.Model
 {
-    public class Fondo : TgcExample
+    public class Fondo : TGCExample
     {
         //Herramienta para crear la caja que simula el ambiente
         private TgcSkyBox skyBox;
@@ -50,7 +50,7 @@ namespace TGC.Group.Model
             D3DDevice.Instance.Device.Transform.Projection = TGCMatrix.PerspectiveFovLH(D3DDevice.Instance.FieldOfView, D3DDevice.Instance.AspectRatio,
                    D3DDevice.Instance.ZNearPlaneDistance, D3DDevice.Instance.ZFarPlaneDistance * 2f).ToMatrix();
             //Coloco a la camara en el centro del cubo
-            skyBox.Center = Camara.Position;
+            skyBox.Center = Camera.Position;
         }
 
         public override void Render()
