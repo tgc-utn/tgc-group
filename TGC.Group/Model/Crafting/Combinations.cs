@@ -10,7 +10,12 @@ namespace TGC.Group.Model.Crafting
     //Esta clase almacena todas las posibles combinaciones en el juego y tambien las produce para cualquier inventario.
     static class Combinations
     {
-        private static List<Combination> combinations = new List<Combination>();
+        private static List<Combination> combinations = new List<Combination>() {
+
+            new Combination(new Item("Hierro", 25), new Item("Oro", 10), new Item("Escopeta", 1))
+
+        };
+
 
         public static Item Combine(Item a, Item b) {
             var combination = GetCombination(a, b);

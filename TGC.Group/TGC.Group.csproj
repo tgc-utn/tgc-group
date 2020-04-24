@@ -101,9 +101,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\Crafting\Combination.cs" />
+    <Compile Include="Model\Crafting\Combinations.cs" />
+    <Compile Include="Model\Crafting\Inventory.cs" />
+    <Compile Include="Model\Crafting\Item.cs" />
     <Compile Include="Model\Fondo.cs" />
     <Compile Include="Model\GameModel.cs" />
-    <Compile Include="Model\Item.cs" />
     <Compile Include="Model\Pez.cs" />
     <Compile Include="Model\Player.cs" />
     <Compile Include="Program.cs" />
@@ -111,6 +114,8 @@
     <EmbeddedResource Include="Form\GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="obj\x86\Debug\TGC.Group.Form.GameForm.resources" />
+    <EmbeddedResource Include="obj\x86\Debug\TGC.Group.Properties.Resources.resources" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -121,10 +126,20 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="bin\x86\Debug\BulletSharp.dll.config" />
+    <None Include="bin\x86\Debug\libbulletc-linux-x64.so" />
+    <None Include="bin\x86\Debug\libbulletc-linux-x86.so" />
+    <None Include="bin\x86\Debug\TGC.Group.exe.config" />
     <None Include="Game.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Game.Designer.cs</LastGenOutput>
     </None>
+    <None Include="obj\x86\Debug\build.force" />
+    <None Include="obj\x86\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="obj\x86\Debug\TGC.Group.csproj.CopyComplete" />
+    <None Include="obj\x86\Debug\TGC.Group.csproj.CoreCompileInputs.cache" />
+    <None Include="obj\x86\Debug\TGC.Group.csproj.GenerateResource.cache" />
+    <None Include="obj\x86\Debug\TGC.Group.csprojAssemblyReference.cache" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -176,10 +191,47 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="bin\x86\Debug\BulletSharp.dll" />
+    <Content Include="bin\x86\Debug\libbulletc-windows-x64.dll" />
+    <Content Include="bin\x86\Debug\libbulletc-windows-x86.dll" />
+    <Content Include="bin\x86\Debug\libbulletc.dll" />
+    <Content Include="bin\x86\Debug\Microsoft.DirectX.Direct3D.dll" />
+    <Content Include="bin\x86\Debug\Microsoft.DirectX.Direct3D.xml" />
+    <Content Include="bin\x86\Debug\Microsoft.DirectX.Direct3DX.dll" />
+    <Content Include="bin\x86\Debug\Microsoft.DirectX.Direct3DX.xml" />
+    <Content Include="bin\x86\Debug\Microsoft.DirectX.DirectInput.dll" />
+    <Content Include="bin\x86\Debug\Microsoft.DirectX.DirectInput.xml" />
+    <Content Include="bin\x86\Debug\Microsoft.DirectX.DirectSound.dll" />
+    <Content Include="bin\x86\Debug\Microsoft.DirectX.DirectSound.xml" />
+    <Content Include="bin\x86\Debug\Microsoft.DirectX.dll" />
+    <Content Include="bin\x86\Debug\Microsoft.DirectX.xml" />
+    <Content Include="bin\x86\Debug\Shaders\TgcKeyFrameMeshShader.fx" />
+    <Content Include="bin\x86\Debug\Shaders\TgcMeshPhongShader.fx" />
+    <Content Include="bin\x86\Debug\Shaders\TgcMeshPointLightShader.fx" />
+    <Content Include="bin\x86\Debug\Shaders\TgcMeshShader.fx" />
+    <Content Include="bin\x86\Debug\Shaders\TgcMeshSpotLightShader.fx" />
+    <Content Include="bin\x86\Debug\Shaders\TgcSkeletalMeshPointLightShader.fx" />
+    <Content Include="bin\x86\Debug\Shaders\TgcSkeletalMeshShader.fx" />
+    <Content Include="bin\x86\Debug\Shaders\Varios.fx" />
+    <Content Include="bin\x86\Debug\TGC.Core.dll" />
+    <Content Include="bin\x86\Debug\TGC.Core.pdb" />
+    <Content Include="bin\x86\Debug\TGC.Core.xml" />
+    <Content Include="bin\x86\Debug\TGC.Group.exe" />
+    <Content Include="bin\x86\Debug\TGC.Group.pdb" />
     <Content Include="Media\cajaMadera4.jpg" />
     <Content Include="Media\Textures\fish.jpg" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
     <Content Include="Media\yellow_fish-TgcScene.xml" />
+    <Content Include="obj\x86\Debug\TempPE\Properties.Resources.Designer.cs.dll" />
+    <Content Include="obj\x86\Debug\TGC.Group.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\x86\Debug\TGC.Group.exe" />
+    <Content Include="obj\x86\Debug\TGC.Group.pdb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Debug\" />
+    <Folder Include="bin\Release\" />
+    <Folder Include="bin\x86\Release\" />
+    <Folder Include="obj\Debug\TempPE\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
