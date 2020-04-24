@@ -35,10 +35,14 @@ namespace TGC.Group.Model
         private TgcPlane suelo;
 
         private TgcPlane[] suelos1;
-        private TgcPlane[] paredes1;
+        private TgcPlane[] paredes11;
+        private TgcPlane[] paredes12;
         private TgcPlane[] suelos2;
-        private TgcPlane[] paredes2;
+        private TgcPlane[] paredes21;
+        private TgcPlane[] paredes22;
         private TgcPlane[] suelos3;
+        private TgcPlane[] paredes31;
+        private TgcPlane[] paredes32;
         private TgcPlane pared;
         private TgcPlane pared2;
         TgcSkyBox skyBox;
@@ -220,17 +224,32 @@ namespace TGC.Group.Model
             //Definimos caracteristicas del suelo
             //suelo = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(50, 50, 50), TgcPlane.Orientations.XZplane, pisoTexture, 10f, 10f);
 
-            int cantidad = 4;
+            int cantidadEspacio1 = 4;
             int escala = 10;
-            suelos1 = completarLineaDeSuelosX(cantidad, pathTexturaCaja, 0, 0, 0, escala);
-            int posx =cantidad* escala;
-            suelos2 = completarLineaDeSuelosZ(8, texturaPisoDeMetal, posx, 0, 0, escala);
-            int posz = 8* escala;
-            suelos3 = completarLineaDeSuelosX(cantidad, pathTexturaCaja, posx, 0, posz, escala);
+            // Pasillo 1 (0,0,0) -> (6x10,0,0)
+
+            suelos1 = completarLineaDeSuelosX(6, pathTexturaCaja, 0, 0, 0, escala);
+            paredes11 = completarParedZ((6 + 1), pathTexturaCaja3, 0, 0, 0, escala);
+            paredes12 = completarParedZ(6, pathTexturaCaja3, 0, 0, 1*escala, escala);
+
+            //Pasillo 2 (6x10,0,0) -> (6x10,0,6x10)
+
+            suelos2 = completarLineaDeSuelosZ(6, texturaPisoDeMetal, 6* escala, 0, 0, escala);
+            paredes21= completarParedX(6, texturaEstrella, (1 + 6) * escala, 0, 0, escala);
+            paredes22 = completarParedX(6, texturaEstrella, (0 + 6) * escala, 0, 1 * escala, escala);
+
+            //Pasillo 3 (6x10,0,6x10) -> (6x10,0,12x10)
+            //int posz = 8* escala;
+
+            suelos3 = completarLineaDeSuelosX(6, pathTexturaCaja, 6*escala, 0, 6*escala, escala);
+            paredes31 = completarParedZ(5, pathTexturaCaja3, (1+6) * escala, 0, 6 * escala, escala);
+            paredes32 = completarParedZ((1+5), pathTexturaCaja3, (0 + 6) * escala, 0, (1+6) * escala, escala);
+
+
             pared = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(10, 10, 10), TgcPlane.Orientations.YZplane, TgcTexture.createTexture(pathTexturaCaja), 10f, 10f);
             pared2 = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(10, 10, 10), TgcPlane.Orientations.XYplane, TgcTexture.createTexture(pathTexturaCaja), 10f, 10f);
-            paredes1= completarParedZ(cantidad, pathTexturaCaja3, 0, 0, 0, escala);
-            paredes2 = completarParedX(8, texturaEstrella, posx+escala, 0, 0, escala);
+            
+           // paredes2 = completarParedX(8, texturaEstrella, posx+escala, 0, 0, escala);
 
 
             //Suelen utilizarse objetos que manejan el comportamiento de la camara.
@@ -308,8 +327,12 @@ namespace TGC.Group.Model
             mostrarArrayPlano(suelos3);
             pared.Render();
             pared2.Render();
-            mostrarArrayPlano(paredes1);
-            mostrarArrayPlano(paredes2);
+            mostrarArrayPlano(paredes11);
+            mostrarArrayPlano(paredes12);
+            mostrarArrayPlano(paredes21);
+            mostrarArrayPlano(paredes22);
+            mostrarArrayPlano(paredes31);
+            mostrarArrayPlano(paredes32);
             skyBox.Render();
 
 
