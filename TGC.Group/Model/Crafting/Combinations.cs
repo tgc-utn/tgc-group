@@ -7,6 +7,7 @@ using System.Windows.Forms;
 
 namespace TGC.Group.Model.Crafting
 {
+    //Esta clase almacena todas las posibles combinaciones en el juego y tambien las produce para cualquier inventario.
     static class Combinations
     {
         private static List<Combination> combinations = new List<Combination>();
@@ -25,19 +26,27 @@ namespace TGC.Group.Model.Crafting
 
         private static bool CanCombine(Item a, Item b, Combination combination) { return combination.IsEnough(a, b); }
 
+
         //List Functions//
+
         private static Combination GetCombination(Item a, Item b) { return combinations.Find(c => CombinationMatches(c, a, b)); }
+
         private static bool CombinationMatches(Combination combination, Item a, Item b)
         {
             //Check
-            if (combination.ItemA().IsSameItem(a))
-                if (combination.ItemB().IsSameItem(b))
+            if (combination.IsSameItemA(a))
+                if (combination.IsSameItemB(b))
                     return true;
-            //Check but reversed
-            if (combination.ItemB().IsSameItem(a))
-                if (combination.ItemA().IsSameItem(b))
+
+            /*Check but reversed
+            if (combination.IsSameItemB(a))
+                if (combination.IsSameItemA(b))
                     return true;
+            */
+
+            //Not the same
             return false;
         }
+
     }
 }

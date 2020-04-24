@@ -16,6 +16,7 @@ namespace TGC.Group.Model
         public void Take(int amount) { this.amount -= amount; }
         public void Add(int amount) { this.amount += amount; }
         public bool IsSameItem(Item item) { return this.name == item.name; }
+        public bool NoAmountLeft() { return amount <= 0; }
 
         public int Amount() { return amount; }
     }
