@@ -104,6 +104,7 @@
     <Compile Include="Model\Fondo.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\Item.cs" />
+    <Compile Include="Model\Pez.cs" />
     <Compile Include="Model\Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -176,7 +177,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Media\cajaMadera4.jpg" />
+    <Content Include="Media\Textures\fish.jpg" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
+    <Content Include="Media\yellow_fish-TgcScene.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

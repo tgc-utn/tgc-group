@@ -33,6 +33,7 @@ namespace TGC.Group.Model
         Fondo oceano;
         Control focusWindows;
         Point mousePosition;
+        Pez pez;
 
         //Caja que se muestra en el ejemplo.
         private TGCBox Box { get; set; }
@@ -94,6 +95,10 @@ namespace TGC.Group.Model
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
 
+            // Cargo un pez
+            pez = new Pez(MediaDir, ShadersDir);
+            pez.Init();
+
             focusWindows = d3dDevice.CreationParameters.FocusWindow;
             mousePosition = focusWindows.PointToScreen(new Point(focusWindows.Width / 2, focusWindows.Height / 2));
             Cursor.Hide();
@@ -112,6 +117,7 @@ namespace TGC.Group.Model
             PreUpdate();
 
             oceano.Update();
+            pez.Update();
            
             BoundingBox = false;
          
@@ -132,6 +138,7 @@ namespace TGC.Group.Model
             PreRender();
 
             oceano.Render();
+            pez.Render();
 
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla P se activa el GodMode", 5, 20, Color.DarkKhaki);
@@ -181,6 +188,7 @@ namespace TGC.Group.Model
             Mesh.Dispose();
             Player.Dispose();
             oceano.Dispose();
+            pez.Dispose();
         }
     }
 }
