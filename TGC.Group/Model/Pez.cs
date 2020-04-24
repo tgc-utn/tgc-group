@@ -21,12 +21,16 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
+        public void actualizarPosicion(TGCVector3 posicion)
+        {
+            mesh.Position = posicion;
+        }
+
         public override void Init()
         {
             var loader = new TgcSceneLoader();
             var scene = loader.loadSceneFromFile(MediaDir + "yellow_fish-TgcScene.xml");
             mesh = scene.Meshes[0];
-            mesh.Position = new TGCVector3(10, 0, 15);
             mesh.Transform = TGCMatrix.Translation(-25, 0, 0);
             mesh.Scale = new TGCVector3(0.3f, 0.3f, 0.3f);
         }

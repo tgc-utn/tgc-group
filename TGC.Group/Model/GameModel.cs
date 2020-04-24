@@ -98,6 +98,7 @@ namespace TGC.Group.Model
             // Cargo un pez
             pez = new Pez(MediaDir, ShadersDir);
             pez.Init();
+            pez.actualizarPosicion(new TGCVector3(10, 0, 15));
 
             focusWindows = d3dDevice.CreationParameters.FocusWindow;
             mousePosition = focusWindows.PointToScreen(new Point(focusWindows.Width / 2, focusWindows.Height / 2));
