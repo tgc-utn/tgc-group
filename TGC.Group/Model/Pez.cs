@@ -9,7 +9,7 @@ namespace TGC.Group.Model
     public class Pez : TGCExample
     {
 
-        private const float VELOCIDAD = 0.05f;
+        private const float VELOCIDAD = 0.1f;
         private TgcMesh mesh;
         private float movidoEnX = 0f;
         private bool sentidoEnXEsPositivo = true;
@@ -23,6 +23,7 @@ namespace TGC.Group.Model
 
         public void actualizarPosicion(TGCVector3 posicion)
         {
+            // todo: actualizar, mesh position esta deprecado
             mesh.Position = posicion;
         }
 
@@ -31,8 +32,10 @@ namespace TGC.Group.Model
             var loader = new TgcSceneLoader();
             var scene = loader.loadSceneFromFile(MediaDir + "yellow_fish-TgcScene.xml");
             mesh = scene.Meshes[0];
-            mesh.Transform = TGCMatrix.Translation(-25, 0, 0);
-            mesh.Scale = new TGCVector3(0.3f, 0.3f, 0.3f);
+            TGCQuaternion rotationY = TGCQuaternion.RotationAxis(new TGCVector3(-25f, 0f, 0f), 0);
+            mesh.Transform = TGCMatrix.Scaling(0.3f, 0.3f, 0.3f) * TGCMatrix.RotationTGCQuaternion(rotationY)
+                * TGCMatrix.Translation(-25, 0, 0);
+            //mesh.Scale = new TGCVector3(0.3f, 0.3f, 0.3f);
         }
         public override void Update()
         {
@@ -45,8 +48,11 @@ namespace TGC.Group.Model
             {
                 // tengo que girar mi pez y moverme para el otro lado
 
-                mesh.Rotation -= new TGCVector3(0, FastMath.PI, 0);
-                mesh.Transform = TGCMatrix.RotationY(mesh.Rotation.Y);
+                //mesh.Rotation -= new TGCVector3(0, FastMath.PI, 0);
+                TGCQuaternion rotationY = TGCQuaternion.RotationAxis(new TGCVector3(0f, FastMath.PI, 0f), 0);
+                mesh.Transform -= TGCMatrix.Scaling(0.3f, 0.3f, 0.3f) * TGCMatrix.RotationTGCQuaternion(rotationY)
+                    * TGCMatrix.Translation(-25, 0, 0);
+                //mesh.Transform = TGCMatrix.RotationY(mesh.Rotation.Y);
                 sentidoEnXEsPositivo = movidoEnX < -500f;
             }
 
@@ -59,6 +65,7 @@ namespace TGC.Group.Model
 
             //Multiplicar movimiento por velocidad y elapsedTime
             movement *= VELOCIDAD * ElapsedTime;
+            // todo: actualizar, mesh position esta deprecado
             mesh.Position = mesh.Position + movement;
             mesh.Transform = TGCMatrix.Translation(mesh.Position);            
         }
