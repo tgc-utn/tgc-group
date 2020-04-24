@@ -6,7 +6,7 @@ using TGC.Core.SceneLoader;
 
 namespace TGC.Group.Model
 {
-    public class Pez : TgcExample
+    public class Pez : TGCExample
     {
 
         private const float VELOCIDAD = 0.05f;
