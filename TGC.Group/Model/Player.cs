@@ -5,13 +5,14 @@ using TGC.Core.Camara;
 using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
+using TGC.Group.Model.Crafting;
 
 namespace TGC.Group.Model
 {
     class Player
     {
         //Gameplay vars
-        private List<Item> inventory;
+        private Inventory inventory = new Inventory();
         private float oxygen = 100f;
         private float health = 100f;
 
