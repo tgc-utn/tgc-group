@@ -46,7 +46,6 @@ namespace TGC.Group.Model
                 // tengo que girar mi pez y moverme para el otro lado
 
                 mesh.Rotation -= new TGCVector3(0, FastMath.PI, 0);
-                mesh.Transform = TGCMatrix.RotationY(mesh.Rotation.Y);
                 sentidoEnXEsPositivo = movidoEnX < -500f;
             }
 
@@ -60,7 +59,7 @@ namespace TGC.Group.Model
             //Multiplicar movimiento por velocidad y elapsedTime
             movement *= VELOCIDAD * ElapsedTime;
             mesh.Position = mesh.Position + movement;
-            mesh.Transform = TGCMatrix.Translation(mesh.Position);            
+            mesh.Transform = TGCMatrix.RotationY(mesh.Rotation.Y) * TGCMatrix.Translation(mesh.Position);            
         }
         public override void Render()
         {
