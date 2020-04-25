@@ -47,7 +47,6 @@ namespace TGC.Group.Model
             if (movidoEnX > 1250f || movidoEnX < -500f)
             {
                 // tengo que girar mi pez y moverme para el otro lado
-
                 //mesh.Rotation -= new TGCVector3(0, FastMath.PI, 0);
                 TGCQuaternion rotationY = TGCQuaternion.RotationAxis(new TGCVector3(0f, FastMath.PI, 0f), 0);
                 mesh.Transform -= TGCMatrix.Scaling(0.3f, 0.3f, 0.3f) * TGCMatrix.RotationTGCQuaternion(rotationY)
@@ -67,7 +66,7 @@ namespace TGC.Group.Model
             movement *= VELOCIDAD * ElapsedTime;
             // todo: actualizar, mesh position esta deprecado
             mesh.Position = mesh.Position + movement;
-            mesh.Transform = TGCMatrix.Translation(mesh.Position);            
+            mesh.Transform = TGCMatrix.RotationY(mesh.Rotation.Y) * TGCMatrix.Translation(mesh.Position);            
         }
         public override void Render()
         {
