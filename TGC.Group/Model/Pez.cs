@@ -13,7 +13,7 @@ namespace TGC.Group.Model
         private TgcMesh mesh;
         private float movidoEnX = 0f;
         private bool sentidoEnXEsPositivo = true;
-        private TGCMatrix escalaBaseRotacion;
+        private TGCMatrix escalaBase;
         private TGCMatrix traslacionBase = TGCMatrix.Translation(new TGCVector3(0.0f, 0.0f, 0.0f));
         private TGCVector3 rotacion = new TGCVector3(0, 0, 0);
 
@@ -34,7 +34,7 @@ namespace TGC.Group.Model
             var loader = new TgcSceneLoader();
             var scene = loader.loadSceneFromFile(MediaDir + "yellow_fish-TgcScene.xml");
             mesh = scene.Meshes[0];
-            escalaBaseRotacion = TGCMatrix.Scaling(new TGCVector3(0.3f, 0.3f, 0.3f));
+            escalaBase = TGCMatrix.Scaling(new TGCVector3(0.3f, 0.3f, 0.3f));
         }
 
         public override void Update()
@@ -53,7 +53,7 @@ namespace TGC.Group.Model
 
             //Multiplicar movimiento por velocidad y elapsedTime
             TGCMatrix traslacion = traslacionBase * TGCMatrix.Translation(movidoEnX, 0, 0);
-            mesh.Transform = escalaBaseRotacion * TGCMatrix.RotationY(rotacion.Y) * traslacion;            
+            mesh.Transform = escalaBase * TGCMatrix.RotationY(rotacion.Y) * traslacion;            
         }
         public override void Render()
         {

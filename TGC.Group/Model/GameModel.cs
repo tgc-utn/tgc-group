@@ -33,7 +33,10 @@ namespace TGC.Group.Model
         Fondo oceano;
         Control focusWindows;
         Point mousePosition;
+        // todo: probablemente deleguemos la generacion de peces en otra clase
+        // para la primer entrega lo dejamos asi
         Pez pez;
+        Pez otroPez;
 
         //Caja que se muestra en el ejemplo.
         private TGCBox Box { get; set; }
@@ -105,6 +108,11 @@ namespace TGC.Group.Model
             pez.Init();
             pez.actualizarPosicion(new TGCVector3(10, 0, 15));
 
+            otroPez = new Pez(MediaDir, ShadersDir);
+            otroPez.Init();
+            otroPez.actualizarPosicion(new TGCVector3(10, 10, 15));
+
+
             focusWindows = d3dDevice.CreationParameters.FocusWindow;
             mousePosition = focusWindows.PointToScreen(new Point(focusWindows.Width / 2, focusWindows.Height / 2));
             Cursor.Hide();
@@ -124,7 +132,8 @@ namespace TGC.Group.Model
 
             oceano.Update();
             pez.Update();
-           
+            otroPez.Update();
+
             BoundingBox = false;
          
 
@@ -146,6 +155,7 @@ namespace TGC.Group.Model
 
             oceano.Render();
             pez.Render();
+            otroPez.Render();
 
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla P se activa el GodMode", 5, 20, Color.DarkKhaki);
@@ -195,6 +205,7 @@ namespace TGC.Group.Model
             Player.Dispose();
             oceano.Dispose();
             pez.Dispose();
+            otroPez.Dispose();
         }
     }
 }
