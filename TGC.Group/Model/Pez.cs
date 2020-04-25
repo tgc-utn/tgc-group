@@ -9,10 +9,13 @@ namespace TGC.Group.Model
     public class Pez : TGCExample
     {
 
-        private const float VELOCIDAD = 0.1f;
+        private const float VELOCIDAD = 0.15f;
         private TgcMesh mesh;
         private float movidoEnX = 0f;
         private bool sentidoEnXEsPositivo = true;
+        private TGCMatrix escalaBaseRotacion;
+        private TGCMatrix traslacionBase = TGCMatrix.Translation(new TGCVector3(0.0f, 0.0f, 0.0f));
+        private TGCVector3 rotacion = new TGCVector3(0, 0, 0);
 
         public Pez(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
@@ -23,8 +26,7 @@ namespace TGC.Group.Model
 
         public void actualizarPosicion(TGCVector3 posicion)
         {
-            // todo: actualizar, mesh position esta deprecado
-            mesh.Position = posicion;
+            traslacionBase = TGCMatrix.Translation(posicion);
         }
 
         public override void Init()
@@ -32,41 +34,26 @@ namespace TGC.Group.Model
             var loader = new TgcSceneLoader();
             var scene = loader.loadSceneFromFile(MediaDir + "yellow_fish-TgcScene.xml");
             mesh = scene.Meshes[0];
-            TGCQuaternion rotationY = TGCQuaternion.RotationAxis(new TGCVector3(-25f, 0f, 0f), 0);
-            mesh.Transform = TGCMatrix.Scaling(0.3f, 0.3f, 0.3f) * TGCMatrix.RotationTGCQuaternion(rotationY)
-                * TGCMatrix.Translation(-25, 0, 0);
-            //mesh.Scale = new TGCVector3(0.3f, 0.3f, 0.3f);
+            escalaBaseRotacion = TGCMatrix.Scaling(new TGCVector3(0.3f, 0.3f, 0.3f));
         }
+
         public override void Update()
         {
-            //Declaramos un vector de movimiento inicializado en cero.
-            //El movimiento sobre el suelo es sobre el plano XZ.
-            //Sobre XZ nos movemos con las flechas del teclado o con las letas WASD.
-            var movement = TGCVector3.Empty;
+            //Movimiento de derecha a izquierda, va y vuelve
             var direccionX = sentidoEnXEsPositivo ? 1f : -1f;
-            if (movidoEnX > 1250f || movidoEnX < -500f)
+            if (movidoEnX > 20f || movidoEnX < -70f)
             {
                 // tengo que girar mi pez y moverme para el otro lado
-                //mesh.Rotation -= new TGCVector3(0, FastMath.PI, 0);
-                TGCQuaternion rotationY = TGCQuaternion.RotationAxis(new TGCVector3(0f, FastMath.PI, 0f), 0);
-                mesh.Transform -= TGCMatrix.Scaling(0.3f, 0.3f, 0.3f) * TGCMatrix.RotationTGCQuaternion(rotationY)
-                    * TGCMatrix.Translation(-25, 0, 0);
-                //mesh.Transform = TGCMatrix.RotationY(mesh.Rotation.Y);
-                sentidoEnXEsPositivo = movidoEnX < -500f;
+                rotacion -= new TGCVector3(0, FastMath.PI, 0);
+                sentidoEnXEsPositivo = movidoEnX > -70f;
             }
 
-
             //Movernos de izquierda a derecha, sobre el eje X.
-            movement.X = direccionX;
-            //movement.Z = -1;
-
-            movidoEnX += direccionX;
+            movidoEnX += direccionX * VELOCIDAD * ElapsedTime;
 
             //Multiplicar movimiento por velocidad y elapsedTime
-            movement *= VELOCIDAD * ElapsedTime;
-            // todo: actualizar, mesh position esta deprecado
-            mesh.Position = mesh.Position + movement;
-            mesh.Transform = TGCMatrix.RotationY(mesh.Rotation.Y) * TGCMatrix.Translation(mesh.Position);            
+            TGCMatrix traslacion = traslacionBase * TGCMatrix.Translation(movidoEnX, 0, 0);
+            mesh.Transform = escalaBaseRotacion * TGCMatrix.RotationY(rotacion.Y) * traslacion;            
         }
         public override void Render()
         {
