@@ -45,6 +45,9 @@ namespace TGC.Group.Model
         private TgcPlane[] paredes32;
         private TgcPlane pared;
         private TgcPlane pared2;
+        private TGCVector3 posicionCamara;
+        private TGCVector3 objetivo;
+
         TgcSkyBox skyBox;
 
         private TgcPlane[] completarLineaDeSuelosX( int cantidadDeSuelo, string DireccionTextura, float X, float Y,float Z, float escala) {
@@ -246,8 +249,8 @@ namespace TGC.Group.Model
             paredes32 = completarParedZ((1+5), pathTexturaCaja3, (0 + 6) * escala, 0, (1+6) * escala, escala);
 
 
-            pared = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(10, 10, 10), TgcPlane.Orientations.YZplane, TgcTexture.createTexture(pathTexturaCaja), 10f, 10f);
-            pared2 = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(10, 10, 10), TgcPlane.Orientations.XYplane, TgcTexture.createTexture(pathTexturaCaja), 10f, 10f);
+            //pared = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(10, 10, 10), TgcPlane.Orientations.YZplane, TgcTexture.createTexture(pathTexturaCaja), 10f, 10f);
+           // pared2 = new TgcPlane(new TGCVector3(0, 0, 0), new TGCVector3(10, 10, 10), TgcPlane.Orientations.XYplane, TgcTexture.createTexture(pathTexturaCaja), 10f, 10f);
             
            // paredes2 = completarParedX(8, texturaEstrella, posx+escala, 0, 0, escala);
 
@@ -256,9 +259,10 @@ namespace TGC.Group.Model
             //Lo que en realidad necesitamos gráficamente es una matriz de View.
             //El framework maneja una cámara estática, pero debe ser inicializada.
             //Posición de la camara.
-            var cameraPosition = new TGCVector3(0, 10, 125);
+            var cameraPosition = new TGCVector3(5, 5, 5);
             //Quiero que la camara mire hacia el origen (0,0,0).
-            var lookAt = TGCVector3.Empty;
+            //var lookAt = TGCVector3.Empty;
+            var lookAt = new TGCVector3(10, 5, 15);
             //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camara.SetCamera(cameraPosition, lookAt);
             //Internamente el framework construye la matriz de view con estos dos vectores.
@@ -274,34 +278,65 @@ namespace TGC.Group.Model
         {
             PreUpdate();
 
+            posicionCamara = Camara.Position;
+            
+            
+            //Hay que ver como calcular esto.
+            objetivo = Camara.LookAt;
+
             if (Input.keyPressed(Key.W))
             {
-                Camara.SetCamera(Camara.Position + new TGCVector3(10f, 0, 0), Camara.LookAt);
+                Camara.SetCamera( (Camara.Position + (objetivo - Camara.Position)) , Camara.LookAt + (objetivo - Camara.Position));
             }
 
             if (Input.keyPressed(Key.S))
             {
-                Camara.SetCamera(Camara.Position + new TGCVector3(-10f, 0, 0), Camara.LookAt);
+                Camara.SetCamera((Camara.Position - (objetivo - Camara.Position)), Camara.LookAt - (objetivo - Camara.Position));
             }
 
             if (Input.keyPressed(Key.A))
             {
-                Camara.SetCamera(Camara.Position + new TGCVector3(0, 0, 10f), Camara.LookAt);
+                Camara.SetCamera(Camara.Position + new TGCVector3(0, 0, 1f), Camara.LookAt  +new TGCVector3(0, 0, 1f));
             }
 
             if (Input.keyPressed(Key.D))
             {
-                Camara.SetCamera(Camara.Position + new TGCVector3(0, 0, -10), Camara.LookAt);
+                Camara.SetCamera(Camara.Position + new TGCVector3(0, 0, -1), Camara.LookAt + new TGCVector3(0, 0, -1));
             }
 
             if (Input.keyPressed(Key.Space))
             {
-                Camara.SetCamera(Camara.Position + new TGCVector3(0f, 10f, 0), Camara.LookAt);
+                Camara.SetCamera(Camara.Position + new TGCVector3(0f, 1f, 0), Camara.LookAt + new TGCVector3(0f, 1f, 0));
             }
 
             if (Input.keyPressed(Key.LeftControl))
             {
-                Camara.SetCamera(Camara.Position + new TGCVector3(0, -10f, 0), Camara.LookAt);
+                Camara.SetCamera(Camara.Position + new TGCVector3(0, -1f, 0), Camara.LookAt + new TGCVector3(0, -1f, 0));
+            }
+
+            if (Input.keyPressed(Key.UpArrow))
+            {
+                Camara.SetCamera(Camara.Position , Camara.LookAt + new TGCVector3(0, 1f, 0));
+                objetivo = Camara.LookAt;
+            }
+
+            if (Input.keyPressed(Key.DownArrow))
+            {
+                Camara.SetCamera(Camara.Position , Camara.LookAt + new TGCVector3( 0, -1f, 0));
+                objetivo = Camara.LookAt;
+            }
+
+            if (Input.keyPressed(Key.RightArrow))
+            {
+                Camara.SetCamera(Camara.Position, Camara.LookAt + new TGCVector3(0, 0, -1f));
+                objetivo = Camara.LookAt;
+            }
+
+            if (Input.keyPressed(Key.LeftArrow))
+            {
+                Camara.SetCamera(Camara.Position, Camara.LookAt + new TGCVector3(0, 0, 1f));
+                objetivo = Camara.LookAt;
+
             }
 
             PostUpdate();
@@ -325,8 +360,8 @@ namespace TGC.Group.Model
             mostrarArrayPlano(suelos1);
             mostrarArrayPlano(suelos2);
             mostrarArrayPlano(suelos3);
-            pared.Render();
-            pared2.Render();
+            //pared.Render();
+            //pared2.Render();
             mostrarArrayPlano(paredes11);
             mostrarArrayPlano(paredes12);
             mostrarArrayPlano(paredes21);
