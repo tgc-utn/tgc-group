@@ -82,17 +82,5 @@ namespace TGC.Group {
                 this["MediaDirectory"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("cajaMadera4.jpg")]
-        public string TexturaCaja {
-            get {
-                return ((string)(this["TexturaCaja"]));
-            }
-            set {
-                this["TexturaCaja"] = value;
-            }
-        }
     }
 }
