@@ -14,11 +14,11 @@ namespace TGC.Group.Model
 {
     /// <summary>
     ///     Ejemplo para implementar el TP.
-    ///     Inicialmente puede ser renombrado o copiado para hacer más ejemplos chicos, en el caso de copiar para que se
+    ///     Inicialmente puede ser renombrado o copiado para hacer mï¿½s ejemplos chicos, en el caso de copiar para que se
     ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
     ///     line 97.
     /// </summary>
-    public class GameModel : TgcExample
+    public class GameModel : TGCExample
     {
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
@@ -32,6 +32,7 @@ namespace TGC.Group.Model
         public override void Init()
         {
             Scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Ciudad\\Ciudad-TgcScene.xml");
+
 
             var posicionInicialDeNave = new TGCVector3(0, 200, -100); 
 

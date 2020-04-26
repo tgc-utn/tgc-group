@@ -28,7 +28,7 @@ namespace TGC.Group.Form
         /// <summary>
         ///     Ejemplo del juego a correr
         /// </summary>
-        private TgcExample Modelo { get; set; }
+        private TGCExample Modelo { get; set; }
 
         /// <summary>
         ///     Obtener o parar el estado del RenderLoop.
@@ -93,7 +93,14 @@ namespace TGC.Group.Form
 
             //Inicio sonido
             DirectSound = new TgcDirectSound();
-            DirectSound.InitializeD3DDevice(panel3D);
+            try
+            {
+                DirectSound.InitializeD3DDevice(panel3D);
+            }
+            catch (ApplicationException ex)
+            {
+                throw new Exception("No se pudo inicializar el sonido", ex);
+            }
 
             //Directorio actual de ejecución
             var currentDirectory = Environment.CurrentDirectory + "\\";
@@ -122,8 +129,7 @@ namespace TGC.Group.Form
                     //Solo renderizamos si la aplicacion tiene foco, para no consumir recursos innecesarios.
                     if (ApplicationActive())
                     {
-                        Modelo.Update();
-                        Modelo.Render();
+                        Modelo.Tick();
                     }
                     else
                     {
