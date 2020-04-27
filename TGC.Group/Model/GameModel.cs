@@ -16,7 +16,7 @@ namespace TGC.Group.Model
     ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
     ///     line 97.
     /// </summary>
-    public class GameModel : TgcExample
+    public class GameModel : TGCExample
     {
         /// <summary>
         ///     Constructor del juego.
@@ -41,7 +41,7 @@ namespace TGC.Group.Model
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
-        ///     Escribir aquÌ todo el cÛdigo de inicializaciÛn: cargar modelos, texturas, estructuras de optimizaciÛn, todo
+        ///     Escribir aquÅEtodo el cÛdigo de inicializaciÛn: cargar modelos, texturas, estructuras de optimizaciÛn, todo
         ///     procesamiento que podemos pre calcular para nuestro juego.
         ///     Borrar el codigo ejemplo no utilizado.
         /// </summary>
@@ -60,7 +60,7 @@ namespace TGC.Group.Model
 
             //Creamos una caja 3D ubicada de dimensiones (5, 10, 5) y la textura como color.
             var size = new TGCVector3(5, 10, 5);
-            //Construimos una caja seg˙n los par·metros, por defecto la misma se crea con centro en el origen y se recomienda asÌ para facilitar las transformaciones.
+            //Construimos una caja seg˙n los par·metros, por defecto la misma se crea con centro en el origen y se recomienda asÅEpara facilitar las transformaciones.
             Box = TGCBox.fromSize(size, texture);
             //PosiciÛn donde quiero que este la caja, es com˙n que se utilicen estructuras internas para las transformaciones.
             //Entonces actualizamos la posiciÛn lÛgica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
@@ -79,14 +79,14 @@ namespace TGC.Group.Model
             //Quiero que la camara mire hacia el origen (0,0,0).
             var lookAt = TGCVector3.Empty;
             //Configuro donde esta la posicion de la camara y hacia donde mira.
-            Camara.SetCamera(cameraPosition, lookAt);
+            Camera.SetCamera(cameraPosition, lookAt);
             //Internamente el framework construye la matriz de view con estos dos vectores.
             //Luego en nuestro juego tendremos que crear una c·mara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
         }
 
         /// <summary>
         ///     Se llama en cada frame.
-        ///     Se debe escribir toda la lÛgica de computo del modelo, asÌ como tambiÈn verificar entradas del usuario y reacciones
+        ///     Se debe escribir toda la lÛgica de computo del modelo, asÅEcomo tambiÈn verificar entradas del usuario y reacciones
         ///     ante ellas.
         /// </summary>
         public override void Update()
@@ -104,13 +104,13 @@ namespace TGC.Group.Model
             {
                 //Como ejemplo podemos hacer un movimiento simple de la c·mara.
                 //En este caso le sumamos un valor en Y
-                Camara.SetCamera(Camara.Position + new TGCVector3(0, 10f, 0), Camara.LookAt);
+                Camera.SetCamera(Camera.Position + new TGCVector3(0, 10f, 0), Camera.LookAt);
                 //Ver ejemplos de c·mara para otras operaciones posibles.
 
                 //Si superamos cierto Y volvemos a la posiciÛn original.
-                if (Camara.Position.Y > 300f)
+                if (Camera.Position.Y > 300f)
                 {
-                    Camara.SetCamera(new TGCVector3(Camara.Position.X, 0f, Camara.Position.Z), Camara.LookAt);
+                    Camera.SetCamera(new TGCVector3(Camera.Position.X, 0f, Camera.Position.Z), Camera.LookAt);
                 }
             }
 
@@ -119,7 +119,7 @@ namespace TGC.Group.Model
 
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
-        ///     Escribir aquÌ todo el cÛdigo referido al renderizado.
+        ///     Escribir aquÅEtodo el cÛdigo referido al renderizado.
         ///     Borrar todo lo que no haga falta.
         /// </summary>
         public override void Render()
@@ -129,12 +129,12 @@ namespace TGC.Group.Model
 
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla F se dibuja el bounding box.", 0, 20, Color.OrangeRed);
-            DrawText.drawText("Con clic izquierdo subimos la camara [Actual]: " + TGCVector3.PrintVector3(Camara.Position), 0, 30, Color.OrangeRed);
+            DrawText.drawText("Con clic izquierdo subimos la Camera [Actual]: " + TGCVector3.PrintTGCVector3(Camera.Position), 0, 30, Color.OrangeRed);
 
             //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
             //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jer·rquicos, tenemos control total.
             Box.Transform = TGCMatrix.Scaling(Box.Scale) * TGCMatrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) * TGCMatrix.Translation(Box.Position);
-            //A modo ejemplo realizamos toda las multiplicaciones, pero aquÌ solo nos hacia falta la traslaciÛn.
+            //A modo ejemplo realizamos toda las multiplicaciones, pero aquÅEsolo nos hacia falta la traslaciÛn.
             //Finalmente invocamos al render de la caja
             Box.Render();
 

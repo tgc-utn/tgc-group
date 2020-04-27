@@ -28,7 +28,7 @@ namespace TGC.Group.Form
         /// <summary>
         ///     Ejemplo del juego a correr
         /// </summary>
-        private TgcExample Modelo { get; set; }
+        private TGCExample Modelo { get; set; }
 
         /// <summary>
         ///     Obtener o parar el estado del RenderLoop.
