@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using TGC.Core.Direct3D;
@@ -30,6 +31,8 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
+        DateTime timestamp;
+
         Fondo oceano;
         Control focusWindows;
         Point mousePosition;
@@ -37,6 +40,7 @@ namespace TGC.Group.Model
         // para la primer entrega lo dejamos asi
         Pez pez;
         Pez otroPez;
+        Tiburon tiburoncin;
 
         //Caja que se muestra en el ejemplo.
         private TGCBox Box { get; set; }
@@ -60,6 +64,7 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
             
+            timestamp = DateTime.Now;
 
             //Utilizando esta propiedad puedo activar el update/render a intervalos constantes.
             FixedTickEnable = true;
@@ -112,6 +117,8 @@ namespace TGC.Group.Model
             otroPez.Init();
             otroPez.actualizarPosicion(new TGCVector3(10, 10, 15));
 
+            tiburoncin = new Tiburon(MediaDir, ShadersDir);
+            tiburoncin.Init();
 
             focusWindows = d3dDevice.CreationParameters.FocusWindow;
             mousePosition = focusWindows.PointToScreen(new Point(focusWindows.Width / 2, focusWindows.Height / 2));
@@ -135,7 +142,14 @@ namespace TGC.Group.Model
             otroPez.Update();
 
             BoundingBox = false;
-         
+            DateTime actualTimestamp = DateTime.Now;
+            // Mostrar Tiburon cada X cantidad de tiempo
+            if (actualTimestamp.Subtract(timestamp).TotalSeconds > 15)
+            {
+                tiburoncin.aparecer(Camera);
+                timestamp = actualTimestamp;
+            }
+            tiburoncin.Update();
 
             Cursor.Position = mousePosition;
             Player.Update(Input, Camera, ElapsedTime);
@@ -156,6 +170,7 @@ namespace TGC.Group.Model
             oceano.Render();
             pez.Render();
             otroPez.Render();
+            tiburoncin.Render();
 
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla P se activa el GodMode", 5, 20, Color.DarkKhaki);
@@ -206,6 +221,7 @@ namespace TGC.Group.Model
             oceano.Dispose();
             pez.Dispose();
             otroPez.Dispose();
+            tiburoncin.Dispose();
         }
     }
 }

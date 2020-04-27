@@ -1,6 +1,4 @@
-﻿using TGC.Core.Direct3D;
-using TGC.Core.Example;
-using TGC.Core.Terrain;
+﻿using TGC.Core.Example;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 
@@ -53,7 +51,7 @@ namespace TGC.Group.Model
 
             //Multiplicar movimiento por velocidad y elapsedTime
             TGCMatrix traslacion = traslacionBase * TGCMatrix.Translation(movidoEnX, 0, 0);
-            mesh.Transform = escalaBase * TGCMatrix.RotationY(rotacion.Y) * traslacion;            
+            mesh.Transform = escalaBase * TGCMatrix.RotationY(rotacion.Y) * traslacion;
         }
         public override void Render()
         {
@@ -61,7 +59,11 @@ namespace TGC.Group.Model
 
             //Dibujar objeto principal
             //Siempre primero hacer todos los calculos de logica e input y luego al final dibujar todo (ciclo update-render)
+
+            
             mesh.Render();
+
+            mesh.BoundingBox.Render();
 
             //PostRender();
         }
