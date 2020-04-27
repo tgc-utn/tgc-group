@@ -219,6 +219,15 @@
     <Content Include="bin\x86\Debug\TGC.Group.exe" />
     <Content Include="bin\x86\Debug\TGC.Group.pdb" />
     <Content Include="Media\cajaMadera4.jpg" />
+    <Content Include="Media\Heightmaps\heightmap_bnw.jpg" />
+    <Content Include="Media\Heightmaps\heightmap_tex.jpg" />
+    <Content Include="Media\Mar\fondoMarBack.jpg" />
+    <Content Include="Media\Mar\fondoMarDown.jpg" />
+    <Content Include="Media\Mar\fondoMarDown.PNG" />
+    <Content Include="Media\Mar\fondoMarFront.jpg" />
+    <Content Include="Media\Mar\fondoMarLeft.jpg" />
+    <Content Include="Media\Mar\fondoMarRight.jpg" />
+    <Content Include="Media\Mar\fondoMarUp.PNG" />
     <Content Include="Media\Textures\fish.jpg" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
     <Content Include="Media\yellow_fish-TgcScene.xml" />
