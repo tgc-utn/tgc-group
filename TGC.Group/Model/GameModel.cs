@@ -6,6 +6,7 @@ using TGC.Core.Example;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Core.Terrain;
 using TGC.Core.Textures;
 
 namespace TGC.Group.Model
@@ -34,6 +35,7 @@ namespace TGC.Group.Model
         DateTime timestamp;
 
         Fondo oceano;
+        TgcSimpleTerrain heightmap;
         Control focusWindows;
         Point mousePosition;
         // todo: probablemente deleguemos la generacion de peces en otra clase
@@ -71,42 +73,23 @@ namespace TGC.Group.Model
             //Se puede configurar el tiempo en estas propiedades TimeBetweenUpdates y TimeBetweenRenders, por defecto esta puedo en 1F / FPS_60 es a lo minimo que deberia correr el TP.
             //De no estar a gusto como se ejecuta el metodo Tick (el que maneja el GameLoop) el mismo es virtual con lo cual pueden sobrescribirlo.
 
-            //Textura de la carperta Media. Game.Default es un archivo de configuracion (Game.settings) util para poner cosas.
-            //Pueden abrir el Game.settings que se ubica dentro de nuestro proyecto para configurar.
-            var pathTexturaCaja = MediaDir + Game.Default.TexturaCaja;
-
-            //Cargamos una textura, tener en cuenta que cargar una textura significa crear una copia en memoria.
-            //Es importante cargar texturas en Init, si se hace en el render loop podemos tener grandes problemas si instanciamos muchas.
-            var texture = TgcTexture.createTexture(pathTexturaCaja);
-
-            //Creamos una caja 3D ubicada de dimensiones (5, 10, 5) y la textura como color.
-            var size = new TGCVector3(5, 10, 5);
-            //Construimos una caja según los parámetros, por defecto la misma se crea con centro en el origen y se recomienda así para facilitar las transformaciones.
-            Box = TGCBox.fromSize(size, texture);
-            //Posición donde quiero que este la caja, es común que se utilicen estructuras internas para las transformaciones.
-            //Entonces actualizamos la posición lógica, luego podemos utilizar esto en render para posicionar donde corresponda con transformaciones.
-            Box.Position = new TGCVector3(-25, 0, 0);
-
-            //Cargo el unico mesh que tiene la escena.
-            Mesh = new TgcSceneLoader().loadSceneFromFile(MediaDir + "LogoTGC-TgcScene.xml").Meshes[0];
-            //Defino una escala en el modelo logico del mesh que es muy grande.
-            Mesh.Scale = new TGCVector3(0.5f, 0.5f, 0.5f);
-
-            //Suelen utilizarse objetos que manejan el comportamiento de la camara.
-            //Lo que en realidad necesitamos gráficamente es una matriz de View.
-            //El framework maneja una cámara estática, pero debe ser inicializada.
-            //Posición de la camara.
+            //Inicializar camara
             var cameraPosition = new TGCVector3(0, 0, 125);
-            //Quiero que la camara mire hacia el origen (0,0,0).
             var lookAt = TGCVector3.Empty;
-            //Configuro donde esta la posicion de la camara y hacia donde mira.
             Camera.SetCamera(cameraPosition, lookAt);
 
             oceano = new Fondo(MediaDir, ShadersDir);
             oceano.Init();
             oceano.Camera = Camera;
-            //Internamente el framework construye la matriz de view con estos dos vectores.
-            //Luego en nuestro juego tendremos que crear una cámara que cambie la matriz de view con variables como movimientos o animaciones de escenas.
+
+            var bnwDir = MediaDir + "\\Heightmaps\\heightmap_bnw.jpg";
+            var texDir = MediaDir + "\\Heightmaps\\heightmap_tex.jpg";
+            float scaleXZ = 10f;
+            float scaleY = .5f;
+            float offsetY = -150f;
+            heightmap = new TgcSimpleTerrain();
+            heightmap.loadHeightmap(bnwDir, scaleXZ, scaleY, new TGCVector3(0, offsetY, 0));
+            heightmap.loadTexture(texDir);
 
             // Cargo un pez
             pez = new Pez(MediaDir, ShadersDir);
@@ -168,6 +151,7 @@ namespace TGC.Group.Model
             PreRender();
 
             oceano.Render();
+            heightmap.Render();
             pez.Render();
             otroPez.Render();
             tiburoncin.Render();
@@ -179,27 +163,6 @@ namespace TGC.Group.Model
             DrawText.drawText("Health: " + Player.Health(), 5, 70, Color.DarkSalmon);
             DrawText.drawText("Oxygen: " + Player.Oxygen(), 5, 80, Color.DarkSalmon);
             DrawText.drawText("Camera: \n" + Player.cam_angles, 5, 100, Color.DarkSalmon);
-
-            //Siempre antes de renderizar el modelo necesitamos actualizar la matriz de transformacion.
-            //Debemos recordar el orden en cual debemos multiplicar las matrices, en caso de tener modelos jerárquicos, tenemos control total.
-            Box.Transform = TGCMatrix.Scaling(Box.Scale) * TGCMatrix.RotationYawPitchRoll(Box.Rotation.Y, Box.Rotation.X, Box.Rotation.Z) * TGCMatrix.Translation(Box.Position);
-            //A modo ejemplo realizamos toda las multiplicaciones, pero aquí solo nos hacia falta la traslación.
-            //Finalmente invocamos al render de la caja
-            Box.Render();
-
-            //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
-            //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
-            Mesh.UpdateMeshTransform();
-            //Render del mesh
-            Mesh.Render();
-
-            //Render de BoundingBox, muy útil para debug de colisiones.
-            if (BoundingBox)
-            {
-                Box.BoundingBox.Render();
-                Mesh.BoundingBox.Render();
-            }
-
             
             Player.UpdateTransform();
             Player.Render();
@@ -215,10 +178,9 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Dispose()
         {
-            Box.Dispose();
-            Mesh.Dispose();
             Player.Dispose();
             oceano.Dispose();
+            heightmap.Dispose();
             pez.Dispose();
             otroPez.Dispose();
             tiburoncin.Dispose();
