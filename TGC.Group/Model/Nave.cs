@@ -38,7 +38,7 @@ namespace TGC.Group.Model
             TGCVector3 movimientoAdelante = new TGCVector3(0, 0, 1);
 
             movimientoDelFrame += versorDirector + movimientoAdelante;
-            movimientoDelFrame *= 50f * elapsedTime;
+            movimientoDelFrame *= 10f * elapsedTime;
 
             mainMesh.Position += movimientoDelFrame;
             mainMesh.Transform = TGCMatrix.Translation(mainMesh.Position);
@@ -77,7 +77,7 @@ namespace TGC.Group.Model
         {
             mainMesh.Render();
             new TgcText2D().drawText("Posicion de la nave:\n" + mainMesh.Position.ToString(), 5, 20, Color.White);
-            //new TgcText2D().drawText("Rotacion de la nave:\n" + mainMesh.Rotation.ToString(), 5, 100, Color.White);    Esto aparece un por un rato pero despues crashea todo :(
+            new TgcText2D().drawText("Rotacion de la nave:\n" + mainMesh.Rotation.ToString(), 5, 100, Color.White);//    Esto aparece un por un rato pero despues crashea todo :(
         }
         public void Dispose()
         {
