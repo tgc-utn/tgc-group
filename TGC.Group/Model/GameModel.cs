@@ -15,11 +15,13 @@ namespace TGC.Group.Model
 {
     /// <summary>
     ///     Ejemplo para implementar el TP.
-    ///     Inicialmente puede ser renombrado o copiado para hacer m醩 ejemplos chicos, en el caso de copiar para que se
+    ///     Inicialmente puede ser renombrado o copiado para hacer m谩s ejemplos chicos, en el caso de copiar para que se
     ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
     ///     line 97.
     /// </summary>
-    public class GameModel : TGCExample {
+
+    public class GameModel : TGCExample
+    {
         /// <summary>
         ///     Constructor del juego.
         /// </summary>
@@ -39,7 +41,7 @@ namespace TGC.Group.Model
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
-        ///     Escribir aqu丒todo el c骴igo de inicializaci髇: cargar modelos, texturas, estructuras de optimizaci髇, todo
+        ///     Escribir aqu聛Etodo el c贸digo de inicializaci贸n: cargar modelos, texturas, estructuras de optimizaci贸n, todo
         ///     procesamiento que podemos pre calcular para nuestro juego.
         ///     Borrar el codigo ejemplo no utilizado.
         /// </summary>
@@ -47,12 +49,11 @@ namespace TGC.Group.Model
            
             scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "MapaV1-TgcScene.xml");
             Camera = new TgcFpsCamera(new TGCVector3(0, 50, 0), Input);
-
         }
 
         /// <summary>
         ///     Se llama en cada frame.
-        ///     Se debe escribir toda la l骻ica de computo del modelo, as丒como tambi閚 verificar entradas del usuario y reacciones
+        ///     Se debe escribir toda la l贸gica de computo del modelo, as聛Ecomo tambi茅n verificar entradas del usuario y reacciones
         ///     ante ellas.
         /// </summary>
         public override void Update() {
@@ -66,15 +67,16 @@ namespace TGC.Group.Model
             var input = Input;
 
             PostUpdate();
+
         }
 
         /// <summary>
         ///     Se llama cada vez que hay que refrescar la pantalla.
-        ///     Escribir aqu丒todo el c骴igo referido al renderizado.
+        ///     Escribir aqu聛Etodo el c贸digo referido al renderizado.
         ///     Borrar todo lo que no haga falta.
         /// </summary>
         public override void Render() {
-            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones seg鷑 nuestra conveniencia.
+            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones seg煤n nuestra conveniencia.
             PreRender(); 
 
             scene.RenderAll();
@@ -96,9 +98,9 @@ namespace TGC.Group.Model
         }
 
         /// <summary>
-        ///     Se llama cuando termina la ejecuci髇 del ejemplo.
+        ///     Se llama cuando termina la ejecuci贸n del ejemplo.
         ///     Hacer Dispose() de todos los objetos creados.
-        ///     Es muy importante liberar los recursos, sobretodo los gr醘icos ya que quedan bloqueados en el device de video.
+        ///     Es muy importante liberar los recursos, sobretodo los gr谩ficos ya que quedan bloqueados en el device de video.
         /// </summary>
         public override void Dispose()
         {
