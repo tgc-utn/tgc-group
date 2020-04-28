@@ -4,33 +4,32 @@ using TGC.Core.Input;
 using Microsoft.DirectX.DirectInput;
 using TGC.Core.Text;
 using System.Drawing;
+using System.Collections.Generic;
+using System;
+using System.Runtime.CompilerServices;
 
 namespace TGC.Group.Model
 {
     public class Nave : IRenderizable
     {
         private readonly string mediaDir;
-        private readonly TGCVector3 posicionInicial; 
-        private TgcMesh mainMesh;
-        private TgcD3dInput input;
+        private TGCVector3 posicion; 
+        private ModeloCompuesto modeloNave;
+        private readonly TgcD3dInput input;
 
         public Nave(string mediaDir, TGCVector3 posicionInicial, TgcD3dInput input)
         {
             this.mediaDir = mediaDir;
-            this.posicionInicial = posicionInicial;
+            this.posicion = posicionInicial;
             this.input = input;
         }
 
         public void Init()
         {
-            TgcSceneLoader loader = new TgcSceneLoader();
-            TgcScene scene2 = loader.loadSceneFromFile(mediaDir + "StarFox\\Nave+de+foxV7-TgcScene.xml");
-
-            //Solo nos interesa el primer modelo de esta escena (tiene solo uno)
-            mainMesh = scene2.Meshes[0];
-            mainMesh.Position = posicionInicial;
-            mainMesh.Transform = TGCMatrix.Translation(0, 5, 0);
+            modeloNave = new ModeloCompuesto(mediaDir + "XWing\\X-Wing-TgcScene.xml", posicion);
         }
+
+
 
         private void Moverse(TGCVector3 versorDirector, float elapsedTime)
         {
@@ -40,8 +39,9 @@ namespace TGC.Group.Model
             movimientoDelFrame += versorDirector + movimientoAdelante;
             movimientoDelFrame *= 10f * elapsedTime;
 
-            mainMesh.Position += movimientoDelFrame;
-            mainMesh.Transform = TGCMatrix.Translation(mainMesh.Position);
+            posicion += movimientoDelFrame;
+
+            modeloNave.CambiarPosicion(posicion);
 
         }
 
@@ -75,13 +75,14 @@ namespace TGC.Group.Model
 
         public void Render()
         {
-            mainMesh.Render();
-            new TgcText2D().drawText("Posicion de la nave:\n" + mainMesh.Position.ToString(), 5, 20, Color.White);
-            new TgcText2D().drawText("Rotacion de la nave:\n" + mainMesh.Rotation.ToString(), 5, 100, Color.White);//    Esto aparece un por un rato pero despues crashea todo :(
+            modeloNave.Render();
+            //new TgcText2D().drawText("Posicion de la nave:\n" + posicion.ToString(), 5, 20, Color.White);
+            //new TgcText2D().drawText("Rotacion de la nave:\n" + mainMesh.Rotation.ToString(), 5, 100, Color.White);
         }
+
         public void Dispose()
         {
-            mainMesh.Dispose();
+            modeloNave.Render();
         }
     }
 }
