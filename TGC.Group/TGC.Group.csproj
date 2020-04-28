@@ -102,6 +102,7 @@
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
     <Compile Include="Model\Camara.cs" />
+    <Compile Include="Model\ModeloCompuesto.cs" />
     <Compile Include="Model\IRenderizable.cs" />
     <Compile Include="Model\GameManager.cs" />
     <Compile Include="Model\Nave.cs" />
