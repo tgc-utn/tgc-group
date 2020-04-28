@@ -18,7 +18,7 @@ Proyecto plantilla para los trabajos prácticos de la asignatura electiva [Técn
 * Carla Gassman, Melany
 * Cristian Martinez, Alexander
 * Gonzalez Martin, Ivan  
-* Kalanit Swimzer, Daiana
+* Szwimer, Daiana Kalanit
 
 
 TGC, Tgcito  |  Apellido, Nombre
