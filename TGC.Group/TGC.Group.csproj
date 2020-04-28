@@ -90,6 +90,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Camara\FPSCamera.cs" />
+    <Compile Include="Camara\RotationalCamera.cs" />
+    <Compile Include="Camara\ThirdPersonCamera.cs" />
     <Compile Include="Form\GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
