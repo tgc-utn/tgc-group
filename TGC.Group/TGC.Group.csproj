@@ -109,6 +109,7 @@
     <Compile Include="Model\Skybox.cs" />
     <Compile Include="Model\TgcThirdPersonCamera.cs" />
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Model\Torreta.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
