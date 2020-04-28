@@ -46,6 +46,9 @@ namespace TGC.Group.Model
             Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
             GameManager.Instance.AgregarRenderizable(skybox);
 
+            Torreta torreta = new Torreta(MediaDir, new TGCVector3(0,10, 15));
+            GameManager.Instance.AgregarRenderizable(torreta);
+
         }
 
         public override void Update()
