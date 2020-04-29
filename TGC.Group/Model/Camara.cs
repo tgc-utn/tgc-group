@@ -24,7 +24,7 @@ namespace TGC.Examples.Camara
         public void Update(float ElapsedTime)
         {
             var cameraMovement = new TGCVector3(0, 0, 1);
-            cameraMovement *= 10f * ElapsedTime;
+            cameraMovement *= 5f * ElapsedTime;
             Target += cameraMovement;
         }
     }
