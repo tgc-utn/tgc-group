@@ -44,15 +44,8 @@ namespace TGC.Group.Model
         Pez otroPez;
         Tiburon tiburoncin;
 
-        //Caja que se muestra en el ejemplo.
-        private TGCBox Box { get; set; }
-        //Mesh de TgcLogo.
-        private TgcMesh Mesh { get; set; }
-
-        //Boleano para ver si dibujamos el boundingbox
-        private bool BoundingBox { get; set; }
-
-        private Player Player { get; set; }
+        FPSCamara FPSCamara;
+        Player Player;
 
 
         /// <summary>
@@ -103,12 +96,16 @@ namespace TGC.Group.Model
             tiburoncin = new Tiburon(MediaDir, ShadersDir);
             tiburoncin.Init();
 
+            //Esconde cursor
             focusWindows = d3dDevice.CreationParameters.FocusWindow;
             mousePosition = focusWindows.PointToScreen(new Point(focusWindows.Width / 2, focusWindows.Height / 2));
             Cursor.Hide();
 
+            //Settear jugador y camara
             Player = new Player();
             Player.InitMesh();
+
+            FPSCamara = new FPSCamara(Camera, Player);
         }
 
         /// <summary>
@@ -124,7 +121,6 @@ namespace TGC.Group.Model
             pez.Update();
             otroPez.Update();
 
-            BoundingBox = false;
             DateTime actualTimestamp = DateTime.Now;
             // Mostrar Tiburon cada X cantidad de tiempo
             if (actualTimestamp.Subtract(timestamp).TotalSeconds > 15)
@@ -134,8 +130,15 @@ namespace TGC.Group.Model
             }
             tiburoncin.Update();
 
+
+            //Lockear mouse
             Cursor.Position = mousePosition;
-            Player.Update(Input, Camera, ElapsedTime);
+
+            //Camara y jugador
+            FPSCamara.Update(Input, ElapsedTime);
+            Player.Update(Input, FPSCamara, ElapsedTime);
+            
+
             PostUpdate();
 
         }
@@ -162,7 +165,7 @@ namespace TGC.Group.Model
             DrawText.drawText("Player Ypos: " + Player.Position().Y, 5, 50, Color.DarkRed);
             DrawText.drawText("Health: " + Player.Health(), 5, 70, Color.DarkSalmon);
             DrawText.drawText("Oxygen: " + Player.Oxygen(), 5, 80, Color.DarkSalmon);
-            DrawText.drawText("Camera: \n" + Player.cam_angles, 5, 100, Color.DarkSalmon);
+            DrawText.drawText("Camera: \n" + FPSCamara.cam_angles, 5, 100, Color.DarkSalmon);
             
             Player.UpdateTransform();
             Player.Render();

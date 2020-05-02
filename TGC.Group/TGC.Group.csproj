@@ -101,6 +101,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\Camara.cs" />
     <Compile Include="Model\Crafting\Combination.cs" />
     <Compile Include="Model\Crafting\Combinations.cs" />
     <Compile Include="Model\Crafting\Inventory.cs" />

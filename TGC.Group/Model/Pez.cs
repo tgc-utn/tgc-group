@@ -6,7 +6,6 @@ namespace TGC.Group.Model
 {
     public class Pez : TGCExample
     {
-
         private const float VELOCIDAD = 0.15f;
         private TgcMesh mesh;
         private float movidoEnX = 0f;

@@ -21,6 +21,7 @@ namespace TGC.Group.Model.Crafting
             var combination = GetCombination(a, b);
             if (combination != null && CanCombine(a, b, combination))
             {
+                //Resto cantidades usadas
                 a.Take(combination.AmountA());
                 b.Take(combination.AmountB());
                 return combination.Result();

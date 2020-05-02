@@ -13,7 +13,7 @@ namespace TGC.Group.Model.Crafting
         private Item result;
         
         public Combination(Item a, Item b, Item result) { this.a = a; this.b = b; this.result = result; } //Used for instancing
-        public bool IsEnough(Item itemA, Item itemB) { return itemA.Amount() >= AmountA() && itemB.Amount() >= AmountB(); }
+        public bool IsEnough(Item itemA, Item itemB) { return itemA.Amount() >= a.Amount() && itemB.Amount() >= AmountB(); }
         public int AmountA() { return a.Amount(); }
         public int AmountB() { return b.Amount(); }
         public bool IsSameItemA(Item item) { return a.IsSameItem(item); }

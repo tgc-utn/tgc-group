@@ -31,11 +31,6 @@ namespace TGC.Group.Model
         private TGCQuaternion rotation = TGCQuaternion.Identity;
 
         //Config vars
-        private float sensitivity = 10f;
-        public TGCVector2 cam_angles = TGCVector2.Zero;
-        private const float CAMERA_MAX_X_ANGLE = 1.5f;
-
-
         private float speed = 25f; //foward and horizontal speed
         private float vspeed = 10f; //vertical speed
 
@@ -45,15 +40,14 @@ namespace TGC.Group.Model
 
         public void InitMesh() { mesh = TGCBox.fromSize(size, null); }
 
-        public void Update(TgcD3dInput Input,TgcCamera Camara, float ElapsedTime) {
+        public void Update(TgcD3dInput Input, FPSCamara Camara, float ElapsedTime) {
             CheckInputs(Input, Camara, ElapsedTime);
             GameplayUpdate(ElapsedTime);
-            UpdateCamera(Input, Camara, ElapsedTime);
         }
 
         public void Render() { }
 
-        private void CheckInputs(TgcD3dInput Input,TgcCamera Camara, float ElapsedTime)
+        private void CheckInputs(TgcD3dInput Input, FPSCamara Camara, float ElapsedTime)
         {
             //Gameplay
             int w = Input.keyDown(Key.W) ? 1 : 0;
@@ -67,11 +61,9 @@ namespace TGC.Group.Model
             float hmov = a - d; //horizontal movement
             float vmov = space - ctrl; //vertical movement
 
-            TGCVector3 movement = GetCameraLookDir(Camara) * fmov * speed + GetCameraLeftDir(Camara) * hmov * speed + TGCVector3.Up * vmov * vspeed;
+            TGCVector3 movement = Camara.LookDir() * fmov * speed + Camara.LeftDir() * hmov * speed + TGCVector3.Up * vmov * vspeed;
             movement *= ElapsedTime;
             Move(movement);
-
-            Rotate(new TGCVector2(Input.XposRelative, Input.YposRelative) * sensitivity * ElapsedTime); //De momento no sirve para nada
 
             //Dev
             bool p = Input.keyPressed(Key.P);
@@ -80,36 +72,14 @@ namespace TGC.Group.Model
 
         private void Move(TGCVector3 movement) { mesh.Position += movement; }
 
-        private void Rotate(TGCVector2 rotAmount) {
-           TGCQuaternion rotationX = TGCQuaternion.RotationAxis(new TGCVector3(0.0f, 1.0f, 0.0f), rotAmount.X);
-           TGCQuaternion rotationY = TGCQuaternion.RotationAxis(new TGCVector3(1.0f, 0.0f, 0.0f), rotAmount.Y);
-           rotation *= rotationX * rotationY;
-        }
-
         public void Dispose() { mesh.Dispose(); }
 
-        public TGCMatrix Rotation() { return TGCMatrix.RotationTGCQuaternion(rotation); }
-
-        public void UpdateTransform() { mesh.Transform = TGCMatrix.Scaling(mesh.Scale) * TGCMatrix.RotationTGCQuaternion(rotation) * TGCMatrix.Translation(mesh.Position); }
+        public void UpdateTransform() { mesh.Transform = TGCMatrix.Scaling(mesh.Scale) * TGCMatrix.Translation(mesh.Position); }
 
         // Camera functions
-        private void UpdateCamera(TgcD3dInput Input, TgcCamera Camara, float ElapsedTime)
-        {
-            cam_angles += new TGCVector2(Input.YposRelative, Input.XposRelative) * sensitivity * ElapsedTime;
-            cam_angles.X = FastMath.Clamp(cam_angles.X, -CAMERA_MAX_X_ANGLE, CAMERA_MAX_X_ANGLE);
-            cam_angles.Y = cam_angles.Y > 2 * FastMath.PI || cam_angles.Y < -2 * FastMath.PI ? 0 : cam_angles.Y;
-            TGCQuaternion rotationY = TGCQuaternion.RotationAxis(new TGCVector3(0f, 1f, 0f), cam_angles.Y);
-            TGCQuaternion rotationX = TGCQuaternion.RotationAxis(new TGCVector3(1f, 0f, 0f), -cam_angles.X);
-            TGCQuaternion rotation = rotationX * rotationY;
+        
 
-            var init_offset = new TGCVector3(0f,0f,1f);
-            TGCMatrix camera_m = TGCMatrix.Translation(init_offset) * TGCMatrix.RotationTGCQuaternion(rotation) * TGCMatrix.Translation(Position());
-            TGCVector3 pos = new TGCVector3(camera_m.M41, camera_m.M42, camera_m.M43);
-            Camara.SetCamera(pos, Position());
-        }
-
-        private TGCVector3 GetCameraLookDir(TgcCamera Camara) { return TGCVector3.Normalize(Camara.LookAt - Camara.Position); }
-        private TGCVector3 GetCameraLeftDir(TgcCamera Camara) { return TGCVector3.Cross(GetCameraLookDir(Camara), Camara.UpVector); }
+        
 
 
         //Gameplay functions

@@ -10,7 +10,7 @@ namespace TGC.Group.Model.Crafting
     {
         private List<Item> inventory = new List<Item>();
 
-        public void Add(Item item) {
+        public void Add(Item item) { //Eliminar item de la escena
             Item inventoryItem = inventory.Find(i => ItemMatches(i,item));
             if (inventoryItem != null)
                 inventoryItem.Add(item.Amount());
