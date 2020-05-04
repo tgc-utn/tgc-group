@@ -38,11 +38,11 @@ namespace TGC.Group.Model
 
         }
 
-        public void aparecer(TgcCamera Camara)
+        public void aparecer(TgcCamera Camera)
         {
             // tengo que buscar la camara y pasar, cambio posicion
             // falta que tambien coincida con donde esta mirando el player??
-            TGCVector3 camaraPosicion = Camara.Position + new TGCVector3(0, -5, -40);
+            TGCVector3 camaraPosicion = Camera.Position + new TGCVector3(0, -5, -40);
             mesh.Position = camaraPosicion;
             traslacionBase = TGCMatrix.Translation(camaraPosicion);
             mesh.Transform = escalaBase * TGCMatrix.RotationY(rotacion.Y) * traslacionBase;

@@ -62,7 +62,7 @@ namespace TGC.Group.Model
             
             mesh.Render();
 
-            // mesh.BoundingBox.Render();
+            mesh.BoundingBox.Render();
 
             //PostRender();
         }

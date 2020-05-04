@@ -21,6 +21,8 @@ namespace TGC.Group.Model
         private const float OXYGEN_DAMAGE = 5f;
         private const float WATER_LEVEL = 10f; //When players reaches a position above this level, then recovers oxygen.
 
+        TgcD3dInput Input;
+
         //Dev vars
         private bool godmode = false;
 
@@ -35,19 +37,23 @@ namespace TGC.Group.Model
         private float vspeed = 10f; //vertical speed
 
 
+        public Player(TgcD3dInput Input) { this.Input = Input; }
+
         //Tgc functions
+
         public TGCVector3 Position() { return mesh.Position; }
 
         public void InitMesh() { mesh = TGCBox.fromSize(size, null); }
 
-        public void Update(TgcD3dInput Input, FPSCamara Camara, float ElapsedTime) {
-            CheckInputs(Input, Camara, ElapsedTime);
+        public void Update(FPSCamara Camara, float ElapsedTime) {
+            CheckInputs(Camara, ElapsedTime);
             GameplayUpdate(ElapsedTime);
+            UpdateTransform();
         }
 
         public void Render() { }
 
-        private void CheckInputs(TgcD3dInput Input, FPSCamara Camara, float ElapsedTime)
+        private void CheckInputs(FPSCamara Camara, float ElapsedTime)
         {
             //Gameplay
             int w = Input.keyDown(Key.W) ? 1 : 0;

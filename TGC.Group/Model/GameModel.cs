@@ -8,6 +8,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Terrain;
 using TGC.Core.Textures;
+using TGC.Group.Model.Entidades;
 
 namespace TGC.Group.Model
 {
@@ -43,6 +44,8 @@ namespace TGC.Group.Model
         Pez pez;
         Pez otroPez;
         Tiburon tiburoncin;
+
+        Fish fish;
 
         FPSCamara FPSCamara;
         Player Player;
@@ -96,16 +99,19 @@ namespace TGC.Group.Model
             tiburoncin = new Tiburon(MediaDir, ShadersDir);
             tiburoncin.Init();
 
+            fish = new Fish();
+            fish.Init(MediaDir);
+
             //Esconde cursor
             focusWindows = d3dDevice.CreationParameters.FocusWindow;
             mousePosition = focusWindows.PointToScreen(new Point(focusWindows.Width / 2, focusWindows.Height / 2));
-            Cursor.Hide();
+            //Cursor.Hide();
 
             //Settear jugador y camara
-            Player = new Player();
+            Player = new Player(Input);
             Player.InitMesh();
 
-            FPSCamara = new FPSCamara(Camera, Player);
+            FPSCamara = new FPSCamara(Camera, Input, Player);
         }
 
         /// <summary>
@@ -131,12 +137,14 @@ namespace TGC.Group.Model
             tiburoncin.Update();
 
 
+            fish.Update(ElapsedTime);
+
             //Lockear mouse
             Cursor.Position = mousePosition;
 
             //Camara y jugador
-            FPSCamara.Update(Input, ElapsedTime);
-            Player.Update(Input, FPSCamara, ElapsedTime);
+            FPSCamara.Update(ElapsedTime);
+            Player.Update(FPSCamara, ElapsedTime);
             
 
             PostUpdate();
@@ -159,6 +167,8 @@ namespace TGC.Group.Model
             otroPez.Render();
             tiburoncin.Render();
 
+
+            fish.Render();
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla P se activa el GodMode", 5, 20, Color.DarkKhaki);
             DrawText.drawText("A,S,D,W para moverse, Ctrl y Espacio para subir o bajar.", 5, 35, Color.DarkKhaki);
@@ -167,7 +177,6 @@ namespace TGC.Group.Model
             DrawText.drawText("Oxygen: " + Player.Oxygen(), 5, 80, Color.DarkSalmon);
             DrawText.drawText("Camera: \n" + FPSCamara.cam_angles, 5, 100, Color.DarkSalmon);
             
-            Player.UpdateTransform();
             Player.Render();
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
@@ -187,6 +196,8 @@ namespace TGC.Group.Model
             pez.Dispose();
             otroPez.Dispose();
             tiburoncin.Dispose();
+
+            fish.Dispose();
         }
     }
 }

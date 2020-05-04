@@ -1,12 +1,17 @@
-﻿using System;
+﻿using BulletSharp;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.Camara;
+using TGC.Core.Collision;
 using TGC.Core.Example;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
+using TGC.Group.Model.Entidades;
 
 namespace TGC.Group.Model
 {
@@ -14,20 +19,56 @@ namespace TGC.Group.Model
     {
         private TgcCamera Camara;
         private Player Player;
+        private TgcD3dInput Input;
+
+        
+
         //Internal vars
         public TGCVector2 cam_angles = TGCVector2.Zero;
+        private TgcPickingRay ray;
+        TGCVector3 collisionPoint;
 
         //Configuration
         private const float CAMERA_MAX_X_ANGLE = 1.5f;
         private float sensitivity = 10f;
 
-        public FPSCamara(TgcCamera Camara, Player Player)
+        public FPSCamara(TgcCamera Camara, TgcD3dInput Input, Player Player)
         {
             this.Camara = Camara;
             this.Player = Player;
+            this.Input = Input;
+
+            this.ray = new TgcPickingRay(Input);
         }
 
-        public void Update(TgcD3dInput Input, float ElapsedTime)
+        public void Update(float ElapsedTime)
+        {
+            UpdateRotation(ElapsedTime);
+            CheckClick();
+        }
+
+        private void CheckClick()
+        {
+            bool click = Input.buttonDown(TgcD3dInput.MouseButtons.BUTTON_LEFT);
+            if (click)
+            {
+                ray.updateRay();
+                List<Entity> entities = Entities.GetEntities();
+                foreach (Entity entity in entities)
+                {
+                    var aabb = entity.GetMesh().BoundingBox;
+
+                    var selected = TgcCollisionUtils.intersectRayAABB(ray.Ray, aabb, out collisionPoint);
+                    if (selected)
+                    {
+                        entity.Dispose();
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void UpdateRotation(float ElapsedTime)
         {
             cam_angles += new TGCVector2(Input.YposRelative, Input.XposRelative) * sensitivity * ElapsedTime;
             cam_angles.X = FastMath.Clamp(cam_angles.X, -CAMERA_MAX_X_ANGLE, CAMERA_MAX_X_ANGLE);
