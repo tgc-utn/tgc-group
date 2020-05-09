@@ -61,7 +61,7 @@ namespace TGC.Group.Model
                     var selected = TgcCollisionUtils.intersectRayAABB(ray.Ray, aabb, out collisionPoint);
                     if (selected)
                     {
-                        entity.Dispose();
+                        entity.Interact();
                         break;
                     }
                 }

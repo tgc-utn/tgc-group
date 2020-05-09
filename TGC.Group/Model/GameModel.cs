@@ -87,20 +87,18 @@ namespace TGC.Group.Model
             heightmap.loadHeightmap(bnwDir, scaleXZ, scaleY, new TGCVector3(0, offsetY, 0));
             heightmap.loadTexture(texDir);
 
-            // Cargo un pez
-            pez = new Pez(MediaDir, ShadersDir);
-            pez.Init();
-            pez.actualizarPosicion(new TGCVector3(10, 0, 15));
+            //Cargar entidades
+            var loader = new TgcSceneLoader();
+            var scene = loader.loadSceneFromFile(MediaDir + "yellow_fish-TgcScene.xml");
+            var mesh = scene.Meshes[0];
 
-            otroPez = new Pez(MediaDir, ShadersDir);
-            otroPez.Init();
-            otroPez.actualizarPosicion(new TGCVector3(10, 10, 15));
+            fish = new Fish(mesh);
+            fish.Init();
 
             tiburoncin = new Tiburon(MediaDir, ShadersDir);
             tiburoncin.Init();
 
-            fish = new Fish();
-            fish.Init(MediaDir);
+            
 
             //Esconde cursor
             focusWindows = d3dDevice.CreationParameters.FocusWindow;
@@ -124,8 +122,6 @@ namespace TGC.Group.Model
             PreUpdate();
 
             oceano.Update();
-            pez.Update();
-            otroPez.Update();
 
             DateTime actualTimestamp = DateTime.Now;
             // Mostrar Tiburon cada X cantidad de tiempo
@@ -163,8 +159,6 @@ namespace TGC.Group.Model
 
             oceano.Render();
             heightmap.Render();
-            pez.Render();
-            otroPez.Render();
             tiburoncin.Render();
 
 
@@ -193,8 +187,6 @@ namespace TGC.Group.Model
             Player.Dispose();
             oceano.Dispose();
             heightmap.Dispose();
-            pez.Dispose();
-            otroPez.Dispose();
             tiburoncin.Dispose();
 
             fish.Dispose();
