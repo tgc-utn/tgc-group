@@ -8,6 +8,10 @@ using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
+using BulletSharp;
+using TGC.Core.BulletPhysics;
+using BulletSharp.Math;
+using TGC.Core.Terrain;
 
 namespace TGC.Group.Model
 {
@@ -26,15 +30,27 @@ namespace TGC.Group.Model
         }
 
         private TgcScene Escena { get; set; }
-
         private TgcMesh Cancha { get; set; }
         private TgcMesh Arco { get; set; }
         private TgcMesh Pelota { get; set; }
 
         private List<Jugador> jugadores = new List<Jugador>();
 
+        private TgcMesh paredes { get; set; }
+
+        private TgcSkyBox skyBox;
+
         private TGCVector3 LookAt;
         private TGCVector3 CameraPosition;
+        protected DiscreteDynamicsWorld dynamicsWorld;
+        protected CollisionDispatcher dispatcher;
+        protected DefaultCollisionConfiguration collisionConfiguration;
+        protected SequentialImpulseConstraintSolver constraintSolver;
+        protected BroadphaseInterface overlappingPairCache;
+
+        private RigidBody floorBody;
+
+        RigidBody ballBody;
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -47,23 +63,61 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
-            //Creamos una caja 3D ubicada de dimensiones (5, 10, 5) y la textura como color.
-            var size = new TGCVector3(5, 10, 5);
+            FixedTickEnable = false;
+
+            //Creamos el mundo fisico por defecto.
+            collisionConfiguration = new DefaultCollisionConfiguration();
+            dispatcher = new CollisionDispatcher(collisionConfiguration);
+            GImpactCollisionAlgorithm.RegisterAlgorithm(dispatcher);
+            constraintSolver = new SequentialImpulseConstraintSolver();
+            overlappingPairCache = new DbvtBroadphase(); //AxisSweep3(new BsVector3(-5000f, -5000f, -5000f), new BsVector3(5000f, 5000f, 5000f), 8192);
+            dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, constraintSolver, collisionConfiguration);
+            dynamicsWorld.Gravity = new TGCVector3(0, -10f, 0).ToBulletVector3();
+
+
+            var floorShape = new StaticPlaneShape(TGCVector3.Up.ToBulletVector3(), 0);
+            var floorMotionState = new DefaultMotionState();
+            var floorInfo = new RigidBodyConstructionInfo(0, floorMotionState, floorShape);
+            floorBody = new RigidBody(floorInfo);
+            dynamicsWorld.AddRigidBody(floorBody);
+
+            ballBody = BulletRigidBodyFactory.Instance.CreateBall(1f, 1f, new TGCVector3(0f, 50f, 0f));
+            dynamicsWorld.AddRigidBody(ballBody);
+
+
+            //Crear SkyBox
+            skyBox = new TgcSkyBox();
+            skyBox.Center = new TGCVector3(0, 500, 0);
+            skyBox.Size = new TGCVector3(10000, 10000, 10000);
+            var texturesPath = MediaDir + "Textures\\SkyBox LostAtSeaDay\\";
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, texturesPath + "lostatseaday_up.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, texturesPath + "lostatseaday_dn.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left, texturesPath + "lostatseaday_lf.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, texturesPath + "lostatseaday_rt.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, texturesPath + "lostatseaday_bk.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, texturesPath + "lostatseaday_ft.jpg");
+            skyBox.Init();
 
             Escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha2-TgcScene.xml");
             Cancha = Escena.Meshes[0];
             Arco = Escena.Meshes[1];
-            TgcMesh Auto = Escena.Meshes[2];
-            TgcMesh Tractor = Escena.Meshes[5];
-            TgcMesh Patrullero = Escena.Meshes[3];
-            TgcMesh Tanque = Escena.Meshes[4];
+            Jugador Auto = new Jugador(Escena.Meshes[2], new TGCVector3(-20, 0, 100), new TGCVector3(0, 0, 0));
+            Jugador Tractor = new Jugador(Escena.Meshes[5], new TGCVector3(0, 0, -30), new TGCVector3(0, FastMath.PI, 0));
+            Jugador Patrullero = new Jugador(Escena.Meshes[3], new TGCVector3(0, 0, 30), new TGCVector3(0, 0, 0));
+            Jugador Tanque = new Jugador(Escena.Meshes[4], new TGCVector3(20, 0, -100), new TGCVector3(0, FastMath.PI, 0));
 
-            jugadores.Add(new Jugador(Auto, new TGCVector3(-20, 0, 100), new TGCVector3(0, 0, 0)));
-            jugadores.Add(new Jugador(Tractor, new TGCVector3(0, 0, -30), new TGCVector3(0, FastMath.PI, 0)));
-            jugadores.Add(new Jugador(Patrullero, new TGCVector3(0, 0, 30), new TGCVector3(0, 0, 0)));
-            jugadores.Add(new Jugador(Tanque, new TGCVector3(20, 0, -100), new TGCVector3(0, FastMath.PI, 0)));
+            jugadores.Add(Auto);
+            jugadores.Add(Tanque);
+            jugadores.Add(Patrullero);
+            jugadores.Add(Tractor);
+            dynamicsWorld.AddRigidBody(Auto.CocheBody);
+            dynamicsWorld.AddRigidBody(Tanque.CocheBody);
+            dynamicsWorld.AddRigidBody(Patrullero.CocheBody);
+            dynamicsWorld.AddRigidBody(Tractor.CocheBody);
 
             Pelota = Escena.getMeshByName("Pelota");
+
+            paredes = Escena.getMeshByName("Box_5");
 
 
             LookAt = new TGCVector3(TGCVector3.Empty);
@@ -78,19 +132,24 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
+            dynamicsWorld.StepSimulation(ElapsedTime, 10, TimeBetweenUpdates);
 
-
-            LookAt.X += Input.XposRelative * 0.5f;
-            LookAt.Y += Input.YposRelative * 0.5f;
+            LookAt.X -= Input.XposRelative * 1.5f;
+            LookAt.Y -= Input.YposRelative * 1.5f;
             Camera.SetCamera(CameraPosition, LookAt);
+
+            System.Windows.Forms.Cursor.Position = new Point(Form.GameForm.ActiveForm.Width / 2, Form.GameForm.ActiveForm.Height / 2);
 
             if (Input.keyDown(Key.W))
             {
-                CameraPosition.Z += 0.5f * ElapsedTime;
+                
+                CameraPosition -= TGCVector3.Normalize(CameraPosition - LookAt) * ElapsedTime * 100f;
+                //CameraPosition.Z -= 100f * ElapsedTime;
             }
             if (Input.keyDown(Key.S))
             {
-                CameraPosition.Z -= 0.5f * ElapsedTime;
+                CameraPosition += TGCVector3.Normalize(CameraPosition - LookAt) * ElapsedTime * 100f;
+                //CameraPosition.Z += 100f * ElapsedTime;
             }
 
             PostUpdate();
@@ -106,7 +165,9 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            Arco.Rotation = new TGCVector3(0, 0, 0);
+            skyBox.Render();
+
+            Arco.Rotation = new TGCVector3(0, 0, 0); 
             Arco.UpdateMeshTransform();
             Arco.Render();
 
@@ -114,7 +175,7 @@ namespace TGC.Group.Model
             Arco.UpdateMeshTransform();
             Arco.Render();
 
-            Pelota.UpdateMeshTransform();
+            Pelota.Transform = TGCMatrix.Scaling(1, 1, 1) * new TGCMatrix(ballBody.InterpolationWorldTransform);
             Pelota.Render();
 
             //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
@@ -126,6 +187,9 @@ namespace TGC.Group.Model
             {
                 jugador.Render();
             }
+
+            paredes.Transform = TGCMatrix.Identity;
+            paredes.Render();
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
