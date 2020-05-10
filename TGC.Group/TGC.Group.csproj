@@ -101,6 +101,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
+    <Compile Include="Model\CamaraJugador.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\Jugador.cs" />
     <Compile Include="Program.cs" />

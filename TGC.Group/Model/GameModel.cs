@@ -35,13 +35,14 @@ namespace TGC.Group.Model
         private TgcMesh Pelota { get; set; }
 
         private List<Jugador> jugadores = new List<Jugador>();
+        private Jugador jugadorActivo;
+
+        private CamaraJugador camara;
 
         private TgcMesh paredes { get; set; }
 
         private TgcSkyBox skyBox;
 
-        private TGCVector3 LookAt;
-        private TGCVector3 CameraPosition;
         protected DiscreteDynamicsWorld dynamicsWorld;
         protected CollisionDispatcher dispatcher;
         protected DefaultCollisionConfiguration collisionConfiguration;
@@ -50,7 +51,13 @@ namespace TGC.Group.Model
 
         private RigidBody floorBody;
 
+        private bool cerrar;
+
         RigidBody ballBody;
+
+        float tAcum;
+        int fps;
+        int lastFps;
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -63,7 +70,9 @@ namespace TGC.Group.Model
             //Device de DirectX para crear primitivas.
             var d3dDevice = D3DDevice.Instance.Device;
 
-            FixedTickEnable = false;
+            FixedTickEnable = true;
+
+            cerrar = false;
 
             //Creamos el mundo fisico por defecto.
             collisionConfiguration = new DefaultCollisionConfiguration();
@@ -99,17 +108,22 @@ namespace TGC.Group.Model
             skyBox.Init();
 
             Escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha2-TgcScene.xml");
+
             Cancha = Escena.Meshes[0];
+            Cancha.Transform = TGCMatrix.Translation(0, -10, 0);
+
             Arco = Escena.Meshes[1];
             Jugador Auto = new Jugador(Escena.Meshes[2], new TGCVector3(-20, 0, 100), new TGCVector3(0, 0, 0));
             Jugador Tractor = new Jugador(Escena.Meshes[5], new TGCVector3(0, 0, -30), new TGCVector3(0, FastMath.PI, 0));
             Jugador Patrullero = new Jugador(Escena.Meshes[3], new TGCVector3(0, 0, 30), new TGCVector3(0, 0, 0));
             Jugador Tanque = new Jugador(Escena.Meshes[4], new TGCVector3(20, 0, -100), new TGCVector3(0, FastMath.PI, 0));
 
+            jugadorActivo = Auto;
+
             jugadores.Add(Auto);
-            jugadores.Add(Tanque);
-            jugadores.Add(Patrullero);
             jugadores.Add(Tractor);
+            jugadores.Add(Patrullero);
+            jugadores.Add(Tanque);
             dynamicsWorld.AddRigidBody(Auto.CocheBody);
             dynamicsWorld.AddRigidBody(Tanque.CocheBody);
             dynamicsWorld.AddRigidBody(Patrullero.CocheBody);
@@ -119,9 +133,11 @@ namespace TGC.Group.Model
 
             paredes = Escena.getMeshByName("Box_5");
 
+            camara = new CamaraJugador(jugadorActivo, ballBody, Camera);
 
-            LookAt = new TGCVector3(TGCVector3.Empty);
-            CameraPosition = new TGCVector3(0, 100, 225);
+            tAcum = 0;
+            fps = 0;
+            lastFps = 0;
         }
 
         /// <summary>
@@ -132,25 +148,25 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
+
             dynamicsWorld.StepSimulation(ElapsedTime, 10, TimeBetweenUpdates);
 
-            LookAt.X -= Input.XposRelative * 1.5f;
-            LookAt.Y -= Input.YposRelative * 1.5f;
-            Camera.SetCamera(CameraPosition, LookAt);
+            foreach (Jugador jugador in jugadores)
+            {
+                jugador.Update(ElapsedTime);
+            }
 
             System.Windows.Forms.Cursor.Position = new Point(Form.GameForm.ActiveForm.Width / 2, Form.GameForm.ActiveForm.Height / 2);
 
-            if (Input.keyDown(Key.W))
+            camara.Update(ElapsedTime);
+
+            if (Input.keyDown(Key.Escape))
             {
-                
-                CameraPosition -= TGCVector3.Normalize(CameraPosition - LookAt) * ElapsedTime * 100f;
-                //CameraPosition.Z -= 100f * ElapsedTime;
+                TGC.Group.Form.GameForm.ActiveForm.Close();
+                cerrar = true;
             }
-            if (Input.keyDown(Key.S))
-            {
-                CameraPosition += TGCVector3.Normalize(CameraPosition - LookAt) * ElapsedTime * 100f;
-                //CameraPosition.Z += 100f * ElapsedTime;
-            }
+
+            jugadorActivo.HandleInput(Input);
 
             PostUpdate();
         }
@@ -162,8 +178,16 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Render()
         {
+
+            if (cerrar)
+            {
+                return;
+            }
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
+            
+            DrawText.drawText("ElapsetTime= " + ElapsedTime, 0, 20, Color.OrangeRed);
+            DrawText.drawText("FPS= " + lastFps, 0, 50, Color.OrangeRed);
 
             skyBox.Render();
 
@@ -193,6 +217,15 @@ namespace TGC.Group.Model
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
+
+            fps++;
+            tAcum += ElapsedTime;
+            if (tAcum >= 1)
+            {
+                lastFps = fps;
+                fps = 0;
+                tAcum = 0;
+            }
         }
 
         /// <summary>

@@ -9,6 +9,7 @@ using TGC.Core.BulletPhysics;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Example;
+using TGC.Core.Input;
 
 namespace TGC.Group.Model
 {
@@ -20,19 +21,54 @@ namespace TGC.Group.Model
 
         public RigidBody CocheBody { get; }
 
+        private Microsoft.DirectX.DirectInput.Key inputAvanzar;
+
+        private BulletSharp.Math.Quaternion rotation;
+
+        private bool avanzando;
+
         public Jugador(TgcMesh mesh, TGCVector3 position, TGCVector3 rotation)
         {
+            inputAvanzar = Key.UpArrow;
+
             Mesh = mesh;
             Position = position;
             Rotation = rotation;
             Position += new TGCVector3(0, 10, 0);
-            CocheBody = BulletRigidBodyFactory.Instance.CreateBox(Mesh.Scale, 1f, Position, 0f, 0f, 0f, 1f, true);
+
+            this.rotation = new BulletSharp.Math.Quaternion();
+
+            CocheBody = BulletRigidBodyFactory.Instance.CreateBox(Mesh.BoundingBox.calculateSize(), 1f, Position, 0f, 0f, 0f, 1f, true);
         }
 
-        public void Update()
+        public void Update(float ElapsedTime)
         {
+
+            BulletSharp.Math.Vector3 translation = new BulletSharp.Math.Vector3();
+            BulletSharp.Math.Vector3 scale = new BulletSharp.Math.Vector3();
+            
+            CocheBody.InterpolationWorldTransform.Decompose( out scale, out rotation, out translation);
+            Position = new TGCVector3(translation);
+
             /*if(TGCExample.Input)
             CocheBody.Velo*/
+        }
+
+        public void HandleInput(TgcD3dInput input)
+        {
+            float maxVelocity = 100;
+            if (input.keyDown(inputAvanzar) )
+            {
+                BulletSharp.Math.Vector3 velocity = new BulletSharp.Math.Vector3(0, 0, -5);
+                velocity = rotation.Rotate(velocity);
+                CocheBody.ApplyImpulse(velocity, new BulletSharp.Math.Vector3());
+                //CocheBody.LinearVelocity = velocity;
+            }
+            
+            if(input.keyUp(inputAvanzar))
+            {
+                CocheBody.LinearVelocity = new BulletSharp.Math.Vector3(0, 0, 0);
+            }
         }
 
         public void Render()
