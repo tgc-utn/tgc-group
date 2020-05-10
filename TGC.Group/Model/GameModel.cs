@@ -117,12 +117,14 @@ namespace TGC.Group.Model
             shark = new Shark(mesh, Player);
             shark.Init();
 
-            coral = new Coral(MediaDir, ShadersDir);
+            scene = loader.loadSceneFromFile(MediaDir + "coral-TgcScene.xml");
+            mesh = scene.Meshes[0];
+            coral = new Coral(mesh);
             coral.Init();
-            coral.actualizarPosicion(new TGCVector3(10, -15, 15));
 
-            nave = new Nave(MediaDir, ShadersDir);
-            nave.Init();
+            scene = loader.loadSceneFromFile(MediaDir + "ship-TgcScene.xml");
+            nave = Nave.Instance();
+            nave.Init(scene);
         }
 
         /// <summary>
@@ -140,7 +142,7 @@ namespace TGC.Group.Model
             } else
             {
                 // update de elementos de agua
-                coral.Update();
+                coral.Update(ElapsedTime);
                 nave.Update();
                 oceano.Update();
 

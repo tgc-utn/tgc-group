@@ -102,7 +102,7 @@
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
     <Compile Include="Model\Camara.cs" />
-    <Compile Include="Model\Coral.cs" />
+    <Compile Include="Model\Entidades\Coral.cs" />
     <Compile Include="Model\Crafting\Combination.cs" />
     <Compile Include="Model\Crafting\Combinations.cs" />
     <Compile Include="Model\Crafting\Inventory.cs" />
@@ -113,10 +113,8 @@
     <Compile Include="Model\Entidades\Shark.cs" />
     <Compile Include="Model\Fondo.cs" />
     <Compile Include="Model\GameModel.cs" />
-    <Compile Include="Model\Nave.cs" />
-    <Compile Include="Model\Pez.cs" />
+    <Compile Include="Model\Entidades\Nave.cs" />
     <Compile Include="Model\Player.cs" />
-    <Compile Include="Model\Tiburon.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">

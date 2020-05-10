@@ -11,6 +11,7 @@ using TGC.Core.Collision;
 using TGC.Core.Example;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
+using TGC.Core.SceneLoader;
 using TGC.Group.Model.Entidades;
 
 namespace TGC.Group.Model
@@ -53,6 +54,20 @@ namespace TGC.Group.Model
             if (click)
             {
                 ray.updateRay();
+                // me fijo si hubo colision con nave
+                List<TgcMesh> meshesNave = Nave.Instance().obtenerMeshes();
+                foreach (TgcMesh mesh in meshesNave)
+                {
+                    var aabb = mesh.BoundingBox;
+
+                    var selected = TgcCollisionUtils.intersectRayAABB(ray.Ray, aabb, out collisionPoint);
+                    if (selected)
+                    {
+                        Nave.Instance().Interact();
+                        break;
+                    }
+                }
+
                 List<Entity> entities = Entities.GetEntities();
                 foreach (Entity entity in entities)
                 {

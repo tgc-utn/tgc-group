@@ -1,37 +1,68 @@
-﻿using TGC.Core.Example;
-using TGC.Core.Mathematica;
+﻿using System.Collections.Generic;
 using TGC.Core.SceneLoader;
 
 namespace TGC.Group.Model
 {
-    class Nave : TGCExample
+    class Nave // es un singleton!
     {
         private TgcScene escenaNave;
         //private TGCMatrix escalaBase;
-        public Nave(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
+
+        private static Nave _instance;
+
+        protected Nave()
         {
-            Category = Game.Default.Category;
-            Name = Game.Default.Name;
-            Description = Game.Default.Description;
         }
 
-        public override void Init()
+        public static Nave Instance()
         {
-            var loader = new TgcSceneLoader();
-            escenaNave = loader.loadSceneFromFile(MediaDir + "ship-TgcScene.xml");
+            if (_instance == null)
+            {
+                _instance = new Nave();
+            }
+
+            return _instance;
+        }
+
+        public void Init(TgcScene _escenaNave)
+        {
+            escenaNave = _escenaNave;
             //escalaBase = TGCMatrix.Scaling(new TGCVector3(0.2f, 0.2f, 0.2f));
         }
-        public override void Update()
+        public void Update()
         {
         }
-        public override void Render()
+        public void Render()
         {
             foreach (var mesh in escenaNave.Meshes)
             {
+                if (mesh == null)
+                {
+                    break;
+                }
                 mesh.Render();
+                //mesh.BoundingBox.Render();
             }
         }
-        public override void Dispose()
+        
+        public void Interact()
+        {
+            /*foreach (var mesh in escenaNave.Meshes)
+            {
+                if (mesh == null)
+                {
+                    break;
+                }
+                mesh.Dispose();
+            }*/
+        }
+
+        public List<TgcMesh> obtenerMeshes()
+        {
+            return escenaNave.Meshes;
+        }
+
+        public void Dispose()
         {
             escenaNave.DisposeAll();
         }

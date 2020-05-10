@@ -44,12 +44,13 @@ namespace TGC.Group.Model
             skyBox.SkyEpsilon = 25f;
 
             skyBox.Init();
+
+            D3DDevice.Instance.Device.Transform.Projection = TGCMatrix.PerspectiveFovLH(D3DDevice.Instance.FieldOfView, D3DDevice.Instance.AspectRatio,
+                   D3DDevice.Instance.ZNearPlaneDistance, D3DDevice.Instance.ZFarPlaneDistance * 2f).ToMatrix();
         }
 
         public override void Update()
         {
-            D3DDevice.Instance.Device.Transform.Projection = TGCMatrix.PerspectiveFovLH(D3DDevice.Instance.FieldOfView, D3DDevice.Instance.AspectRatio,
-                   D3DDevice.Instance.ZNearPlaneDistance, D3DDevice.Instance.ZFarPlaneDistance * 2f).ToMatrix();
             //Coloco a la camara en el centro del cubo
             skyBox.Center = Camera.Position;
         }
