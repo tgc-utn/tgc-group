@@ -42,11 +42,12 @@ namespace TGC.Group.Model
         // para la primer entrega lo dejamos asi
         Pez pez;
         Pez otroPez;
+        Coral coral;
         Tiburon tiburoncin;
 
         FPSCamara FPSCamara;
         Player Player;
-
+        Nave nave;
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -93,6 +94,10 @@ namespace TGC.Group.Model
             otroPez.Init();
             otroPez.actualizarPosicion(new TGCVector3(10, 10, 15));
 
+            coral = new Coral(MediaDir, ShadersDir);
+            coral.Init();
+            coral.actualizarPosicion(new TGCVector3(10, -15, 15));
+
             tiburoncin = new Tiburon(MediaDir, ShadersDir);
             tiburoncin.Init();
 
@@ -104,6 +109,9 @@ namespace TGC.Group.Model
             //Settear jugador y camara
             Player = new Player();
             Player.InitMesh();
+
+            nave = new Nave(MediaDir, ShadersDir);
+            nave.Init();
 
             FPSCamara = new FPSCamara(Camera, Player);
         }
@@ -120,10 +128,11 @@ namespace TGC.Group.Model
             oceano.Update();
             pez.Update();
             otroPez.Update();
+            coral.Update();
 
             DateTime actualTimestamp = DateTime.Now;
             // Mostrar Tiburon cada X cantidad de tiempo
-            if (actualTimestamp.Subtract(timestamp).TotalSeconds > 15)
+            if (actualTimestamp.Subtract(timestamp).TotalSeconds > 10)
             {
                 tiburoncin.aparecer(Camera);
                 timestamp = actualTimestamp;
@@ -137,7 +146,7 @@ namespace TGC.Group.Model
             //Camara y jugador
             FPSCamara.Update(Input, ElapsedTime);
             Player.Update(Input, FPSCamara, ElapsedTime);
-            
+            nave.Update();
 
             PostUpdate();
 
@@ -158,7 +167,7 @@ namespace TGC.Group.Model
             pez.Render();
             otroPez.Render();
             tiburoncin.Render();
-
+            coral.Render();
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla P se activa el GodMode", 5, 20, Color.DarkKhaki);
             DrawText.drawText("A,S,D,W para moverse, Ctrl y Espacio para subir o bajar.", 5, 35, Color.DarkKhaki);
@@ -169,6 +178,7 @@ namespace TGC.Group.Model
             
             Player.UpdateTransform();
             Player.Render();
+            nave.Render();
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
@@ -187,6 +197,8 @@ namespace TGC.Group.Model
             pez.Dispose();
             otroPez.Dispose();
             tiburoncin.Dispose();
+            coral.Dispose();
+            nave.Dispose();
         }
     }
 }

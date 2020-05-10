@@ -102,12 +102,14 @@
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
     <Compile Include="Model\Camara.cs" />
+    <Compile Include="Model\Coral.cs" />
     <Compile Include="Model\Crafting\Combination.cs" />
     <Compile Include="Model\Crafting\Combinations.cs" />
     <Compile Include="Model\Crafting\Inventory.cs" />
     <Compile Include="Model\Crafting\Item.cs" />
     <Compile Include="Model\Fondo.cs" />
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Model\Nave.cs" />
     <Compile Include="Model\Pez.cs" />
     <Compile Include="Model\Player.cs" />
     <Compile Include="Model\Tiburon.cs" />
@@ -220,6 +222,9 @@
     <Content Include="bin\x86\Debug\TGC.Core.xml" />
     <Content Include="bin\x86\Debug\TGC.Group.exe" />
     <Content Include="bin\x86\Debug\TGC.Group.pdb" />
+    <Content Include="Media\coral-TgcScene.xml" />
+    <Content Include="Media\ship-TgcScene.xml" />
+    <Content Include="Media\Textures\10010_Coral_v1_Diffuse.jpg" />
     <Content Include="Media\cajaMadera4.jpg" />
     <Content Include="Media\shark-TgcScene.xml" />
     <Content Include="Media\Textures\12960_Shark_diff_v2.jpg" />
@@ -232,8 +237,13 @@
     <Content Include="Media\Mar\fondoMarLeft.jpg" />
     <Content Include="Media\Mar\fondoMarRight.jpg" />
     <Content Include="Media\Mar\fondoMarUp.PNG" />
+    <Content Include="Media\Textures\bodyColor_de_la_Superficie.png" />
+    <Content Include="Media\Textures\Color_helice.png" />
+    <Content Include="Media\Textures\difuse_enganche.png" />
     <Content Include="Media\Textures\fish.jpg" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
+    <Content Include="Media\Textures\float_texColor_de_la_Superficie.png" />
+    <Content Include="Media\Textures\LAMP_UVS.png" />
     <Content Include="Media\yellow_fish-TgcScene.xml" />
     <Content Include="obj\x86\Debug\TempPE\Properties.Resources.Designer.cs.dll" />
     <Content Include="obj\x86\Debug\TGC.Group.csproj.FileListAbsolute.txt" />
