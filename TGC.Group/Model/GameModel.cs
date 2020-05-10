@@ -39,13 +39,10 @@ namespace TGC.Group.Model
         TgcSimpleTerrain heightmap;
         Control focusWindows;
         Point mousePosition;
-        // todo: probablemente deleguemos la generacion de peces en otra clase
-        // para la primer entrega lo dejamos asi
-        Pez pez;
-        Pez otroPez;
-        Tiburon tiburoncin;
 
+        //Entidades
         Fish fish;
+        Shark shark;
 
         FPSCamara FPSCamara;
         Player Player;
@@ -68,6 +65,18 @@ namespace TGC.Group.Model
             FixedTickEnable = true;
             //Se puede configurar el tiempo en estas propiedades TimeBetweenUpdates y TimeBetweenRenders, por defecto esta puedo en 1F / FPS_60 es a lo minimo que deberia correr el TP.
             //De no estar a gusto como se ejecuta el metodo Tick (el que maneja el GameLoop) el mismo es virtual con lo cual pueden sobrescribirlo.
+
+            //Esconder cursor
+            focusWindows = d3dDevice.CreationParameters.FocusWindow;
+            mousePosition = focusWindows.PointToScreen(new Point(focusWindows.Width / 2, focusWindows.Height / 2));
+            //Cursor.Hide();
+
+            //Settear jugador y camara
+            Player = new Player(Input);
+            Player.InitMesh();
+
+            FPSCamara = new FPSCamara(Camera, Input, Player);
+
 
             //Inicializar camara
             var cameraPosition = new TGCVector3(0, 0, 125);
@@ -95,21 +104,14 @@ namespace TGC.Group.Model
             fish = new Fish(mesh);
             fish.Init();
 
-            tiburoncin = new Tiburon(MediaDir, ShadersDir);
-            tiburoncin.Init();
+            scene = loader.loadSceneFromFile(MediaDir + "shark-TgcScene.xml");
+            mesh = scene.Meshes[0];
 
+            shark = new Shark(mesh, Player);
+            shark.Init();
             
 
-            //Esconde cursor
-            focusWindows = d3dDevice.CreationParameters.FocusWindow;
-            mousePosition = focusWindows.PointToScreen(new Point(focusWindows.Width / 2, focusWindows.Height / 2));
-            //Cursor.Hide();
-
-            //Settear jugador y camara
-            Player = new Player(Input);
-            Player.InitMesh();
-
-            FPSCamara = new FPSCamara(Camera, Input, Player);
+            
         }
 
         /// <summary>
@@ -127,14 +129,13 @@ namespace TGC.Group.Model
             // Mostrar Tiburon cada X cantidad de tiempo
             if (actualTimestamp.Subtract(timestamp).TotalSeconds > 15)
             {
-                tiburoncin.aparecer(Camera);
+                shark.Spawn();
                 timestamp = actualTimestamp;
             }
-            tiburoncin.Update();
-
+            shark.Update(ElapsedTime);
 
             fish.Update(ElapsedTime);
-
+            
             //Lockear mouse
             Cursor.Position = mousePosition;
 
@@ -159,10 +160,10 @@ namespace TGC.Group.Model
 
             oceano.Render();
             heightmap.Render();
-            tiburoncin.Render();
 
 
             fish.Render();
+            shark.Render();
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla P se activa el GodMode", 5, 20, Color.DarkKhaki);
             DrawText.drawText("A,S,D,W para moverse, Ctrl y Espacio para subir o bajar.", 5, 35, Color.DarkKhaki);
@@ -187,9 +188,9 @@ namespace TGC.Group.Model
             Player.Dispose();
             oceano.Dispose();
             heightmap.Dispose();
-            tiburoncin.Dispose();
 
             fish.Dispose();
+            shark.Dispose();
         }
     }
 }

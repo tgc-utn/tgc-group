@@ -109,6 +109,7 @@
     <Compile Include="Model\Entidades\Entity.cs" />
     <Compile Include="Model\Entidades\Entities.cs" />
     <Compile Include="Model\Entidades\Fish.cs" />
+    <Compile Include="Model\Entidades\Shark.cs" />
     <Compile Include="Model\Fondo.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\Pez.cs" />

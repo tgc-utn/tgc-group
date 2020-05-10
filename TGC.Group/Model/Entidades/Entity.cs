@@ -13,6 +13,7 @@ namespace TGC.Group.Model.Entidades
     {
         protected TgcMesh mesh;
         protected TGCVector3 defaultLookDir; //direccion a la que esta mirando el mesh al meterlo en escena
+        protected TGCQuaternion rotation;
 
         public Entity(TgcMesh mesh, TGCVector3 defaultLookDir) { 
             this.mesh = mesh;
@@ -60,9 +61,8 @@ namespace TGC.Group.Model.Entidades
         /// <param name="speed">Velocidad a la que la entidad se mueve</param>
         protected void Move(TGCVector3 goalPos, float speed, float ElapsedTime)
         {
-            Console.WriteLine("Entity goal: " + goalPos);
             TGCVector3 dir = TGCVector3.Normalize(goalPos - mesh.Position);
-            var rotation = GetLookAtRotation(dir);
+            LookAt(dir);
 
             TGCVector3 movement = dir * speed * ElapsedTime;
             mesh.Position += movement;
@@ -74,11 +74,11 @@ namespace TGC.Group.Model.Entidades
         /// Devuelve la rotacion que se debe aplicar a la matriz de transformacion para que la entidad apunte hacia una direccion.
         /// </summary>
         /// <param name="lookDir">Vector normalizado que define la direccion a la que debe mirar la entidad.</param>
-        private TGCQuaternion GetLookAtRotation(TGCVector3 lookDir)
+        private void LookAt(TGCVector3 lookDir)
         {
             float angle = FastMath.Acos(TGCVector3.Dot(defaultLookDir, lookDir));
             TGCVector3 rotVector = TGCVector3.Cross(defaultLookDir, lookDir);
-            return TGCQuaternion.RotationAxis(rotVector, angle);
+            rotation = TGCQuaternion.RotationAxis(rotVector, angle);
         }
     }
 }

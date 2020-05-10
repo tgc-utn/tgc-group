@@ -1,10 +1,12 @@
 ﻿using Microsoft.DirectX.DirectInput;
 using System;
 using System.Collections.Generic;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.Camara;
 using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
+using TGC.Core.SceneLoader;
 using TGC.Group.Model.Crafting;
 
 namespace TGC.Group.Model
@@ -42,6 +44,7 @@ namespace TGC.Group.Model
         //Tgc functions
 
         public TGCVector3 Position() { return mesh.Position; }
+        public TgcBoundingAxisAlignBox BoundingBox() { return mesh.BoundingBox; }
 
         public void InitMesh() { mesh = TGCBox.fromSize(size, null); }
 
@@ -72,7 +75,7 @@ namespace TGC.Group.Model
             Move(movement);
 
             //Dev
-            bool p = Input.keyPressed(Key.P);
+            bool p = Input.keyDown(Key.P);
             if (p) { godmode = !godmode; GodMode(godmode); }
         }
 
@@ -102,8 +105,8 @@ namespace TGC.Group.Model
             if (oxygen == 0) GetDamage(OXYGEN_DAMAGE * ElapsedTime);
         }
 
-        private void GetHeal(float amount) { health = Math.Min(100f, health + amount); }
-        private void GetDamage(float amount) { health = Math.Max(0, health - amount); }
+        public void GetHeal(float amount) { health = Math.Min(100f, health + amount); }
+        public void GetDamage(float amount) { health = Math.Max(0, health - amount); }
         private void RecoverOxygen(float ElapsedTime) { oxygen = Math.Min(100, oxygen + OXYGEN_RECOVER_SPEED * ElapsedTime); }
         private bool IsOutsideWater() { return mesh.Position.Y > WATER_LEVEL; }
 

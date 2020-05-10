@@ -11,6 +11,7 @@ namespace TGC.Group.Model.Entidades
 {
     class Fish : Entity
     {
+        static TGCVector3 meshLookDir = new TGCVector3(-1, 0, 0);
 
         //Config
         const float speed = 7.5f;
@@ -18,9 +19,8 @@ namespace TGC.Group.Model.Entidades
 
         //Internal vars
         TGCVector3 goalPos = TGCVector3.Empty;
-        TGCQuaternion rotation = TGCQuaternion.Identity;
 
-        public Fish(TgcMesh mesh) : base(mesh, new TGCVector3(-1,0,0)) { }
+        public Fish(TgcMesh mesh) : base(mesh, meshLookDir) { }
 
         protected override void InitEntity()
         {
@@ -30,7 +30,7 @@ namespace TGC.Group.Model.Entidades
         protected override void UpdateEntity(float ElapsedTime)
         {
             if (ArrivedGoalPos()) 
-                GetNewGoalPos();
+                SetRandomGoalPos();
 
             Move(goalPos, speed, ElapsedTime);
         }
@@ -42,7 +42,7 @@ namespace TGC.Group.Model.Entidades
 
         //Internal functions
 
-        private void GetNewGoalPos()
+        private void SetRandomGoalPos()
         {
             Random r = new Random();
             var x = (float) r.NextDouble();
