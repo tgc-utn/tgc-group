@@ -40,7 +40,9 @@ namespace TGC.Group.Model.Entidades
             DisposeEntity();
         }
 
-        public virtual void Interact() { }
+        public virtual void Interact() {
+            InteractEntity();
+        }
 
 
         //Override functions
@@ -48,6 +50,7 @@ namespace TGC.Group.Model.Entidades
         protected virtual void UpdateEntity(float ElapsedTime) { }
         protected virtual void RenderEntity() { }
         protected virtual void DisposeEntity() { }
+        protected virtual void InteractEntity() { }
 
         //Getters
         public TgcMesh GetMesh() { return mesh; }
