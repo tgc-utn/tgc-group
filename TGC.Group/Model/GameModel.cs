@@ -32,6 +32,12 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
+        // variable que indica si esta dentro o fuera de la nave, en base a esto se renderiza un escenario u otro
+        // comienza en la nave por lo tanto se inicializa en true
+        // cuando se cambia esta variable hay que ocultar todos los elemntos del escenario anterior y hacer un fade a negro
+        // como todavia no tenemos ese escenario, lo dejamos en false temporalmente
+        bool estaEnNave = false;
+
         DateTime timestamp;
 
         Fondo oceano;
@@ -125,28 +131,37 @@ namespace TGC.Group.Model
         { 
             PreUpdate();
 
-            oceano.Update();
-            pez.Update();
-            otroPez.Update();
-            coral.Update();
-
-            DateTime actualTimestamp = DateTime.Now;
-            // Mostrar Tiburon cada X cantidad de tiempo
-            if (actualTimestamp.Subtract(timestamp).TotalSeconds > 10)
+            if (estaEnNave)
             {
-                tiburoncin.aparecer(Camera);
-                timestamp = actualTimestamp;
+                // update de elementos de nave
+            } else
+            {
+                // update de elementos de agua
+                oceano.Update();
+                pez.Update();
+                otroPez.Update();
+                coral.Update();
+
+                DateTime actualTimestamp = DateTime.Now;
+                // Mostrar Tiburon cada X cantidad de tiempo
+                if (actualTimestamp.Subtract(timestamp).TotalSeconds > 10)
+                {
+                    tiburoncin.aparecer(Camera);
+                    timestamp = actualTimestamp;
+                }
+                tiburoncin.Update();
+
+                nave.Update();
+
             }
-            tiburoncin.Update();
 
-
+            // esto se hace siempre
             //Lockear mouse
             Cursor.Position = mousePosition;
 
             //Camara y jugador
             FPSCamara.Update(Input, ElapsedTime);
             Player.Update(Input, FPSCamara, ElapsedTime);
-            nave.Update();
 
             PostUpdate();
 
@@ -162,12 +177,20 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            oceano.Render();
-            heightmap.Render();
-            pez.Render();
-            otroPez.Render();
-            tiburoncin.Render();
-            coral.Render();
+            if (estaEnNave)
+            {
+
+            } else
+            {
+                oceano.Render();
+                heightmap.Render();
+                pez.Render();
+                otroPez.Render();
+                tiburoncin.Render();
+                coral.Render();
+                nave.Render();
+            }
+            // esto se dibuja siempre
             //Dibuja un texto por pantalla
             DrawText.drawText("Con la tecla P se activa el GodMode", 5, 20, Color.DarkKhaki);
             DrawText.drawText("A,S,D,W para moverse, Ctrl y Espacio para subir o bajar.", 5, 35, Color.DarkKhaki);
@@ -178,7 +201,6 @@ namespace TGC.Group.Model
             
             Player.UpdateTransform();
             Player.Render();
-            nave.Render();
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
