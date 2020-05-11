@@ -12,10 +12,10 @@ namespace TGC.Group.Model
         private TGCVector3 CameraPosition;
         private TgcCamera  camara;
 
-        private Jugador               jugador;
-        private BulletSharp.RigidBody pelota;
+        private ObjetoJuego jugador;
+        private ObjetoJuego pelota;
 
-        public CamaraJugador(Jugador jugador, BulletSharp.RigidBody pelota, TgcCamera camara)
+        public CamaraJugador(ObjetoJuego jugador, ObjetoJuego pelota, TgcCamera camara)
         {
             this.jugador = jugador;
             this.pelota = pelota;
@@ -27,14 +27,9 @@ namespace TGC.Group.Model
 
         public void Update(float ElapsedTime)
         {
-            BulletSharp.Math.Vector3 scale = new BulletSharp.Math.Vector3();
-            BulletSharp.Math.Vector3 translation = new BulletSharp.Math.Vector3();
-            BulletSharp.Math.Quaternion rotation = new BulletSharp.Math.Quaternion();
 
-            pelota.InterpolationWorldTransform.Decompose(out scale, out rotation, out translation);
-
-            LookAt = new TGCVector3(translation);
-            CameraPosition = jugador.Position;
+            LookAt = pelota.Translation;
+            CameraPosition = jugador.Translation;
             CameraPosition.Y += 10;
             CameraPosition.Z += 100;
 

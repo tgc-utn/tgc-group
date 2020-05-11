@@ -2,7 +2,6 @@ using BulletSharp;
 using Microsoft.DirectX.DirectInput;
 using System.Collections.Generic;
 using System.Drawing;
-using TGC.Core.BulletPhysics;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Mathematica;
@@ -29,7 +28,6 @@ namespace TGC.Group.Model
         private TgcScene  escena;
         private TgcMesh   cancha;
         private TgcMesh   arco;
-        private TgcMesh   pelota;
         private TgcMesh   paredes;
         private TgcSkyBox skyBox;
 
@@ -37,6 +35,7 @@ namespace TGC.Group.Model
         private List<Jugador> jugadores = new List<Jugador>();
         private Jugador       jugadorActivo;
         private CamaraJugador camara;
+        private Pelota        pelota;
 
         //Objetos de fisica
         protected DiscreteDynamicsWorld             dynamicsWorld;
@@ -45,7 +44,6 @@ namespace TGC.Group.Model
         protected SequentialImpulseConstraintSolver constraintSolver;
         protected BroadphaseInterface               overlappingPairCache;
         private   RigidBody                         floorBody;
-        private   RigidBody                         ballBody;
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -65,8 +63,11 @@ namespace TGC.Group.Model
             initMeshes();
 
             initJugadores();
+            
+            pelota = new Pelota( escena.getMeshByName("Pelota"), new TGCVector3(0f, 50f, 0f));
+            dynamicsWorld.AddRigidBody(pelota.Cuerpo);
 
-            camara = new CamaraJugador(jugadorActivo, ballBody, Camera);
+            camara = new CamaraJugador(jugadorActivo, pelota, Camera);
         }
 
         private void initFisica()
@@ -91,10 +92,6 @@ namespace TGC.Group.Model
 
             floorBody = new RigidBody(floorInfo);
             dynamicsWorld.AddRigidBody(floorBody);
-
-            //Creamos cuerpo de la pelota
-            ballBody = BulletRigidBodyFactory.Instance.CreateBall(1f, 1f, new TGCVector3(0f, 50f, 0f));
-            dynamicsWorld.AddRigidBody(ballBody);
         }
 
         private void initMeshes()
@@ -120,8 +117,6 @@ namespace TGC.Group.Model
 
             arco = escena.Meshes[1];
 
-            pelota = escena.getMeshByName("Pelota");
-
             paredes = escena.getMeshByName("Box_5");
         }
 
@@ -138,10 +133,10 @@ namespace TGC.Group.Model
             jugadores.Add(Tractor);
             jugadores.Add(Patrullero);
             jugadores.Add(Tanque);
-            dynamicsWorld.AddRigidBody(Auto.CocheBody);
-            dynamicsWorld.AddRigidBody(Tanque.CocheBody);
-            dynamicsWorld.AddRigidBody(Patrullero.CocheBody);
-            dynamicsWorld.AddRigidBody(Tractor.CocheBody);
+            dynamicsWorld.AddRigidBody(Auto.Cuerpo);
+            dynamicsWorld.AddRigidBody(Tanque.Cuerpo);
+            dynamicsWorld.AddRigidBody(Patrullero.Cuerpo);
+            dynamicsWorld.AddRigidBody(Tractor.Cuerpo);
         }
 
         /// <summary>
@@ -159,6 +154,8 @@ namespace TGC.Group.Model
             {
                 jugador.Update(ElapsedTime);
             }
+
+            pelota.Update(ElapsedTime);
 
             camara.Update(ElapsedTime);
 
@@ -198,8 +195,7 @@ namespace TGC.Group.Model
             arco.Rotation = new TGCVector3(0, FastMath.PI, 0);
             arco.UpdateMeshTransform();
             arco.Render();
-
-            pelota.Transform = new TGCMatrix(ballBody.InterpolationWorldTransform);
+            
             pelota.Render();
             
             cancha.Transform = new TGCMatrix(floorBody.InterpolationWorldTransform);

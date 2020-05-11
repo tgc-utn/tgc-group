@@ -104,6 +104,7 @@
     <Compile Include="Model\CamaraJugador.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\Jugador.cs" />
+    <Compile Include="Model\ObjetoJuego.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
@@ -123,6 +124,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Game.Designer.cs</LastGenOutput>
     </None>
+    <Compile Include="Model\Pelota.cs" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
