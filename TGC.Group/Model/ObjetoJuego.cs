@@ -7,13 +7,7 @@ namespace TGC.Group.Model
     class ObjetoJuego
     {
         //Objetos de meshes
-        public TgcMesh Mesh
-        {
-            get {
-                return mesh;
-            }
-        }
-        
+        public TgcMesh    Mesh        { get { return mesh; } }
         public TGCVector3 Scale       { get { return new TGCVector3(scale); } }
         public TGCVector3 Translation { get { return new TGCVector3(translation); } }
         public TGCVector4 Rotation    { get { return new TGCVector4(rotation.X,rotation.Y,rotation.Z,rotation.W); } }
