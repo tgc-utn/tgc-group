@@ -1,16 +1,12 @@
+using BulletSharp;
 using Microsoft.DirectX.DirectInput;
 using System.Collections.Generic;
 using System.Drawing;
+using TGC.Core.BulletPhysics;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
-using TGC.Core.Geometry;
-using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
-using TGC.Core.Textures;
-using BulletSharp;
-using TGC.Core.BulletPhysics;
-using BulletSharp.Math;
 using TGC.Core.Terrain;
 
 namespace TGC.Group.Model
@@ -29,35 +25,27 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        private TgcScene Escena { get; set; }
-        private TgcMesh Cancha { get; set; }
-        private TgcMesh Arco { get; set; }
-        private TgcMesh Pelota { get; set; }
-
-        private List<Jugador> jugadores = new List<Jugador>();
-        private Jugador jugadorActivo;
-
-        private CamaraJugador camara;
-
-        private TgcMesh paredes { get; set; }
-
+        //Objetos de escena
+        private TgcScene  escena;
+        private TgcMesh   cancha;
+        private TgcMesh   arco;
+        private TgcMesh   pelota;
+        private TgcMesh   paredes;
         private TgcSkyBox skyBox;
 
-        protected DiscreteDynamicsWorld dynamicsWorld;
-        protected CollisionDispatcher dispatcher;
-        protected DefaultCollisionConfiguration collisionConfiguration;
+        //Objetos de juego
+        private List<Jugador> jugadores = new List<Jugador>();
+        private Jugador       jugadorActivo;
+        private CamaraJugador camara;
+
+        //Objetos de fisica
+        protected DiscreteDynamicsWorld             dynamicsWorld;
+        protected CollisionDispatcher               dispatcher;
+        protected DefaultCollisionConfiguration     collisionConfiguration;
         protected SequentialImpulseConstraintSolver constraintSolver;
-        protected BroadphaseInterface overlappingPairCache;
-
-        private RigidBody floorBody;
-
-        private bool cerrar;
-
-        RigidBody ballBody;
-
-        float tAcum;
-        int fps;
-        int lastFps;
+        protected BroadphaseInterface               overlappingPairCache;
+        private   RigidBody                         floorBody;
+        private   RigidBody                         ballBody;
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -72,27 +60,45 @@ namespace TGC.Group.Model
 
             FixedTickEnable = true;
 
-            cerrar = false;
+            initFisica();
 
+            initMeshes();
+
+            initJugadores();
+
+            camara = new CamaraJugador(jugadorActivo, ballBody, Camera);
+        }
+
+        private void initFisica()
+        {
             //Creamos el mundo fisico por defecto.
             collisionConfiguration = new DefaultCollisionConfiguration();
+
             dispatcher = new CollisionDispatcher(collisionConfiguration);
             GImpactCollisionAlgorithm.RegisterAlgorithm(dispatcher);
+
             constraintSolver = new SequentialImpulseConstraintSolver();
+
             overlappingPairCache = new DbvtBroadphase(); //AxisSweep3(new BsVector3(-5000f, -5000f, -5000f), new BsVector3(5000f, 5000f, 5000f), 8192);
+
             dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, constraintSolver, collisionConfiguration);
             dynamicsWorld.Gravity = new TGCVector3(0, -10f, 0).ToBulletVector3();
 
+            //Creamos el cuerpo del piso
+            StaticPlaneShape          floorShape = new StaticPlaneShape(TGCVector3.Up.ToBulletVector3(), 0);
+            DefaultMotionState        floorMotionState = new DefaultMotionState();
+            RigidBodyConstructionInfo floorInfo = new RigidBodyConstructionInfo(0, floorMotionState, floorShape);
 
-            var floorShape = new StaticPlaneShape(TGCVector3.Up.ToBulletVector3(), 0);
-            var floorMotionState = new DefaultMotionState();
-            var floorInfo = new RigidBodyConstructionInfo(0, floorMotionState, floorShape);
             floorBody = new RigidBody(floorInfo);
             dynamicsWorld.AddRigidBody(floorBody);
 
+            //Creamos cuerpo de la pelota
             ballBody = BulletRigidBodyFactory.Instance.CreateBall(1f, 1f, new TGCVector3(0f, 50f, 0f));
             dynamicsWorld.AddRigidBody(ballBody);
+        }
 
+        private void initMeshes()
+        {
 
             //Crear SkyBox
             skyBox = new TgcSkyBox();
@@ -107,16 +113,24 @@ namespace TGC.Group.Model
             skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, texturesPath + "lostatseaday_ft.jpg");
             skyBox.Init();
 
-            Escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha2-TgcScene.xml");
+            //cargar escena
+            escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha2-TgcScene.xml");
 
-            Cancha = Escena.Meshes[0];
-            Cancha.Transform = TGCMatrix.Translation(0, -10, 0);
+            cancha = escena.Meshes[0];
 
-            Arco = Escena.Meshes[1];
-            Jugador Auto = new Jugador(Escena.Meshes[2], new TGCVector3(-20, 0, 100), new TGCVector3(0, 0, 0));
-            Jugador Tractor = new Jugador(Escena.Meshes[5], new TGCVector3(0, 0, -30), new TGCVector3(0, FastMath.PI, 0));
-            Jugador Patrullero = new Jugador(Escena.Meshes[3], new TGCVector3(0, 0, 30), new TGCVector3(0, 0, 0));
-            Jugador Tanque = new Jugador(Escena.Meshes[4], new TGCVector3(20, 0, -100), new TGCVector3(0, FastMath.PI, 0));
+            arco = escena.Meshes[1];
+
+            pelota = escena.getMeshByName("Pelota");
+
+            paredes = escena.getMeshByName("Box_5");
+        }
+
+        private void initJugadores()
+        {
+            Jugador Auto = new Jugador(escena.Meshes[2], new TGCVector3(-20, 0, 100), new TGCVector3(0, 0, 0));
+            Jugador Tractor = new Jugador(escena.Meshes[5], new TGCVector3(0, 0, -30), new TGCVector3(0, FastMath.PI, 0));
+            Jugador Patrullero = new Jugador(escena.Meshes[3], new TGCVector3(0, 0, 30), new TGCVector3(0, 0, 0));
+            Jugador Tanque = new Jugador(escena.Meshes[4], new TGCVector3(20, 0, -100), new TGCVector3(0, FastMath.PI, 0));
 
             jugadorActivo = Auto;
 
@@ -128,16 +142,6 @@ namespace TGC.Group.Model
             dynamicsWorld.AddRigidBody(Tanque.CocheBody);
             dynamicsWorld.AddRigidBody(Patrullero.CocheBody);
             dynamicsWorld.AddRigidBody(Tractor.CocheBody);
-
-            Pelota = Escena.getMeshByName("Pelota");
-
-            paredes = Escena.getMeshByName("Box_5");
-
-            camara = new CamaraJugador(jugadorActivo, ballBody, Camera);
-
-            tAcum = 0;
-            fps = 0;
-            lastFps = 0;
         }
 
         /// <summary>
@@ -156,19 +160,23 @@ namespace TGC.Group.Model
                 jugador.Update(ElapsedTime);
             }
 
-            System.Windows.Forms.Cursor.Position = new Point(Form.GameForm.ActiveForm.Width / 2, Form.GameForm.ActiveForm.Height / 2);
-
             camara.Update(ElapsedTime);
+
+            handleInput();
+
+            PostUpdate();
+        }
+
+        private void handleInput()
+        {
+            jugadorActivo.HandleInput(Input);
+
+            System.Windows.Forms.Cursor.Position = new Point(Form.GameForm.ActiveForm.Width / 2, Form.GameForm.ActiveForm.Height / 2);
 
             if (Input.keyDown(Key.Escape))
             {
                 TGC.Group.Form.GameForm.ActiveForm.Close();
-                cerrar = true;
             }
-
-            jugadorActivo.HandleInput(Input);
-
-            PostUpdate();
         }
 
         /// <summary>
@@ -178,34 +186,24 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Render()
         {
-
-            if (cerrar)
-            {
-                return;
-            }
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
-            
-            DrawText.drawText("ElapsetTime= " + ElapsedTime, 0, 20, Color.OrangeRed);
-            DrawText.drawText("FPS= " + lastFps, 0, 50, Color.OrangeRed);
 
             skyBox.Render();
 
-            Arco.Rotation = new TGCVector3(0, 0, 0); 
-            Arco.UpdateMeshTransform();
-            Arco.Render();
+            arco.Rotation = new TGCVector3(0, 0, 0); 
+            arco.UpdateMeshTransform();
+            arco.Render();
 
-            Arco.Rotation = new TGCVector3(0, FastMath.PI, 0);
-            Arco.UpdateMeshTransform();
-            Arco.Render();
+            arco.Rotation = new TGCVector3(0, FastMath.PI, 0);
+            arco.UpdateMeshTransform();
+            arco.Render();
 
-            Pelota.Transform = TGCMatrix.Scaling(1, 1, 1) * new TGCMatrix(ballBody.InterpolationWorldTransform);
-            Pelota.Render();
-
-            //Cuando tenemos modelos mesh podemos utilizar un método que hace la matriz de transformación estándar.
-            //Es útil cuando tenemos transformaciones simples, pero OJO cuando tenemos transformaciones jerárquicas o complicadas.
-            Cancha.UpdateMeshTransform();
-            Cancha.Render();
+            pelota.Transform = new TGCMatrix(ballBody.InterpolationWorldTransform);
+            pelota.Render();
+            
+            cancha.Transform = new TGCMatrix(floorBody.InterpolationWorldTransform);
+            cancha.Render();
 
             foreach (var jugador in jugadores)
             {
@@ -217,15 +215,6 @@ namespace TGC.Group.Model
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
-
-            fps++;
-            tAcum += ElapsedTime;
-            if (tAcum >= 1)
-            {
-                lastFps = fps;
-                fps = 0;
-                tAcum = 0;
-            }
         }
 
         /// <summary>
@@ -235,7 +224,7 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Dispose()
         {
-            Escena.DisposeAll();
+            escena.DisposeAll();
         }
     }
 }

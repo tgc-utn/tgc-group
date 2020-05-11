@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TGC.Core.Mathematica;
-using TGC.Core.Input;
+﻿using Microsoft.DirectX.DirectInput;
 using TGC.Core.Camara;
-using Microsoft.DirectX.DirectInput;
-
+using TGC.Core.Input;
+using TGC.Core.Mathematica;
 
 namespace TGC.Group.Model
 {
@@ -16,9 +10,9 @@ namespace TGC.Group.Model
 
         private TGCVector3 LookAt;
         private TGCVector3 CameraPosition;
-        private TgcCamera camara;
+        private TgcCamera  camara;
 
-        private Jugador jugador;
+        private Jugador               jugador;
         private BulletSharp.RigidBody pelota;
 
         public CamaraJugador(Jugador jugador, BulletSharp.RigidBody pelota, TgcCamera camara)

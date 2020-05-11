@@ -1,31 +1,25 @@
 ﻿using BulletSharp;
 using Microsoft.DirectX.DirectInput;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TGC.Core.BulletPhysics;
+using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
-using TGC.Core.Example;
-using TGC.Core.Input;
 
 namespace TGC.Group.Model
 {
     class Jugador
     {
-        public TgcMesh Mesh { get; }
+        //Objetos de meshes
+        public TgcMesh    Mesh { get; }
         public TGCVector3 Position { get; set; }
         public TGCVector3 Rotation { get; set; }
 
+        //Objetos de fisica
         public RigidBody CocheBody { get; }
-
-        private Microsoft.DirectX.DirectInput.Key inputAvanzar;
-
         private BulletSharp.Math.Quaternion rotation;
 
-        private bool avanzando;
+        //Objetos de juego
+        private Microsoft.DirectX.DirectInput.Key inputAvanzar;
 
         public Jugador(TgcMesh mesh, TGCVector3 position, TGCVector3 rotation)
         {
@@ -49,14 +43,10 @@ namespace TGC.Group.Model
             
             CocheBody.InterpolationWorldTransform.Decompose( out scale, out rotation, out translation);
             Position = new TGCVector3(translation);
-
-            /*if(TGCExample.Input)
-            CocheBody.Velo*/
         }
 
         public void HandleInput(TgcD3dInput input)
         {
-            float maxVelocity = 100;
             if (input.keyDown(inputAvanzar) )
             {
                 BulletSharp.Math.Vector3 velocity = new BulletSharp.Math.Vector3(0, 0, -5);
@@ -74,8 +64,9 @@ namespace TGC.Group.Model
         public void Render()
         {
             Mesh.Transform = new TGCMatrix(CocheBody.InterpolationWorldTransform);
-            Mesh.BoundingBox.transform(Mesh.Transform);
             Mesh.Render();
+
+            Mesh.BoundingBox.transform(Mesh.Transform);
             Mesh.BoundingBox.Render();
         }
 
