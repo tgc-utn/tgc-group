@@ -1,6 +1,7 @@
 ﻿using BulletSharp;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Model
 {
@@ -40,9 +41,29 @@ namespace TGC.Group.Model
         {
             Mesh.Transform = new TGCMatrix(cuerpo.InterpolationWorldTransform);
             Mesh.Render();
-
+            
             Mesh.BoundingBox.transform(Mesh.Transform);
             Mesh.BoundingBox.Render();
+        }
+
+        public void RenderRigidBodyBoundingBox()
+        {
+            BulletSharp.Math.Vector3 aabbMin = new BulletSharp.Math.Vector3();
+            BulletSharp.Math.Vector3 aabbMax = new BulletSharp.Math.Vector3();
+            BulletSharp.Math.Matrix aabbTransform = new BulletSharp.Math.Matrix();
+
+            cuerpo.GetWorldTransform(out aabbTransform);
+
+            cuerpo.CollisionShape.GetAabb(aabbTransform, out aabbMin, out aabbMax);
+
+            TgcBoundingAxisAlignBox aabb = new Core.BoundingVolumes.TgcBoundingAxisAlignBox(new TGCVector3(aabbMin), new TGCVector3(aabbMax), Translation, Scale);
+
+            aabb.Render();
+        }
+
+        public virtual void Dispose()
+        {
+            cuerpo.Dispose();
         }
     }
 }
