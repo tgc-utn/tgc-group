@@ -39,15 +39,45 @@ namespace TGC.Group.Model
         private void MoverseEnDireccion(TGCVector3 versorDirector, float elapsedTime)
         {
             TGCVector3 movimientoDelFrame = new TGCVector3(0, 0, 0);
-            TGCVector3 movimientoAdelante = new TGCVector3(0, 0, 1) * velocidad;
+            TGCVector3 movimientoAdelante = new TGCVector3(0, 0, 1);
 
             movimientoDelFrame += versorDirector + movimientoAdelante;
-            movimientoDelFrame *= 10f * elapsedTime;
+            movimientoDelFrame *= 10f * elapsedTime * velocidad;
 
             posicion += movimientoDelFrame;
 
             modeloNave.CambiarPosicion(posicion);
+        }
 
+        private void Acelerar()
+        {
+            if(velocidad < 4f)
+            {
+                velocidad += 0.01f;
+            }
+        }
+
+        private void Desacelerar()
+        {
+            if(velocidad > 0.5f)
+            {
+                velocidad -= 0.01f;
+            }
+        }
+
+        private void VolverAVelocidadNormal()
+        {
+            if(velocidad != 1f)
+            {
+                if(velocidad > 1f)
+                {
+                    Desacelerar();
+                }
+                else
+                {
+                    Acelerar();
+                }
+            }
         }
 
 
@@ -88,15 +118,15 @@ namespace TGC.Group.Model
 
             if (input.keyDown(Key.LeftShift))
             {
-                velocidad += 0.01f;
+                Acelerar();
             }
             else if (input.keyDown(Key.LeftControl))
             {
-                velocidad -= 0.01f;
+                Desacelerar();
             }
             else
             {
-
+                VolverAVelocidadNormal();
             }
 
             MoverseEnDireccion(direccionDelInput, elapsedTime);
