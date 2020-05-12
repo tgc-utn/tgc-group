@@ -9,11 +9,12 @@ using TGC.Core.SceneLoader;
 
 namespace TGC.Group.Model
 {
-    
+
     class ModeloCompuesto
     {
         private readonly List<TgcMesh> meshes;
-
+        private TGCMatrix baseScaleRotation;
+        private TGCMatrix rotacionMesh;
         public ModeloCompuesto(string direccionDelModelo, TGCVector3 posicionInicial)
         {
             meshes = new TgcSceneLoader().loadSceneFromFile(direccionDelModelo).Meshes;
@@ -34,19 +35,26 @@ namespace TGC.Group.Model
 
         public void CambiarRotacion(TGCVector3 nuevaRotacion)
         {
-            /*
+
             TGCQuaternion rotationX = TGCQuaternion.RotationAxis(new TGCVector3(1.0f, 0.0f, 0.0f), nuevaRotacion.X);
             TGCQuaternion rotationY = TGCQuaternion.RotationAxis(new TGCVector3(0.0f, 1.0f, 0.0f), nuevaRotacion.Y);
             TGCQuaternion rotationZ = TGCQuaternion.RotationAxis(new TGCVector3(0.0f, 0.0f, 1.0f), nuevaRotacion.Z);
 
             TGCQuaternion rotation = rotationX * rotationY * rotationZ;
 
-            TGCMatrix baseScaleRotation = TGCMatrix.Scaling(new TGCVector3(0.05f, 0.05f, 0.05f)) * TGCMatrix.RotationY(FastMath.PI_HALF);
+            baseScaleRotation = TGCMatrix.Scaling(new TGCVector3(0.15f, 0.15f, 0.15f)) * TGCMatrix.RotationY(FastMath.PI_HALF);
 
-            TransformarModelo(delegate (TgcMesh unMesh) { unMesh.Rotation = nuevaRotacion; });
-            TransformarModelo(delegate (TgcMesh unMesh) { unMesh.Transform = TGCMatrix.RotationTGCQuaternion(rotation); });
-            */
+            TGCMatrix.RotationTGCQuaternion(rotation);
+            //TransformarModelo(delegate (TgcMesh unMesh) { unMesh.Rotation = nuevaRotacion; });
+            //TransformarModelo(delegate (TgcMesh unMesh) { unMesh.Transform = TGCMatrix.RotationTGCQuaternion(rotation); });
+            rotacionMesh = TGCMatrix.RotationTGCQuaternion(rotation);
         }
+
+        public void aplicarTransformaciones()
+        {
+            TransformarModelo(delegate (TgcMesh unMesh) { unMesh.Transform = baseScaleRotation * rotacionMesh * TGCMatrix.Translation(unMesh.Position); });
+        }
+
 
         public void Render()
         {
@@ -57,7 +65,6 @@ namespace TGC.Group.Model
         {
             TransformarModelo(delegate (TgcMesh unMesh) { unMesh.Dispose(); });
         }
-
 
 
 
