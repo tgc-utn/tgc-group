@@ -28,7 +28,7 @@ namespace TGC.Group.Model
             Scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Xwing\\TRENCH_RUN-TgcScene.xml");
 
 
-            var posicionInicialDeNave = new TGCVector3(0, 5, -50); 
+            var posicionInicialDeNave = new TGCVector3(0, 5, -250); 
 
             Nave naveDelJuego = new Nave(MediaDir, posicionInicialDeNave,Input);
             GameManager.Instance.AgregarRenderizable(naveDelJuego);
@@ -40,7 +40,7 @@ namespace TGC.Group.Model
             Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
             GameManager.Instance.AgregarRenderizable(skybox);
 
-            Torreta torreta = new Torreta(MediaDir, new TGCVector3(0,10, 15));
+            Torreta torreta = new Torreta(MediaDir, new TGCVector3(0,10, 15), naveDelJuego);
             GameManager.Instance.AgregarRenderizable(torreta);
 
         }

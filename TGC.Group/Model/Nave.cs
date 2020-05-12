@@ -17,7 +17,7 @@ namespace TGC.Group.Model
         private TGCVector3 posicion; 
         private ModeloCompuesto modeloNave;
         private readonly TgcD3dInput input;
-        private float velocidad = 1f;
+        private float velocidad = 0.7f;
 
         public Nave(string mediaDir, TGCVector3 posicionInicial, TgcD3dInput input)
         {
