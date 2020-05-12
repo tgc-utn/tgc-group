@@ -53,7 +53,6 @@ namespace TGC.Group.Model
             //TODO colision con balas y destruccion de la misma
         }
 
-
         public void Render()
         {
             mainMesh.Render();

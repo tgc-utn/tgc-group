@@ -31,7 +31,7 @@ namespace TGC.Group.Model
 
 
 
-        private void Moverse(TGCVector3 versorDirector, float elapsedTime)
+        private void MoverseEnDireccion(TGCVector3 versorDirector, float elapsedTime)
         {
             TGCVector3 movimientoDelFrame = new TGCVector3(0, 0, 0);
             TGCVector3 movimientoAdelante = new TGCVector3(0, 0, 1);
@@ -68,7 +68,7 @@ namespace TGC.Group.Model
                 direccionDelInput.Y = -1;
             }
 
-            Moverse(direccionDelInput, elapsedTime);
+            MoverseEnDireccion(direccionDelInput, elapsedTime);
 
         }
 
@@ -82,8 +82,14 @@ namespace TGC.Group.Model
 
         public void Dispose()
         {
-            modeloNave.Render();
+            modeloNave.Dispose();
         }
+
+        public TGCVector3 GetPosicion()
+        {
+            return posicion;
+        }
+
     }
 }
 

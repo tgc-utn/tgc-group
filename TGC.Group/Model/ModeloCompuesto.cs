@@ -53,6 +53,11 @@ namespace TGC.Group.Model
             TransformarModelo(delegate (TgcMesh unMesh) { unMesh.Render(); });
         }
 
+        public void Dispose()
+        {
+            TransformarModelo(delegate (TgcMesh unMesh) { unMesh.Dispose(); });
+        }
+
 
 
 

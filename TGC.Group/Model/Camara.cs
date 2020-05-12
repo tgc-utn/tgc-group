@@ -1,31 +1,28 @@
 ﻿using TGC.Core.Mathematica;
+using TGC.Group.Model;
 
 namespace TGC.Examples.Camara
 {
     class Camara : TgcThirdPersonCamera
     {
+        private readonly Nave NaveDelJuego;
 
-        #region Constructores 
-        //Tal vez no es necesario tener los 3 constructores pero por si acaso los pongo por ahora.
-        public Camara(): base()
+        public Camara(TGCVector3 target, float offsetHeight, float offsetForward, Nave nave) : base(target, offsetHeight, offsetForward)
         {
+            this.NaveDelJuego = nave;
         }
 
-        public Camara(TGCVector3 target, float offsetHeight, float offsetForward) : base(target,offsetHeight,offsetForward)
+        private void SeguirNaveParaAdelante()
         {
+            float nuevaPosicionEnZ = NaveDelJuego.GetPosicion().Z;
+            TGCVector3 nuevoTarget = new TGCVector3(Target.X, Target.Y, nuevaPosicionEnZ);
+            Target = nuevoTarget;
         }
 
-        public Camara(TGCVector3 target, TGCVector3 targetDisplacement, float offsetHeight, float offsetForward) : base(target, targetDisplacement, offsetHeight, offsetForward)
-        {
-        }
-        #endregion 
 
-
-        public void Update(float ElapsedTime)
+        public void Update(float _)
         {
-            var cameraMovement = new TGCVector3(0, 0, 1);
-            cameraMovement *= 10f * ElapsedTime;
-            Target += cameraMovement;
+            SeguirNaveParaAdelante();
         }
     }
 }
