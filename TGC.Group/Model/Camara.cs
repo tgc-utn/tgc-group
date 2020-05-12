@@ -20,7 +20,7 @@ namespace TGC.Examples.Camara
         }
 
 
-        public void Update(float _)
+        public void Update(float elapsedTime)
         {
             SeguirNaveParaAdelante();
         }

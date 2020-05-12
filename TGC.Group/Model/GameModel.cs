@@ -12,12 +12,6 @@ using TGC.Examples.Camara;
 
 namespace TGC.Group.Model
 {
-    /// <summary>
-    ///     Ejemplo para implementar el TP.
-    ///     Inicialmente puede ser renombrado o copiado para hacer m�s ejemplos chicos, en el caso de copiar para que se
-    ///     ejecute el nuevo ejemplo deben cambiar el modelo que instancia GameForm <see cref="Form.GameForm.InitGraphics()" />
-    ///     line 97.
-    /// </summary>
     public class GameModel : TGCExample
     {
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)

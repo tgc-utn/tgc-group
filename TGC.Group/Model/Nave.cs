@@ -16,6 +16,7 @@ namespace TGC.Group.Model
         private TGCVector3 posicion; 
         private ModeloCompuesto modeloNave;
         private readonly TgcD3dInput input;
+        private float velocidad = 1f;
 
         public Nave(string mediaDir, TGCVector3 posicionInicial, TgcD3dInput input)
         {
@@ -34,7 +35,7 @@ namespace TGC.Group.Model
         private void MoverseEnDireccion(TGCVector3 versorDirector, float elapsedTime)
         {
             TGCVector3 movimientoDelFrame = new TGCVector3(0, 0, 0);
-            TGCVector3 movimientoAdelante = new TGCVector3(0, 0, 1);
+            TGCVector3 movimientoAdelante = new TGCVector3(0, 0, 1) * velocidad;
 
             movimientoDelFrame += versorDirector + movimientoAdelante;
             movimientoDelFrame *= 10f * elapsedTime;
@@ -68,10 +69,18 @@ namespace TGC.Group.Model
                 direccionDelInput.Y = -1;
             }
 
+            if (input.keyDown(Key.LeftShift))
+            {
+                velocidad += 0.01f;
+            }
+            else if (input.keyDown(Key.LeftControl))
+            {
+                velocidad -= 0.01f;
+            }
+
             MoverseEnDireccion(direccionDelInput, elapsedTime);
 
         }
-
 
         public void Render()
         {
