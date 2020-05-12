@@ -1,4 +1,5 @@
 ﻿using BulletSharp;
+using System.Drawing;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.BoundingVolumes;
@@ -44,6 +45,8 @@ namespace TGC.Group.Model
             
             Mesh.BoundingBox.transform(Mesh.Transform);
             Mesh.BoundingBox.Render();
+
+            RenderRigidBodyBoundingBox();
         }
 
         public void RenderRigidBodyBoundingBox()
@@ -56,8 +59,9 @@ namespace TGC.Group.Model
 
             cuerpo.CollisionShape.GetAabb(aabbTransform, out aabbMin, out aabbMax);
 
-            TgcBoundingAxisAlignBox aabb = new Core.BoundingVolumes.TgcBoundingAxisAlignBox(new TGCVector3(aabbMin), new TGCVector3(aabbMax), Translation, Scale);
+            TgcBoundingAxisAlignBox aabb = new TgcBoundingAxisAlignBox(new TGCVector3(aabbMin), new TGCVector3(aabbMax), Translation, Scale);
 
+            aabb.setRenderColor(Color.Blue);
             aabb.Render();
         }
 
