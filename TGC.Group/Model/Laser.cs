@@ -12,14 +12,16 @@ namespace TGC.Group.Model
     {
         private readonly string mediaDir;
         private readonly TGCVector3 posicionInicial;
+        private readonly TGCVector3 direccion;
         private TgcMesh mainMesh;
 
         private TGCMatrix baseScaleRotation;
         private TGCMatrix baseQuaternionTranslation;
-        public Laser(string mediaDir, TGCVector3 posicionInicial)
+        public Laser(string mediaDir, TGCVector3 posicionInicial,TGCVector3 direccion)
         {
             this.mediaDir = mediaDir;
             this.posicionInicial = posicionInicial;
+            this.direccion = direccion;
         }
         public void Init()
         {

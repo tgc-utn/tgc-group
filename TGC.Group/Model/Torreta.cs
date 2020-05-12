@@ -70,6 +70,7 @@ namespace TGC.Group.Model
                         TGCMatrix.RotationTGCQuaternion(quaternionAuxiliar) *
                         baseQuaternionTranslation;
             }
+           // Disparar(DireccionB);
         }
 
         public void Render()
@@ -88,7 +89,14 @@ namespace TGC.Group.Model
             mainMesh.Dispose();
         }
 
-
+        public void Disparar(TGCVector3 VectorDireccionDisparo)
+        {
+            var direccionDisparo = VectorDireccionDisparo;
+            direccionDisparo.Z += 40;
+            TGCVector3 posicionLaser = posicionInicial;
+            posicionLaser.Y += 10;
+            GameManager.Instance.AgregarRenderizable(new Laser(mediaDir,posicionLaser,direccionDisparo));
+        }
 
 
 
