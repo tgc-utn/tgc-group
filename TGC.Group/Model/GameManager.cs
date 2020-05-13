@@ -10,7 +10,7 @@ namespace TGC.Group.Model
 
     internal class GameManager
     {
-        private readonly List<IRenderizable> Renderizables = new List<IRenderizable>();
+        private List<IRenderizable> Renderizables = new List<IRenderizable>();
         public Camara Camara { get; set; }
 
         public void Update(float elapsedTime)

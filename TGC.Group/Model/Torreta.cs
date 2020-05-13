@@ -18,7 +18,7 @@ namespace TGC.Group.Model
         private readonly string mediaDir;
         private readonly TGCVector3 posicionInicial;
         private TgcMesh mainMesh;
-
+        private bool CONDICIONCOPADA = true;
         private TGCMatrix baseScaleRotation;
         private TGCMatrix baseQuaternionTranslation;
         private float giro = 0f;
@@ -70,7 +70,7 @@ namespace TGC.Group.Model
                         TGCMatrix.RotationTGCQuaternion(quaternionAuxiliar) *
                         baseQuaternionTranslation;
             }
-           // Disparar(DireccionB);
+            
         }
 
         public void Render()
@@ -91,13 +91,15 @@ namespace TGC.Group.Model
 
         public void Disparar(TGCVector3 VectorDireccionDisparo)
         {
-            var direccionDisparo = VectorDireccionDisparo;
-            direccionDisparo.Z += 40;
-            TGCVector3 posicionLaser = posicionInicial;
-            posicionLaser.Y += 10;
-            GameManager.Instance.AgregarRenderizable(new Laser(mediaDir,posicionLaser,direccionDisparo));
-        }
 
+                TGCVector3 direccionDisparo = VectorDireccionDisparo;
+                direccionDisparo.Z += 40f;
+                TGCVector3 posicionLaser = posicionInicial;
+                //posicionLaser.Y += 0.5f;
+                GameManager.Instance.AgregarRenderizable(new Laser(mediaDir, posicionLaser, direccionDisparo));
+            
+
+        }
 
 
     }

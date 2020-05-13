@@ -43,6 +43,9 @@ namespace TGC.Group.Model
             Torreta torreta = new Torreta(MediaDir, new TGCVector3(0,10, 15), naveDelJuego);
             GameManager.Instance.AgregarRenderizable(torreta);
 
+            TGCVector3 direccionDisparo = posicionInicialDeNave - new TGCVector3(0, 10, 15);
+            torreta.Disparar(new TGCVector3(0, 0, -100));
+
         }
 
         public override void Update()
