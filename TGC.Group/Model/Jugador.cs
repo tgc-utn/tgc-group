@@ -20,6 +20,7 @@ namespace TGC.Group.Model
             this.translation.Y += 10;
 
             cuerpo = BulletRigidBodyFactory.Instance.CreateBox(Mesh.BoundingBox.calculateSize(), 1f, new TGCVector3(translation), rotation.X, rotation.Y, rotation.Z, 1f, true);
+            cuerpo.SetSleepingThresholds(0, 0);
         }
 
         public void HandleInput(TgcD3dInput input)
@@ -32,12 +33,13 @@ namespace TGC.Group.Model
             {
                 cuerpo.ApplyForce(Vector3.Transform(new Vector3(0, 0, 50), rotation), new Vector3(0, 0, 0));
             }
-            //cuerpo.LinearVelocity = Vector3.Transform(cuerpo.LinearVelocity, rotation);
+            //cuerpo.LinearVelocity = cuerpo.LinearVelocity + new Vector3(0,1,0);
             if (input.keyDown(Key.RightArrow))
             {
                 Vector3 velocity = Vector3.Transform(new Vector3(-1, 0, 0), rotation);
                 cuerpo.ApplyForce(velocity * 50, Vector3.Transform(new Vector3(0, 0, -5), rotation));
                 cuerpo.ApplyForce(velocity * -50, Vector3.Transform(new Vector3(0, 0, 5), rotation));
+                //cuerpo.LinearVelocity = Vector3.Transform(cuerpo.LinearVelocity, new Quaternion().);
             }
             if (input.keyDown(Key.LeftArrow))
             {

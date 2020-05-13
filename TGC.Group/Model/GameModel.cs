@@ -186,6 +186,8 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
+            DrawText.drawText(jugadorActivo.Cuerpo.LinearVelocity.ToString() + "", 0, 20, Color.Red);
+
             skyBox.Render();
 
             arco.Rotation = new TGCVector3(0, 0, 0); 
