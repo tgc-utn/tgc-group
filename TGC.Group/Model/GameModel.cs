@@ -28,17 +28,17 @@ namespace TGC.Group.Model
             Scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Xwing\\TRENCH_RUN-TgcScene.xml");
 
 
-            var posicionInicialDeNave = new TGCVector3(0, 5, -250); 
+            var posicionInicialDeNave = new TGCVector3(100, -15, -250); 
 
             Nave naveDelJuego = new Nave(MediaDir, posicionInicialDeNave,Input);
             GameManager.Instance.AgregarRenderizable(naveDelJuego);
 
-            Camara camaraDelJuego = new Camara(posicionInicialDeNave, 30, -150, naveDelJuego);
+            Camara camaraDelJuego = new Camara(posicionInicialDeNave, 10, -50, naveDelJuego);
             Camera = camaraDelJuego;
             GameManager.Instance.Camara = camaraDelJuego;
 
-            Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
-            GameManager.Instance.AgregarRenderizable(skybox);
+            //Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
+            //GameManager.Instance.AgregarRenderizable(skybox);
 
             Torreta torreta = new Torreta(MediaDir, new TGCVector3(10,2, 15), naveDelJuego);
             GameManager.Instance.AgregarRenderizable(torreta);
@@ -56,6 +56,8 @@ namespace TGC.Group.Model
         {
             PreUpdate();
             GameManager.Instance.Update(ElapsedTime);
+            Scene.Meshes.ForEach(delegate (TgcMesh mesh) { mesh.Transform= TGCMatrix.Scaling(20f, 20f, 20f); });
+            //Scene.BoundingBox.transform(TGCMatrix.Scaling(10f, 10f, 10f));
             PostUpdate();
         }
 
@@ -64,6 +66,9 @@ namespace TGC.Group.Model
         {
             PreRender();
             Scene.RenderAll();
+            //Scene.Meshes.ForEach(delegate (TgcMesh mesh) { mesh.BoundingBox.transform(TGCMatrix.Scaling(20f, 20f, 20f)); });
+            Scene.Meshes.ForEach(delegate (TgcMesh mesh) { mesh.BoundingBox.Render(); });
+
             GameManager.Instance.Render();
             PostRender();
         }
