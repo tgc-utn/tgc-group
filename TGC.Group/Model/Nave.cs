@@ -20,6 +20,9 @@ namespace TGC.Group.Model
         private float velocidadBase;
         private float velocidad;
         private float aceleracion;
+        private TGCVector3 rotacionBase;
+        private TGCVector3 rotacion;
+        private float aceleracionRotacion;
         
 
         public Nave(string mediaDir, TGCVector3 posicionInicial, TgcD3dInput input)
@@ -30,13 +33,16 @@ namespace TGC.Group.Model
             this.velocidadBase = 1f;
             this.velocidad = velocidadBase;
             this.aceleracion = 0.01f;
+            this.rotacionBase = new TGCVector3(0f, Geometry.DegreeToRadian(180f), 0f);
+            this.rotacion = rotacionBase;
+            this.aceleracionRotacion = 0.008f;
         }
 
 
         public void Init()
         {
             modeloNave = new ModeloCompuesto(mediaDir + "XWing\\X-Wing-TgcScene.xml", posicion);
-            var rotacionInicial = new TGCVector3(0f, 1f, 0f) * Geometry.DegreeToRadian(180f);
+            TGCVector3 rotacionInicial = new TGCVector3(0f, 1f, 0f) * Geometry.DegreeToRadian(180f);
             modeloNave.CambiarRotacion(rotacionInicial);
         }
 
@@ -55,76 +61,39 @@ namespace TGC.Group.Model
             modeloNave.CambiarPosicion(posicion);
         }
 
-        private void Acelerar()
-        {
-            float velocidadMaximo = velocidadBase * 4;
-
-            if(velocidad < velocidadMaximo)
-            {
-                velocidad += aceleracion;
-            }
-        }
-
-        private void Desacelerar()
-        {
-            float velocidadMinima = velocidadBase / 2;
-
-            if(velocidad > velocidadMinima)
-            {
-                velocidad -= aceleracion;
-            }
-        }
-
-        private void VolverAVelocidadNormal()
-        {
-
-            if(velocidad != velocidadBase)
-            {
-                if(velocidad > velocidadBase)
-                {
-                    Desacelerar();
-                }
-                else
-                {
-                    Acelerar();
-                }
-            }
-        }
-
 
         public void Update(float elapsedTime)
         {
             TGCVector3 direccionDelInput = new TGCVector3(0, 0, 0); //A "direccion" se refiere a direccion y sentido.
-            TGCVector3 giroRotacion = new TGCVector3(0f, Geometry.DegreeToRadian(180f), 0f);
 
             if (input.keyDown(Key.Left) || input.keyDown(Key.A))
             {
                 direccionDelInput.X = -1;
-                giroRotacion.Z = Geometry.DegreeToRadian(20f);
+                RotarIzquierda();
             }
             else if (input.keyDown(Key.Right) || input.keyDown(Key.D))
             {
                 direccionDelInput.X = 1;
-                giroRotacion.Z = Geometry.DegreeToRadian(-20f);
+                RotarDerecha();
             }
             else
             {
-                giroRotacion.Z = Geometry.DegreeToRadian(0f);
+                VolverARotacionHorizontalNormal();
             }
 
             if (input.keyDown(Key.Up) || input.keyDown(Key.W))
             {
                 direccionDelInput.Y = 1;
-                giroRotacion.X = Geometry.DegreeToRadian(10f);
+                RotarArriba();
             }
             else if (input.keyDown(Key.Down) || input.keyDown(Key.S))
             {
                 direccionDelInput.Y = -1;
-                giroRotacion.X = Geometry.DegreeToRadian(-10f);
+                RotarAbajo();
             }
             else
             {
-                giroRotacion.X = Geometry.DegreeToRadian(0f);
+                VolverARotacionVerticalNormal();
             }
 
             if (input.keyDown(Key.LeftShift))
@@ -141,7 +110,7 @@ namespace TGC.Group.Model
             }
 
             MoverseEnDireccion(direccionDelInput, elapsedTime);
-            modeloNave.CambiarRotacion(giroRotacion);
+            modeloNave.CambiarRotacion(rotacion);
 
         }
 
@@ -157,6 +126,117 @@ namespace TGC.Group.Model
         {
             modeloNave.Dispose();
         }
+
+        #region Aceleraciones (ifs)
+        private void Acelerar()
+        {
+            float velocidadMaxima = velocidadBase * 4;
+
+            if (velocidad < velocidadMaxima)
+            {
+                velocidad += aceleracion;
+            }
+        }
+
+        private void Desacelerar()
+        {
+            float velocidadMinima = velocidadBase / 2;
+
+            if (velocidad > velocidadMinima)
+            {
+                velocidad -= aceleracion;
+            }
+        }
+
+        private void VolverAVelocidadNormal()
+        {
+
+            if (velocidad != velocidadBase)
+            {
+                if (velocidad > velocidadBase)
+                {
+                    Desacelerar();
+                }
+                else
+                {
+                    Acelerar();
+                }
+            }
+        }
+        #endregion
+
+        #region Rotacion (ifs)
+        private void RotarDerecha()
+        {
+            float rotacionMaxima = Geometry.DegreeToRadian(-20f);
+
+            if (rotacion.Z > rotacionMaxima)
+            {
+                rotacion += new TGCVector3(0,0,-aceleracionRotacion/2);
+            }
+        }
+
+        private void RotarIzquierda()
+        {
+            float rotacionMaxima = Geometry.DegreeToRadian(20f);
+
+            if (rotacion.Z < rotacionMaxima)
+            {
+                rotacion += new TGCVector3(0, 0, aceleracionRotacion/2);
+            }
+        }
+
+        private void VolverARotacionHorizontalNormal()
+        {
+            if(rotacion.Z != rotacionBase.Z)
+            {
+                if(rotacion.Z > rotacionBase.Z)
+                {
+                    RotarDerecha();
+                }
+                else
+                {
+                    RotarIzquierda();
+                }
+            }
+        }
+
+        private void RotarArriba()
+        {
+            float rotacionMaxima = Geometry.DegreeToRadian(10f);
+
+            if (rotacion.X < rotacionMaxima)
+            {
+                rotacion += new TGCVector3(aceleracionRotacion, 0, 0);
+            }
+        }
+
+        private void RotarAbajo()
+        {
+            float rotacionMaxima = Geometry.DegreeToRadian(-10f);
+
+            if (rotacion.X > rotacionMaxima)
+            {
+                rotacion += new TGCVector3(-aceleracionRotacion, 0, 0);
+            }
+        }
+
+        private void VolverARotacionVerticalNormal()
+        {
+            if (rotacion.X != rotacionBase.X)
+            {
+                if (rotacion.X > rotacionBase.X)
+                {
+                    RotarAbajo();
+                }
+                else
+                {
+                    RotarArriba();
+                }
+            }
+        }
+
+        #endregion
 
         public TGCVector3 GetPosicion()
         {
