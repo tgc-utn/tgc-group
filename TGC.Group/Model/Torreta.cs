@@ -40,7 +40,7 @@ namespace TGC.Group.Model
             //Solo nos interesa el primer modelo de esta escena (tiene solo uno)
             mainMesh = scene2.Meshes[0];
             mainMesh.Position = posicionInicial;
-            baseQuaternionTranslation = TGCMatrix.Translation(new TGCVector3(0.0f, 0.01f, 0.0f));
+            baseQuaternionTranslation = TGCMatrix.Translation(posicionInicial);
             baseScaleRotation = TGCMatrix.Scaling(new TGCVector3(0.15f, 0.15f, 0.15f));
             mainMesh.Transform = TGCMatrix.Scaling(0.1f, 0.1f, 0.1f);
         }
