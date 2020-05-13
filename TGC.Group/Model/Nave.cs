@@ -17,13 +17,19 @@ namespace TGC.Group.Model
         private TGCVector3 posicion; 
         private ModeloCompuesto modeloNave;
         private readonly TgcD3dInput input;
-        private float velocidad = 0.7f;
+        private float velocidadBase;
+        private float velocidad;
+        private float aceleracion;
+        
 
         public Nave(string mediaDir, TGCVector3 posicionInicial, TgcD3dInput input)
         {
             this.mediaDir = mediaDir;
             this.posicion = posicionInicial;
             this.input = input;
+            this.velocidadBase = 1f;
+            this.velocidad = velocidadBase;
+            this.aceleracion = 0.01f;
         }
 
 
@@ -51,25 +57,30 @@ namespace TGC.Group.Model
 
         private void Acelerar()
         {
-            if(velocidad < 4f)
+            float velocidadMaximo = velocidadBase * 4;
+
+            if(velocidad < velocidadMaximo)
             {
-                velocidad += 0.01f;
+                velocidad += aceleracion;
             }
         }
 
         private void Desacelerar()
         {
-            if(velocidad > 0.5f)
+            float velocidadMinima = velocidadBase / 2;
+
+            if(velocidad > velocidadMinima)
             {
-                velocidad -= 0.01f;
+                velocidad -= aceleracion;
             }
         }
 
         private void VolverAVelocidadNormal()
         {
-            if(velocidad != 1f)
+
+            if(velocidad != velocidadBase)
             {
-                if(velocidad > 1f)
+                if(velocidad > velocidadBase)
                 {
                     Desacelerar();
                 }
