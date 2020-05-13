@@ -1,4 +1,6 @@
-﻿using Microsoft.DirectX.DirectInput;
+﻿using BulletSharp.Math;
+using Microsoft.DirectX.DirectInput;
+using System;
 using TGC.Core.BulletPhysics;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
@@ -17,21 +19,31 @@ namespace TGC.Group.Model
 
             this.translation.Y += 10;
 
-            cuerpo = BulletRigidBodyFactory.Instance.CreateBox(Mesh.BoundingBox.calculateSize(), 1f, new TGCVector3(translation), 0f, 0f, 0f, 1f, true);
+            cuerpo = BulletRigidBodyFactory.Instance.CreateBox(Mesh.BoundingBox.calculateSize(), 1f, new TGCVector3(translation), rotation.X, rotation.Y, rotation.Z, 1f, true);
         }
 
         public void HandleInput(TgcD3dInput input)
         {
-            if (input.keyDown(inputAvanzar) )
+            if (input.keyDown(inputAvanzar))
             {
-                BulletSharp.Math.Vector3 velocity = new BulletSharp.Math.Vector3(0, 0, -5);
-                velocity = rotation.Rotate(velocity);
-                cuerpo.ApplyImpulse(velocity, new BulletSharp.Math.Vector3());
+                cuerpo.ApplyForce(Vector3.Transform(new Vector3(0, 0, -50), rotation), new Vector3(0,0,0));
             }
-            
-            if(input.keyUp(inputAvanzar))
+            if (input.keyDown(Key.DownArrow))
             {
-                cuerpo.LinearVelocity = new BulletSharp.Math.Vector3(0, 0, 0);
+                cuerpo.ApplyForce(Vector3.Transform(new Vector3(0, 0, 50), rotation), new Vector3(0, 0, 0));
+            }
+            //cuerpo.LinearVelocity = Vector3.Transform(cuerpo.LinearVelocity, rotation);
+            if (input.keyDown(Key.RightArrow))
+            {
+                Vector3 velocity = Vector3.Transform(new Vector3(-1, 0, 0), rotation);
+                cuerpo.ApplyForce(velocity * 50, Vector3.Transform(new Vector3(0, 0, -5), rotation));
+                cuerpo.ApplyForce(velocity * -50, Vector3.Transform(new Vector3(0, 0, 5), rotation));
+            }
+            if (input.keyDown(Key.LeftArrow))
+            {
+                Vector3 velocity = Vector3.Transform(new Vector3(1, 0, 0), rotation);
+                cuerpo.ApplyForce(velocity * 50, Vector3.Transform(new Vector3(0, 0, -5), rotation));
+                cuerpo.ApplyForce(velocity * -50, Vector3.Transform(new Vector3(0, 0, 5), rotation));
             }
         }
 
