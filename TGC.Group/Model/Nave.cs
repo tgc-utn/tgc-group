@@ -27,7 +27,7 @@ namespace TGC.Group.Model
             this.mediaDir = mediaDir;
             this.posicion = posicionInicial;
             this.input = input;
-            this.velocidadBase = 1f;
+            this.velocidadBase = 12f;
             this.velocidad = velocidadBase;
             this.aceleracion = 0.01f;
         }

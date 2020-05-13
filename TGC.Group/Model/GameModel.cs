@@ -25,8 +25,14 @@ namespace TGC.Group.Model
 
         public override void Init()
         {
-            Scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Xwing\\TRENCH_RUN-TgcScene.xml");
+            //Scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Xwing\\TRENCH_RUN-TgcScene.xml");
+            Bloque bloque = new Bloque(MediaDir, new TGCVector3(0f,0f,1000f), "Xwing\\TRENCH_RUN-TgcScene.xml");
+            GameManager.Instance.AgregarRenderizable(bloque);
 
+            Bloque bloque1 = new Bloque(MediaDir, new TGCVector3(0f, 100f, 3000f), "Xwing\\death+star-TgcScene.xml");
+            Bloque bloque2 = new Bloque(MediaDir, new TGCVector3(0f, 0f, 5000f), "Xwing\\TRENCH_RUN-TgcScene.xml");
+            GameManager.Instance.AgregarRenderizable(bloque1);
+            GameManager.Instance.AgregarRenderizable(bloque2);
 
             var posicionInicialDeNave = new TGCVector3(100, -15, -250); 
 
@@ -56,7 +62,7 @@ namespace TGC.Group.Model
         {
             PreUpdate();
             GameManager.Instance.Update(ElapsedTime);
-            Scene.Meshes.ForEach(delegate (TgcMesh mesh) { mesh.Transform= TGCMatrix.Scaling(20f, 20f, 20f); });
+            //Scene.Meshes.ForEach(delegate (TgcMesh mesh) { mesh.Transform= TGCMatrix.Scaling(20f, 20f, 20f); });
             //Scene.BoundingBox.transform(TGCMatrix.Scaling(10f, 10f, 10f));
             PostUpdate();
         }
@@ -65,9 +71,9 @@ namespace TGC.Group.Model
         public override void Render()
         {
             PreRender();
-            Scene.RenderAll();
+            //Scene.RenderAll();
             //Scene.Meshes.ForEach(delegate (TgcMesh mesh) { mesh.BoundingBox.transform(TGCMatrix.Scaling(20f, 20f, 20f)); });
-            Scene.Meshes.ForEach(delegate (TgcMesh mesh) { mesh.BoundingBox.Render(); });
+           // Scene.Meshes.ForEach(delegate (TgcMesh mesh) { mesh.BoundingBox.Render(); });
 
             GameManager.Instance.Render();
             PostRender();
@@ -75,7 +81,7 @@ namespace TGC.Group.Model
 
         public override void Dispose()
         {
-            Scene.DisposeAll();
+            //Scene.DisposeAll();
             GameManager.Instance.Dispose();
         }
     }
