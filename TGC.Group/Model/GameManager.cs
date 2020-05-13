@@ -15,10 +15,10 @@ namespace TGC.Group.Model
 
         public void Update(float elapsedTime)
         {
-            Renderizables.ForEach(delegate (IRenderizable unRenderizable) { unRenderizable.Update(elapsedTime); });
+            List<IRenderizable> RenderizablesAuxiliar = new List<IRenderizable>(Renderizables);
+            RenderizablesAuxiliar.ForEach(delegate (IRenderizable unRenderizable) { unRenderizable.Update(elapsedTime); });
             Camara.Update(elapsedTime);
         }
-
         public void Render()
         {
             Renderizables.ForEach(delegate (IRenderizable unRenderizable) { unRenderizable.Render(); });

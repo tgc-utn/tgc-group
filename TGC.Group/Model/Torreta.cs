@@ -21,7 +21,7 @@ namespace TGC.Group.Model
         private bool CONDICIONCOPADA = true;
         private TGCMatrix baseScaleRotation;
         private TGCMatrix baseQuaternionTranslation;
-        private float giro = 0f;
+        private float tiempo = 0f;
         private Nave jugador;
         private float anguloEntreVectores;
         private TGCQuaternion quaternionAuxiliar;
@@ -70,7 +70,14 @@ namespace TGC.Group.Model
                         TGCMatrix.RotationTGCQuaternion(quaternionAuxiliar) *
                         baseQuaternionTranslation;
             }
-            
+            //codigo de prueba------
+            tiempo += .1f + elapsedTime;
+            if(tiempo > 6f)
+            {
+                Disparar(DireccionB);
+                tiempo = 0f;
+            }
+            //--------
         }
 
         public void Render()
