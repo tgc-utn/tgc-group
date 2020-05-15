@@ -14,6 +14,7 @@ namespace TGC.Group.Model
 {
     public class GameModel : TGCExample
     {
+        private EscenarioLoader escenarioLoader;
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
@@ -21,11 +22,11 @@ namespace TGC.Group.Model
             Description = Game.Default.Description;
         }
 
-        private TgcScene Scene;
 
         public override void Init()
         {
             //Scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Xwing\\TRENCH_RUN-TgcScene.xml");
+            /*
             Bloque bloque = new Bloque(MediaDir, new TGCVector3(0f,0f,1000f), "Xwing\\TRENCH_RUN-TgcScene.xml");
             GameManager.Instance.AgregarRenderizable(bloque);
 
@@ -33,7 +34,7 @@ namespace TGC.Group.Model
             Bloque bloque2 = new Bloque(MediaDir, new TGCVector3(0f, 0f, 5000f), "Xwing\\TRENCH_RUN-TgcScene.xml");
             GameManager.Instance.AgregarRenderizable(bloque1);
             GameManager.Instance.AgregarRenderizable(bloque2);
-
+            */
             var posicionInicialDeNave = new TGCVector3(100, -15, -250); 
 
             Nave naveDelJuego = new Nave(MediaDir, posicionInicialDeNave,Input);
@@ -43,25 +44,27 @@ namespace TGC.Group.Model
             Camera = camaraDelJuego;
             GameManager.Instance.Camara = camaraDelJuego;
 
+            escenarioLoader = new EscenarioLoader(MediaDir, naveDelJuego);
             //Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
             //GameManager.Instance.AgregarRenderizable(skybox);
-
+            /*
             Torreta torreta = new Torreta(MediaDir, new TGCVector3(10,2, 15), naveDelJuego);
             GameManager.Instance.AgregarRenderizable(torreta);
 
             Torreta torreta2 = new Torreta(MediaDir, new TGCVector3(-10, 2, 15), naveDelJuego);
             GameManager.Instance.AgregarRenderizable(torreta2);
-
+            
             TGCVector3 direccionDisparo = posicionInicialDeNave - new TGCVector3(10, 2, 15);
             torreta.Disparar(direccionDisparo);
             torreta2.Disparar(posicionInicialDeNave - new TGCVector3(-10, 2, 15));
-
+            */
         }
 
         public override void Update()
         {
             PreUpdate();
             GameManager.Instance.Update(ElapsedTime);
+            escenarioLoader.Update(ElapsedTime);
             //Scene.Meshes.ForEach(delegate (TgcMesh mesh) { mesh.Transform= TGCMatrix.Scaling(20f, 20f, 20f); });
             //Scene.BoundingBox.transform(TGCMatrix.Scaling(10f, 10f, 10f));
             PostUpdate();

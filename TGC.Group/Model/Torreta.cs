@@ -18,7 +18,6 @@ namespace TGC.Group.Model
         private readonly string mediaDir;
         private readonly TGCVector3 posicionInicial;
         private TgcMesh mainMesh;
-        private bool CONDICIONCOPADA = true;
         private TGCMatrix baseScaleRotation;
         private TGCMatrix baseQuaternionTranslation;
         private float tiempo = 0f;
@@ -41,7 +40,7 @@ namespace TGC.Group.Model
             mainMesh = scene2.Meshes[0];
             mainMesh.Position = posicionInicial;
             baseQuaternionTranslation = TGCMatrix.Translation(posicionInicial);
-            baseScaleRotation = TGCMatrix.Scaling(new TGCVector3(0.15f, 0.15f, 0.15f));
+            baseScaleRotation = TGCMatrix.Scaling(new TGCVector3(0.1f, 0.1f, 0.1f));
             mainMesh.Transform = TGCMatrix.Scaling(0.1f, 0.1f, 0.1f);
         }
 
@@ -52,7 +51,7 @@ namespace TGC.Group.Model
             TGCVector3 PosicionB = jugador.GetPosicion();
             TGCVector3 DireccionA = new TGCVector3(0, 0, -1);
             TGCVector3 DireccionB = PosicionB - PosicionA;
-            if (DireccionB.Length() >= 15f && PosicionA.Z > PosicionB.Z)
+            if (DireccionB.Length() >= 15f && PosicionA.Z > PosicionB.Z + 10f)
             {
                 DireccionB.Normalize();
                 // anguloEntreVectores = (float)Math.Acos(TGCVector3.Dot(DireccionA, DireccionB));
@@ -83,13 +82,14 @@ namespace TGC.Group.Model
         public void Render()
         {
             mainMesh.Render();
+            /*
             TGCVector3 PosicionB = jugador.GetPosicion();
             TGCVector3 DireccionA = new TGCVector3(0, 0, -1);
             TGCVector3 DireccionB = PosicionB - posicionInicial;
             bool dada = posicionInicial.Z > PosicionB.Z;
             new TgcText2D().drawText("Distancia: " + DireccionB.Length().ToString(), 5, 20, Color.White);
             new TgcText2D().drawText("\n Condicion: " + dada.ToString(), 5, 20, Color.White);
-
+            */
         }
         public void Dispose()
         {

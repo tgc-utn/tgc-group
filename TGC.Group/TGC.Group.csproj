@@ -103,6 +103,7 @@
     </Compile>
     <Compile Include="Model\Bloque.cs" />
     <Compile Include="Model\Camara.cs" />
+    <Compile Include="Model\EscenarioLoader.cs" />
     <Compile Include="Model\Laser.cs" />
     <Compile Include="Model\ModeloCompuesto.cs" />
     <Compile Include="Model\IRenderizable.cs" />

@@ -30,7 +30,7 @@ namespace TGC.Group.Model
             this.mediaDir = mediaDir;
             this.posicion = posicionInicial;
             this.input = input;
-            this.velocidadBase = 1f;
+            this.velocidadBase = 2f;
             this.velocidadActual = velocidadBase;
             this.aceleracionMovimiento = 0.01f;
             this.rotacionBase = new TGCVector3(0f, Geometry.DegreeToRadian(180f), 0f);

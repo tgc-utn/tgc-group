@@ -17,12 +17,16 @@ namespace TGC.Group.Model
         private TGCMatrix TranslationMatrix;
         private TgcScene Scene;
         private String nombreMapa;
+        private List<TGCVector3> posicionesTorretas;
+        private Nave nave;
 
-        public Bloque(string mediaDir, TGCVector3 posicionInicial,String nombreMapa)
+        public Bloque(string mediaDir, TGCVector3 posicionInicial,String nombreMapa,List<TGCVector3> posiciones,Nave nave)
         {
             this.mediaDir = mediaDir;
             this.posicionInicial = posicionInicial;
             this.nombreMapa = nombreMapa;
+            this.posicionesTorretas = posiciones;
+            this.nave = nave;
         }
         public void Init()
         {
@@ -30,7 +34,16 @@ namespace TGC.Group.Model
             Scene = new TgcSceneLoader().loadSceneFromFile(mediaDir + nombreMapa);
             ScaleMatrix = TGCMatrix.Scaling(20f, 20f, 20f);
             TranslationMatrix = TGCMatrix.Translation(posicionInicial);
+            instanciarTorretas();
+        }
 
+        private void instanciarTorretas()
+        {
+            this.posicionesTorretas.
+                ForEach(delegate (TGCVector3 tor) {
+                    Torreta torreta = new Torreta(mediaDir,tor,nave);
+                    GameManager.Instance.AgregarRenderizable(torreta); 
+                });
         }
 
         public void Update(float elapsedTime)
