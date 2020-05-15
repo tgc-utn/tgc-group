@@ -21,7 +21,11 @@ sampler2D diffuseMap = sampler_state
 };
 
 // variable de fogs
+float4 ColorFog;
 float4 CameraPos;
+float StartFogDistance;
+float EndFogDistance;
+float Density;
 
 //Input del Vertex Shader
 struct VS_INPUT_VERTEX
@@ -60,17 +64,15 @@ struct PS_INPUT_PIXEL
 //Pixel Shader
 float4 ps_main(VS_OUTPUT_VERTEX input) : COLOR0
 {
-    float zn = 1f;
-    float zf = 5000f;
-    
-    float4 fogColor = float4(0.12f, 0.16078f, 0.45098f,1);
+    float zn = StartFogDistance;
+    float zf = EndFogDistance;
 
     float4 fvBaseColor = tex2D(diffuseMap, input.Texture);
     if (input.PosView.z < zn)
         return fvBaseColor;
     else if (input.PosView.z > zf)
     {
-        fvBaseColor = fogColor;
+        fvBaseColor = ColorFog;
         return fvBaseColor;
     }
     else
@@ -79,7 +81,13 @@ float4 ps_main(VS_OUTPUT_VERTEX input) : COLOR0
         float1 total = zf - zn;
         float1 resto = input.PosView.z - zn;
         float1 proporcion = resto / total;
-        fvBaseColor = lerp(fvBaseColor, fogColor, proporcion);
+        
+        float1 r = lerp(fvBaseColor.r, ColorFog.r, proporcion);
+        float1 g = lerp(fvBaseColor.g, ColorFog.g, proporcion);
+        float1 b = lerp(fvBaseColor.b, ColorFog.b, proporcion);
+        float1 a = lerp(fvBaseColor.a, ColorFog.a, proporcion);
+        
+        fvBaseColor = float4(r, g, b, a);
         return fvBaseColor;
     }
 }

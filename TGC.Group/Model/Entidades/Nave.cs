@@ -53,6 +53,15 @@ namespace TGC.Group.Model
                 mesh.Effect = effect;
             }
         }
+
+        public void Technique(string tec)
+        {
+            foreach (var mesh in escenaNave.Meshes)
+            {
+                if (mesh == null) break;
+                mesh.Technique = tec;
+            }
+        }
         
         public void Interact()
         {

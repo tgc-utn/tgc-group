@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using Microsoft.DirectX.Direct3D;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
+using TGC.Core.Fog;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
@@ -57,7 +58,11 @@ namespace TGC.Group.Model
         Player Player;
         Nave nave;
 
+        //Shaders
+        TgcFog fog;
         Effect e_fog;
+
+
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
         ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
@@ -129,6 +134,15 @@ namespace TGC.Group.Model
             nave = Nave.Instance();
             nave.Init(scene);
 
+            //Cargar shaders
+            fog = new TgcFog();
+            fog.Color = Color.FromArgb(30, 40, 145);
+            fog.Density = 1;
+            fog.EndDistance = 1000;
+            fog.StartDistance = 1;
+            fog.Enabled = true;
+
+            e_fog = TGCShaders.Instance.LoadEffect(ShadersDir + "e_fog.fx");
             
         }
 
@@ -187,25 +201,42 @@ namespace TGC.Group.Model
             D3DDevice.Instance.Device.BeginScene();
             D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
 
-            Console.WriteLine(e_fog==null);
-            Console.WriteLine("\n\n\n\n");
+            fog.updateValues();
+            e_fog.SetValue("ColorFog", fog.Color.ToArgb());
+            e_fog.SetValue("CameraPos", TGCVector3.TGCVector3ToFloat4Array(Camera.Position));
+            e_fog.SetValue("StartFogDistance", fog.StartDistance);
+            e_fog.SetValue("EndFogDistance", fog.EndDistance);
+            e_fog.SetValue("Density", fog.Density);
 
             if (estaEnNave)
             {
 
             } else
             {
+                oceano.Effect(e_fog);
+                oceano.Technique("RenderScene");
                 oceano.Render();
-
+                
+                heightmap.Effect = e_fog;
+                heightmap.Technique = "RenderScene";
                 heightmap.Render();
 
+                fish.Effect(e_fog);
+                fish.Technique("RenderScene");
                 fish.Render();
 
+                shark.Effect(e_fog);
+                shark.Technique("RenderScene");
                 shark.Render();
 
+                coral.Effect(e_fog);
+                coral.Technique("RenderScene");
                 coral.Render();
 
+                nave.Effect(e_fog);
+                nave.Technique("RenderScene");
                 nave.Render();
+                
             }
             // esto se dibuja siempre
             //Dibuja un texto por pantalla

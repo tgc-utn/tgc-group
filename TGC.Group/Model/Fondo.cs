@@ -67,6 +67,14 @@ namespace TGC.Group.Model
                 mesh.Effect = effect;
             }
         }
+
+        public void Technique(string tec)
+        {
+            foreach (var mesh in skyBox.Faces)
+            {
+                mesh.Technique = tec;
+            }
+        }
         public override void Dispose()
         {
             skyBox.Dispose();

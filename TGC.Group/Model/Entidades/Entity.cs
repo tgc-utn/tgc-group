@@ -39,6 +39,11 @@ namespace TGC.Group.Model.Entidades
             mesh.Effect = effect;
         }
 
+        public void Technique(string tec)
+        {
+            mesh.Technique = tec;
+        }
+
         public void Dispose() { 
             Entities.Remove(this);
             mesh.Dispose();
