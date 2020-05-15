@@ -2,7 +2,7 @@ using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Terrain;
 using TGC.Core.Mathematica;
-
+using Microsoft.DirectX.Direct3D;
 
 namespace TGC.Group.Model
 {
@@ -60,6 +60,13 @@ namespace TGC.Group.Model
             skyBox.Render();
         }
 
+        public void Effect(Effect effect)
+        {
+            foreach(var mesh in skyBox.Faces)
+            {
+                mesh.Effect = effect;
+            }
+        }
         public override void Dispose()
         {
             skyBox.Dispose();

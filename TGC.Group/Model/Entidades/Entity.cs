@@ -34,6 +34,11 @@ namespace TGC.Group.Model.Entidades
             RenderEntity(); 
         }
 
+        public void Effect(Effect effect)
+        {
+            mesh.Effect = effect;
+        }
+
         public void Dispose() { 
             Entities.Remove(this);
             mesh.Dispose();

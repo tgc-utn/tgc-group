@@ -1,11 +1,13 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using Microsoft.DirectX.Direct3D;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Core.Shaders;
 using TGC.Core.Terrain;
 using TGC.Core.Textures;
 using TGC.Group.Model.Entidades;
@@ -55,6 +57,7 @@ namespace TGC.Group.Model
         Player Player;
         Nave nave;
 
+        Effect e_fog;
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
         ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
@@ -125,6 +128,8 @@ namespace TGC.Group.Model
             scene = loader.loadSceneFromFile(MediaDir + "ship-TgcScene.xml");
             nave = Nave.Instance();
             nave.Init(scene);
+
+            
         }
 
         /// <summary>
@@ -178,8 +183,12 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Render()
         {
-            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
-            PreRender();
+            ClearTextures();
+            D3DDevice.Instance.Device.BeginScene();
+            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+
+            Console.WriteLine(e_fog==null);
+            Console.WriteLine("\n\n\n\n");
 
             if (estaEnNave)
             {
@@ -187,10 +196,15 @@ namespace TGC.Group.Model
             } else
             {
                 oceano.Render();
+
                 heightmap.Render();
+
                 fish.Render();
+
                 shark.Render();
+
                 coral.Render();
+
                 nave.Render();
             }
             // esto se dibuja siempre
@@ -204,8 +218,9 @@ namespace TGC.Group.Model
             
             Player.Render();
 
-            //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
-            PostRender();
+            D3DDevice.Instance.Device.EndScene();
+            D3DDevice.Instance.Device.Present();
+
         }
 
         /// <summary>

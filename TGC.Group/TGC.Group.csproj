@@ -110,10 +110,10 @@
     <Compile Include="Model\Entidades\Entity.cs" />
     <Compile Include="Model\Entidades\Entities.cs" />
     <Compile Include="Model\Entidades\Fish.cs" />
+    <Compile Include="Model\Entidades\Nave.cs" />
     <Compile Include="Model\Entidades\Shark.cs" />
     <Compile Include="Model\Fondo.cs" />
     <Compile Include="Model\GameModel.cs" />
-    <Compile Include="Model\Entidades\Nave.cs" />
     <Compile Include="Model\Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -156,7 +156,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="Shaders\TgcKeyFrameMeshShader.fx">
+    <None Include="Shaders\Fog.fx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Shaders\TgcMeshPhongShader.fx">
@@ -251,6 +251,9 @@
     <Content Include="obj\x86\Debug\TGC.Group.csproj.FileListAbsolute.txt" />
     <Content Include="obj\x86\Debug\TGC.Group.exe" />
     <Content Include="obj\x86\Debug\TGC.Group.pdb" />
+    <None Include="Shaders\TgcKeyFrameMeshShader.fx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bin\Debug\" />
