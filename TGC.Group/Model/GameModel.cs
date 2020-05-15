@@ -186,7 +186,8 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            DrawText.drawText(jugadorActivo.Cuerpo.LinearVelocity.ToString() + "", 0, 20, Color.Red);
+            DrawText.drawText("Turbo: " + jugadorActivo.Turbo, 0, 20, Color.Red);
+            DrawText.drawText(jugadorActivo.Translation.ToString(), 0, 40, Color.Red);
 
             skyBox.Render();
 
