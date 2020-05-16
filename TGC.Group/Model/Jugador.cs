@@ -16,7 +16,12 @@ namespace TGC.Group.Model
 
         private Boolean EnElAire => translation.Y > 3; // TODO: Capaz se puede mejorar
 
-        public int Turbo { get; private set; } = 100;
+        private int turbo = 100;
+        public int Turbo
+        {
+            get => turbo;
+            private set => turbo = Math.Min(value, 100);
+        }
 
 
         public Jugador(TgcMesh mesh, TGCVector3 translation=new TGCVector3(), TGCVector3 rotation=new TGCVector3(),float angle=0) :base(mesh,translation,rotation,angle)

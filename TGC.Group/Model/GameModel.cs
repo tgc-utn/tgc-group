@@ -2,6 +2,7 @@ using BulletSharp;
 using Microsoft.DirectX.DirectInput;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Net.NetworkInformation;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Mathematica;
@@ -36,6 +37,7 @@ namespace TGC.Group.Model
         private Jugador       jugadorActivo;
         private CamaraJugador camara;
         private Pelota        pelota;
+        private List<Turbo>   turbos = new List<Turbo>();
 
         //Objetos de fisica
         protected DiscreteDynamicsWorld             dynamicsWorld;
@@ -118,6 +120,26 @@ namespace TGC.Group.Model
             arco = escena.Meshes[1];
 
             paredes = escena.getMeshByName("Box_5");
+
+            TgcMesh meshTurbo = escena.getMeshByName("Turbo");
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(80, 0, 100)));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(-80, 0, -100)));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(80, 0, -100)));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(-80, 0, 100)));
+
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(0, 0, 130)));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(0, 0, -130)));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(0, 0, 250)));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(0, 0, -250)));
+
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(220, 0, 0), 100));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(-220, 0, 0), 100));
+
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(220, 0, 300), 100));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(-220, 0, -300), 100));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(-220, 0, 300), 100));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(220, 0, -300), 100));
+
         }
 
         private void initJugadores()
@@ -153,6 +175,11 @@ namespace TGC.Group.Model
             foreach (Jugador jugador in jugadores)
             {
                 jugador.Update(ElapsedTime);
+            }
+
+            foreach (var turbo in turbos)
+            {
+                turbo.Update(ElapsedTime);
             }
 
             pelota.Update(ElapsedTime);
@@ -210,6 +237,11 @@ namespace TGC.Group.Model
 
             paredes.Transform = TGCMatrix.Identity;
             paredes.Render();
+
+            foreach (var turbo in turbos)
+            {
+                turbo.Render();
+            }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();

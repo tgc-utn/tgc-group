@@ -105,6 +105,7 @@
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\Jugador.cs" />
     <Compile Include="Model\ObjetoJuego.cs" />
+    <Compile Include="Model\Turbo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form\GameForm.resx">
