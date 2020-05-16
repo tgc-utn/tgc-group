@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.DirectX.Direct3D;
+using TGC.Core.Collision;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Fog;
@@ -40,9 +42,10 @@ namespace TGC.Group.Model
         // comienza en la nave por lo tanto se inicializa en true
         // cuando se cambia esta variable hay que ocultar todos los elemntos del escenario anterior y hacer un fade a negro
         // como todavia no tenemos ese escenario, lo dejamos en false temporalmente
-        bool estaEnNave = false;
 
         DateTime timestamp;
+
+        bool estaEnNave;
 
         Fondo oceano;
         TgcSimpleTerrain heightmap;
@@ -143,7 +146,7 @@ namespace TGC.Group.Model
             fog.Enabled = true;
 
             e_fog = TGCShaders.Instance.LoadEffect(ShadersDir + "e_fog.fx");
-            
+
         }
 
         /// <summary>
@@ -158,6 +161,9 @@ namespace TGC.Group.Model
             if (estaEnNave)
             {
                 // update de elementos de nave
+                List<TgcMesh> paredes = null;
+                Player.Update(FPSCamara, ElapsedTime, paredes);
+
             } else
             {
                 // update de elementos de agua
@@ -176,6 +182,8 @@ namespace TGC.Group.Model
 
                 fish.Update(ElapsedTime);
 
+                Player.Update(FPSCamara, ElapsedTime);
+
             }
 
             // esto se hace siempre
@@ -184,7 +192,7 @@ namespace TGC.Group.Model
 
             //Camara y jugador
             FPSCamara.Update(ElapsedTime);
-            Player.Update(FPSCamara, ElapsedTime);
+            
 
             PostUpdate();
 
