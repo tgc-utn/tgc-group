@@ -1,11 +1,14 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using Microsoft.DirectX.Direct3D;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
+using TGC.Core.Fog;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Core.Shaders;
 using TGC.Core.Terrain;
 using TGC.Core.Textures;
 using TGC.Group.Model.Entidades;
@@ -54,6 +57,11 @@ namespace TGC.Group.Model
         FPSCamara FPSCamara;
         Player Player;
         Nave nave;
+
+        //Shaders
+        TgcFog fog;
+        Effect e_fog;
+
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -125,6 +133,17 @@ namespace TGC.Group.Model
             scene = loader.loadSceneFromFile(MediaDir + "ship-TgcScene.xml");
             nave = Nave.Instance();
             nave.Init(scene);
+
+            //Cargar shaders
+            fog = new TgcFog();
+            fog.Color = Color.FromArgb(30, 40, 145);
+            fog.Density = 1;
+            fog.EndDistance = 1000;
+            fog.StartDistance = 1;
+            fog.Enabled = true;
+
+            e_fog = TGCShaders.Instance.LoadEffect(ShadersDir + "e_fog.fx");
+            
         }
 
         /// <summary>
@@ -178,20 +197,46 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Render()
         {
-            //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
-            PreRender();
+            ClearTextures();
+            D3DDevice.Instance.Device.BeginScene();
+            D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.Black, 1.0f, 0);
+
+            fog.updateValues();
+            e_fog.SetValue("ColorFog", fog.Color.ToArgb());
+            e_fog.SetValue("CameraPos", TGCVector3.TGCVector3ToFloat4Array(Camera.Position));
+            e_fog.SetValue("StartFogDistance", fog.StartDistance);
+            e_fog.SetValue("EndFogDistance", fog.EndDistance);
+            e_fog.SetValue("Density", fog.Density);
 
             if (estaEnNave)
             {
 
             } else
             {
+                oceano.Effect(e_fog);
+                oceano.Technique("RenderScene");
                 oceano.Render();
+                
+                heightmap.Effect = e_fog;
+                heightmap.Technique = "RenderScene";
                 heightmap.Render();
+
+                fish.Effect(e_fog);
+                fish.Technique("RenderScene");
                 fish.Render();
+
+                shark.Effect(e_fog);
+                shark.Technique("RenderScene");
                 shark.Render();
+
+                coral.Effect(e_fog);
+                coral.Technique("RenderScene");
                 coral.Render();
+
+                nave.Effect(e_fog);
+                nave.Technique("RenderScene");
                 nave.Render();
+                
             }
             // esto se dibuja siempre
             //Dibuja un texto por pantalla
@@ -204,8 +249,9 @@ namespace TGC.Group.Model
             
             Player.Render();
 
-            //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
-            PostRender();
+            D3DDevice.Instance.Device.EndScene();
+            D3DDevice.Instance.Device.Present();
+
         }
 
         /// <summary>
