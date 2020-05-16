@@ -52,6 +52,10 @@ namespace TGC.Group.Model
                     cuerpo.ApplyForce(rotacion, Vector3.Transform(new Vector3(0, 0, -5), rotation));
                     cuerpo.ApplyForce(-rotacion, Vector3.Transform(new Vector3(0, 0, 5), rotation));
                 }
+                if (input.keyDown(Key.A))
+                {
+                    cuerpo.AngularVelocity = Vector3.Zero;
+                }
             }
             if (input.keyDown(Key.Space))
             {
@@ -87,7 +91,6 @@ namespace TGC.Group.Model
 
         private void HandleInputTurbo(TgcD3dInput input)
         {
-
             if (input.keyDown(Key.LeftControl) && Turbo > 0)
             {
                 cuerpo.ApplyCentralForce(Vector3.Transform(new Vector3(0, 0, -50), rotation));
@@ -102,6 +105,11 @@ namespace TGC.Group.Model
             else
                 HandleInputSuelo(input);
             HandleInputTurbo(input);
+
+            if (input.keyDown(Key.A))
+            {
+
+            }
         }
 
     }

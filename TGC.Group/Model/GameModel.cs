@@ -80,7 +80,7 @@ namespace TGC.Group.Model
 
             constraintSolver = new SequentialImpulseConstraintSolver();
 
-            overlappingPairCache = new DbvtBroadphase(); //AxisSweep3(new BsVector3(-5000f, -5000f, -5000f), new BsVector3(5000f, 5000f, 5000f), 8192);
+            overlappingPairCache = new DbvtBroadphase();
 
             dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, constraintSolver, collisionConfiguration);
             dynamicsWorld.Gravity = new TGCVector3(0, -10f, 0).ToBulletVector3();
@@ -111,7 +111,7 @@ namespace TGC.Group.Model
             skyBox.Init();
 
             //cargar escena
-            escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha2-TgcScene.xml");
+            escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha-TgcScene.xml");
 
             cancha = escena.Meshes[0];
 
@@ -187,7 +187,6 @@ namespace TGC.Group.Model
             PreRender();
 
             DrawText.drawText("Turbo: " + jugadorActivo.Turbo, 0, 20, Color.Red);
-            DrawText.drawText(jugadorActivo.Translation.ToString(), 0, 40, Color.Red);
 
             skyBox.Render();
 
