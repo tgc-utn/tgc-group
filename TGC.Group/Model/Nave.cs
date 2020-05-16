@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using TGC.Core.SceneLoader;
+using Microsoft.DirectX.Direct3D;
 
 namespace TGC.Group.Model
 {
@@ -23,6 +24,25 @@ namespace TGC.Group.Model
 
             return _instance;
         }
+
+        public void Effect(Effect effect)
+        {
+
+            foreach (var mesh in escenaNave.Meshes)
+            {
+                mesh.Effect = effect;
+            }
+        }
+
+        public void Technique(string tec)
+        {
+
+            foreach (var mesh in escenaNave.Meshes)
+            { 
+                mesh.Technique = tec;
+            }
+        }
+
 
         public void Init(TgcScene _escenaNave)
         {
