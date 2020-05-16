@@ -75,7 +75,6 @@ namespace TGC.Group.Model
 
         private void CheckInputs(FPSCamara Camara, float ElapsedTime, List<TgcMesh> Paredes)
         {
-            Console.WriteLine(estaEnNave);
             int w = Input.keyDown(Key.W) ? 1 : 0;
             int s = Input.keyDown(Key.S) ? 1 : 0;
             int d = Input.keyDown(Key.D) ? 1 : 0;
