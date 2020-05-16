@@ -56,6 +56,7 @@ namespace TGC.Group.Model
         Fish fish;
         Shark shark;
         Coral coral;
+        Metal oro;
 
         FPSCamara FPSCamara;
         Player Player;
@@ -133,6 +134,11 @@ namespace TGC.Group.Model
             coral = new Coral(mesh);
             coral.Init();
 
+            scene = loader.loadSceneFromFile(MediaDir + "Oro-TgcScene.xml");
+            mesh = scene.Meshes[0];
+            oro = new Metal(mesh);
+            oro.Init();
+
             scene = loader.loadSceneFromFile(MediaDir + "ship-TgcScene.xml");
             nave = Nave.Instance();
             nave.Init(scene);
@@ -168,6 +174,7 @@ namespace TGC.Group.Model
             {
                 // update de elementos de agua
                 coral.Update(ElapsedTime);
+                oro.Update(ElapsedTime);
                 nave.Update();
                 oceano.Update();
 
@@ -244,7 +251,11 @@ namespace TGC.Group.Model
                 nave.Effect(e_fog);
                 nave.Technique("RenderScene");
                 nave.Render();
-                
+
+                oro.Effect(e_fog);
+                oro.Technique("RenderScene");
+                oro.Render();
+
             }
             // esto se dibuja siempre
             //Dibuja un texto por pantalla
@@ -275,6 +286,7 @@ namespace TGC.Group.Model
 
             fish.Dispose();
             shark.Dispose();
+            oro.Dispose();
             coral.Dispose();
             nave.Dispose();
         }

@@ -110,6 +110,7 @@
     <Compile Include="Model\Entidades\Entity.cs" />
     <Compile Include="Model\Entidades\Entities.cs" />
     <Compile Include="Model\Entidades\Fish.cs" />
+    <Compile Include="Model\Entidades\Metal.cs" />
     <Compile Include="Model\Entidades\Shark.cs" />
     <Compile Include="Model\Fondo.cs" />
     <Compile Include="Model\GameModel.cs" />
@@ -222,6 +223,7 @@
     <Content Include="bin\x86\Debug\TGC.Group.exe" />
     <Content Include="bin\x86\Debug\TGC.Group.pdb" />
     <Content Include="Media\coral-TgcScene.xml" />
+    <Content Include="Media\Oro-TgcScene.xml" />
     <Content Include="Media\ship-TgcScene.xml" />
     <Content Include="Media\Textures\10010_Coral_v1_Diffuse.jpg" />
     <Content Include="Media\cajaMadera4.jpg" />
@@ -243,6 +245,8 @@
     <Content Include="Media\LogoTGC-TgcScene.xml" />
     <Content Include="Media\Textures\float_texColor_de_la_Superficie.png" />
     <Content Include="Media\Textures\LAMP_UVS.png" />
+    <Content Include="Media\Textures\oro.jpg" />
+    <Content Include="Media\Textures\Piedra3.jpg" />
     <Content Include="Media\yellow_fish-TgcScene.xml" />
     <Content Include="obj\x86\Debug\TempPE\Properties.Resources.Designer.cs.dll" />
     <Content Include="obj\x86\Debug\TGC.Group.csproj.FileListAbsolute.txt" />
