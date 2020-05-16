@@ -136,7 +136,7 @@ namespace TGC.Group.Model
 
             //Cargar shaders
             fog = new TgcFog();
-            fog.Color = Color.FromArgb(30, 40, 145);
+            fog.Color = Color.FromArgb(30, 144, 255);
             fog.Density = 1;
             fog.EndDistance = 1000;
             fog.StartDistance = 1;
