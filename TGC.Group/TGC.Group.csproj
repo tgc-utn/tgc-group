@@ -114,6 +114,7 @@
     <Compile Include="Model\Entidades\Shark.cs" />
     <Compile Include="Model\Fondo.cs" />
     <Compile Include="Model\GameModel.cs" />
+    <Compile Include="Model\InteriorNave.cs" />
     <Compile Include="Model\Nave.cs" />
     <Compile Include="Model\Player.cs" />
     <Compile Include="Program.cs" />
@@ -245,8 +246,8 @@
     <Content Include="Media\LogoTGC-TgcScene.xml" />
     <Content Include="Media\Textures\float_texColor_de_la_Superficie.png" />
     <Content Include="Media\Textures\LAMP_UVS.png" />
+    <Content Include="Media\Textures\Lisas.bmp" />
     <Content Include="Media\Textures\oro.jpg" />
-    <Content Include="Media\Textures\Piedra3.jpg" />
     <Content Include="Media\yellow_fish-TgcScene.xml" />
     <Content Include="obj\x86\Debug\TempPE\Properties.Resources.Designer.cs.dll" />
     <Content Include="obj\x86\Debug\TGC.Group.csproj.FileListAbsolute.txt" />

@@ -21,7 +21,6 @@ namespace TGC.Group.Model
             {
                 _instance = new Nave();
             }
-
             return _instance;
         }
 

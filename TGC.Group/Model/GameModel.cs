@@ -45,8 +45,10 @@ namespace TGC.Group.Model
 
         DateTime timestamp;
 
-        bool estaEnNave;
+        bool estaEnNave;// = true;
+        //bool escenaEsNave;
 
+        //TgcScene interiorNave;
         Fondo oceano;
         TgcSimpleTerrain heightmap;
         Control focusWindows;
@@ -61,10 +63,18 @@ namespace TGC.Group.Model
         FPSCamara FPSCamara;
         Player Player;
         Nave nave;
+        InteriorNave interiorNave;
 
         //Shaders
         TgcFog fog;
         Effect e_fog;
+
+        // data de los heightmaps
+        string marBnwDir = "\\Heightmaps\\heightmap_bnw.jpg";
+        string marTexDir = "\\Heightmaps\\heightmap_tex.jpg";
+        float marScaleXZ = 10f;
+        float marScaleY = .5f;
+        float marOffsetY = -150f;
 
 
         /// <summary>
@@ -98,7 +108,7 @@ namespace TGC.Group.Model
 
 
             //Inicializar camara
-            var cameraPosition = new TGCVector3(0, 0, 125);
+            var cameraPosition = new TGCVector3(0, 100, 150);
             var lookAt = TGCVector3.Empty;
             Camera.SetCamera(cameraPosition, lookAt);
 
@@ -106,14 +116,9 @@ namespace TGC.Group.Model
             oceano.Init();
             oceano.Camera = Camera;
 
-            var bnwDir = MediaDir + "\\Heightmaps\\heightmap_bnw.jpg";
-            var texDir = MediaDir + "\\Heightmaps\\heightmap_tex.jpg";
-            float scaleXZ = 10f;
-            float scaleY = .5f;
-            float offsetY = -150f;
             heightmap = new TgcSimpleTerrain();
-            heightmap.loadHeightmap(bnwDir, scaleXZ, scaleY, new TGCVector3(0, offsetY, 0));
-            heightmap.loadTexture(texDir);
+            heightmap.loadHeightmap(MediaDir + marBnwDir, marScaleXZ, marScaleY, new TGCVector3(0, marOffsetY, 0));
+            heightmap.loadTexture(MediaDir + marTexDir);
 
             //Cargar entidades
             var loader = new TgcSceneLoader();
@@ -153,6 +158,9 @@ namespace TGC.Group.Model
 
             e_fog = TGCShaders.Instance.LoadEffect(ShadersDir + "e_fog.fx");
 
+            interiorNave = InteriorNave.Instance();
+            interiorNave.Init(MediaDir);
+
         }
 
         /// <summary>
@@ -166,12 +174,27 @@ namespace TGC.Group.Model
 
             if (estaEnNave)
             {
+                /*if (!escenaEsNave)
+                {
+                    var loader = new TgcSceneLoader();
+                    scene = loader.loadSceneFromFile(MediaDir + "MeshCreator\\Scenes\\Deposito\\Deposito-TgcScene.xml");
+                    // cargo la escena correspondiente
+                    escenaEsNave = true;
+                }*/
+
                 // update de elementos de nave
-                List<TgcMesh> paredes = null;
-                Player.Update(FPSCamara, ElapsedTime, paredes);
+                //List<TgcMesh> paredes = null;
+                interiorNave.Update();
 
             } else
             {
+                /*if (escenaEsNave)
+                {
+                    // cargo la escena correspondiente
+                    heightmap.loadHeightmap(MediaDir + marBnwDir, marScaleXZ, marScaleY, new TGCVector3(0, marOffsetY, 0));
+                    heightmap.loadTexture(MediaDir + marTexDir);
+                    escenaEsNave = false;
+                }*/
                 // update de elementos de agua
                 coral.Update(ElapsedTime);
                 oro.Update(ElapsedTime);
@@ -189,8 +212,6 @@ namespace TGC.Group.Model
 
                 fish.Update(ElapsedTime);
 
-                Player.Update(FPSCamara, ElapsedTime);
-
             }
 
             // esto se hace siempre
@@ -199,7 +220,8 @@ namespace TGC.Group.Model
 
             //Camara y jugador
             FPSCamara.Update(ElapsedTime);
-            
+
+            Player.Update(FPSCamara, ElapsedTime, estaEnNave);
 
             PostUpdate();
 
@@ -225,7 +247,7 @@ namespace TGC.Group.Model
 
             if (estaEnNave)
             {
-
+                interiorNave.Render();
             } else
             {
                 oceano.Effect(e_fog);
@@ -289,6 +311,8 @@ namespace TGC.Group.Model
             oro.Dispose();
             coral.Dispose();
             nave.Dispose();
+
+            interiorNave.Dispose();
         }
     }
 }

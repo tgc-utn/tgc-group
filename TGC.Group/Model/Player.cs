@@ -53,8 +53,8 @@ namespace TGC.Group.Model
         /// <summary>
         /// Update del jugador cuando esta FUERA de la nave.
         /// </summary>
-        public void Update(FPSCamara Camara, float ElapsedTime) {
-            estaEnNave = false;
+        public void Update(FPSCamara Camara, float ElapsedTime, bool _estaEnNave) {
+            estaEnNave = _estaEnNave;
             CheckInputs(Camara, ElapsedTime, null);
             GameplayUpdate(ElapsedTime);
             UpdateTransform();
@@ -63,13 +63,13 @@ namespace TGC.Group.Model
         /// <summary>
         /// Update del jugador cuando esta DENTRO de la nave.
         /// </summary>
-        public void Update(FPSCamara Camara, float ElapsedTime, List<TgcMesh> Paredes)
+        /*public void Update(FPSCamara Camara, float ElapsedTime, List<TgcMesh> Paredes)
         {
             estaEnNave = true;
             CheckInputs(Camara, ElapsedTime, Paredes);
             GameplayUpdate(ElapsedTime);
             UpdateTransform();
-        }
+        }*/
 
         public void Render() { }
 
@@ -101,36 +101,33 @@ namespace TGC.Group.Model
             TGCVector3 movement = LookDir * fmov * speed + Camara.LeftDir() * hmov * speed + TGCVector3.Up * vmov * vspeed;
             movement *= ElapsedTime;
 
-            if (estaEnNave && Paredes != null)
-                Move(movement, Paredes);
-            else
-                Move(movement);
+            Move(movement);
 
             //Dev
             bool p = Input.keyDown(Key.P);
             if (p) { godmode = !godmode; GodMode(godmode); }
         }
 
-        private void Move(TGCVector3 movement) { mesh.Position += movement; }
-        private void Move(TGCVector3 movement, List<TgcMesh> Paredes)
-        {
-            TGCVector3 lastPos = mesh.Position;
-            Move(movement);
-
-            //Check for collisions
-            bool collided = false;
-            foreach (var pared in Paredes)
+        private void Move(TGCVector3 movement) {
+            mesh.Position += movement;
+            if (estaEnNave)
             {
-                if (TgcCollisionUtils.testAABBAABB(mesh.BoundingBox, pared.BoundingBox))
-                {
-                    collided = true;
-                    break;
-                }
-            }
-            //If any collision then go to last position.
-            if (collided)
-                mesh.Position = lastPos;
+                TGCVector3 lastPos = mesh.Position;
 
+                //Check for collisions
+                bool collided = false;
+                foreach (var pared in InteriorNave.Instance().obtenerMeshes())
+                {
+                    if (TgcCollisionUtils.testAABBAABB(mesh.BoundingBox, pared.BoundingBox))
+                    {
+                        collided = true;
+                        break;
+                    }
+                }
+                //If any collision then go to last position.
+                if (collided)
+                    mesh.Position = lastPos;
+            }
         }
 
         public void Dispose() { mesh.Dispose(); }
