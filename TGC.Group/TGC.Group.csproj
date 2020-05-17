@@ -102,6 +102,7 @@
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
     <Compile Include="Model\Bloque.cs" />
+    <Compile Include="Model\BloqueBuilder.cs" />
     <Compile Include="Model\Camara.cs" />
     <Compile Include="Model\EscenarioLoader.cs" />
     <Compile Include="Model\Laser.cs" />

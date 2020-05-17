@@ -24,6 +24,7 @@ namespace TGC.Group.Model
         private Nave jugador;
         private float anguloEntreVectores;
         private TGCQuaternion quaternionAuxiliar;
+        private bool cond = false;
         public Torreta(string mediaDir, TGCVector3 posicionInicial,Nave nave)
         {
             this.mediaDir = mediaDir;
@@ -90,6 +91,7 @@ namespace TGC.Group.Model
             new TgcText2D().drawText("Distancia: " + DireccionB.Length().ToString(), 5, 20, Color.White);
             new TgcText2D().drawText("\n Condicion: " + dada.ToString(), 5, 20, Color.White);
             */
+
         }
         public void Dispose()
         {
