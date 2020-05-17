@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using TGC.Core.BulletPhysics;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 
@@ -17,22 +13,22 @@ namespace TGC.Group.Model
         public Turbo(TgcMesh mesh, TGCVector3 translation, int poder = 25, TGCVector3 rotation = new TGCVector3(), float angle = 0) : base(mesh, translation, rotation, angle)
         {
             this.poder = poder;
+
+            cuerpo = BulletRigidBodyFactory.Instance.CreateCylinder(mesh.BoundingBox.calculateSize() * 0.5f, translation, 0);
+            cuerpo.CollisionFlags = BulletSharp.CollisionFlags.NoContactResponse | BulletSharp.CollisionFlags.StaticObject;
         }
 
-        public void Update(float ElapsedTime)
+        public override void Update(float ElapsedTime)
         {
             // TODO: Si esta inactivo, cuando pase TIEMPO_INACTIVO se debe volver a activar
+            if (Activo) // Si no esta activo, no actualizamos.
+                base.Update(ElapsedTime);
         }
 
-        public void Render()
+        public override void Render()
         {
             if (Activo) // Si no esta activo, no renderizamos. TODO: Estaria bueno tener un shader que lo oscurezca o algo asi
-            {
-                mesh.Transform = TGCMatrix.Translation(new TGCVector3(translation));
-                mesh.Render();
-                mesh.BoundingBox.transform(mesh.Transform);
-                mesh.BoundingBox.Render();
-            }
+                base.Render();
         }
 
         public int Usar()

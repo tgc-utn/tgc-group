@@ -13,7 +13,7 @@ namespace TGC.Group.Model
         //Objetos de juego
         private Key inputAvanzar;
 
-        private Boolean EnElAire => translation.Y > 3; // TODO: Capaz se puede mejorar
+        private Boolean EnElAire => translation.Y > 4; // TODO: Capaz se puede mejorar
 
         private int turbo = 100;
         public int Turbo
@@ -23,7 +23,7 @@ namespace TGC.Group.Model
         }
 
 
-        public Jugador(TgcMesh mesh, TGCVector3 translation=new TGCVector3(), TGCVector3 rotation=new TGCVector3(),float angle=0) :base(mesh,translation,rotation,angle)
+        public Jugador(TgcMesh mesh, TGCVector3 translation=new TGCVector3(), TGCVector3 rotation=new TGCVector3(), float angle=0) :base(mesh,translation,rotation,angle)
         {
             inputAvanzar = Key.UpArrow;
 
@@ -35,6 +35,7 @@ namespace TGC.Group.Model
 
         private void HandleInputSuelo(TgcD3dInput input)
         {
+            Vector3 velocidadLineal = cuerpo.LinearVelocity;
             if (input.keyDown(inputAvanzar))
             {
                 cuerpo.ApplyCentralForce(Vector3.Transform(new Vector3(0, 0, -50), rotation));
@@ -43,18 +44,18 @@ namespace TGC.Group.Model
             {
                 cuerpo.ApplyCentralForce(Vector3.Transform(new Vector3(0, 0, 50), rotation));
             }
-            if (cuerpo.LinearVelocity.Length > 1)
+            if (velocidadLineal.Length > 1)
             {
-                Vector3 rotacion = Vector3.Transform(new Vector3(1, 0, 0), rotation) * 500 / cuerpo.LinearVelocity.Length;
+                Vector3 rotacion = Vector3.Transform(new Vector3(1, 0, 0), rotation) * 500 * Math.Sign(velocidadLineal.Z) / velocidadLineal.Length;
                 if (input.keyDown(Key.RightArrow))
                 {
-                    cuerpo.ApplyForce(rotacion, Vector3.Transform(new Vector3(0, 0, 5), rotation));
-                    cuerpo.ApplyForce(-rotacion, Vector3.Transform(new Vector3(0, 0, -5), rotation));
+                    cuerpo.ApplyForce(-rotacion, Vector3.Transform(new Vector3(0, 0, 5), rotation));
+                    cuerpo.ApplyForce(rotacion, Vector3.Transform(new Vector3(0, 0, -5), rotation));
                 }
                 if (input.keyDown(Key.LeftArrow))
                 {
-                    cuerpo.ApplyForce(rotacion, Vector3.Transform(new Vector3(0, 0, -5), rotation));
-                    cuerpo.ApplyForce(-rotacion, Vector3.Transform(new Vector3(0, 0, 5), rotation));
+                    cuerpo.ApplyForce(-rotacion, Vector3.Transform(new Vector3(0, 0, -5), rotation));
+                    cuerpo.ApplyForce(rotacion, Vector3.Transform(new Vector3(0, 0, 5), rotation));
                 }
                 if (input.keyDown(Key.A))
                 {
@@ -110,6 +111,11 @@ namespace TGC.Group.Model
             else
                 HandleInputSuelo(input);
             HandleInputTurbo(input);
+        }
+
+        public void RecogerTurbo(Turbo turbo)
+        {
+            Turbo += turbo.Usar();
         }
 
     }

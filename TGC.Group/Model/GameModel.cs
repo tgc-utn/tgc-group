@@ -2,7 +2,10 @@ using BulletSharp;
 using Microsoft.DirectX.DirectInput;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.BulletPhysics;
+using TGC.Core.Collision;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Mathematica;
@@ -146,7 +149,6 @@ namespace TGC.Group.Model
             turbos.Add(new Turbo(meshTurbo, new TGCVector3(-220, 0, -300), 100));
             turbos.Add(new Turbo(meshTurbo, new TGCVector3(-220, 0, 300), 100));
             turbos.Add(new Turbo(meshTurbo, new TGCVector3(220, 0, -300), 100));
-
         }
 
         private void initJugadores()
@@ -180,14 +182,19 @@ namespace TGC.Group.Model
 
             dynamicsWorld.StepSimulation(ElapsedTime, 10, TimeBetweenUpdates);
 
-            foreach (Jugador jugador in jugadores)
-            {
-                jugador.Update(ElapsedTime);
-            }
-
             foreach (var turbo in turbos)
             {
                 turbo.Update(ElapsedTime);
+            }
+
+            foreach (Jugador jugador in jugadores)
+            {
+                jugador.Update(ElapsedTime);
+
+                // Esto quedo medio feo, capaz estaria bueno trasladar esta logica a Turbo? O a Jugador?:
+                Turbo turboEnContacto = turbos.Find(turbo => turbo.CheckCollideWith(jugador)); // Nunca vamos a tocar mas de 1 turbo en simultaneo
+                if (turboEnContacto != null)
+                    jugador.RecogerTurbo(turboEnContacto);
             }
 
             pelota.Update(ElapsedTime);
@@ -206,7 +213,8 @@ namespace TGC.Group.Model
         {
             jugadorActivo.HandleInput(Input);
 
-            System.Windows.Forms.Cursor.Position = new Point(Form.GameForm.ActiveForm.Width / 2, Form.GameForm.ActiveForm.Height / 2);
+            // Queremos esto todavia?:
+            //System.Windows.Forms.Cursor.Position = new Point(Form.GameForm.ActiveForm.Width / 2, Form.GameForm.ActiveForm.Height / 2);
 
             if (Input.keyDown(Key.Escape))
             {
@@ -224,7 +232,7 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
-            DrawText.drawText("Turbo: " + jugadorActivo.Turbo, 0, 20, Color.Red);
+            DrawText.drawText("Turbo: " + jugadorActivo.Turbo, 1800, 20, Color.Red);
 
             skyBox.Render();
             
@@ -269,7 +277,12 @@ namespace TGC.Group.Model
 
             pelota.Dispose();
 
-            escena.DisposeAll();            
+            escena.DisposeAll();   
+            
+            foreach (Turbo turbo in turbos)
+            {
+                turbo.Dispose();
+            }
         }
     }
 }
