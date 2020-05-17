@@ -29,7 +29,7 @@ namespace TGC.Group.Model
 
             this.translation.Y += 10;
 
-            cuerpo = BulletRigidBodyFactory.Instance.CreateBox(Mesh.BoundingBox.calculateSize(), 1f, new TGCVector3(translation), rotation.X, rotation.Y, rotation.Z, 1f, true);
+            cuerpo = BulletRigidBodyFactory.Instance.CreateBox(Mesh.BoundingBox.calculateSize()  * 0.5f, 2f, new TGCVector3(translation), rotation.X, rotation.Y, rotation.Z, 1f, true);
             cuerpo.SetSleepingThresholds(0, 0);
         }
 

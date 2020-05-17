@@ -2,7 +2,7 @@ using BulletSharp;
 using Microsoft.DirectX.DirectInput;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Net.NetworkInformation;
+using TGC.Core.BulletPhysics;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Mathematica;
@@ -28,8 +28,6 @@ namespace TGC.Group.Model
         //Objetos de escena
         private TgcScene  escena;
         private TgcMesh   cancha;
-        private TgcMesh   arco;
-        private TgcMesh   paredes;
         private TgcSkyBox skyBox;
 
         //Objetos de juego
@@ -37,8 +35,9 @@ namespace TGC.Group.Model
         private Jugador       jugadorActivo;
         private CamaraJugador camara;
         private Pelota        pelota;
-        private Bordes        bordes;
         private List<Turbo>   turbos = new List<Turbo>();
+        private Paredes       paredes;
+        private Arco[]        arcos;
 
         //Objetos de fisica
         protected DiscreteDynamicsWorld             dynamicsWorld;
@@ -70,13 +69,17 @@ namespace TGC.Group.Model
             pelota = new Pelota( escena.getMeshByName("Pelota"), new TGCVector3(0f, 50f, 0f));
             dynamicsWorld.AddRigidBody(pelota.Cuerpo);
 
-            bordes = new Bordes(paredes.BoundingBox);
-            foreach (RigidBody pared in bordes.paredes)
-            {
-                dynamicsWorld.AddRigidBody(pared);
-            }
+            paredes = new Paredes(escena.getMeshByName("Box_5"));
 
-            camara = new CamaraJugador(jugadorActivo, pelota, Camera, paredes.createBoundingBox());
+            arcos = new Arco[2];
+
+            arcos[0] = new Arco(escena.getMeshByName("Arco"),FastMath.PI);
+            arcos[1] = new Arco(escena.getMeshByName("Arco"),0);
+
+            dynamicsWorld.AddRigidBody(arcos[0].Cuerpo);
+            dynamicsWorld.AddRigidBody(arcos[1].Cuerpo);
+
+            camara = new CamaraJugador(jugadorActivo, pelota, Camera, paredes.Mesh.createBoundingBox());
         }
 
         private void initFisica()
@@ -123,10 +126,6 @@ namespace TGC.Group.Model
             escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha-TgcScene.xml");
 
             cancha = escena.Meshes[0];
-
-            arco = escena.Meshes[1];
-
-            paredes = escena.getMeshByName("Box_5");
 
             TgcMesh meshTurbo = escena.getMeshByName("Turbo");
             turbos.Add(new Turbo(meshTurbo, new TGCVector3(80, 0, 100)));
@@ -192,6 +191,9 @@ namespace TGC.Group.Model
 
             pelota.Update(ElapsedTime);
 
+            arcos[0].Update(ElapsedTime);
+            arcos[1].Update(ElapsedTime);
+
             camara.Update(ElapsedTime);
 
             handleInput();
@@ -224,14 +226,6 @@ namespace TGC.Group.Model
             DrawText.drawText("Turbo: " + jugadorActivo.Turbo, 0, 20, Color.Red);
 
             skyBox.Render();
-
-            arco.Rotation = new TGCVector3(0, 0, 0); 
-            arco.UpdateMeshTransform();
-            arco.Render();
-
-            arco.Rotation = new TGCVector3(0, FastMath.PI, 0);
-            arco.UpdateMeshTransform();
-            arco.Render();
             
             pelota.Render();
             
@@ -243,9 +237,8 @@ namespace TGC.Group.Model
                 jugador.Render();
             }
 
-            paredes.Transform = TGCMatrix.Identity;
-            paredes.Render();
-            bordes.Render();
+            arcos[0].Render();
+            arcos[1].Render();
 
             DrawText.drawText("posicion del jugador: " + jugadorActivo.Translation.ToString(),0,20,Color.Red);
 
@@ -253,6 +246,8 @@ namespace TGC.Group.Model
             {
                 turbo.Render();
             }
+
+            paredes.Render();
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();

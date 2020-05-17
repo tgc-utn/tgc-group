@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TGC.Group.Model
+﻿namespace TGC.Group.Model
 {
     interface IObjetoJuego
     {
-        void Render();
         void Update(float elapsedTime);
+        void Render();
         void Dispose();
     }
 }

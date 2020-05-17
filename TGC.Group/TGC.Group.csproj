@@ -101,12 +101,13 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Game.settings</DependentUpon>
     </Compile>
-    <Compile Include="Model\Bordes.cs" />
+    <Compile Include="Model\Arco.cs" />
     <Compile Include="Model\CamaraJugador.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\IObjetoJuego.cs" />
     <Compile Include="Model\Jugador.cs" />
     <Compile Include="Model\ObjetoJuego.cs" />
+    <Compile Include="Model\Paredes.cs" />
     <Compile Include="Model\Turbo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

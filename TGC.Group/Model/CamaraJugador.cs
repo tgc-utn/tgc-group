@@ -35,6 +35,8 @@ namespace TGC.Group.Model
             this.camara = camara;
             this.limites = limites;
 
+            this.limites.scaleTranslate(new TGCVector3(0, 0, 0), new TGCVector3(0.9f,0.9f,0.9f));
+
             lookAt = new TGCVector3(TGCVector3.Empty);
             cameraPosition = new TGCVector3(0, 100, 225);
         }
