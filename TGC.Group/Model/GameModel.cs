@@ -36,6 +36,7 @@ namespace TGC.Group.Model
         private Jugador       jugadorActivo;
         private CamaraJugador camara;
         private Pelota        pelota;
+        private Bordes        bordes;
 
         //Objetos de fisica
         protected DiscreteDynamicsWorld             dynamicsWorld;
@@ -67,7 +68,13 @@ namespace TGC.Group.Model
             pelota = new Pelota( escena.getMeshByName("Pelota"), new TGCVector3(0f, 50f, 0f));
             dynamicsWorld.AddRigidBody(pelota.Cuerpo);
 
-            camara = new CamaraJugador(jugadorActivo, pelota, Camera);
+            bordes = new Bordes(paredes.BoundingBox);
+            foreach (RigidBody pared in bordes.paredes)
+            {
+                dynamicsWorld.AddRigidBody(pared);
+            }
+
+            camara = new CamaraJugador(jugadorActivo, pelota, Camera, paredes.createBoundingBox());
         }
 
         private void initFisica()
@@ -122,21 +129,22 @@ namespace TGC.Group.Model
 
         private void initJugadores()
         {
-            Jugador Auto = new Jugador(escena.Meshes[2], new TGCVector3(-20, 0, 100), new TGCVector3(0, 0, 0));
-            Jugador Tractor = new Jugador(escena.Meshes[5], new TGCVector3(0, 0, -30), new TGCVector3(0, FastMath.PI, 0));
-            Jugador Patrullero = new Jugador(escena.Meshes[3], new TGCVector3(0, 0, 30), new TGCVector3(0, 0, 0));
-            Jugador Tanque = new Jugador(escena.Meshes[4], new TGCVector3(20, 0, -100), new TGCVector3(0, FastMath.PI, 0));
+            Jugador auto       = new Jugador(escena.Meshes[2], new TGCVector3(-20, 0, 100), new TGCVector3(0, 0, 0));
+            Jugador tractor    = new Jugador(escena.Meshes[5], new TGCVector3(0, 0, -30), new TGCVector3(0, FastMath.PI, 0));
+            Jugador patrullero = new Jugador(escena.Meshes[3], new TGCVector3(0, 0, 30), new TGCVector3(0, 0, 0));
+            Jugador tanque     = new Jugador(escena.Meshes[4], new TGCVector3(20, 0, -100), new TGCVector3(0, FastMath.PI, 0));
 
-            jugadorActivo = Auto;
+            jugadorActivo = auto;
 
-            jugadores.Add(Auto);
-            jugadores.Add(Tractor);
-            jugadores.Add(Patrullero);
-            jugadores.Add(Tanque);
-            dynamicsWorld.AddRigidBody(Auto.Cuerpo);
-            dynamicsWorld.AddRigidBody(Tanque.Cuerpo);
-            dynamicsWorld.AddRigidBody(Patrullero.Cuerpo);
-            dynamicsWorld.AddRigidBody(Tractor.Cuerpo);
+            jugadores.Add(auto);
+            jugadores.Add(tractor);
+            jugadores.Add(patrullero);
+            jugadores.Add(tanque);
+
+            dynamicsWorld.AddRigidBody(auto.Cuerpo);
+            dynamicsWorld.AddRigidBody(tanque.Cuerpo);
+            dynamicsWorld.AddRigidBody(patrullero.Cuerpo);
+            dynamicsWorld.AddRigidBody(tractor.Cuerpo);
         }
 
         /// <summary>
@@ -208,6 +216,9 @@ namespace TGC.Group.Model
 
             paredes.Transform = TGCMatrix.Identity;
             paredes.Render();
+            bordes.Render();
+
+            DrawText.drawText("posicion del jugador: " + jugadorActivo.Translation.ToString(),0,20,Color.Red);
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();
@@ -220,7 +231,15 @@ namespace TGC.Group.Model
         /// </summary>
         public override void Dispose()
         {
-            escena.DisposeAll();
+
+            foreach (Jugador jugador in jugadores)
+            {
+                jugador.Dispose();
+            }
+
+            pelota.Dispose();
+
+            escena.DisposeAll();            
         }
     }
 }

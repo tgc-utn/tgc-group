@@ -22,14 +22,35 @@ namespace TGC.Group.Model
 
         public void HandleInput(TgcD3dInput input)
         {
-            if (input.keyDown(inputAvanzar) )
+            BulletSharp.Math.Vector3 velocity = new BulletSharp.Math.Vector3(0, 0, 0);
+
+            if (input.keyDown(Key.Up))
             {
-                BulletSharp.Math.Vector3 velocity = new BulletSharp.Math.Vector3(0, 0, -5);
-                velocity = rotation.Rotate(velocity);
-                cuerpo.ApplyImpulse(velocity, new BulletSharp.Math.Vector3());
+                velocity.Z -= 5;
             }
-            
-            if(input.keyUp(inputAvanzar))
+            else if (input.keyDown(Key.Down))
+            {
+                velocity.Z += 5;
+            }
+            else if (input.keyDown(Key.Left))
+            {
+                velocity.X += 5;
+            }
+            else if (input.keyDown(Key.Right))
+            {
+                velocity.X -= 5;
+            }
+
+            //velocity = rotation.Rotate(velocity);
+
+
+            //cuerpo.ApplyImpulse(velocity, new BulletSharp.Math.Vector3());
+
+            cuerpo.LinearVelocity = velocity * 5;
+
+            return;
+
+            if (input.keyUp(inputAvanzar))
             {
                 cuerpo.LinearVelocity = new BulletSharp.Math.Vector3(0, 0, 0);
             }

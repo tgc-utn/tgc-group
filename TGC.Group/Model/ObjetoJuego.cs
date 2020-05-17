@@ -6,7 +6,7 @@ using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Model
 {
-    class ObjetoJuego
+    class ObjetoJuego: IObjetoJuego
     {
         //Objetos de meshes
         public TgcMesh    Mesh        { get { return mesh; } }
@@ -33,7 +33,7 @@ namespace TGC.Group.Model
             this.rotation = new BulletSharp.Math.Quaternion( new BulletSharp.Math.Vector3(rotation.X,rotation.Y,rotation.Z)  ,angle);
         }
 
-        public virtual void Update(float ElapsedTime)
+        public virtual void Update(float elapsedTime)
         {
             cuerpo.InterpolationWorldTransform.Decompose(out scale, out rotation, out translation);
         }
@@ -49,20 +49,25 @@ namespace TGC.Group.Model
             RenderRigidBodyBoundingBox();
         }
 
-        public void RenderRigidBodyBoundingBox()
+        public static void RenderRigidBodyBoundingBox(RigidBody rigidBody, TGCVector3 translation, TGCVector3 scale)
         {
             BulletSharp.Math.Vector3 aabbMin = new BulletSharp.Math.Vector3();
             BulletSharp.Math.Vector3 aabbMax = new BulletSharp.Math.Vector3();
             BulletSharp.Math.Matrix aabbTransform = new BulletSharp.Math.Matrix();
 
-            cuerpo.GetWorldTransform(out aabbTransform);
+            rigidBody.GetWorldTransform(out aabbTransform);
 
-            cuerpo.CollisionShape.GetAabb(aabbTransform, out aabbMin, out aabbMax);
+            rigidBody.CollisionShape.GetAabb(aabbTransform, out aabbMin, out aabbMax);
 
-            TgcBoundingAxisAlignBox aabb = new TgcBoundingAxisAlignBox(new TGCVector3(aabbMin), new TGCVector3(aabbMax), Translation, Scale);
+            TgcBoundingAxisAlignBox aabb = new TgcBoundingAxisAlignBox(new TGCVector3(aabbMin), new TGCVector3(aabbMax), translation, scale);
 
             aabb.setRenderColor(Color.Blue);
             aabb.Render();
+        }
+
+        public void RenderRigidBodyBoundingBox()
+        {
+            RenderRigidBodyBoundingBox(cuerpo, Translation, Scale);
         }
 
         public virtual void Dispose()

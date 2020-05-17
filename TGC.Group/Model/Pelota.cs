@@ -10,6 +10,5 @@ namespace TGC.Group.Model
         {
 			cuerpo = BulletRigidBodyFactory.Instance.CreateBall(1f, 1f, new TGCVector3(translation));
         }
-		
     }
 }
