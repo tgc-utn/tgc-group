@@ -126,6 +126,7 @@ namespace TGC.Group.Model
             escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha-TgcScene.xml");
 
             cancha = escena.Meshes[0];
+            
 
             TgcMesh meshTurbo = escena.getMeshByName("Turbo");
             turbos.Add(new Turbo(meshTurbo, new TGCVector3(80, 0, 100)));
