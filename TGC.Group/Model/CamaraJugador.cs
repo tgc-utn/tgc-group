@@ -55,7 +55,6 @@ namespace TGC.Group.Model
                 cameraPosition.Y = minTranslateY;
             }
             
-            /*
             if (cameraPosition.X < limites.PMin.X)
             {
                 cameraPosition.X = limites.PMin.X;
@@ -73,7 +72,6 @@ namespace TGC.Group.Model
             {
                 cameraPosition.Z = limites.PMax.Z;
             }
-            */
 
             camara.SetCamera(cameraPosition, pelota.Translation);
         }

@@ -8,7 +8,7 @@ namespace TGC.Group.Model
     {
         public Pelota(TgcMesh mesh, TGCVector3 translation = new TGCVector3(), TGCVector3 rotation = new TGCVector3(), float angle = 0) : base(mesh, translation, rotation, angle)
         {
-			cuerpo = BulletRigidBodyFactory.Instance.CreateBall(1f, 1f, new TGCVector3(translation));
+			cuerpo = BulletRigidBodyFactory.Instance.CreateBall(17f, 1f, new TGCVector3(translation));
         }
     }
 }

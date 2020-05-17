@@ -2,6 +2,7 @@ using BulletSharp;
 using Microsoft.DirectX.DirectInput;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Net.NetworkInformation;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Mathematica;
@@ -37,6 +38,7 @@ namespace TGC.Group.Model
         private CamaraJugador camara;
         private Pelota        pelota;
         private Bordes        bordes;
+        private List<Turbo>   turbos = new List<Turbo>();
 
         //Objetos de fisica
         protected DiscreteDynamicsWorld             dynamicsWorld;
@@ -87,7 +89,7 @@ namespace TGC.Group.Model
 
             constraintSolver = new SequentialImpulseConstraintSolver();
 
-            overlappingPairCache = new DbvtBroadphase(); //AxisSweep3(new BsVector3(-5000f, -5000f, -5000f), new BsVector3(5000f, 5000f, 5000f), 8192);
+            overlappingPairCache = new DbvtBroadphase();
 
             dynamicsWorld = new DiscreteDynamicsWorld(dispatcher, overlappingPairCache, constraintSolver, collisionConfiguration);
             dynamicsWorld.Gravity = new TGCVector3(0, -10f, 0).ToBulletVector3();
@@ -118,13 +120,33 @@ namespace TGC.Group.Model
             skyBox.Init();
 
             //cargar escena
-            escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha2-TgcScene.xml");
+            escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha-TgcScene.xml");
 
             cancha = escena.Meshes[0];
 
             arco = escena.Meshes[1];
 
             paredes = escena.getMeshByName("Box_5");
+
+            TgcMesh meshTurbo = escena.getMeshByName("Turbo");
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(80, 0, 100)));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(-80, 0, -100)));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(80, 0, -100)));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(-80, 0, 100)));
+
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(0, 0, 130)));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(0, 0, -130)));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(0, 0, 250)));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(0, 0, -250)));
+
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(220, 0, 0), 100));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(-220, 0, 0), 100));
+
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(220, 0, 300), 100));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(-220, 0, -300), 100));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(-220, 0, 300), 100));
+            turbos.Add(new Turbo(meshTurbo, new TGCVector3(220, 0, -300), 100));
+
         }
 
         private void initJugadores()
@@ -163,6 +185,11 @@ namespace TGC.Group.Model
                 jugador.Update(ElapsedTime);
             }
 
+            foreach (var turbo in turbos)
+            {
+                turbo.Update(ElapsedTime);
+            }
+
             pelota.Update(ElapsedTime);
 
             camara.Update(ElapsedTime);
@@ -194,6 +221,8 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
 
+            DrawText.drawText("Turbo: " + jugadorActivo.Turbo, 0, 20, Color.Red);
+
             skyBox.Render();
 
             arco.Rotation = new TGCVector3(0, 0, 0); 
@@ -219,6 +248,11 @@ namespace TGC.Group.Model
             bordes.Render();
 
             DrawText.drawText("posicion del jugador: " + jugadorActivo.Translation.ToString(),0,20,Color.Red);
+
+            foreach (var turbo in turbos)
+            {
+                turbo.Render();
+            }
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();

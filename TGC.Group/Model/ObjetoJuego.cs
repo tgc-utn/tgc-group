@@ -22,7 +22,7 @@ namespace TGC.Group.Model
         protected BulletSharp.Math.Quaternion rotation;
         protected RigidBody cuerpo;
 
-        public ObjetoJuego(TgcMesh mesh, TGCVector3 translation=new TGCVector3(), TGCVector3 rotation=new TGCVector3(), float angle=0)
+        public ObjetoJuego(TgcMesh mesh, TGCVector3 translation=new TGCVector3(), TGCVector3 rotation=new TGCVector3(), float angle=50)
         {
             this.mesh = mesh;
 
