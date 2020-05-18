@@ -22,9 +22,13 @@ namespace TGC.Group.Model
         private readonly float velocidadRotacion;
         private int rotacionesDeRollRestantes;
         private bool estaRolleando;
+        private bool estaVivo;
+        private TgcText2D textoGameOver;
+        private string mediaDir;
 
         public Nave(string mediaDir, TGCVector3 posicionInicial, InputDelJugador input)
         {
+            this.mediaDir = mediaDir;
             this.modeloNave = new ModeloCompuesto(mediaDir + "XWing\\X-Wing-TgcScene.xml", posicion);
             this.posicion = posicionInicial;
             this.input = input;
@@ -36,6 +40,7 @@ namespace TGC.Group.Model
             this.velocidadRotacion = 0.008f;
             this.rotacionesDeRollRestantes = 0;
             this.estaRolleando = false;
+            this.estaVivo = true;
         }
 
 
@@ -44,6 +49,7 @@ namespace TGC.Group.Model
             
             TGCVector3 rotacionInicial = new TGCVector3(0f, 1f, 0f) * Geometry.DegreeToRadian(180f);
             modeloNave.CambiarRotacion(rotacionInicial);
+            setearTextoGameOver();
         }
 
         public void Update(float elapsedTime)
@@ -79,15 +85,29 @@ namespace TGC.Group.Model
                     VolverARotacionNormal();
                 }
             }
-
+            if (input.HayInputDeDisparo())
+            {
+                Disparar();
+            }
             MoverseEnDireccion(input.DireccionDelInput(), elapsedTime);
-
+            if (naveEstaColisionandoConLaser())
+            {
+                this.estaVivo = false;
+            }
         }
 
         public void Render()
         {
-            modeloNave.aplicarTransformaciones();
-            modeloNave.Render();
+            if (estaVivo)
+            {
+                modeloNave.aplicarTransformaciones();
+                modeloNave.Render();
+            }
+            else
+            {
+                textoGameOver.render();
+            }
+
             new TgcText2D().drawText("Velocidad de la nave:\n" + velocidadActual.ToString(), 5, 20, Color.White);
             new TgcText2D().drawText("Posicion de la nave:\n" + posicion.ToString(), 5, 60, Color.White);
             new TgcText2D().drawText("Rotacion de la nave:\n" + rotacionActual.ToString(), 5, 130, Color.White);
@@ -213,7 +233,27 @@ namespace TGC.Group.Model
         }
         #endregion
 
+        private bool estaViva()
+        {
+            return this.estaVivo;
+        }
+        private void setearTextoGameOver()
+        {
+            textoGameOver = new TgcText2D();
+            textoGameOver.Text = "GAME\nOVER";
+            textoGameOver.Color = Color.Black;
+            textoGameOver.Align = TgcText2D.TextAlign.CENTER;
+            textoGameOver.Position = new Point(500, 300);
+            textoGameOver.Size = new Size(400, 200);
+            textoGameOver.changeFont(new System.Drawing.Font("TimesNewRoman", 100, FontStyle.Bold | FontStyle.Italic));
+        }
+        private void Disparar()
+        {
+            TGCVector3 posicionLaser = new TGCVector3(GetPosicion());
+            posicionLaser.Z += 100f;
+            GameManager.Instance.AgregarRenderizable(new Laser(mediaDir, posicionLaser, new TGCVector3(0,0,1)));
 
+        }
     }
 }
 

@@ -100,5 +100,9 @@ namespace TGC.Group.Model
         {
             return input.keyDown(Key.Q);
         }
+        public Boolean HayInputDeDisparo()
+        {
+            return input.keyDown(Key.Space);
+        }
     }
 }

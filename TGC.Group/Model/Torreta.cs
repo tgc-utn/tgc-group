@@ -101,11 +101,10 @@ namespace TGC.Group.Model
 
         public void Disparar(TGCVector3 posicionNave)
         {
-                posicionNave.Z += 15f;
+                posicionNave.Z += 15f; //TODO modificar este valor respecto la velocidad de la nave
                 TGCVector3 direccionDisparo = posicionNave - posicionInicial;
-                //direccionDisparo.Z += 40f;
                 TGCVector3 posicionLaser = posicionInicial;
-                //posicionLaser.Y += 0.5f;
+                posicionLaser.Y += 0.5f;
                 GameManager.Instance.AgregarRenderizable(new Laser(mediaDir, posicionLaser, direccionDisparo));
             
 
