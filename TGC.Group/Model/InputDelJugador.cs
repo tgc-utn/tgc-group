@@ -95,5 +95,10 @@ namespace TGC.Group.Model
         {
             return !SentidoDeAceleracionDelInput().Equals(0f);
         }
+
+        public Boolean HayInputDeRoll()
+        {
+            return input.keyDown(Key.Q);
+        }
     }
 }
