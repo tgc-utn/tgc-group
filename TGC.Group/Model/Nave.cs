@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System;
 using System.Runtime.CompilerServices;
 using Microsoft.DirectX.Direct3D;
+using TGC.Core.Collision;
 
 namespace TGC.Group.Model
 {
@@ -241,8 +242,6 @@ namespace TGC.Group.Model
 
 
         #endregion
-
-
 
     }
 }

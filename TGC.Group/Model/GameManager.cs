@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TGC.Core.Collision;
 using TGC.Examples.Camara;
 
 namespace TGC.Group.Model
@@ -41,8 +42,10 @@ namespace TGC.Group.Model
             unRenderizable.Dispose();
         }
 
-
-
+        public List<Laser> obtenerLaseres()
+        {
+            return new List<Laser>(Renderizables.OfType<Laser>());
+        }
 
 
         #region Singleton

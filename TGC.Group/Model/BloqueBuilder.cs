@@ -32,6 +32,7 @@ namespace TGC.Group.Model
         public void setPosicion(TGCVector3 nuevaPosicion)
         {
             this.posicion = nuevaPosicion;
+            posicionesTorretas.ForEach(delegate (TGCVector3 pos) { pos.Z += nuevaPosicion.Z; });
         }
         public TGCVector3 getPosicion()
         {
