@@ -47,6 +47,7 @@ namespace TGC.Group.Model
 
         public void Update(float elapsedTime)
         {
+            TGCMatrix matrizTransformacion;
             TGCQuaternion rotationX = TGCQuaternion.RotationAxis(new TGCVector3(0.0f, 1.0f, 0.0f), Geometry.DegreeToRadian(90f/* + anguloEntreVectores*15*/));
             TGCVector3 PosicionA = posicionInicial;
             TGCVector3 PosicionB = jugador.GetPosicion();
@@ -60,16 +61,18 @@ namespace TGC.Group.Model
                 var cross = TGCVector3.Cross(DireccionA, DireccionB);
                 var newRotation = TGCQuaternion.RotationAxis(cross, FastMath.Acos(TGCVector3.Dot(DireccionA, DireccionB)));
                 quaternionAuxiliar = rotationX * newRotation;
-                mainMesh.Transform = baseScaleRotation *
+                matrizTransformacion = baseScaleRotation *
                    TGCMatrix.RotationTGCQuaternion(rotationX * newRotation) *
                    baseQuaternionTranslation;
             }
             else
             {
-                mainMesh.Transform = baseScaleRotation *
+                matrizTransformacion = baseScaleRotation *
                         TGCMatrix.RotationTGCQuaternion(quaternionAuxiliar) *
                         baseQuaternionTranslation;
             }
+            mainMesh.Transform = matrizTransformacion;
+            mainMesh.BoundingBox.transform(matrizTransformacion);
             //codigo de prueba------
             tiempo += .1f + elapsedTime;
             if(tiempo > 15f)

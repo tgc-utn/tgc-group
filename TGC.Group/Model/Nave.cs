@@ -6,6 +6,7 @@ using TGC.Core.Collision;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Model
 {
@@ -25,6 +26,7 @@ namespace TGC.Group.Model
         private bool estaVivo;
         private TgcText2D textoGameOver;
         private string mediaDir;
+        //private TgcBoundingAxisAlignBox boundingBox;
 
         public Nave(string mediaDir, TGCVector3 posicionInicial, InputDelJugador input)
         {
@@ -111,7 +113,7 @@ namespace TGC.Group.Model
             new TgcText2D().drawText("Velocidad de la nave:\n" + velocidadActual.ToString(), 5, 20, Color.White);
             new TgcText2D().drawText("Posicion de la nave:\n" + posicion.ToString(), 5, 60, Color.White);
             new TgcText2D().drawText("Rotacion de la nave:\n" + rotacionActual.ToString(), 5, 130, Color.White);
-            new TgcText2D().drawText("Tocando un Laser:\n"+ naveEstaColisionandoConLaser().ToString(), 5, 170, Color.White);
+            new TgcText2D().drawText("Tocando un Laser:\n"+ naveEstaColisionandoConLaser().ToString(), 5, 200, Color.White);
 
         }
 
