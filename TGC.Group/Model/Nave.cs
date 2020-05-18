@@ -207,7 +207,7 @@ namespace TGC.Group.Model
         #endregion
         private bool naveEstaColisionandoConLaser()
         {
-            var listaLaseres = GameManager.Instance.obtenerLaseres();
+            var listaLaseres = GameManager.Instance.obtenerLaseresEnemigos();
             return listaLaseres.Any(laser => modeloNave.colisionaConLaser(laser));
         }
         #region Roll
@@ -250,7 +250,7 @@ namespace TGC.Group.Model
         private void Disparar()
         {
             TGCVector3 posicionLaser = new TGCVector3(GetPosicion());
-            posicionLaser.Z += 100f;
+            //posicionLaser.Z += 100f;
             GameManager.Instance.AgregarRenderizable(new Laser(mediaDir, posicionLaser, new TGCVector3(0,0,1)));
 
         }

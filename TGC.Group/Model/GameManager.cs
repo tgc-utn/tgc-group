@@ -46,6 +46,10 @@ namespace TGC.Group.Model
         {
             return new List<Laser>(Renderizables.OfType<Laser>());
         }
+        public List<Laser> obtenerLaseresEnemigos()
+        {
+            return new List<Laser>(Renderizables.OfType<LaserEnemigo>());
+        }
 
 
         #region Singleton

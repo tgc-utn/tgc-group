@@ -107,6 +107,7 @@
     <Compile Include="Model\InputDelJugador.cs" />
     <Compile Include="Model\EscenarioLoader.cs" />
     <Compile Include="Model\Laser.cs" />
+    <Compile Include="Model\LaserEnemigo.cs" />
     <Compile Include="Model\ModeloCompuesto.cs" />
     <Compile Include="Model\IRenderizable.cs" />
     <Compile Include="Model\GameManager.cs" />
