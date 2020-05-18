@@ -15,7 +15,7 @@ Trabajo práctico de la asignatura electiva [Técnicas de Gráficos por Computad
 
 ## Integrantes ##
  - Cortez Francisco
- - Floxo Tomas 
+ - Floxo Lodeiro Tomas 
  - Vazquez Candela
 
 
