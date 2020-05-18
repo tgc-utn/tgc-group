@@ -1,4 +1,5 @@
 using BulletSharp;
+using BulletSharp.Math;
 using Microsoft.DirectX.DirectInput;
 using System.Collections.Generic;
 using System.Drawing;
@@ -41,6 +42,9 @@ namespace TGC.Group.Model
         private List<Turbo>   turbos = new List<Turbo>();
         private Paredes       paredes;
         private Arco[]        arcos;
+
+        private int golequipo1 = 0;
+        private int golequipo2 = 0;
 
         //Objetos de fisica
         protected DiscreteDynamicsWorld             dynamicsWorld;
@@ -203,12 +207,26 @@ namespace TGC.Group.Model
             arcos[0].Update(ElapsedTime);
             arcos[1].Update(ElapsedTime);
 
+            if (pelota.CheckCollideWith(arcos[0]))
+            {
+                golequipo1++;
+                pelota.ReiniciarPelota();
+            }
+
+            if (pelota.CheckCollideWith(arcos[1]))
+            {
+                golequipo2++;
+                pelota.ReiniciarPelota();
+            }
+
+
             camara.Update(ElapsedTime);
 
             handleInput();
 
             PostUpdate();
         }
+
 
         private void handleInput()
         {
@@ -258,6 +276,9 @@ namespace TGC.Group.Model
             }
 
             paredes.Render();
+
+            DrawText.drawText("GOL Equipo 1: " + golequipo1, 140, 120, Color.DarkRed);
+            DrawText.drawText("GOL Equipo 2: " + golequipo2, 140, 140, Color.DarkRed);
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();

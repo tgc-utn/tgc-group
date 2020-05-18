@@ -1,4 +1,5 @@
-﻿using TGC.Core.BulletPhysics;
+﻿using BulletSharp.Math;
+using TGC.Core.BulletPhysics;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 
@@ -25,6 +26,12 @@ namespace TGC.Group.Model
             Mesh.BoundingBox.Render();
 
             RenderRigidBodyBoundingBox();
+        }
+        public void ReiniciarPelota()
+        {
+            cuerpo.WorldTransform = TGCMatrix.Translation(new TGCVector3(0f, 50f, 0f)).ToBulletMatrix();
+            cuerpo.LinearVelocity = Vector3.Zero;
+            cuerpo.AngularVelocity = Vector3.Zero;
         }
     }
 }
