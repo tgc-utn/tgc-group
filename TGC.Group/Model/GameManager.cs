@@ -42,15 +42,6 @@ namespace TGC.Group.Model
             unRenderizable.Dispose();
         }
 
-        public List<Laser> obtenerLaseres()
-        {
-            return new List<Laser>(Renderizables.OfType<Laser>());
-        }
-        public List<Laser> obtenerLaseresEnemigos()
-        {
-            return new List<Laser>(Renderizables.OfType<LaserEnemigo>());
-        }
-
 
         #region Singleton
 

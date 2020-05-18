@@ -104,6 +104,7 @@
     <Compile Include="Model\Bloque.cs" />
     <Compile Include="Model\BloqueBuilder.cs" />
     <Compile Include="Model\Camara.cs" />
+    <Compile Include="Model\LaserDeJugador.cs" />
     <Compile Include="Model\Colisionable.cs" />
     <Compile Include="Model\InputDelJugador.cs" />
     <Compile Include="Model\EscenarioLoader.cs" />

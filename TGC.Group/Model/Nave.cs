@@ -251,7 +251,7 @@ namespace TGC.Group.Model
         {
             TGCVector3 posicionLaser = new TGCVector3(GetPosicion());
             //posicionLaser.Z += 100f;
-            GameManager.Instance.AgregarRenderizable(new Laser(mediaDir, posicionLaser, new TGCVector3(0,0,1),this));
+            GameManager.Instance.AgregarRenderizable(new LaserDeJugador(mediaDir, posicionLaser, new TGCVector3(0,0,1),this));
 
         }
 

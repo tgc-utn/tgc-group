@@ -10,7 +10,7 @@ using TGC.Core.SceneLoader;
 
 namespace TGC.Group.Model
 {
-    class Laser : Colisionable
+    public abstract class Laser : Colisionable
     {
         internal string direccionDeScene;
         private readonly TGCVector3 posicionInicial;
@@ -18,13 +18,11 @@ namespace TGC.Group.Model
 
         private TGCMatrix baseScaleRotation;
         private TGCMatrix baseQuaternionTranslation;
+
         public Laser(string mediaDir, TGCVector3 posicionInicial,TGCVector3 direccion, Nave naveDelJugador) :  base(naveDelJugador)
         {
-            
-            this.direccionDeScene = mediaDir + "Xwing\\laserBueno-TgcScene.xml";
             this.posicionInicial = posicionInicial;
             this.direccion = direccion;
-
         }
 
 
