@@ -14,7 +14,10 @@ namespace TGC.Group.Model
             this.meshRotationAngle = meshRotationAngle;
 
             cuerpo = BulletRigidBodyFactory.Instance.CreateRigidBodyFromTgcMesh(mesh);
-            cuerpo.WorldTransform = TGCMatrix.RotationTGCQuaternion(new TGCQuaternion(0, 1, 0, meshRotationAngle)).ToBulletMatrix();
+            TGCQuaternion rot = new TGCQuaternion();
+            rot.RotateAxis(new TGCVector3(0, 1, 0), meshRotationAngle);
+            //cuerpo.WorldTransform = TGCMatrix.RotationTGCQuaternion(new TGCQuaternion(0, 1, 0, meshRotationAngle)).ToBulletMatrix();
+            cuerpo.WorldTransform = TGCMatrix.RotationTGCQuaternion(rot).ToBulletMatrix();
         }
 
     }
