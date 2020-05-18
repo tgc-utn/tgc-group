@@ -73,6 +73,7 @@ namespace TGC.Group.Model
             dynamicsWorld.AddRigidBody(pelota.Cuerpo);
 
             paredes = new Paredes(escena.getMeshByName("Box_5"));
+            dynamicsWorld.AddRigidBody(paredes.Cuerpo);
 
             arcos = new Arco[2];
 
