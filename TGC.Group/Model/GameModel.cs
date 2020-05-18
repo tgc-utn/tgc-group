@@ -35,9 +35,11 @@ namespace TGC.Group.Model
             GameManager.Instance.AgregarRenderizable(bloque1);
             GameManager.Instance.AgregarRenderizable(bloque2);
             */
-            var posicionInicialDeNave = new TGCVector3(100, -15, -250); 
+            var posicionInicialDeNave = new TGCVector3(100, -15, -250);
 
-            Nave naveDelJuego = new Nave(MediaDir, posicionInicialDeNave,Input);
+            InputDelJugador input = new InputDelJugador(Input);
+
+            Nave naveDelJuego = new Nave(MediaDir, posicionInicialDeNave, input);
             GameManager.Instance.AgregarRenderizable(naveDelJuego);
 
             Camara camaraDelJuego = new Camara(posicionInicialDeNave, 10, -50, naveDelJuego);
