@@ -17,7 +17,8 @@ namespace TGC.Group.Model
         private TGCVector3 rotacionBase;
         private TGCVector3 rotacionActual;
         private readonly float velocidadRotacion;
-        
+        private int rotacionesDeRollRestantes;
+        private bool estaRolleando;
 
         public Nave(string mediaDir, TGCVector3 posicionInicial, InputDelJugador input)
         {
@@ -30,6 +31,8 @@ namespace TGC.Group.Model
             this.rotacionBase = new TGCVector3(0f, Geometry.DegreeToRadian(180f), 0f);
             this.rotacionActual = rotacionBase;
             this.velocidadRotacion = 0.008f;
+            this.rotacionesDeRollRestantes = 0;
+            this.estaRolleando = false;
         }
 
 
@@ -53,26 +56,38 @@ namespace TGC.Group.Model
                 VolverAVelocidadNormal();
             }
 
-            if (input.HayInputDeRotacion())
+            if (input.HayInputDeRoll())
             {
-                RotarEnDireccion(input.RotacionDelInput());
+                EmpezarARollear();
+            }
+
+            if (estaRolleando)
+            {
+                Rollear();
             }
             else
             {
-                VolverARotacionNormal();
+                if (input.HayInputDeRotacion())
+                {
+                    RotarEnDireccion(input.RotacionDelInput());
+                }
+                else
+                {
+                    VolverARotacionNormal();
+                }
             }
 
-            MoverseEnDireccion(input.DireccionDelInput(),elapsedTime);
-
+            MoverseEnDireccion(input.DireccionDelInput(), elapsedTime);
 
         }
+
         public void Render()
         {
             modeloNave.aplicarTransformaciones();
             modeloNave.Render();
             new TgcText2D().drawText("Velocidad de la nave:\n" + velocidadActual.ToString(), 5, 20, Color.White);
-            //new TgcText2D().drawText("Posicion de la nave:\n" + posicion.ToString(), 5, 20, Color.White);
-            //new TgcText2D().drawText("Rotacion de la nave:\n" + mainMesh.Rotation.ToString(), 5, 100, Color.White);
+            new TgcText2D().drawText("Posicion de la nave:\n" + posicion.ToString(), 5, 60, Color.White);
+            new TgcText2D().drawText("Rotacion de la nave:\n" + rotacionActual.ToString(), 5, 130, Color.White);
         }
 
         public void Dispose()
@@ -83,6 +98,8 @@ namespace TGC.Group.Model
         {
             return posicion;
         }
+
+        #region Movimientos
 
         private void MoverseEnDireccion(TGCVector3 versorDirector,float elapsedTime)
         {
@@ -105,7 +122,12 @@ namespace TGC.Group.Model
             float nuevaRotacionZ = NuevaRotacionEnEjeSegunLimite(rotacionASumar.Z + rotacionActual.Z, limiteEnZ);
             float nuevaRotacionX = NuevaRotacionEnEjeSegunLimite(rotacionASumar.X + rotacionActual.X, limiteEnX);
 
-            rotacionActual = new TGCVector3(nuevaRotacionX, Geometry.DegreeToRadian(180f), nuevaRotacionZ);
+            Rotar(new TGCVector3(nuevaRotacionX, Geometry.DegreeToRadian(180f), nuevaRotacionZ));
+        }
+
+        private void Rotar(TGCVector3 nuevaRotacion)
+        {
+            rotacionActual = nuevaRotacion;
             modeloNave.CambiarRotacion(rotacionActual);
         }
         private void Acelerar(float aceleracion)
@@ -117,11 +139,11 @@ namespace TGC.Group.Model
 
             if (nuevaVelocidad < velocidadMinima)
             {
-                velocidadActual = velocidadMinima;
+                velocidadActual += aceleracion;
             }
             else if(nuevaVelocidad > velocidadMaxima)
             {
-                velocidadActual = velocidadMaxima;
+                velocidadActual -= aceleracion;
             }
             else
             {
@@ -157,6 +179,30 @@ namespace TGC.Group.Model
                 return nuevaPosibleRotacion;
             }
         }
+        #endregion
+
+        #region Roll
+        private void EmpezarARollear()
+        {
+            estaRolleando = true;
+        }
+
+        private void Rollear()
+        {
+            rotacionesDeRollRestantes--;
+            Rotar(rotacionActual + new TGCVector3(0, 0, aceleracionMovimiento*4));
+
+            if (TerminoElRoll())
+            {
+                estaRolleando = false;
+            }
+        }
+
+        private bool TerminoElRoll()
+        {
+            return rotacionActual.Z > Math.PI*2;
+        }
+        #endregion
 
 
     }
