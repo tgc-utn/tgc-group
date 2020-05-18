@@ -139,7 +139,7 @@ namespace TGC.Group.Model
 
             if (nuevaVelocidad < velocidadMinima)
             {
-                velocidadActual += aceleracion;
+                velocidadActual -= aceleracion;
             }
             else if(nuevaVelocidad > velocidadMaxima)
             {
