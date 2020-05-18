@@ -13,7 +13,7 @@ namespace TGC.Group.Model
         //Objetos de juego
         private Key inputAvanzar;
 
-        private Boolean EnElAire => translation.Y > 4; // TODO: Capaz se puede mejorar
+        private Boolean EnElAire => translation.Y > 3; // TODO: Capaz se puede mejorar
 
         private int turbo = 100;
         public int Turbo
@@ -35,31 +35,30 @@ namespace TGC.Group.Model
 
         private void HandleInputSuelo(TgcD3dInput input)
         {
+            cuerpo.AngularVelocity = Vector3.Zero;
+            Vector3 frente = Vector3.Transform(new Vector3(0, 0, -1), rotation); // Vector que apunta siempre al frente del auto
             Vector3 velocidadLineal = cuerpo.LinearVelocity;
+            cuerpo.LinearVelocity = (velocidadLineal.Dot(frente) / frente.LengthSquared) * frente;
             if (input.keyDown(inputAvanzar))
             {
-                cuerpo.ApplyCentralForce(Vector3.Transform(new Vector3(0, 0, -50), rotation));
+                cuerpo.ApplyCentralForce(frente * 50);
             }
             if (input.keyDown(Key.DownArrow))
             {
-                cuerpo.ApplyCentralForce(Vector3.Transform(new Vector3(0, 0, 50), rotation));
+                cuerpo.ApplyCentralForce(frente * -50);
             }
             if (velocidadLineal.Length > 1)
             {
-                Vector3 rotacion = Vector3.Transform(new Vector3(1, 0, 0), rotation) * 500 * Math.Sign(velocidadLineal.Z) / velocidadLineal.Length;
+                Vector3 rotacion = Vector3.Transform(new Vector3(1, 0, 0), rotation) * Math.Min(5000f / (velocidadLineal.Length * .2f), 1000f);
                 if (input.keyDown(Key.RightArrow))
                 {
-                    cuerpo.ApplyForce(-rotacion, Vector3.Transform(new Vector3(0, 0, 5), rotation));
-                    cuerpo.ApplyForce(rotacion, Vector3.Transform(new Vector3(0, 0, -5), rotation));
+                    cuerpo.ApplyForce(rotacion, frente * -5);
+                    cuerpo.ApplyForce(-rotacion, frente * 5);
                 }
                 if (input.keyDown(Key.LeftArrow))
                 {
-                    cuerpo.ApplyForce(-rotacion, Vector3.Transform(new Vector3(0, 0, -5), rotation));
-                    cuerpo.ApplyForce(rotacion, Vector3.Transform(new Vector3(0, 0, 5), rotation));
-                }
-                if (input.keyDown(Key.A))
-                {
-                    cuerpo.AngularVelocity = Vector3.Zero;
+                    cuerpo.ApplyForce(rotacion, frente * 5);
+                    cuerpo.ApplyForce(-rotacion, frente * -5);
                 }
             }
             if (input.keyDown(Key.Space))
