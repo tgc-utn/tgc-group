@@ -74,7 +74,7 @@ namespace TGC.Group.Model
             tiempo += .1f + elapsedTime;
             if(tiempo > 15f)
             {
-                Disparar(DireccionB);
+                Disparar(PosicionB);
                 tiempo = 0f;
             }
             //--------
@@ -99,11 +99,11 @@ namespace TGC.Group.Model
             mainMesh.Dispose();
         }
 
-        public void Disparar(TGCVector3 VectorDireccionDisparo)
+        public void Disparar(TGCVector3 posicionNave)
         {
-
-                TGCVector3 direccionDisparo = VectorDireccionDisparo;
-                direccionDisparo.Z += 40f;
+                posicionNave.Z += 15f;
+                TGCVector3 direccionDisparo = posicionNave - posicionInicial;
+                //direccionDisparo.Z += 40f;
                 TGCVector3 posicionLaser = posicionInicial;
                 //posicionLaser.Y += 0.5f;
                 GameManager.Instance.AgregarRenderizable(new Laser(mediaDir, posicionLaser, direccionDisparo));

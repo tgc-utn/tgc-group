@@ -44,7 +44,7 @@ namespace TGC.Group.Model
             TGCVector3 direccionDisparo = direccion;
             direccionDisparo.Normalize();
             TGCQuaternion giro = QuaternionDireccion(direccionDisparo);
-            TGCVector3 movement = direccionDisparo * 10f * elapsedTime;
+            TGCVector3 movement = direccionDisparo * 60f * elapsedTime;
             mainMesh.Position = mainMesh.Position + movement;
             TGCMatrix matrizTransformacion = baseScaleRotation * TGCMatrix.RotationTGCQuaternion(rotation*giro)
                 * TGCMatrix.Translation(mainMesh.Position);
