@@ -155,9 +155,9 @@ namespace TGC.Group.Model
         private void initJugadores()
         {
             Jugador auto       = new Jugador(escena.Meshes[2], new TGCVector3(-20, 0, 100), new TGCVector3(0, 0, 0));
-            Jugador tractor    = new Jugador(escena.Meshes[5], new TGCVector3(0, 0, -30), new TGCVector3(0, FastMath.PI, 0));
+            Jugador tractor    = new Jugador(escena.Meshes[5], new TGCVector3(0, 0, -30), new TGCVector3(FastMath.PI, 0, 0));
             Jugador patrullero = new Jugador(escena.Meshes[3], new TGCVector3(0, 0, 30), new TGCVector3(0, 0, 0));
-            Jugador tanque     = new Jugador(escena.Meshes[4], new TGCVector3(20, 0, -100), new TGCVector3(0, FastMath.PI, 0));
+            Jugador tanque     = new Jugador(escena.Meshes[4], new TGCVector3(20, 0, -100), new TGCVector3(FastMath.PI, 0, 0));
 
             jugadorActivo = auto;
 
