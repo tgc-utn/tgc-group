@@ -105,7 +105,7 @@ namespace TGC.Group.Model
                 TGCVector3 direccionDisparo = posicionNave - posicionInicial;
                 TGCVector3 posicionLaser = posicionInicial;
                 posicionLaser.Y += 0.5f;
-                GameManager.Instance.AgregarRenderizable(new LaserEnemigo(mediaDir, posicionLaser, direccionDisparo));
+                GameManager.Instance.AgregarRenderizable(new LaserEnemigo(mediaDir, posicionLaser, direccionDisparo, jugador));
             
 
         }

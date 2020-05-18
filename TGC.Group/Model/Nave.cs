@@ -6,13 +6,15 @@ using TGC.Core.Collision;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Timers;
 
 namespace TGC.Group.Model
 {
     public class Nave : IRenderizable
     {
         private TGCVector3 posicion; 
-        private ModeloCompuesto modeloNave;
+        private readonly ModeloCompuesto modeloNave;
         private readonly InputDelJugador input;
         private readonly float velocidadBase;
         private float velocidadActual;
@@ -20,11 +22,11 @@ namespace TGC.Group.Model
         private TGCVector3 rotacionBase;
         private TGCVector3 rotacionActual;
         private readonly float velocidadRotacion;
-        private int rotacionesDeRollRestantes;
         private bool estaRolleando;
         private bool estaVivo;
         private TgcText2D textoGameOver;
         private string mediaDir;
+        private DateTime ultimoRoll;
 
         public Nave(string mediaDir, TGCVector3 posicionInicial, InputDelJugador input)
         {
@@ -38,9 +40,9 @@ namespace TGC.Group.Model
             this.rotacionBase = new TGCVector3(0f, Geometry.DegreeToRadian(180f), 0f);
             this.rotacionActual = rotacionBase;
             this.velocidadRotacion = 0.008f;
-            this.rotacionesDeRollRestantes = 0;
             this.estaRolleando = false;
             this.estaVivo = true;
+            this.ultimoRoll = new DateTime(0);
         }
 
 
@@ -49,7 +51,7 @@ namespace TGC.Group.Model
             
             TGCVector3 rotacionInicial = new TGCVector3(0f, 1f, 0f) * Geometry.DegreeToRadian(180f);
             modeloNave.CambiarRotacion(rotacionInicial);
-            setearTextoGameOver();
+            SetearTextoGameOver();
         }
 
         public void Update(float elapsedTime)
@@ -89,18 +91,16 @@ namespace TGC.Group.Model
             {
                 Disparar();
             }
+
             MoverseEnDireccion(input.DireccionDelInput(), elapsedTime);
-            if (naveEstaColisionandoConLaser())
-            {
-                this.estaVivo = false;
-            }
+
         }
 
         public void Render()
         {
             if (estaVivo)
             {
-                modeloNave.aplicarTransformaciones();
+                modeloNave.AplicarTransformaciones();
                 modeloNave.Render();
             }
             else
@@ -111,7 +111,6 @@ namespace TGC.Group.Model
             new TgcText2D().drawText("Velocidad de la nave:\n" + velocidadActual.ToString(), 5, 20, Color.White);
             new TgcText2D().drawText("Posicion de la nave:\n" + posicion.ToString(), 5, 60, Color.White);
             new TgcText2D().drawText("Rotacion de la nave:\n" + rotacionActual.ToString(), 5, 130, Color.White);
-            new TgcText2D().drawText("Tocando un Laser:\n"+ naveEstaColisionandoConLaser().ToString(), 5, 170, Color.White);
 
         }
 
@@ -205,20 +204,24 @@ namespace TGC.Group.Model
             }
         }
         #endregion
-        private bool naveEstaColisionandoConLaser()
-        {
-            var listaLaseres = GameManager.Instance.obtenerLaseresEnemigos();
-            return listaLaseres.Any(laser => modeloNave.colisionaConLaser(laser));
-        }
+
         #region Roll
         private void EmpezarARollear()
         {
-            estaRolleando = true;
+            if (SePuedeRollear())
+            {
+                estaRolleando = true;
+                ultimoRoll = DateTime.Now;
+            }
+        }
+
+        private Boolean SePuedeRollear()
+        {
+            return (DateTime.Now - ultimoRoll).TotalSeconds > 30;
         }
 
         private void Rollear()
         {
-            rotacionesDeRollRestantes--;
             Rotar(rotacionActual + new TGCVector3(0, 0, aceleracionMovimiento*4));
 
             if (TerminoElRoll())
@@ -232,27 +235,47 @@ namespace TGC.Group.Model
             return rotacionActual.Z > Math.PI*2;
         }
         #endregion
-
-        private bool estaViva()
+        private void SetearTextoGameOver()
         {
-            return this.estaVivo;
-        }
-        private void setearTextoGameOver()
-        {
-            textoGameOver = new TgcText2D();
-            textoGameOver.Text = "GAME\nOVER";
-            textoGameOver.Color = Color.Black;
-            textoGameOver.Align = TgcText2D.TextAlign.CENTER;
-            textoGameOver.Position = new Point(500, 300);
-            textoGameOver.Size = new Size(400, 200);
+            textoGameOver = new TgcText2D
+            {
+                Text = "GAME\nOVER",
+                Color = Color.Black,
+                Align = TgcText2D.TextAlign.CENTER,
+                Position = new Point(500, 300),
+                Size = new Size(400, 200)
+            };
             textoGameOver.changeFont(new System.Drawing.Font("TimesNewRoman", 100, FontStyle.Bold | FontStyle.Italic));
         }
         private void Disparar()
         {
             TGCVector3 posicionLaser = new TGCVector3(GetPosicion());
             //posicionLaser.Z += 100f;
-            GameManager.Instance.AgregarRenderizable(new Laser(mediaDir, posicionLaser, new TGCVector3(0,0,1)));
+            GameManager.Instance.AgregarRenderizable(new Laser(mediaDir, posicionLaser, new TGCVector3(0,0,1),this));
 
+        }
+
+        public Boolean ColisionaConColisionable(Colisionable unColisionable)
+        {
+            return modeloNave.ColisionaConColisionable(unColisionable);
+        }
+
+        public void Morir()
+        {
+            estaVivo = false;
+        }
+
+        public void Colisionar()
+        {
+            Morir();
+        }
+
+        public void ChocarConLaser()
+        {
+            if (!estaRolleando)
+            {
+                Morir();
+            }
         }
     }
 }
