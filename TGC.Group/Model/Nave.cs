@@ -1,23 +1,19 @@
 ﻿using TGC.Core.Mathematica;
-using TGC.Core.SceneLoader;
-using TGC.Core.Input;
-using Microsoft.DirectX.DirectInput;
 using TGC.Core.Text;
 using System.Drawing;
-using System.Collections.Generic;
-using System;
-using System.Runtime.CompilerServices;
 using Microsoft.DirectX.Direct3D;
 using TGC.Core.Collision;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TGC.Group.Model
 {
     public class Nave : IRenderizable
     {
-        private readonly string mediaDir;
         private TGCVector3 posicion; 
         private ModeloCompuesto modeloNave;
-        private readonly TgcD3dInput input;
+        private readonly InputDelJugador input;
         private readonly float velocidadBase;
         private float velocidadActual;
         private readonly float aceleracionMovimiento;
@@ -26,12 +22,12 @@ namespace TGC.Group.Model
         private readonly float velocidadRotacion;
         
 
-        public Nave(string mediaDir, TGCVector3 posicionInicial, TgcD3dInput input)
+        public Nave(string mediaDir, TGCVector3 posicionInicial, InputDelJugador input)
         {
-            this.mediaDir = mediaDir;
+            this.modeloNave = new ModeloCompuesto(mediaDir + "XWing\\X-Wing-TgcScene.xml", posicion);
             this.posicion = posicionInicial;
             this.input = input;
-            this.velocidadBase = 10f;
+            this.velocidadBase = 5f;
             this.velocidadActual = velocidadBase;
             this.aceleracionMovimiento = 0.01f;
             this.rotacionBase = new TGCVector3(0f, Geometry.DegreeToRadian(180f), 0f);
@@ -42,31 +38,43 @@ namespace TGC.Group.Model
 
         public void Init()
         {
-            modeloNave = new ModeloCompuesto(mediaDir + "XWing\\X-Wing-TgcScene.xml", posicion);
+            
             TGCVector3 rotacionInicial = new TGCVector3(0f, 1f, 0f) * Geometry.DegreeToRadian(180f);
             modeloNave.CambiarRotacion(rotacionInicial);
         }
 
         public void Update(float elapsedTime)
-        { 
-            TGCVector3 direccionDelInput = new TGCVector3(0, 0, 0); //A "direccion" se refiere a direccion y sentido.
-            TGCVector3 rotacionDelInput = new TGCVector3(0, 0, 0);
+        {
 
+            if (input.HayInputDeAceleracion())
+            {
+                float aceleracionDelInput = input.SentidoDeAceleracionDelInput() * aceleracionMovimiento;
+                Acelerar(aceleracionDelInput);
+            }
+            else
+            {
+                VolverAVelocidadNormal();
+            }
 
-            RotarYMoverseHorizontalmenteSegunInput(ref direccionDelInput,ref rotacionDelInput);
-            RotarYMoverseVerticalmenteSegunInput(ref direccionDelInput,ref rotacionDelInput);
-            AcelerarSegunInput();
+            if (input.HayInputDeRotacion())
+            {
+                RotarEnDireccion(input.RotacionDelInput());
+            }
+            else
+            {
+                VolverARotacionNormal();
+            }
 
-            MoverseEnDireccion(direccionDelInput, elapsedTime);
-            Rotar(rotacionDelInput);
-            modeloNave.CambiarRotacion(rotacionActual);
+            MoverseEnDireccion(input.DireccionDelInput(),elapsedTime);
+
 
         }
-
         public void Render()
         {
             modeloNave.aplicarTransformaciones();
             modeloNave.Render();
+            new TgcText2D().drawText("Velocidad de la nave: " + velocidadActual.ToString(), 5, 20, Color.White);
+            new TgcText2D().drawText("Tocando un Laser:\n"+ naveEstaColisionandoConLaser().ToString(), 5, 40, Color.White);
             //new TgcText2D().drawText("Posicion de la nave:\n" + posicion.ToString(), 5, 20, Color.White);
             //new TgcText2D().drawText("Rotacion de la nave:\n" + mainMesh.Rotation.ToString(), 5, 100, Color.White);
         }
@@ -80,7 +88,7 @@ namespace TGC.Group.Model
             return posicion;
         }
 
-        private void MoverseEnDireccion(TGCVector3 versorDirector, float elapsedTime)
+        private void MoverseEnDireccion(TGCVector3 versorDirector,float elapsedTime)
         {
             TGCVector3 movimientoDelFrame = new TGCVector3(0, 0, 0);
             TGCVector3 movimientoAdelante = new TGCVector3(0, 0, 1);
@@ -92,132 +100,50 @@ namespace TGC.Group.Model
 
             modeloNave.CambiarPosicion(posicion);
         }
-        private void Rotar(TGCVector3 rotacionASumar)
+        private void RotarEnDireccion(TGCVector3 versorDirector)
         {
             float limiteEnZ = Geometry.DegreeToRadian(20f);
             float limiteEnX = Geometry.DegreeToRadian(15f);
+            TGCVector3 rotacionASumar = versorDirector * velocidadRotacion;
 
             float nuevaRotacionZ = NuevaRotacionEnEjeSegunLimite(rotacionASumar.Z + rotacionActual.Z, limiteEnZ);
             float nuevaRotacionX = NuevaRotacionEnEjeSegunLimite(rotacionASumar.X + rotacionActual.X, limiteEnX);
 
             rotacionActual = new TGCVector3(nuevaRotacionX, Geometry.DegreeToRadian(180f), nuevaRotacionZ);
+            modeloNave.CambiarRotacion(rotacionActual);
         }
-
-        //Seccion de codigo maldito
-        #region Inputs
-        private void RotarYMoverseVerticalmenteSegunInput(ref TGCVector3 direccionDelInput, ref TGCVector3 rotacionDelInput)
-        {
-            if (input.keyDown(Key.Up) || input.keyDown(Key.W))
-            {
-                direccionDelInput.Y = 1;
-                rotacionDelInput.X = velocidadRotacion;
-            }
-            else if (input.keyDown(Key.Down) || input.keyDown(Key.S))
-            {
-                direccionDelInput.Y = -1;
-                rotacionDelInput.X = -velocidadRotacion;
-            }
-            else
-            {
-                rotacionDelInput.X = RotacionParaVolverANormal(rotacionActual.X, rotacionBase.X);
-            }
-        }
-
-        private void RotarYMoverseHorizontalmenteSegunInput(ref TGCVector3 direccionDelInput, ref TGCVector3 rotacionDelInput)
-        {
-            if (input.keyDown(Key.Left) || input.keyDown(Key.A))
-            {
-                direccionDelInput.X = -1;
-                rotacionDelInput.Z = velocidadRotacion;
-            }
-            else if (input.keyDown(Key.Right) || input.keyDown(Key.D))
-            {
-                direccionDelInput.X = 1;
-                rotacionDelInput.Z = -velocidadRotacion;
-            }
-            else
-            {
-                rotacionDelInput.Z = RotacionParaVolverANormal(rotacionActual.Z, rotacionBase.Z);
-            }
-
-
-        }
-        private void AcelerarSegunInput()
-        {
-            if (input.keyDown(Key.LeftShift))
-            {
-                Acelerar();
-            }
-            else if (input.keyDown(Key.LeftControl))
-            {
-                Desacelerar();
-            }
-            else
-            {
-                VolverAVelocidadNormal();
-            }
-        }
-
-        #endregion
-
-        #region Aceleraciones
-        private void Acelerar()
+        private void Acelerar(float aceleracion)
         {
             float velocidadMaxima = velocidadBase * 4;
-
-            if (velocidadActual < velocidadMaxima)
-            {
-                velocidadActual += aceleracionMovimiento;
-            }
-        }
-
-        private void Desacelerar()
-        {
             float velocidadMinima = velocidadBase / 2;
 
-            if (velocidadActual > velocidadMinima)
+            float nuevaVelocidad = aceleracion + velocidadActual;
+
+            if (nuevaVelocidad < velocidadMinima)
             {
-                velocidadActual -= aceleracionMovimiento;
+                velocidadActual = velocidadMinima;
             }
-        }
-
-        private void VolverAVelocidadNormal()
-        {
-
-            if (velocidadActual != velocidadBase)
+            else if(nuevaVelocidad > velocidadMaxima)
             {
-                if (velocidadActual > velocidadBase)
-                {
-                    Desacelerar();
-                }
-                else
-                {
-                    Acelerar();
-                }
-            }
-        }
-        #endregion
-
-        #region Rotaciones
-        private float RotacionParaVolverANormal(float rotacionActual, float rotacionNormal)
-        {
-            if (rotacionActual != rotacionNormal)
-            {
-                if (rotacionActual > rotacionNormal)
-                {
-                    return -velocidadRotacion;
-                }
-                else
-                {
-                    return velocidadRotacion;
-                }
+                velocidadActual = velocidadMaxima;
             }
             else
             {
-                return 0f;
+                velocidadActual = nuevaVelocidad;
             }
         }
-        private float NuevaRotacionEnEjeSegunLimite(float nuevaPosibleRotacion, float rotacionLimite)
+
+        private void VolverARotacionNormal()
+        {
+            TGCVector3 direccionDeRotacionNecesaria = TGCVector3.Normalize(rotacionBase - rotacionActual);
+            RotarEnDireccion(direccionDeRotacionNecesaria);
+        }
+        private void VolverAVelocidadNormal()
+        {
+            float aceleracion = Math.Sign(velocidadBase - velocidadActual) * aceleracionMovimiento;
+            Acelerar(aceleracion);
+        }
+        private float NuevaRotacionEnEjeSegunLimite(float nuevaPosibleRotacion, float rotacionLimite) //Mal nombre aaa
         {
             float rotacionMaxima = rotacionLimite;
             float rotacionMinima = -rotacionLimite;
@@ -235,13 +161,11 @@ namespace TGC.Group.Model
                 return nuevaPosibleRotacion;
             }
         }
-
-
-
-
-
-
-        #endregion
+        private bool naveEstaColisionandoConLaser()
+        {
+            var listaLaseres = GameManager.Instance.obtenerLaseres();
+            return listaLaseres.Any(laser => modeloNave.colisionaConLaser(laser));
+        }
 
     }
 }

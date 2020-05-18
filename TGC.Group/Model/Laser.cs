@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.DirectX.Direct3D;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 
@@ -67,6 +68,10 @@ namespace TGC.Group.Model
             TGCVector3 cross = TGCVector3.Cross(DireccionA, direccionDisparoNormalizado);
             TGCQuaternion newRotation = TGCQuaternion.RotationAxis(cross, FastMath.Acos(TGCVector3.Dot(DireccionA, direccionDisparoNormalizado)));
             return newRotation;
+        }
+        public TgcBoundingAxisAlignBox getBoundingBox()
+        {
+            return mainMesh.BoundingBox;
         }
     }
 }

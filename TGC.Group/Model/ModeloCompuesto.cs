@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.DirectX.Direct3D;
+using TGC.Core.BoundingVolumes;
+using TGC.Core.Collision;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 
@@ -25,6 +27,13 @@ namespace TGC.Group.Model
         private void TransformarModelo(Action<TgcMesh> funcionTransformacion)
         {
             meshes.ForEach(delegate (TgcMesh unMesh) { funcionTransformacion(unMesh); });
+        }
+        private void TransformarBoundingBox(Action<TgcMesh> funcionTransformacion)
+        {
+            meshes.ForEach(delegate (TgcMesh unMesh) {
+                unMesh.BoundingBox.transform(unMesh.Transform);
+                funcionTransformacion(unMesh);
+            });
         }
 
         public void CambiarPosicion(TGCVector3 nuevaPosicion)
@@ -59,6 +68,7 @@ namespace TGC.Group.Model
         public void Render()
         {
             TransformarModelo(delegate (TgcMesh unMesh) { unMesh.Render(); });
+            TransformarBoundingBox(delegate (TgcMesh unMesh) { unMesh.BoundingBox.Render(); });
         }
 
         public void Dispose()
@@ -66,9 +76,12 @@ namespace TGC.Group.Model
             TransformarModelo(delegate (TgcMesh unMesh) { unMesh.Dispose(); });
         }
 
-
-
-
+        public bool colisionaConLaser(Laser laser) 
+        {
+            List<TgcBoundingAxisAlignBox> boundingBoxes = new List<TgcBoundingAxisAlignBox>();
+            meshes.ForEach(delegate (TgcMesh unMesh) { boundingBoxes.Add(unMesh.BoundingBox); });
+            return boundingBoxes.Any(bound => TgcCollisionUtils.testAABBAABB(bound,laser.getBoundingBox()));
+        }
 
     }
 }

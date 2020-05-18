@@ -72,7 +72,7 @@ namespace TGC.Group.Model
             }
             //codigo de prueba------
             tiempo += .1f + elapsedTime;
-            if(tiempo > 6f)
+            if(tiempo > 15f)
             {
                 Disparar(DireccionB);
                 tiempo = 0f;
@@ -83,6 +83,7 @@ namespace TGC.Group.Model
         public void Render()
         {
             mainMesh.Render();
+            mainMesh.BoundingBox.Render();
             /*
             TGCVector3 PosicionB = jugador.GetPosicion();
             TGCVector3 DireccionA = new TGCVector3(0, 0, -1);
