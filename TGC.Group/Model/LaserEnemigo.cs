@@ -12,6 +12,7 @@ namespace TGC.Group.Model
         public LaserEnemigo(string mediaDir, TGCVector3 posicionInicial, TGCVector3 direccion, Nave naveDelJugador)
             : base(mediaDir,posicionInicial,direccion, naveDelJugador)
         {
+            this.direccionDeScene = mediaDir + "Xwing\\laser-TgcScene.xml";
         }
 
         internal override void ColisionarConNave()

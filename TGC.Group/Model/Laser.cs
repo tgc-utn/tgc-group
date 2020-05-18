@@ -12,7 +12,7 @@ namespace TGC.Group.Model
 {
     class Laser : Colisionable
     {
-        private readonly string mediaDir;
+        internal string direccionDeScene;
         private readonly TGCVector3 posicionInicial;
         private readonly TGCVector3 direccion;
 
@@ -21,14 +21,18 @@ namespace TGC.Group.Model
         public Laser(string mediaDir, TGCVector3 posicionInicial,TGCVector3 direccion, Nave naveDelJugador) :  base(naveDelJugador)
         {
             
-            this.mediaDir = mediaDir;
+            this.direccionDeScene = mediaDir + "Xwing\\laserBueno-TgcScene.xml";
             this.posicionInicial = posicionInicial;
             this.direccion = direccion;
+
         }
+
+
+
         public override void Init()
         {
             TgcSceneLoader loader = new TgcSceneLoader();
-            TgcScene scene2 = loader.loadSceneFromFile(mediaDir + "Xwing\\laser-TgcScene.xml");
+            TgcScene scene2 = loader.loadSceneFromFile(direccionDeScene);
 
             //Solo nos interesa el primer modelo de esta escena (tiene solo uno)
             mainMesh = scene2.Meshes[0];
