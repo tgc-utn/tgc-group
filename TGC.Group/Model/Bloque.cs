@@ -55,7 +55,6 @@ namespace TGC.Group.Model
         {
             //Scene.RenderAll();
 
-
         }
         public void Dispose()
         {

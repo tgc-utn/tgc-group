@@ -60,7 +60,7 @@ namespace TGC.Group.Model
             torreta.Disparar(direccionDisparo);
             torreta2.Disparar(posicionInicialDeNave - new TGCVector3(-10, 2, 15));
             */
-            TieFighter tieFighter = new TieFighter(MediaDir, new TGCVector3(0, 5, 60));
+            TieFighter tieFighter = new TieFighter(MediaDir, new TGCVector3(100, -15, 100), naveDelJuego);
             GameManager.Instance.AgregarRenderizable(tieFighter);
 
         }

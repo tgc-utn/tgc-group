@@ -59,7 +59,7 @@ namespace TGC.Group.Model
             rotacionMesh = TGCMatrix.RotationTGCQuaternion(rotation);
         }
 
-        public void aplicarTransformaciones()
+        public void AplicarTransformaciones()
         {
             TransformarModelo(delegate (TgcMesh unMesh) { unMesh.Transform = baseScaleRotation * rotacionMesh * TGCMatrix.Translation(unMesh.Position); });
         }
@@ -76,11 +76,16 @@ namespace TGC.Group.Model
             TransformarModelo(delegate (TgcMesh unMesh) { unMesh.Dispose(); });
         }
 
-        public bool colisionaConLaser(Laser laser) 
+        private List<TgcBoundingAxisAlignBox> BoundingBoxesDelModelo()
         {
             List<TgcBoundingAxisAlignBox> boundingBoxes = new List<TgcBoundingAxisAlignBox>();
             meshes.ForEach(delegate (TgcMesh unMesh) { boundingBoxes.Add(unMesh.BoundingBox); });
-            return boundingBoxes.Any(bound => TgcCollisionUtils.testAABBAABB(bound,laser.getBoundingBox()));
+            return boundingBoxes;
+        }
+
+        public Boolean ColisionaConColisionable(Colisionable unColisionable) 
+        {
+            return BoundingBoxesDelModelo().Any(bound => TgcCollisionUtils.testAABBAABB(bound, unColisionable.GetBoundingBox()));
         }
 
     }
