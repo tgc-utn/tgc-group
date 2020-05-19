@@ -25,12 +25,13 @@ namespace TGC.Group.Model
 
         public override void Dispose() 
         {
-            GameManager.Instance.QuitarRenderizable(this);
+            //GameManager.Instance.QuitarRenderizable(this);
         }
 
         private void Destruirse()
         {
-            Dispose();
+            estaVivo = false;
+            //Dispose();
         }
 
         private Boolean LePegaUnLaser()

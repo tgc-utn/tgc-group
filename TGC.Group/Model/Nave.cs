@@ -312,6 +312,11 @@ namespace TGC.Group.Model
         {
             return velocidadActual;
         }
+
+        public Boolean SePuedeRenderizar()
+        {
+            return true;
+        }
     }
 }
 
