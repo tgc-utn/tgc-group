@@ -12,6 +12,7 @@ namespace TGC.Group.Model
     {
         public LaserDeJugador(string direccionDeScene, TGCVector3 posicionInicial, TGCVector3 direccion) : base(direccionDeScene,posicionInicial,direccion)
         {
+            this.velocidad = 10f;
         }
         public override void Update(float elapsedTime)
         {
@@ -19,7 +20,7 @@ namespace TGC.Group.Model
             TGCQuaternion rotation = TGCQuaternion.RotationAxis(new TGCVector3(1.0f, 0.0f, 0.0f), Geometry.DegreeToRadian(90f));
             TGCVector3 direccionDisparo = direccion;
             direccionDisparo.Normalize();
-            TGCVector3 movement = direccionDisparo * 80f * elapsedTime;
+            TGCVector3 movement = direccionDisparo * 80f * elapsedTime*velocidad;
             mainMesh.Position += movement;
             TGCMatrix matrizTransformacion = baseScaleRotation * TGCMatrix.RotationTGCQuaternion(rotation)
                 * TGCMatrix.Translation(mainMesh.Position);

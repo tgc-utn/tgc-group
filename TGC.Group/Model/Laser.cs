@@ -15,7 +15,7 @@ namespace TGC.Group.Model
         protected string direccionDeScene;
         protected readonly TGCVector3 posicionInicial;
         protected readonly TGCVector3 direccion;
-
+        internal float velocidad;
         protected TGCMatrix baseScaleRotation;
         protected TGCMatrix baseQuaternionTranslation;
         protected TgcMesh mainMesh;
@@ -49,7 +49,7 @@ namespace TGC.Group.Model
             TGCVector3 direccionDisparo = direccion;
             direccionDisparo.Normalize();
             TGCQuaternion giro = QuaternionDireccion(direccionDisparo);
-            TGCVector3 movement = direccionDisparo * 60f * elapsedTime;
+            TGCVector3 movement = direccionDisparo * 60f * elapsedTime*velocidad;
             mainMesh.Position += movement;
             TGCMatrix matrizTransformacion = baseScaleRotation * TGCMatrix.RotationTGCQuaternion(rotation*giro)
                 * TGCMatrix.Translation(mainMesh.Position);
