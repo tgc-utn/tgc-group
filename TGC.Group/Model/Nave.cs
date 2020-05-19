@@ -27,6 +27,7 @@ namespace TGC.Group.Model
         private TgcText2D textoGameOver;
         private string mediaDir;
         private DateTime ultimoRoll;
+        private DateTime ultimoTiro;
 
         public Nave(string mediaDir, TGCVector3 posicionInicial, InputDelJugador input)
         {
@@ -43,6 +44,7 @@ namespace TGC.Group.Model
             this.estaRolleando = false;
             this.estaVivo = true;
             this.ultimoRoll = new DateTime(0);
+            this.ultimoTiro = new DateTime(0);
         }
 
 
@@ -266,11 +268,21 @@ namespace TGC.Group.Model
             };
             textoGameOver.changeFont(new System.Drawing.Font("TimesNewRoman", 100, FontStyle.Bold | FontStyle.Italic));
         }
+
+        private Boolean SePuedeDisparar()
+        {
+            return (DateTime.Now - ultimoTiro).TotalSeconds > 0.1f;
+        }
         private void Disparar()
         {
-            TGCVector3 posicionLaser = new TGCVector3(GetPosicion());
-            posicionLaser.Z += 10f;
-            GameManager.Instance.AgregarRenderizable(new LaserDeJugador(mediaDir + "Xwing\\laserBueno-TgcScene.xml", posicionLaser, new TGCVector3(0,0,1)));
+            if (SePuedeDisparar())
+            {
+                TGCVector3 posicionLaser = new TGCVector3(GetPosicion());
+                posicionLaser.Z += 10f;
+                GameManager.Instance.AgregarRenderizable(new LaserDeJugador(mediaDir + "Xwing\\laserBueno-TgcScene.xml", posicionLaser, new TGCVector3(0, 0, 1)));
+                ultimoTiro = DateTime.Now;
+            }
+
 
         }
 
