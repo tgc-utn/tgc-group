@@ -49,7 +49,7 @@ namespace TGC.Group.Model
             return mainMesh.BoundingBox;
         }
 
-        public Boolean SePuedeRenderizar()
+        public virtual Boolean SePuedeRenderizar()
         {
             return estaVivo;
         }
