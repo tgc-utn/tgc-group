@@ -76,7 +76,7 @@ namespace TGC.Group.Model
             TransformarModelo(delegate (TgcMesh unMesh) { unMesh.Dispose(); });
         }
 
-        private List<TgcBoundingAxisAlignBox> BoundingBoxesDelModelo()
+        public List<TgcBoundingAxisAlignBox> BoundingBoxesDelModelo()
         {
             List<TgcBoundingAxisAlignBox> boundingBoxes = new List<TgcBoundingAxisAlignBox>();
             meshes.ForEach(delegate (TgcMesh unMesh) { boundingBoxes.Add(unMesh.BoundingBox); });

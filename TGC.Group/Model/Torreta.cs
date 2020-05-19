@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms.VisualStyles;
 using Microsoft.DirectX.Direct3D;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
@@ -13,7 +14,7 @@ using TGC.Core.Text;
 
 namespace TGC.Group.Model
 {
-    class Torreta : IRenderizable
+    class Torreta : Enemigo
     {
         private readonly string mediaDir;
         private readonly TGCVector3 posicionInicial;
@@ -32,7 +33,7 @@ namespace TGC.Group.Model
             this.jugador = nave;
 
         }
-        public void Init()
+        public override void Init()
         {
             TgcSceneLoader loader = new TgcSceneLoader();
             TgcScene scene2 = loader.loadSceneFromFile(mediaDir + "Xwing\\Turbolaser-TgcScene.xml");
@@ -45,8 +46,9 @@ namespace TGC.Group.Model
             mainMesh.Transform = TGCMatrix.Scaling(0.1f, 0.1f, 0.1f);
         }
 
-        public void Update(float elapsedTime)
+        public override void Update(float elapsedTime)
         {
+            base.Update(elapsedTime);
             TGCMatrix matrizTransformacion;
             TGCQuaternion rotationX = TGCQuaternion.RotationAxis(new TGCVector3(0.0f, 1.0f, 0.0f), Geometry.DegreeToRadian(90f/* + anguloEntreVectores*15*/));
             TGCVector3 PosicionA = posicionInicial;
@@ -83,7 +85,7 @@ namespace TGC.Group.Model
             //--------
         }
 
-        public void Render()
+        public override void Render()
         {
             mainMesh.Render();
             mainMesh.BoundingBox.Render();
@@ -97,8 +99,9 @@ namespace TGC.Group.Model
             */
 
         }
-        public void Dispose()
+        public override void Dispose()
         {
+            base.Dispose();
             mainMesh.Dispose();
         }
 
@@ -111,6 +114,9 @@ namespace TGC.Group.Model
                 GameManager.Instance.AgregarRenderizable(new LaserEnemigo(mediaDir, posicionLaser, direccionDisparo, jugador));
         }
 
-
+        public override TgcBoundingAxisAlignBox GetBoundingBox()
+        {
+            return mainMesh.BoundingBox;
+        }
     }
 }

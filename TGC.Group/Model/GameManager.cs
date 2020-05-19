@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TGC.Core.BoundingVolumes;
 using TGC.Core.Collision;
 using TGC.Examples.Camara;
 
@@ -42,6 +43,10 @@ namespace TGC.Group.Model
             unRenderizable.Dispose();
         }
 
+        public Boolean HayUnLaserDeJugadorEnBoundingBox(TgcBoundingAxisAlignBox unBoundingBox)
+        {
+            return Renderizables.OfType<LaserDeJugador>().Any(laser => TgcCollisionUtils.testAABBAABB(laser.GetMainMesh().BoundingBox, unBoundingBox));
+        }
 
         #region Singleton
 

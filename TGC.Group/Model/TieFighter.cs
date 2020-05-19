@@ -11,7 +11,7 @@ using System.Drawing.Text;
 
 namespace TGC.Group.Model
 {
-    class TieFighter : IRenderizable
+    class TieFighter : Enemigo
     {
         private TGCVector3 posicion;
         private ModeloCompuesto modeloNave;
@@ -34,7 +34,7 @@ namespace TGC.Group.Model
         }
 
 
-        public void Init()
+        public override void Init()
         {
 
             matrizEscala = TGCMatrix.Scaling(.5f, .5f, .5f);
@@ -43,10 +43,12 @@ namespace TGC.Group.Model
             matrizRotacion = TGCMatrix.RotationTGCQuaternion(rotacionInicial);
         }
         
-        public void Update(float elapsedTime)
+        public override void Update(float elapsedTime)
         {
+            base.Update(elapsedTime);
+
             modeloNave.CambiarRotacion(new TGCVector3(0f, Geometry.DegreeToRadian(0f), 0f));
-            if (naveEstaMuyLejos())
+            if (NaveEstaMuyLejos())
             {
                 Acercarse(elapsedTime);
             }
@@ -57,19 +59,20 @@ namespace TGC.Group.Model
             }
             //matrizEscala * matrizRotacion *matrizPosicion;
         }
-        private bool naveEstaMuyLejos()
+        private bool NaveEstaMuyLejos()
         {
             return posicion.Z - jugador.GetPosicion().Z >= 100f;
         }
-        public void Render()
+        public override void Render()
         {
             modeloNave.AplicarTransformaciones();
             modeloNave.Render();
             new TgcText2D().drawText("COOLDOWN: " + coolDownDisparo.ToString(), 5, 250, Color.White);
 
         }
-        public void Dispose()
+        public override void Dispose()
         {
+            base.Dispose();
             modeloNave.Dispose();
         }
         private void Acercarse(float elapsedTime)
@@ -104,6 +107,11 @@ namespace TGC.Group.Model
             }
             
 
+        }
+
+        public override TgcBoundingAxisAlignBox GetBoundingBox()
+        {
+            return modeloNave.BoundingBoxesDelModelo()[0]; //TODO: Hacer que esto sea mas decente 
         }
     }
 }
