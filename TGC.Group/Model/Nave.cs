@@ -277,9 +277,9 @@ namespace TGC.Group.Model
                 Morir();
             }
         }
-        public float getVelocidadBase()
+        public float getVelocidad()
         {
-            return velocidadBase;
+            return velocidadActual;
         }
     }
 }
