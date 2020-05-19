@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.DirectX.Direct3D;
 using TGC.Core.BoundingVolumes;
+using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Core.Textures;
 
 namespace TGC.Group.Model
 {
@@ -15,57 +18,42 @@ namespace TGC.Group.Model
         private string direccionDeScene;
         private readonly TGCVector3 posicionInicial;
         private readonly TGCVector3 direccion;
+        private readonly float velocidad;
 
-        private TGCMatrix baseScaleRotation;
-        private TGCMatrix baseQuaternionTranslation;
-        private TgcMesh mainMesh;
+        private TGCBox modeloDeLaser;
 
         public Laser(string direccionDeScene, TGCVector3 posicionInicial,TGCVector3 direccion)
         {
             this.direccionDeScene = direccionDeScene;
             this.posicionInicial = posicionInicial;
             this.direccion = direccion;
+            this.velocidad = 100f;
         }
-
-
 
         public void Init()
         {
-            TgcSceneLoader loader = new TgcSceneLoader();
-            TgcScene scene2 = loader.loadSceneFromFile(direccionDeScene);
-
-            //Solo nos interesa el primer modelo de esta escena (tiene solo uno)
-            mainMesh = scene2.Meshes[0];
-            mainMesh.Position = posicionInicial;
-            baseQuaternionTranslation = TGCMatrix.Translation(posicionInicial);
-            baseScaleRotation = TGCMatrix.Scaling(new TGCVector3(.2f, .2f, .2f));
-            mainMesh.Transform = TGCMatrix.Scaling(0.1f, 0.1f, 0.1f) * TGCMatrix.Translation(mainMesh.Position);
+            modeloDeLaser = TGCBox.fromSize(new TGCVector3(0.5f, 5, 0.5f), Color.Red);
+            modeloDeLaser.Position = posicionInicial;
         }
 
         public void Update(float elapsedTime)
         {
-            TGCQuaternion rotation = TGCQuaternion.RotationAxis(new TGCVector3(1.0f, 0.0f, 0.0f), Geometry.DegreeToRadian(90f));
             TGCVector3 direccionDisparo = direccion;
             direccionDisparo.Normalize();
-            TGCQuaternion giro = QuaternionDireccion(direccionDisparo);
-            TGCVector3 movement = direccionDisparo * 60f * elapsedTime;
-            mainMesh.Position += movement;
-            TGCMatrix matrizTransformacion = baseScaleRotation * TGCMatrix.RotationTGCQuaternion(rotation*giro)
-                * TGCMatrix.Translation(mainMesh.Position);
-            mainMesh.Transform = matrizTransformacion;
-            //mainMesh.updateBoundingBox();
-            mainMesh.BoundingBox.transform(matrizTransformacion);
+            TGCVector3 movement = direccionDisparo * velocidad * elapsedTime;
+            modeloDeLaser.Position += movement;
+            modeloDeLaser.Transform = TGCMatrix.Translation(modeloDeLaser.Position);
         }
 
         public void Render()
         {
-            mainMesh.Render();
-            mainMesh.BoundingBox.Render();
+            modeloDeLaser.Render();
+            modeloDeLaser.BoundingBox.Render();
 
         }
         public void Dispose()
         {
-            mainMesh.Dispose();
+            modeloDeLaser.Dispose();
         }
 
         private TGCQuaternion QuaternionDireccion(TGCVector3 direccionDisparoNormalizado)
@@ -76,9 +64,9 @@ namespace TGC.Group.Model
             return newRotation;
         }
 
-        public TgcMesh GetMainMesh()
+        public TGCBox GetModeloLaser()
         {
-            return mainMesh;
+            return modeloDeLaser;
         }
     }
 }

@@ -43,7 +43,7 @@ namespace TGC.Group.Model
 
         public abstract void Dispose();
 
-        public TgcBoundingAxisAlignBox GetBoundingBox()
+        public virtual TgcBoundingAxisAlignBox GetBoundingBox()
         {
             return mainMesh.BoundingBox;
         }
