@@ -15,6 +15,7 @@ namespace TGC.Group.Model
     public class GameModel : TGCExample
     {
         private EscenarioLoader escenarioLoader;
+        private TieFighterSpawner tieFighterSpawner;
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
@@ -47,6 +48,7 @@ namespace TGC.Group.Model
             GameManager.Instance.Camara = camaraDelJuego;
 
             escenarioLoader = new EscenarioLoader(MediaDir, naveDelJuego);
+            tieFighterSpawner = new TieFighterSpawner(MediaDir, naveDelJuego);
             //Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
             //GameManager.Instance.AgregarRenderizable(skybox);
             /*
@@ -60,8 +62,8 @@ namespace TGC.Group.Model
             torreta.Disparar(direccionDisparo);
             torreta2.Disparar(posicionInicialDeNave - new TGCVector3(-10, 2, 15));
             */
-            TieFighter tieFighter = new TieFighter(MediaDir, new TGCVector3(100, -15, 100), naveDelJuego);
-            GameManager.Instance.AgregarRenderizable(tieFighter);
+            //TieFighter tieFighter = new TieFighter(MediaDir, new TGCVector3(100, -15, 100), naveDelJuego);
+            //GameManager.Instance.AgregarRenderizable(tieFighter);
 
         }
 
@@ -70,6 +72,7 @@ namespace TGC.Group.Model
             PreUpdate();
             GameManager.Instance.Update(ElapsedTime);
             escenarioLoader.Update(ElapsedTime);
+            tieFighterSpawner.Update(ElapsedTime);
             //Scene.Meshes.ForEach(delegate (TgcMesh mesh) { mesh.Transform= TGCMatrix.Scaling(20f, 20f, 20f); });
             //Scene.BoundingBox.transform(TGCMatrix.Scaling(10f, 10f, 10f));
             PostUpdate();
