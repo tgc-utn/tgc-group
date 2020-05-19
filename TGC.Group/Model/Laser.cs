@@ -10,24 +10,26 @@ using TGC.Core.SceneLoader;
 
 namespace TGC.Group.Model
 {
-    public abstract class Laser : Colisionable
+    public class Laser : IRenderizable
     {
-        internal string direccionDeScene;
+        private string direccionDeScene;
         private readonly TGCVector3 posicionInicial;
         private readonly TGCVector3 direccion;
 
         private TGCMatrix baseScaleRotation;
         private TGCMatrix baseQuaternionTranslation;
+        private TgcMesh mainMesh;
 
-        public Laser(string mediaDir, TGCVector3 posicionInicial,TGCVector3 direccion, Nave naveDelJugador) :  base(naveDelJugador)
+        public Laser(string direccionDeScene, TGCVector3 posicionInicial,TGCVector3 direccion)
         {
+            this.direccionDeScene = direccionDeScene;
             this.posicionInicial = posicionInicial;
             this.direccion = direccion;
         }
 
 
 
-        public override void Init()
+        public void Init()
         {
             TgcSceneLoader loader = new TgcSceneLoader();
             TgcScene scene2 = loader.loadSceneFromFile(direccionDeScene);
@@ -40,7 +42,7 @@ namespace TGC.Group.Model
             mainMesh.Transform = TGCMatrix.Scaling(0.1f, 0.1f, 0.1f) * TGCMatrix.Translation(mainMesh.Position);
         }
 
-        public override void Update(float elapsedTime)
+        public void Update(float elapsedTime)
         {
             TGCQuaternion rotation = TGCQuaternion.RotationAxis(new TGCVector3(1.0f, 0.0f, 0.0f), Geometry.DegreeToRadian(90f));
             TGCVector3 direccionDisparo = direccion;
@@ -55,13 +57,13 @@ namespace TGC.Group.Model
             mainMesh.BoundingBox.transform(matrizTransformacion);
         }
 
-        public override void Render()
+        public void Render()
         {
             mainMesh.Render();
             mainMesh.BoundingBox.Render();
 
         }
-        public override void Dispose()
+        public void Dispose()
         {
             mainMesh.Dispose();
         }
@@ -72,6 +74,11 @@ namespace TGC.Group.Model
             TGCVector3 cross = TGCVector3.Cross(DireccionA, direccionDisparoNormalizado);
             TGCQuaternion newRotation = TGCQuaternion.RotationAxis(cross, FastMath.Acos(TGCVector3.Dot(DireccionA, direccionDisparoNormalizado)));
             return newRotation;
+        }
+
+        public TgcMesh GetMainMesh()
+        {
+            return mainMesh;
         }
     }
 }

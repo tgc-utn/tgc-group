@@ -88,7 +88,7 @@ namespace TGC.Group.Model
             TGCVector3 movimientoDelFrame = new TGCVector3(0, 0, 0);
             TGCVector3 movimientoAdelante = new TGCVector3(0, 0, 1);
             movimientoDelFrame += versorDirector + movimientoAdelante;
-            movimientoDelFrame *= 10f * elapsedTime * jugador.getVelocidad();
+            movimientoDelFrame *= 10f * elapsedTime * jugador.GetVelocidad();
             posicion += movimientoDelFrame;
             modeloNave.CambiarPosicion(posicion);
         }

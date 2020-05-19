@@ -250,8 +250,8 @@ namespace TGC.Group.Model
         private void Disparar()
         {
             TGCVector3 posicionLaser = new TGCVector3(GetPosicion());
-            //posicionLaser.Z += 100f;
-            GameManager.Instance.AgregarRenderizable(new LaserDeJugador(mediaDir, posicionLaser, new TGCVector3(0,0,1),this));
+            posicionLaser.Z += 10f;
+            GameManager.Instance.AgregarRenderizable(new LaserDeJugador(mediaDir + "Xwing\\laserBueno-TgcScene.xml", posicionLaser, new TGCVector3(0,0,1)));
 
         }
 
@@ -277,7 +277,7 @@ namespace TGC.Group.Model
                 Morir();
             }
         }
-        public float getVelocidad()
+        public float GetVelocidad()
         {
             return velocidadActual;
         }

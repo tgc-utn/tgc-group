@@ -9,9 +9,10 @@ namespace TGC.Group.Model
 {
     class LaserDeJugador : Laser
     {
-        public LaserDeJugador(string mediaDir, TGCVector3 posicionInicial, TGCVector3 direccion, Nave naveDelJugador) : base(mediaDir, posicionInicial, direccion, naveDelJugador)
+        public LaserDeJugador(string direccionDeScene, TGCVector3 posicionInicial, TGCVector3 direccion) : base(direccionDeScene,posicionInicial,direccion)
         {
-            this.direccionDeScene = mediaDir + "Xwing\\laserBueno-TgcScene.xml";
         }
+
+
     }
 }
