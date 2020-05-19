@@ -12,13 +12,13 @@ namespace TGC.Group.Model
 {
     public class Laser : IRenderizable
     {
-        private string direccionDeScene;
-        private readonly TGCVector3 posicionInicial;
-        private readonly TGCVector3 direccion;
+        protected string direccionDeScene;
+        protected readonly TGCVector3 posicionInicial;
+        protected readonly TGCVector3 direccion;
 
-        private TGCMatrix baseScaleRotation;
-        private TGCMatrix baseQuaternionTranslation;
-        private TgcMesh mainMesh;
+        protected TGCMatrix baseScaleRotation;
+        protected TGCMatrix baseQuaternionTranslation;
+        protected TgcMesh mainMesh;
 
         public Laser(string direccionDeScene, TGCVector3 posicionInicial,TGCVector3 direccion)
         {
@@ -38,11 +38,12 @@ namespace TGC.Group.Model
             mainMesh = scene2.Meshes[0];
             mainMesh.Position = posicionInicial;
             baseQuaternionTranslation = TGCMatrix.Translation(posicionInicial);
-            baseScaleRotation = TGCMatrix.Scaling(new TGCVector3(.2f, .2f, .2f));
-            mainMesh.Transform = TGCMatrix.Scaling(0.1f, 0.1f, 0.1f) * TGCMatrix.Translation(mainMesh.Position);
+            baseScaleRotation = TGCMatrix.Scaling(new TGCVector3(.1f, .1f, .1f));
+            TGCQuaternion rotation = TGCQuaternion.RotationAxis(new TGCVector3(1.0f, 0.0f, 0.0f), Geometry.DegreeToRadian(90f));
+            mainMesh.Transform = TGCMatrix.Scaling(0.1f, 0.1f, 0.1f) * TGCMatrix.RotationTGCQuaternion(rotation) * TGCMatrix.Translation(mainMesh.Position);
         }
 
-        public void Update(float elapsedTime)
+        public virtual void Update(float elapsedTime)
         {
             TGCQuaternion rotation = TGCQuaternion.RotationAxis(new TGCVector3(1.0f, 0.0f, 0.0f), Geometry.DegreeToRadian(90f));
             TGCVector3 direccionDisparo = direccion;
