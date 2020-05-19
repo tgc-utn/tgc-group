@@ -78,9 +78,13 @@ namespace TGC.Group.Model
             }
             else
             {
-                if (input.HayInputDeRotacion())
+                if (input.HayInputDePonerseVertical())
                 {
-                    RotarEnDireccion(input.RotacionDelInput());
+                    RotarPorPonerseVertical(new TGCVector3(0, 0, -1));
+                }
+                else if (input.HayInputDeRotacion())
+                {
+                    RotarPorMoverseEnDireccion(input.RotacionDelInput());
                 }
                 else
                 {
@@ -123,8 +127,6 @@ namespace TGC.Group.Model
             return posicion;
         }
 
-        #region Movimientos
-
         private void MoverseEnDireccion(TGCVector3 versorDirector,float elapsedTime)
         {
             TGCVector3 movimientoDelFrame = new TGCVector3(0, 0, 0);
@@ -137,23 +139,62 @@ namespace TGC.Group.Model
 
             modeloNave.CambiarPosicion(posicion);
         }
-        private void RotarEnDireccion(TGCVector3 versorDirector)
-        {
-            float limiteEnZ = Geometry.DegreeToRadian(20f);
-            float limiteEnX = Geometry.DegreeToRadian(15f);
-            TGCVector3 rotacionASumar = versorDirector * velocidadRotacion;
-
-            float nuevaRotacionZ = NuevaRotacionEnEjeSegunLimite(rotacionASumar.Z + rotacionActual.Z, limiteEnZ);
-            float nuevaRotacionX = NuevaRotacionEnEjeSegunLimite(rotacionASumar.X + rotacionActual.X, limiteEnX);
-
-            Rotar(new TGCVector3(nuevaRotacionX, Geometry.DegreeToRadian(180f), nuevaRotacionZ));
-        }
+        #region Rotacion
 
         private void Rotar(TGCVector3 nuevaRotacion)
         {
             rotacionActual = nuevaRotacion;
             modeloNave.CambiarRotacion(rotacionActual);
         }
+        private void RotarEnDireccionConLimite(TGCVector3 versorDirector, float limiteEnZ, float limiteEnX, float multiplicadorVelocidad)
+        {
+
+            TGCVector3 rotacionASumar = versorDirector * velocidadRotacion* multiplicadorVelocidad;
+
+            float nuevaRotacionZ = NuevaRotacionEnEjeSegunLimite(rotacionActual.Z, rotacionASumar.Z  , limiteEnZ);
+            float nuevaRotacionX = NuevaRotacionEnEjeSegunLimite(rotacionActual.X, rotacionASumar.X  , limiteEnX);
+
+            Rotar(new TGCVector3(nuevaRotacionX, Geometry.DegreeToRadian(180f), nuevaRotacionZ));
+        }
+
+        private void RotarPorMoverseEnDireccion(TGCVector3 versorDirector)
+        {
+            RotarEnDireccionConLimite(versorDirector, Geometry.DegreeToRadian(20f), Geometry.DegreeToRadian(15f), 1);
+        }
+
+        private void RotarPorPonerseVertical(TGCVector3 versorDirector)
+        {
+            RotarEnDireccionConLimite(versorDirector, Geometry.DegreeToRadian(90f), 0, 4);
+        }
+
+        private void VolverARotacionNormal()
+        {
+            TGCVector3 direccionDeRotacionNecesaria = TGCVector3.Normalize(rotacionBase - rotacionActual);
+            RotarEnDireccionConLimite(direccionDeRotacionNecesaria, Geometry.DegreeToRadian(360f), Geometry.DegreeToRadian(360f),1);
+        }
+
+        private float NuevaRotacionEnEjeSegunLimite(float rotacionActual, float rotacionASumar, float rotacionLimite) //Mal nombre aaa
+        {
+            float rotacionMaxima = rotacionLimite;
+            float rotacionMinima = -rotacionLimite;
+            float nuevaPosibleRotacion = rotacionActual + rotacionASumar;
+
+            if (nuevaPosibleRotacion >= rotacionMaxima)
+            {
+                return rotacionActual;
+            }
+            else if (nuevaPosibleRotacion <= rotacionMinima)
+            {
+                return rotacionActual;
+            }
+            else
+            {
+                return nuevaPosibleRotacion;
+            }
+        }
+
+
+        #endregion
         private void Acelerar(float aceleracion)
         {
             float velocidadMaxima = velocidadBase * 4;
@@ -175,37 +216,25 @@ namespace TGC.Group.Model
             }
         }
 
-        private void VolverARotacionNormal()
-        {
-            TGCVector3 direccionDeRotacionNecesaria = TGCVector3.Normalize(rotacionBase - rotacionActual);
-            RotarEnDireccion(direccionDeRotacionNecesaria);
-        }
         private void VolverAVelocidadNormal()
         {
             float aceleracion = Math.Sign(velocidadBase - velocidadActual) * aceleracionMovimiento;
             Acelerar(aceleracion);
         }
-        private float NuevaRotacionEnEjeSegunLimite(float nuevaPosibleRotacion, float rotacionLimite) //Mal nombre aaa
-        {
-            float rotacionMaxima = rotacionLimite;
-            float rotacionMinima = -rotacionLimite;
 
-            if (nuevaPosibleRotacion >= rotacionMaxima)
-            {
-                return rotacionMaxima;
-            }
-            else if (nuevaPosibleRotacion <= rotacionMinima)
-            {
-                return rotacionMinima;
-            }
-            else
-            {
-                return nuevaPosibleRotacion;
-            }
-        }
-        #endregion
 
         #region Roll
+        private void Rollear()
+        {
+            Rotar(rotacionActual + new TGCVector3(0, 0, aceleracionMovimiento * 4));
+
+            if (TerminoElRoll())
+            {
+                rotacionActual = new TGCVector3(0, 0, 0);
+                estaRolleando = false;
+            }
+        }
+
         private void EmpezarARollear()
         {
             if (SePuedeRollear())
@@ -217,17 +246,7 @@ namespace TGC.Group.Model
 
         private Boolean SePuedeRollear()
         {
-            return (DateTime.Now - ultimoRoll).TotalSeconds > 30;
-        }
-
-        private void Rollear()
-        {
-            Rotar(rotacionActual + new TGCVector3(0, 0, aceleracionMovimiento*4));
-
-            if (TerminoElRoll())
-            {
-                estaRolleando = false;
-            }
+            return (DateTime.Now - ultimoRoll).TotalSeconds > 5;
         }
 
         private bool TerminoElRoll()
@@ -262,7 +281,7 @@ namespace TGC.Group.Model
 
         public void Morir()
         {
-            estaVivo = false;
+            //estaVivo = false;
         }
 
         public void Colisionar()

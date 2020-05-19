@@ -14,23 +14,19 @@ using TGC.Core.Text;
 
 namespace TGC.Group.Model
 {
-    class Torreta : Enemigo
+    class Torreta : Destruible
     {
         private readonly string mediaDir;
         private readonly TGCVector3 posicionInicial;
-        private TgcMesh mainMesh;
         private TGCMatrix baseScaleRotation;
         private TGCMatrix baseQuaternionTranslation;
         private float tiempo = 0f;
-        private Nave jugador;
-        private float anguloEntreVectores;
         private TGCQuaternion quaternionAuxiliar;
-        private bool cond = false;
-        public Torreta(string mediaDir, TGCVector3 posicionInicial,Nave nave)
+
+        public Torreta(string mediaDir, TGCVector3 posicionInicial,Nave nave) : base(nave)
         {
             this.mediaDir = mediaDir;
             this.posicionInicial = posicionInicial;
-            this.jugador = nave;
 
         }
         public override void Init()
@@ -52,7 +48,7 @@ namespace TGC.Group.Model
             TGCMatrix matrizTransformacion;
             TGCQuaternion rotationX = TGCQuaternion.RotationAxis(new TGCVector3(0.0f, 1.0f, 0.0f), Geometry.DegreeToRadian(90f/* + anguloEntreVectores*15*/));
             TGCVector3 PosicionA = posicionInicial;
-            TGCVector3 PosicionB = jugador.GetPosicion();
+            TGCVector3 PosicionB = naveDelJugador.GetPosicion();
             TGCVector3 DireccionA = new TGCVector3(0, 0, -1);
             TGCVector3 DireccionB = PosicionB - PosicionA;
             if (DireccionB.Length() >= 15f && PosicionA.Z > PosicionB.Z + 10f)
@@ -111,7 +107,7 @@ namespace TGC.Group.Model
                 TGCVector3 direccionDisparo = posicionNave - posicionInicial;
                 TGCVector3 posicionLaser = posicionInicial;
                 posicionLaser.Y += 0.5f;
-                GameManager.Instance.AgregarRenderizable(new LaserEnemigo(mediaDir, posicionLaser, direccionDisparo, jugador));
+                GameManager.Instance.AgregarRenderizable(new LaserEnemigo(mediaDir, posicionLaser, direccionDisparo, naveDelJugador));
         }
 
         public override TgcBoundingAxisAlignBox GetBoundingBox()

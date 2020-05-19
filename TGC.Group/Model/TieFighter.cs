@@ -11,7 +11,7 @@ using System.Drawing.Text;
 
 namespace TGC.Group.Model
 {
-    class TieFighter : Enemigo
+    class TieFighter : Destruible
     {
         private TGCVector3 posicion;
         private ModeloCompuesto modeloNave;
@@ -19,17 +19,15 @@ namespace TGC.Group.Model
         private TGCMatrix matrizEscala;
         private TGCMatrix matrizPosicion;
         private TGCMatrix matrizRotacion;
-        private Nave jugador;
         private float coolDownDisparo;
 
         //private TgcBoundingAxisAlignBox boundingBox;
 
-        public TieFighter(string mediaDir, TGCVector3 posicionInicial,Nave jugador)
+        public TieFighter(string mediaDir, TGCVector3 posicionInicial,Nave jugador) : base(jugador)
         {
             this.mediaDir = mediaDir;
             this.posicion = posicionInicial;
             this.modeloNave = new ModeloCompuesto(mediaDir + "XWing\\xwing-TgcScene.xml", posicion);
-            this.jugador = jugador;
             coolDownDisparo = 0f;
         }
 
@@ -55,13 +53,13 @@ namespace TGC.Group.Model
             else
             {
                 IrALaVelocidadDeLaNave(elapsedTime);
-                Disparar(jugador.GetPosicion(), elapsedTime);
+                Disparar(naveDelJugador.GetPosicion(), elapsedTime);
             }
             //matrizEscala * matrizRotacion *matrizPosicion;
         }
         private bool NaveEstaMuyLejos()
         {
-            return posicion.Z - jugador.GetPosicion().Z >= 100f;
+            return posicion.Z - naveDelJugador.GetPosicion().Z >= 100f;
         }
         public override void Render()
         {
@@ -91,7 +89,7 @@ namespace TGC.Group.Model
             TGCVector3 movimientoDelFrame = new TGCVector3(0, 0, 0);
             TGCVector3 movimientoAdelante = new TGCVector3(0, 0, 1);
             movimientoDelFrame += versorDirector + movimientoAdelante;
-            movimientoDelFrame *= 10f * elapsedTime * jugador.GetVelocidad();
+            movimientoDelFrame *= 10f * elapsedTime * naveDelJugador.GetVelocidad();
             posicion += movimientoDelFrame;
             modeloNave.CambiarPosicion(posicion);
         }
@@ -102,7 +100,7 @@ namespace TGC.Group.Model
             TGCVector3 direccionDisparo = posicionNave - posicion;
             if(coolDownDisparo > 4f)
             {
-                GameManager.Instance.AgregarRenderizable(new LaserEnemigo(mediaDir, posicion, direccionDisparo, jugador));
+                GameManager.Instance.AgregarRenderizable(new LaserEnemigo(mediaDir, posicion, direccionDisparo, naveDelJugador));
                 coolDownDisparo = 0f;
             }
             

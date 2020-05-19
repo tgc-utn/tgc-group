@@ -7,14 +7,15 @@ using TGC.Core.BoundingVolumes;
 
 namespace TGC.Group.Model
 {
-    public abstract class Enemigo : IRenderizable
+    public abstract class Destruible : Colisionable
     {
 
-        public abstract void Init();
+        public Destruible(Nave naveDelJugador) : base(naveDelJugador)
+        {
 
-        public abstract void Render();
+        }
 
-        public virtual void Update(float elapsedTime)
+        public override void Update(float elapsedTime)
         {
             if (LePegaUnLaser())
             {
@@ -22,7 +23,7 @@ namespace TGC.Group.Model
             }
         }
 
-        public virtual void Dispose() 
+        public override void Dispose() 
         {
             GameManager.Instance.QuitarRenderizable(this);
         }
@@ -37,6 +38,6 @@ namespace TGC.Group.Model
            return GameManager.Instance.HayUnLaserDeJugadorEnBoundingBox(GetBoundingBox());
         }
 
-        public abstract TgcBoundingAxisAlignBox GetBoundingBox();
+        public new abstract TgcBoundingAxisAlignBox GetBoundingBox();
     }
 }
