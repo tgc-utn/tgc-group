@@ -19,12 +19,14 @@ namespace TGC.Group.Model
         protected TGCMatrix baseScaleRotation;
         protected TGCMatrix baseQuaternionTranslation;
         protected TgcMesh mainMesh;
+        private DateTime tiempoDeSpawn;
 
         public Laser(string direccionDeScene, TGCVector3 posicionInicial,TGCVector3 direccion)
         {
             this.direccionDeScene = direccionDeScene;
             this.posicionInicial = posicionInicial;
             this.direccion = direccion;
+            this.tiempoDeSpawn = DateTime.Now;
         }
 
 
@@ -80,6 +82,11 @@ namespace TGC.Group.Model
         public TgcMesh GetMainMesh()
         {
             return mainMesh;
+        }
+
+        public Boolean SePuedeRenderizar()
+        {
+            return (DateTime.Now - tiempoDeSpawn).TotalSeconds < 5;
         }
     }
 }

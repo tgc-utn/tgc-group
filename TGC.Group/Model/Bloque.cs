@@ -60,5 +60,10 @@ namespace TGC.Group.Model
         {
             Scene.DisposeAll();
         }
+
+        public Boolean SePuedeRenderizar()
+        {
+            return true;
+        }
     }
 }

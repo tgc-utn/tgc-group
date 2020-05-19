@@ -2,6 +2,7 @@
 using TGC.Core.Mathematica;
 using TGC.Examples.Camara;
 using TGC.Core.Direct3D;
+using System;
 
 namespace TGC.Group.Model
 {
@@ -62,6 +63,11 @@ namespace TGC.Group.Model
 		public void Dispose()
 		{
 			skyBox.Dispose();
+		}
+
+		public Boolean SePuedeRenderizar()
+		{
+			return true;
 		}
 	}
 }
