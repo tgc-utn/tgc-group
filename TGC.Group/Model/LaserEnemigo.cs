@@ -4,18 +4,17 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TGC.Core.BoundingVolumes;
 using TGC.Core.Mathematica;
 
 namespace TGC.Group.Model
 {
     class LaserEnemigo : Colisionable
     {
-        private Laser laser;
+        private Laser modeloLaser;
         public LaserEnemigo(string mediaDir, TGCVector3 posicionInicial, TGCVector3 direccionDisparo, Nave naveDelJugador): base(naveDelJugador)
         {
             string direccionDeScene = mediaDir + "Xwing\\laser-TgcScene.xml";
-            laser = new Laser(direccionDeScene,posicionInicial,direccionDisparo);
+            modeloLaser = new Laser(direccionDeScene,posicionInicial,direccionDisparo);
         }
 
         internal override void ColisionarConNave()
@@ -29,17 +28,18 @@ namespace TGC.Group.Model
 
         public override void Init()
         {
-            laser.Init();
+            modeloLaser.Init();
+            this.mainMesh = modeloLaser.GetMainMesh();
         }
 
         public override void Dispose()
         {
-            laser.Dispose();
+            modeloLaser.Dispose();
         }
 
         public override void Update(float elapsedTime)
         {
-            laser.Update(elapsedTime);
+            modeloLaser.Update(elapsedTime);
             base.Update(elapsedTime);
         }
 
@@ -48,16 +48,11 @@ namespace TGC.Group.Model
             
             if (EstaColisionandoConNave())
             {
-                GetBoundingBox().setRenderColor(Color.Pink);
+                mainMesh.BoundingBox.setRenderColor(Color.Red);
             }
 
-            laser.Render();
+            modeloLaser.Render();
 
-        }
-
-        public override TgcBoundingAxisAlignBox GetBoundingBox()
-        {
-            return laser.GetModeloLaser().BoundingBox;
         }
 
     }

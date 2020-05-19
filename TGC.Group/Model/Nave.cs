@@ -31,7 +31,7 @@ namespace TGC.Group.Model
         public Nave(string mediaDir, TGCVector3 posicionInicial, InputDelJugador input)
         {
             this.mediaDir = mediaDir;
-            this.modeloNave = new ModeloCompuesto(mediaDir + "XWing\\xwing.xml", posicion);
+            this.modeloNave = new ModeloCompuesto(mediaDir + "XWing\\X-Wing-TgcScene.xml", posicion);
             this.posicion = posicionInicial;
             this.input = input;
             this.velocidadBase = 5f;

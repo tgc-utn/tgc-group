@@ -30,8 +30,10 @@ namespace TGC.Group.Model
         }
         private void TransformarBoundingBox(Action<TgcMesh> funcionTransformacion)
         {
-            BoundingBoxDelModelo().transform(meshes[0].Transform);
-            funcionTransformacion(meshes[0]);
+            meshes.ForEach(delegate (TgcMesh unMesh) {
+                unMesh.BoundingBox.transform(unMesh.Transform);
+                funcionTransformacion(unMesh);
+            });
         }
 
         public void CambiarPosicion(TGCVector3 nuevaPosicion)
@@ -74,14 +76,16 @@ namespace TGC.Group.Model
             TransformarModelo(delegate (TgcMesh unMesh) { unMesh.Dispose(); });
         }
 
-        private TgcBoundingAxisAlignBox BoundingBoxDelModelo()
+        private List<TgcBoundingAxisAlignBox> BoundingBoxesDelModelo()
         {
-            return meshes[0].BoundingBox;
+            List<TgcBoundingAxisAlignBox> boundingBoxes = new List<TgcBoundingAxisAlignBox>();
+            meshes.ForEach(delegate (TgcMesh unMesh) { boundingBoxes.Add(unMesh.BoundingBox); });
+            return boundingBoxes;
         }
 
         public Boolean ColisionaConColisionable(Colisionable unColisionable) 
         {
-            return TgcCollisionUtils.testAABBAABB(BoundingBoxDelModelo(), unColisionable.GetBoundingBox());
+            return BoundingBoxesDelModelo().Any(bound => TgcCollisionUtils.testAABBAABB(bound, unColisionable.GetBoundingBox()));
         }
 
     }
