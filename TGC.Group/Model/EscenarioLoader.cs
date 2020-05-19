@@ -26,14 +26,16 @@ namespace TGC.Group.Model
 
         public void Update(float elapsedTime)
         {
+            Random rnd = new Random();
+            int numeroRandom = rnd.Next(2); // devuelve un numero entre 0 y 2
             TGCVector3 posicionBloque;
             if (naveAvanzoLoSuficiente())
             {
-                posicionBloque = bloques[0].getPosicion();
+                posicionBloque = bloques[numeroRandom].getPosicion();
                 posicionBloque.Z = 1000f+ numeroBloques * tamanioZBloques;
-                bloques[0].setPosicion(posicionBloque);
+                bloques[numeroRandom].setPosicion(posicionBloque);
                 numeroBloques++;
-                GameManager.Instance.AgregarRenderizable(bloques[0].generarBloque());
+                GameManager.Instance.AgregarRenderizable(bloques[numeroRandom].generarBloque());
 
             }
         }
@@ -44,12 +46,17 @@ namespace TGC.Group.Model
             List<TGCVector3> positions = new List<TGCVector3>();
             positions.Add(new TGCVector3(100, -35, 200));
             positions.Add(new TGCVector3(80, -35, 1000));
+            List<TGCVector3> positions2 = new List<TGCVector3>();
+            positions2.Add(new TGCVector3(100, 0, 300));
+
             BloqueBuilder bloque = new BloqueBuilder(mediaDir, new TGCVector3(0f, 0f, 1000f), "Xwing\\TRENCH_RUN-TgcScene.xml", positions, nave);
+            BloqueBuilder bloque1 = new BloqueBuilder(mediaDir, new TGCVector3(0f, 100f, 1000f), "Xwing\\death+star-TgcScene.xml", positions2, nave);
+            BloqueBuilder bloque2 = new BloqueBuilder(mediaDir, new TGCVector3(0f, 100f, 1000f), "Xwing\\death+star-TgcScene.xml", new List<TGCVector3>(), nave);
             //Bloque bloque1 = new Bloque(mediaDir, new TGCVector3(0f, 100f, 3000f), "Xwing\\death+star-TgcScene.xml");
             //Bloque bloque2 = new Bloque(mediaDir, new TGCVector3(0f, 0f, 5000f), "Xwing\\TRENCH_RUN-TgcScene.xml");
             bloques.Add(bloque);
-            //bloques.Add(bloque1);
-            //bloques.Add(bloque2);
+            bloques.Add(bloque1);
+            bloques.Add(bloque2);
         }
         private bool naveAvanzoLoSuficiente()
         {

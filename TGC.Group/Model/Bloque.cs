@@ -53,7 +53,7 @@ namespace TGC.Group.Model
 
         public void Render()
         {
-            //Scene.RenderAll();
+            Scene.RenderAll();
 
         }
         public void Dispose()
