@@ -55,5 +55,10 @@ namespace TGC.Group.Model
 
         }
 
+        public override Boolean SePuedeRenderizar()
+        {
+            return modeloLaser.SuperoCiertoTiempoDeVida(5);
+        }
+
     }
 }

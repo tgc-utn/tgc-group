@@ -26,6 +26,7 @@ namespace TGC.Group.Model
             this.direccionDeScene = direccionDeScene;
             this.posicionInicial = posicionInicial;
             this.direccion = direccion;
+            this.velocidad = 1;
             this.tiempoDeSpawn = DateTime.Now;
         }
 
@@ -84,9 +85,14 @@ namespace TGC.Group.Model
             return mainMesh;
         }
 
+        public Boolean SuperoCiertoTiempoDeVida(float tiempoLimite)
+        {
+            return (DateTime.Now - tiempoDeSpawn).TotalSeconds < tiempoLimite;
+        }
+
         public Boolean SePuedeRenderizar()
         {
-            return (DateTime.Now - tiempoDeSpawn).TotalSeconds < 5;
+            return SuperoCiertoTiempoDeVida(1);
         }
     }
 }
