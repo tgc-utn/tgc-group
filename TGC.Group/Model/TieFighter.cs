@@ -65,7 +65,7 @@ namespace TGC.Group.Model
         {
             modeloNave.AplicarTransformaciones();
             modeloNave.Render();
-            new TgcText2D().drawText("COOLDOWN: " + coolDownDisparo.ToString(), 5, 250, Color.White);
+            //new TgcText2D().drawText("COOLDOWN: " + coolDownDisparo.ToString(), 5, 250, Color.White);
 
         }
         public override void Dispose()

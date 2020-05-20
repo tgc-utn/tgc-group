@@ -114,14 +114,13 @@ namespace TGC.Group.Model
             {
                 textoGameOver.render();
             }
-
-            new TgcText2D().drawText("Velocidad de la nave:\n" + velocidadActual.ToString(), 5, 20, Color.White);
+            /*
             new TgcText2D().drawText("Posicion de la nave:\n" + posicion.ToString(), 5, 60, Color.White);
+            new TgcText2D().drawText("Velocidad de la nave:\n" + velocidadActual.ToString(), 5, 20, Color.White);
             new TgcText2D().drawText("Rotacion de la nave:\n" + rotacionActual.ToString(), 5, 130, Color.White);
-
-            new TgcText2D().drawText(textoControles + rotacionActual.ToString(), 5, 10, Color.White);
+            */
+            new TgcText2D().drawText(textoControles, 5, 10, Color.White);
            
-
         }
 
         public void Dispose()
@@ -141,7 +140,20 @@ namespace TGC.Group.Model
             movimientoDelFrame += versorDirector + movimientoAdelante;
             movimientoDelFrame *= 10f * elapsedTime * velocidadActual;
 
-            posicion += movimientoDelFrame;
+            TGCVector3 nuevaPosiblePosicion = posicion + movimientoDelFrame;
+
+            if(nuevaPosiblePosicion.X < 128 && nuevaPosiblePosicion.X > 90)
+            {
+                posicion.X = nuevaPosiblePosicion.X;
+            }
+            
+            if (nuevaPosiblePosicion.Y > -30 && nuevaPosiblePosicion.Y < 0)
+            {
+                posicion.Y = nuevaPosiblePosicion.Y;
+            }
+
+            posicion.Z = nuevaPosiblePosicion.Z;
+
 
             modeloNave.CambiarPosicion(posicion);
         }
@@ -157,8 +169,8 @@ namespace TGC.Group.Model
 
             TGCVector3 rotacionASumar = versorDirector * velocidadRotacion* multiplicadorVelocidad;
 
-            float nuevaRotacionZ = NuevaRotacionEnEjeSegunLimite(rotacionActual.Z, rotacionASumar.Z  , limiteEnZ);
-            float nuevaRotacionX = NuevaRotacionEnEjeSegunLimite(rotacionActual.X, rotacionASumar.X  , limiteEnX);
+            float nuevaRotacionZ = NuevoValorDentroDeLimites(rotacionActual.Z, rotacionASumar.Z  , limiteEnZ);
+            float nuevaRotacionX = NuevoValorDentroDeLimites(rotacionActual.X, rotacionASumar.X  , limiteEnX);
 
             Rotar(new TGCVector3(nuevaRotacionX, Geometry.DegreeToRadian(180f), nuevaRotacionZ));
         }
@@ -179,19 +191,19 @@ namespace TGC.Group.Model
             RotarEnDireccionConLimite(direccionDeRotacionNecesaria, Geometry.DegreeToRadian(360f), Geometry.DegreeToRadian(360f),1);
         }
 
-        private float NuevaRotacionEnEjeSegunLimite(float rotacionActual, float rotacionASumar, float rotacionLimite) //Mal nombre aaa
+        private float NuevoValorDentroDeLimites(float valorActual, float valorASumar, float valorLimite) //Mal nombre aaa
         {
-            float rotacionMaxima = rotacionLimite;
-            float rotacionMinima = -rotacionLimite;
-            float nuevaPosibleRotacion = rotacionActual + rotacionASumar;
+            float rotacionMaxima = valorLimite;
+            float rotacionMinima = -valorLimite;
+            float nuevaPosibleRotacion = valorActual + valorASumar;
 
             if (nuevaPosibleRotacion >= rotacionMaxima)
             {
-                return rotacionActual;
+                return valorActual;
             }
             else if (nuevaPosibleRotacion <= rotacionMinima)
             {
-                return rotacionActual;
+                return valorActual;
             }
             else
             {
