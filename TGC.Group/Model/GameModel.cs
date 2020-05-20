@@ -50,11 +50,11 @@ namespace TGC.Group.Model
             escenarioLoader = new EscenarioLoader(MediaDir, naveDelJuego);
             tieFighterSpawner = new TieFighterSpawner(MediaDir, naveDelJuego);
 
-            Obstaculo obstaculo = new Obstaculo(MediaDir, naveDelJuego, new TGCVector3(100, -15, -50));
+            Obstaculo obstaculo = new Obstaculo(MediaDir, naveDelJuego, new TGCVector3(100, -15, 720));
             GameManager.Instance.AgregarRenderizable(obstaculo);
 
-            //Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
-            //GameManager.Instance.AgregarRenderizable(skybox);
+            Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
+            GameManager.Instance.AgregarRenderizable(skybox);
             /*
             Torreta torreta = new Torreta(MediaDir, new TGCVector3(10,2, 15), naveDelJuego);
             GameManager.Instance.AgregarRenderizable(torreta);
@@ -66,8 +66,7 @@ namespace TGC.Group.Model
             torreta.Disparar(direccionDisparo);
             torreta2.Disparar(posicionInicialDeNave - new TGCVector3(-10, 2, 15));
             */
-            //TieFighter tieFighter = new TieFighter(MediaDir, new TGCVector3(100, -15, 100), naveDelJuego);
-            //GameManager.Instance.AgregarRenderizable(tieFighter);
+
 
         }
 
