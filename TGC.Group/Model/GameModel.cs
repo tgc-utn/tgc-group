@@ -26,17 +26,7 @@ namespace TGC.Group.Model
 
         public override void Init()
         {
-            //Scene = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Xwing\\TRENCH_RUN-TgcScene.xml");
-            /*
-            Bloque bloque = new Bloque(MediaDir, new TGCVector3(0f,0f,1000f), "Xwing\\TRENCH_RUN-TgcScene.xml");
-            GameManager.Instance.AgregarRenderizable(bloque);
-
-            Bloque bloque1 = new Bloque(MediaDir, new TGCVector3(0f, 100f, 3000f), "Xwing\\death+star-TgcScene.xml");
-            Bloque bloque2 = new Bloque(MediaDir, new TGCVector3(0f, 0f, 5000f), "Xwing\\TRENCH_RUN-TgcScene.xml");
-            GameManager.Instance.AgregarRenderizable(bloque1);
-            GameManager.Instance.AgregarRenderizable(bloque2);
-            */
-            var posicionInicialDeNave = new TGCVector3(100, -15, -250);
+            var posicionInicialDeNave = new TGCVector3(105, -15, -250);
 
             InputDelJugador input = new InputDelJugador(Input);
 
@@ -55,18 +45,6 @@ namespace TGC.Group.Model
 
             Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
             GameManager.Instance.AgregarRenderizable(skybox);
-            /*
-            Torreta torreta = new Torreta(MediaDir, new TGCVector3(10,2, 15), naveDelJuego);
-            GameManager.Instance.AgregarRenderizable(torreta);
-
-            Torreta torreta2 = new Torreta(MediaDir, new TGCVector3(-10, 2, 15), naveDelJuego);
-            GameManager.Instance.AgregarRenderizable(torreta2);
-            
-            TGCVector3 direccionDisparo = posicionInicialDeNave - new TGCVector3(10, 2, 15);
-            torreta.Disparar(direccionDisparo);
-            torreta2.Disparar(posicionInicialDeNave - new TGCVector3(-10, 2, 15));
-            */
-
 
         }
 
@@ -76,8 +54,6 @@ namespace TGC.Group.Model
             GameManager.Instance.Update(ElapsedTime);
             escenarioLoader.Update(ElapsedTime);
             tieFighterSpawner.Update(ElapsedTime);
-            //Scene.Meshes.ForEach(delegate (TgcMesh mesh) { mesh.Transform= TGCMatrix.Scaling(20f, 20f, 20f); });
-            //Scene.BoundingBox.transform(TGCMatrix.Scaling(10f, 10f, 10f));
             PostUpdate();
         }
 
@@ -85,17 +61,12 @@ namespace TGC.Group.Model
         public override void Render()
         {
             PreRender();
-            //Scene.RenderAll();
-            //Scene.Meshes.ForEach(delegate (TgcMesh mesh) { mesh.BoundingBox.transform(TGCMatrix.Scaling(20f, 20f, 20f)); });
-           // Scene.Meshes.ForEach(delegate (TgcMesh mesh) { mesh.BoundingBox.Render(); });
-
             GameManager.Instance.Render();
             PostRender();
         }
 
         public override void Dispose()
         {
-            //Scene.DisposeAll();
             GameManager.Instance.Dispose();
         }
     }
