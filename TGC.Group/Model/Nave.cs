@@ -119,7 +119,7 @@ namespace TGC.Group.Model
             new TgcText2D().drawText("Velocidad de la nave:\n" + velocidadActual.ToString(), 5, 20, Color.White);
             new TgcText2D().drawText("Rotacion de la nave:\n" + rotacionActual.ToString(), 5, 130, Color.White);
             */
-            new TgcText2D().drawText(textoControles, 5, 10, Color.White);
+            //new TgcText2D().drawText(textoControles, 5, 10, Color.White);
            
         }
 
