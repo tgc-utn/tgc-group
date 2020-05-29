@@ -8,6 +8,7 @@ namespace TGC.Group.Model
     {
         private const int TIEMPO_INACTIVO = 30; // Tiempo en segundos que el turbo esta inactivo (o sea, no se puede recoger)
         private int poder; // La cantidad de turbo que le da al auto
+        private float time = 0;
         public bool Activo { get; private set; } = true; // Seguramente es mejorable todo esto
 
         public Turbo(TgcMesh mesh, TGCVector3 translation, int poder = 25, TGCVector3 rotation = new TGCVector3(), float angle = 0) : base(mesh, translation, rotation, angle)
@@ -23,6 +24,15 @@ namespace TGC.Group.Model
             // TODO: Si esta inactivo, cuando pase TIEMPO_INACTIVO se debe volver a activar
             if (Activo) // Si no esta activo, no actualizamos.
                 base.Update(ElapsedTime);
+            else
+            {
+                time += ElapsedTime;
+                if(time >= TIEMPO_INACTIVO)
+                {
+                    time = 0;
+                    Activo = true;
+                }
+            }
         }
 
         public override void Render()

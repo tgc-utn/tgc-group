@@ -114,7 +114,8 @@ namespace TGC.Group.Model
 
         public void RecogerTurbo(Turbo turbo)
         {
-            Turbo += turbo.Usar();
+            if (Turbo < 100)
+                Turbo += turbo.Usar();
         }
 
     }
