@@ -283,7 +283,6 @@ namespace TGC.Group.Model
              
             skyBox.Render();
 
-            pelota.Mesh.Technique = "DIFFUSE_MAP_AND_LIGHTMAP";
             pelota.Render();
             
             cancha.Transform = new TGCMatrix(floorBody.InterpolationWorldTransform);
