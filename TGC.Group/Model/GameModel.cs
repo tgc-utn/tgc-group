@@ -107,8 +107,8 @@ namespace TGC.Group.Model
                 D3DDevice.Instance.Height - medidorTurbo.Scaling.X * medidorTurbo.Bitmap.Height - .05f * D3DDevice.Instance.Height);
             textoTurbo = new TgcText2D();
             textoTurbo.Align = TgcText2D.TextAlign.CENTER;
-            textoTurbo.Size = new Size(250, 250);
-            textoTurbo.Position = new Point((int)medidorTurbo.Position.X, (int)medidorTurbo.Position.Y + 90);
+            textoTurbo.Size = new Size((int)(250 * medidorTurbo.Scaling.X), (int)(250 * medidorTurbo.Scaling.X));
+            textoTurbo.Position = new Point((int)medidorTurbo.Position.X, (int)medidorTurbo.Position.Y + (int)(90 * medidorTurbo.Scaling.X));
             textoTurbo.Color = Color.White;
             textoTurbo.changeFont(new Font("TimesNewRoman", 50, FontStyle.Bold));
         }
