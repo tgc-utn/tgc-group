@@ -1,9 +1,12 @@
 using BulletSharp;
 using BulletSharp.Math;
+using Microsoft.DirectX;
 using Microsoft.DirectX.DirectInput;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Forms;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.BulletPhysics;
 using TGC.Core.Collision;
@@ -12,6 +15,7 @@ using TGC.Core.Example;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Terrain;
+using TGC.Core.Text;
 
 namespace TGC.Group.Model
 {
@@ -54,6 +58,11 @@ namespace TGC.Group.Model
         protected BroadphaseInterface               overlappingPairCache;
         private   RigidBody                         floorBody;
 
+        // 2D
+        private Drawer2D drawer2D;
+        private CustomSprite medidorTurbo;
+        private TgcText2D textoTurbo;
+
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
         ///     Escribir aquí todo el código de inicialización: cargar modelos, texturas, estructuras de optimización, todo
@@ -73,7 +82,7 @@ namespace TGC.Group.Model
 
             initJugadores();
             
-            pelota = new Pelota( escena.getMeshByName("Pelota"), new TGCVector3(0f, 50f, 0f));
+            pelota = new Pelota(escena.getMeshByName("Pelota"), new TGCVector3(0f, 50f, -100f));
             dynamicsWorld.AddRigidBody(pelota.Cuerpo);
 
             paredes = new Paredes(escena.getMeshByName("Box_5"));
@@ -88,6 +97,20 @@ namespace TGC.Group.Model
             dynamicsWorld.AddRigidBody(arcos[1].Cuerpo);
 
             camara = new CamaraJugador(jugadorActivo, pelota, Camera, paredes.Mesh.createBoundingBox());
+
+
+            drawer2D = new Drawer2D();
+            medidorTurbo = new CustomSprite();
+            medidorTurbo.Bitmap = new CustomBitmap(MediaDir + "\\Textures\\MedidorTurbo.png", D3DDevice.Instance.Device);
+            medidorTurbo.Scaling = new TGCVector2(.25f * D3DDevice.Instance.Height / medidorTurbo.Bitmap.Height, .25f * D3DDevice.Instance.Height / medidorTurbo.Bitmap.Height);
+            medidorTurbo.Position = new TGCVector2(D3DDevice.Instance.Width - medidorTurbo.Scaling.X * medidorTurbo.Bitmap.Height - .05f * D3DDevice.Instance.Width,
+                D3DDevice.Instance.Height - medidorTurbo.Scaling.X * medidorTurbo.Bitmap.Height - .05f * D3DDevice.Instance.Height);
+            textoTurbo = new TgcText2D();
+            textoTurbo.Align = TgcText2D.TextAlign.CENTER;
+            textoTurbo.Size = new Size(250, 250);
+            textoTurbo.Position = new Point((int)medidorTurbo.Position.X, (int)medidorTurbo.Position.Y + 90);
+            textoTurbo.Color = Color.White;
+            textoTurbo.changeFont(new Font("TimesNewRoman", 50, FontStyle.Bold));
         }
 
         private void initFisica()
@@ -211,18 +234,23 @@ namespace TGC.Group.Model
             {
                 golequipo1++;
                 pelota.ReiniciarPelota();
+                jugadores.ForEach(jugador => jugador.ReiniciarJugador());
             }
 
             if (pelota.CheckCollideWith(arcos[1]))
             {
                 golequipo2++;
                 pelota.ReiniciarPelota();
+                jugadores.ForEach(jugador => jugador.ReiniciarJugador());
             }
 
 
             camara.Update(ElapsedTime);
 
             handleInput();
+
+            textoTurbo.Text = jugadorActivo.Turbo.ToString();
+            textoTurbo.Color = Color.FromArgb(255, 255 - (int)(jugadorActivo.Turbo * 2.55), 255 - (int)(Math.Min(jugadorActivo.Turbo, 50) * 4.55));
 
             PostUpdate();
         }
@@ -252,9 +280,10 @@ namespace TGC.Group.Model
             PreRender();
 
             DrawText.drawText("Turbo: " + jugadorActivo.Turbo, 1800, 20, Color.Red);
-
+             
             skyBox.Render();
-            
+
+            pelota.Mesh.Technique = "DIFFUSE_MAP_AND_LIGHTMAP";
             pelota.Render();
             
             cancha.Transform = new TGCMatrix(floorBody.InterpolationWorldTransform);
@@ -279,6 +308,12 @@ namespace TGC.Group.Model
 
             DrawText.drawText("GOL Equipo 1: " + golequipo1, 140, 120, Color.DarkRed);
             DrawText.drawText("GOL Equipo 2: " + golequipo2, 140, 140, Color.DarkRed);
+
+            drawer2D.BeginDrawSprite();
+            drawer2D.DrawSprite(medidorTurbo);
+            drawer2D.EndDrawSprite();
+
+            textoTurbo.render();
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();

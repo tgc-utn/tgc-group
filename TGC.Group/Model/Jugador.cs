@@ -1,10 +1,12 @@
 ﻿using BulletSharp.Math;
 using Microsoft.DirectX.DirectInput;
 using System;
+using System.Windows.Forms;
 using TGC.Core.BulletPhysics;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Group.Form;
 
 namespace TGC.Group.Model
 {
@@ -12,6 +14,8 @@ namespace TGC.Group.Model
     {
         //Objetos de juego
         private Key inputAvanzar;
+        private TGCVector3 posicionInicial;
+        private TGCVector3 rotacionInicial;
 
         private Boolean EnElAire => translation.Y > 3; // TODO: Capaz se puede mejorar
 
@@ -22,7 +26,6 @@ namespace TGC.Group.Model
             private set => turbo = Math.Min(value, 100);
         }
 
-
         public Jugador(TgcMesh mesh, TGCVector3 translation=new TGCVector3(), TGCVector3 rotation=new TGCVector3(), float angle=0) :base(mesh,translation,rotation,angle)
         {
             inputAvanzar = Key.UpArrow;
@@ -31,6 +34,16 @@ namespace TGC.Group.Model
 
             cuerpo = BulletRigidBodyFactory.Instance.CreateBox(Mesh.BoundingBox.calculateSize()  * 0.5f, 2f, new TGCVector3(translation), rotation.X, rotation.Y, rotation.Z, 1f, true);
             cuerpo.SetSleepingThresholds(0, 0);
+
+            posicionInicial = new TGCVector3(translation);
+            rotacionInicial = new TGCVector3(rotation);
+        }
+
+        public void ReiniciarJugador()
+        {
+            cuerpo.WorldTransform = TGCMatrix.RotationYawPitchRoll(rotacionInicial.X, rotacionInicial.Y, rotacionInicial.Z).ToBulletMatrix() * TGCMatrix.Translation(posicionInicial).ToBulletMatrix();
+            cuerpo.LinearVelocity = Vector3.Zero;
+            cuerpo.AngularVelocity = Vector3.Zero;
         }
 
         private void HandleInputSuelo(TgcD3dInput input)
