@@ -1,22 +1,5 @@
-using BulletSharp;
-using BulletSharp.Math;
-using Microsoft.DirectX;
-using Microsoft.DirectX.DirectInput;
-using System;
-using System.Timers;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
-using TGC.Core.BoundingVolumes;
-using TGC.Core.BulletPhysics;
-using TGC.Core.Collision;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
-using TGC.Core.Mathematica;
-using TGC.Core.SceneLoader;
-using TGC.Core.Terrain;
-using TGC.Core.Text;
 
 namespace TGC.Group.Model
 {

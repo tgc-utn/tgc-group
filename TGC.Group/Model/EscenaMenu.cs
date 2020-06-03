@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 using TGC.Core.Camara;
 using TGC.Core.Direct3D;
 using TGC.Core.Input;
 using TGC.Core.Text;
+using Microsoft.DirectX.DirectInput;
 
 namespace TGC.Group.Model
 {
@@ -25,17 +21,17 @@ namespace TGC.Group.Model
         }
         public override void Dispose()
         {
+            texto.Dispose();
         }
 
         public override void Render()
         {
-            DrawText.drawText("Espacio para empezar", 0, 20, Color.Red);
             texto.render();
         }
 
         public override Escena Update(float ElapsedTime)
         {
-            if (Input.keyDown(Microsoft.DirectX.DirectInput.Key.Space))
+            if (Input.keyDown(Key.Space))
             {
                 return CambiarEscena(new EscenaJuego(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input));
             }

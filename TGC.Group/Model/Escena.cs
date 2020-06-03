@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TGC.Core.Camara;
 using TGC.Core.Input;
 using TGC.Core.Text;
@@ -11,7 +7,6 @@ namespace TGC.Group.Model
 {
     abstract class Escena
     {
-        // Comun
         protected TgcCamera Camera;
         protected String MediaDir;
         protected TgcText2D DrawText;
