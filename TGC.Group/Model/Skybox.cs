@@ -64,11 +64,6 @@ namespace TGC.Group.Model
 		{
 			skyBox.Dispose();
 		}
-
-		public Boolean SePuedeRenderizar()
-		{
-			return true;
-		}
 	}
 }
 

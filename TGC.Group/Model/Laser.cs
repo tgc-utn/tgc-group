@@ -48,6 +48,7 @@ namespace TGC.Group.Model
 
         public virtual void Update(float elapsedTime)
         {
+
             TGCQuaternion rotation = TGCQuaternion.RotationAxis(new TGCVector3(1.0f, 0.0f, 0.0f), Geometry.DegreeToRadian(90f));
             TGCVector3 direccionDisparo = direccion;
             direccionDisparo.Normalize();
@@ -59,6 +60,7 @@ namespace TGC.Group.Model
             mainMesh.Transform = matrizTransformacion;
             //mainMesh.updateBoundingBox();
             mainMesh.BoundingBox.transform(matrizTransformacion);
+
         }
 
         public void Render()
@@ -87,12 +89,7 @@ namespace TGC.Group.Model
 
         public Boolean SuperoCiertoTiempoDeVida(float tiempoLimite)
         {
-            return (DateTime.Now - tiempoDeSpawn).TotalSeconds < tiempoLimite;
-        }
-
-        public Boolean SePuedeRenderizar()
-        {
-            return SuperoCiertoTiempoDeVida(1);
+            return (DateTime.Now - tiempoDeSpawn).TotalSeconds > tiempoLimite;
         }
     }
 }

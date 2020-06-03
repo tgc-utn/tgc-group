@@ -18,12 +18,12 @@ namespace TGC.Group.Model
         public void Update(float elapsedTime)
         {
             List<IRenderizable> RenderizablesAuxiliar = new List<IRenderizable>(Renderizables);
-            RenderizablesAuxiliar.ForEach(delegate (IRenderizable unRenderizable) { if (unRenderizable.SePuedeRenderizar()) { unRenderizable.Update(elapsedTime); } });
+            RenderizablesAuxiliar.ForEach(delegate (IRenderizable unRenderizable) { unRenderizable.Update(elapsedTime); });
             Camara.Update(elapsedTime);
         }
         public void Render()
         {
-            Renderizables.ForEach(delegate (IRenderizable unRenderizable) { if (unRenderizable.SePuedeRenderizar()) { unRenderizable.Render(); } });
+            Renderizables.ForEach(delegate (IRenderizable unRenderizable){ unRenderizable.Render(); } );
         }
 
         public void Dispose()
@@ -45,7 +45,7 @@ namespace TGC.Group.Model
 
         public Boolean HayUnLaserDeJugadorEnBoundingBox(TgcBoundingAxisAlignBox unBoundingBox)
         {
-            return Renderizables.OfType<LaserDeJugador>().Any(laser => laser.SePuedeRenderizar() && TgcCollisionUtils.testAABBAABB(laser.GetMainMesh().BoundingBox, unBoundingBox));
+            return Renderizables.OfType<LaserDeJugador>().Any(laser => TgcCollisionUtils.testAABBAABB(laser.GetMainMesh().BoundingBox, unBoundingBox));
         }
 
         #region Singleton

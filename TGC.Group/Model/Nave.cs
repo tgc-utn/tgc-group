@@ -28,6 +28,8 @@ namespace TGC.Group.Model
         private string mediaDir;
         private DateTime ultimoRoll;
         private DateTime ultimoTiro;
+        private int cantidadNitro;
+        private int cantidadVida;
 
         public Nave(string mediaDir, TGCVector3 posicionInicial, InputDelJugador input)
         {
@@ -45,6 +47,8 @@ namespace TGC.Group.Model
             this.estaVivo = true;
             this.ultimoRoll = new DateTime(0);
             this.ultimoTiro = new DateTime(0);
+            this.cantidadNitro = 100;
+            this.cantidadVida = 100;
         }
 
 
@@ -58,6 +62,10 @@ namespace TGC.Group.Model
 
         public void Update(float elapsedTime)
         {
+            if(cantidadVida <= 0)
+            {
+                Morir();
+            }
 
             if (input.HayInputDeAceleracion())
             {
@@ -120,7 +128,7 @@ namespace TGC.Group.Model
             new TgcText2D().drawText("Rotacion de la nave:\n" + rotacionActual.ToString(), 5, 130, Color.White);
             */
             //new TgcText2D().drawText(textoControles, 5, 10, Color.White);
-           
+            new HUD().Render(cantidadVida, cantidadNitro);
         }
 
         public void Dispose()
@@ -321,17 +329,19 @@ namespace TGC.Group.Model
         {
             if (!estaRolleando)
             {
-                Morir();
+                PerderVida(1);
             }
         }
+
+        private void PerderVida(int vidaAPerder)
+        {
+            int nuevaPosibleVida = cantidadVida - vidaAPerder;
+            cantidadVida = nuevaPosibleVida > 0 ? nuevaPosibleVida : 0;
+        }
+
         public float GetVelocidad()
         {
             return velocidadActual;
-        }
-
-        public Boolean SePuedeRenderizar()
-        {
-            return true;
         }
     }
 }

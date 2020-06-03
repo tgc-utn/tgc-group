@@ -12,7 +12,6 @@ namespace TGC.Group.Model
     {
         internal Nave naveDelJugador;
         internal TgcMesh mainMesh;
-        internal Boolean estaVivo = true;
 
         public Colisionable(Nave naveDelJugador)
         {
@@ -47,11 +46,6 @@ namespace TGC.Group.Model
         public TgcBoundingAxisAlignBox GetBoundingBox()
         {
             return mainMesh.BoundingBox;
-        }
-
-        public virtual Boolean SePuedeRenderizar()
-        {
-            return estaVivo;
         }
     }
 }

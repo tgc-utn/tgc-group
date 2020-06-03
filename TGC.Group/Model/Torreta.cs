@@ -95,11 +95,6 @@ namespace TGC.Group.Model
             */
 
         }
-        public override void Dispose()
-        {
-            base.Dispose();
-            mainMesh.Dispose();
-        }
 
         public void Disparar(TGCVector3 posicionNave)
         {

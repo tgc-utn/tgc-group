@@ -22,7 +22,5 @@ namespace TGC.Group.Model
         void Render();
 
         void Dispose();
-
-        Boolean SePuedeRenderizar();
     }
 }

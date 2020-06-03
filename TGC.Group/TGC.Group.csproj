@@ -110,6 +110,7 @@
     <Compile Include="Model\Bloque.cs" />
     <Compile Include="Model\BloqueBuilder.cs" />
     <Compile Include="Model\Camara.cs" />
+    <Compile Include="Model\HUD.cs" />
     <Compile Include="Model\Obstaculo.cs" />
     <Compile Include="Model\Destruible.cs" />
     <Compile Include="Model\Colisionable.cs" />

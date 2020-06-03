@@ -28,6 +28,11 @@ namespace TGC.Group.Model
             //mainMesh.updateBoundingBox();
             mainMesh.BoundingBox.transform(matrizTransformacion);
             //base.Update(elapsedTime);
+
+            if (SuperoCiertoTiempoDeVida(1))
+            {
+                GameManager.Instance.QuitarRenderizable(this);
+            }
         }
 
     }

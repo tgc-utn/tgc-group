@@ -68,11 +68,12 @@ namespace TGC.Group.Model
             //new TgcText2D().drawText("COOLDOWN: " + coolDownDisparo.ToString(), 5, 250, Color.White);
 
         }
+
         public override void Dispose()
         {
-            base.Dispose();
             modeloNave.Dispose();
         }
+
         private void Acercarse(float elapsedTime)
         {
             TGCVector3 versorDirector = new TGCVector3(0, 0, -1);
