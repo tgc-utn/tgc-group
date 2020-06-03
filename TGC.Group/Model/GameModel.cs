@@ -50,7 +50,7 @@ namespace TGC.Group.Model
 
         private int golequipo1 = 0;
         private int golequipo2 = 0;
-        private double tiempoRestante = 3;
+        private double tiempoRestante = 300;
 
         //Objetos de fisica
         protected DiscreteDynamicsWorld             dynamicsWorld;
