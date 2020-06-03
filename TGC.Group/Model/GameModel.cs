@@ -63,9 +63,6 @@ namespace TGC.Group.Model
 
         // 2D
         private Drawer2D drawer2D;
-        private Drawer2D rojo2D;
-        private Drawer2D azul2D;
-        private Drawer2D contador2D;
         private CustomSprite medidorTurbo;
         private CustomSprite equipoRojo;
         private CustomSprite equipoAzul;
@@ -114,9 +111,6 @@ namespace TGC.Group.Model
 
 
             drawer2D = new Drawer2D();
-            rojo2D = new Drawer2D();
-            azul2D = new Drawer2D();
-            contador2D = new Drawer2D();
             medidorTurbo = new CustomSprite();
             equipoRojo = new CustomSprite();
             equipoAzul = new CustomSprite();
@@ -189,13 +183,7 @@ namespace TGC.Group.Model
             textoConTiempo.Color = Color.Black;
             textoConTiempo.changeFont(new Font("TimesNewRoman", 30, FontStyle.Bold));
 
-            System.Timers.Timer objTimer = new System.Timers.Timer();
-            objTimer.Interval = 300;
-            objTimer.Elapsed += new System.Timers.ElapsedEventHandler(objTimer_Elapsed);
-            objTimer.Start();
-            objTimer.BeginInit();
-
-            
+                       
         }
 
         private void objTimer_Elapsed(object sender, ElapsedEventArgs e)
@@ -342,7 +330,7 @@ namespace TGC.Group.Model
                 contador -= 1;
                 antElapse = 0;
             }
-            //contador -= ElapsedTime;
+           
             camara.Update(ElapsedTime);
 
             handleInput();
@@ -405,37 +393,23 @@ namespace TGC.Group.Model
 
             paredes.Render();
 
-            //DrawText.drawText("GOL Equipo 1: " + golequipo1, 140, 120, Color.DarkRed);
-            //DrawText.drawText("GOL Equipo 2: " + golequipo2, 140, 140, Color.DarkRed);
             textoGolAzul.Text = golequipo1.ToString();
             textoGolRojo.Text = golequipo2.ToString();
             textoConTiempo.Text = contador.ToString();
 
             drawer2D.BeginDrawSprite();
             drawer2D.DrawSprite(medidorTurbo);
+            drawer2D.DrawSprite(equipoRojo);
+            drawer2D.DrawSprite(equipoAzul);
+            drawer2D.DrawSprite(contadorTiempo);
             drawer2D.EndDrawSprite();
 
-            rojo2D.BeginDrawSprite();
-            rojo2D.DrawSprite(equipoRojo);
-            rojo2D.EndDrawSprite();
-
-            azul2D.BeginDrawSprite();
-            azul2D.DrawSprite(equipoAzul);
-            azul2D.EndDrawSprite();
-
-            contador2D.BeginDrawSprite();
-            contador2D.DrawSprite(contadorTiempo);
-            contador2D.EndDrawSprite();
-
            
-           
-           
-
             if (contador < 0)
-              { 
-               contador2D.BeginDrawSprite();
-               contador2D.DrawSprite(gameOver);
-               contador2D.EndDrawSprite();
+              {
+                drawer2D.BeginDrawSprite();
+                drawer2D.DrawSprite(gameOver);
+                drawer2D.EndDrawSprite();
                 
                }
 
