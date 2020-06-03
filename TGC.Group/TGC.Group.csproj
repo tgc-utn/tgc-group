@@ -108,6 +108,10 @@
     <Compile Include="Model\2D\HUD.cs" />
     <Compile Include="Model\Arco.cs" />
     <Compile Include="Model\CamaraJugador.cs" />
+    <Compile Include="Model\Escena.cs" />
+    <Compile Include="Model\EscenaGameOver.cs" />
+    <Compile Include="Model\EscenaJuego.cs" />
+    <Compile Include="Model\EscenaMenu.cs" />
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\IObjetoJuego.cs" />
     <Compile Include="Model\Jugador.cs" />
