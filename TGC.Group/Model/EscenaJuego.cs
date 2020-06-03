@@ -52,13 +52,17 @@ namespace TGC.Group.Model
         private TgcText2D textoGolRojo;
         private TgcText2D textoConTiempo;
 
-        public EscenaJuego(TgcCamera Camera, string MediaDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input) : base(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input)
+        public EscenaJuego(TgcCamera Camera, string MediaDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input, List<Jugador> jugadores, Jugador jugadorActivo) : base(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input)
         {
+
             initFisica();
 
             initMeshes();
 
+            this.jugadores = jugadores;
+            this.jugadorActivo = jugadorActivo;
             initJugadores();
+
 
             pelota = new Pelota(escena.getMeshByName("Pelota"), new TGCVector3(0f, 50f, -100f));
             dynamicsWorld.AddRigidBody(pelota.Cuerpo);
@@ -211,22 +215,11 @@ namespace TGC.Group.Model
 
         private void initJugadores()
         {
-            Jugador auto = new Jugador(escena.Meshes[2], new TGCVector3(-20, 0, 100), new TGCVector3(0, 0, 0));
-            Jugador tractor = new Jugador(escena.Meshes[5], new TGCVector3(0, 0, -30), new TGCVector3(FastMath.PI, 0, 0));
-            Jugador patrullero = new Jugador(escena.Meshes[3], new TGCVector3(0, 0, 30), new TGCVector3(0, 0, 0));
-            Jugador tanque = new Jugador(escena.Meshes[4], new TGCVector3(20, 0, -100), new TGCVector3(FastMath.PI, 0, 0));
-
-            jugadorActivo = auto;
-
-            jugadores.Add(auto);
-            jugadores.Add(tractor);
-            jugadores.Add(patrullero);
-            jugadores.Add(tanque);
-
-            dynamicsWorld.AddRigidBody(auto.Cuerpo);
-            dynamicsWorld.AddRigidBody(tanque.Cuerpo);
-            dynamicsWorld.AddRigidBody(patrullero.Cuerpo);
-            dynamicsWorld.AddRigidBody(tractor.Cuerpo);
+            jugadores[0].Reubicar(new TGCVector3(-20, 0, 100), new TGCVector3(0, 0, 0));
+            jugadores[1].Reubicar(new TGCVector3(0, 0, -30), new TGCVector3(FastMath.PI, 0, 0));
+            jugadores[2].Reubicar(new TGCVector3(0, 0, 30), new TGCVector3(0, 0, 0));
+            jugadores[3].Reubicar(new TGCVector3(20, 0, -100), new TGCVector3(FastMath.PI, 0, 0));
+            jugadores.ForEach(jugador => dynamicsWorld.AddRigidBody(jugador.Cuerpo));
         }
 
         public override Escena Update(float ElapsedTime)

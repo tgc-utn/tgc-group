@@ -1,18 +1,17 @@
 ﻿using BulletSharp.Math;
 using Microsoft.DirectX.DirectInput;
 using System;
-using System.Windows.Forms;
 using TGC.Core.BulletPhysics;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
-using TGC.Group.Form;
 
 namespace TGC.Group.Model
 {
     class Jugador : ObjetoJuego
     {
         //Objetos de juego
+        private String nombre;
         private Key inputAvanzar;
         private TGCVector3 posicionInicial;
         private TGCVector3 rotacionInicial;
@@ -26,8 +25,9 @@ namespace TGC.Group.Model
             private set => turbo = Math.Min(value, 100);
         }
 
-        public Jugador(TgcMesh mesh, TGCVector3 translation=new TGCVector3(), TGCVector3 rotation=new TGCVector3(), float angle=0) :base(mesh,translation,rotation,angle)
+        public Jugador(String nombre, TgcMesh mesh, TGCVector3 translation=new TGCVector3(), TGCVector3 rotation=new TGCVector3(), float angle=0) :base(mesh,translation,rotation,angle)
         {
+            this.nombre = nombre;
             inputAvanzar = Key.UpArrow;
 
             this.translation.Y += 10;
@@ -44,6 +44,13 @@ namespace TGC.Group.Model
             cuerpo.WorldTransform = TGCMatrix.RotationYawPitchRoll(rotacionInicial.X, rotacionInicial.Y, rotacionInicial.Z).ToBulletMatrix() * TGCMatrix.Translation(posicionInicial).ToBulletMatrix();
             cuerpo.LinearVelocity = Vector3.Zero;
             cuerpo.AngularVelocity = Vector3.Zero;
+        }
+
+        public void Reubicar(TGCVector3 translation, TGCVector3 rotation)
+        {
+            posicionInicial = translation;
+            rotacionInicial = rotation;
+            ReiniciarJugador();
         }
 
         private void HandleInputSuelo(TgcD3dInput input)
