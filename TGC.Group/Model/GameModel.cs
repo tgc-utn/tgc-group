@@ -1,5 +1,6 @@
 using Microsoft.DirectX.DirectInput;
 using System.Drawing;
+using System.Windows.Forms;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
@@ -26,6 +27,7 @@ namespace TGC.Group.Model
 
         public override void Init()
         {
+            /*
             var posicionInicialDeNave = new TGCVector3(105, -15, -250);
 
             InputDelJugador input = new InputDelJugador(Input);
@@ -45,15 +47,29 @@ namespace TGC.Group.Model
 
             Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
             GameManager.Instance.AgregarRenderizable(skybox);
+            */
+            //Cursor.Hide();
+            Nave naveDelJuego = new Nave(MediaDir, TGCVector3.Empty, new InputDelJugador(Input));
+            Camara camaraDelJuego = new Camara(TGCVector3.Empty, 10, -50, naveDelJuego);
+            Camera = camaraDelJuego;
+            GameManager.Instance.Camara = camaraDelJuego;
+
 
         }
 
         public override void Update()
         {
             PreUpdate();
+            Drawer2D drawer = new Drawer2D();
+            CustomSprite PantallaInicioFondo = new CustomSprite
+            {
+                Bitmap = new CustomBitmap(MediaDir + "InicioMenu.png", D3DDevice.Instance.Device),
+                Position = new TGCVector2(0, 0)
+            };
             GameManager.Instance.Update(ElapsedTime);
-            escenarioLoader.Update(ElapsedTime);
-            tieFighterSpawner.Update(ElapsedTime);
+            drawer.DrawSprite(PantallaInicioFondo);
+            //escenarioLoader.Update(ElapsedTime);
+            //tieFighterSpawner.Update(ElapsedTime);
             PostUpdate();
         }
 
