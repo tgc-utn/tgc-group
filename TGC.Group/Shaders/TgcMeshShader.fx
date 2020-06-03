@@ -211,9 +211,12 @@ float4 ps_diffuseMapAndLightmap(PS_INPUT_DIFFUSE_MAP_AND_LIGHTMAP input) : COLOR
 	//Obtener color de diffuseMap y de Lightmap
 	float4 albedo = tex2D(diffuseMap, input.Texcoord);
 	float4 lightmapColor = tex2D(lightMap, input.TexcoordLightmap);
-
+    	
+	
 	//Modular ambos colores por color del mesh
 	return albedo * lightmapColor * input.Color;
+   
+
 }
 
 //technique DIFFUSE_MAP_AND_LIGHTMAP

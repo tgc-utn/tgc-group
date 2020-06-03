@@ -3,6 +3,7 @@ using BulletSharp.Math;
 using Microsoft.DirectX;
 using Microsoft.DirectX.DirectInput;
 using System;
+using System.Timers;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -49,6 +50,8 @@ namespace TGC.Group.Model
 
         private int golequipo1 = 0;
         private int golequipo2 = 0;
+        private double contador   = 300;
+        private double i = 0;
 
         //Objetos de fisica
         protected DiscreteDynamicsWorld             dynamicsWorld;
@@ -60,8 +63,19 @@ namespace TGC.Group.Model
 
         // 2D
         private Drawer2D drawer2D;
+        private Drawer2D rojo2D;
+        private Drawer2D azul2D;
+        private Drawer2D contador2D;
         private CustomSprite medidorTurbo;
+        private CustomSprite equipoRojo;
+        private CustomSprite equipoAzul;
+        private CustomSprite contadorTiempo;
+        private CustomSprite gameOver;
         private TgcText2D textoTurbo;
+        private TgcText2D textoGolAzul;
+        private TgcText2D textoGolRojo;
+        private TgcText2D textoConTiempo;
+        private double antElapse;
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -100,17 +114,94 @@ namespace TGC.Group.Model
 
 
             drawer2D = new Drawer2D();
+            rojo2D = new Drawer2D();
+            azul2D = new Drawer2D();
+            contador2D = new Drawer2D();
             medidorTurbo = new CustomSprite();
+            equipoRojo = new CustomSprite();
+            equipoAzul = new CustomSprite();
+            contadorTiempo = new CustomSprite();
+            gameOver = new CustomSprite();
+            
             medidorTurbo.Bitmap = new CustomBitmap(MediaDir + "\\Textures\\MedidorTurbo.png", D3DDevice.Instance.Device);
-            medidorTurbo.Scaling = new TGCVector2(.25f * D3DDevice.Instance.Height / medidorTurbo.Bitmap.Height, .25f * D3DDevice.Instance.Height / medidorTurbo.Bitmap.Height);
+            equipoRojo.Bitmap = new CustomBitmap(MediaDir + "\\Textures\\EquipoRojo.png", D3DDevice.Instance.Device);
+            equipoAzul.Bitmap = new CustomBitmap(MediaDir + "\\Textures\\EquipoAzul.png", D3DDevice.Instance.Device);
+            contadorTiempo.Bitmap = new CustomBitmap(MediaDir + "\\Textures\\ContadorTiempo.png", D3DDevice.Instance.Device);
+            gameOver.Bitmap = new CustomBitmap(MediaDir + "Textures\\GameOver.png", D3DDevice.Instance.Device);
+
+            medidorTurbo.Scaling = new TGCVector2(.25f * D3DDevice.Instance.Height / medidorTurbo.Bitmap.Height, 
+                .25f * D3DDevice.Instance.Height / medidorTurbo.Bitmap.Height);
             medidorTurbo.Position = new TGCVector2(D3DDevice.Instance.Width - medidorTurbo.Scaling.X * medidorTurbo.Bitmap.Height - .05f * D3DDevice.Instance.Width,
                 D3DDevice.Instance.Height - medidorTurbo.Scaling.X * medidorTurbo.Bitmap.Height - .05f * D3DDevice.Instance.Height);
+
+            equipoRojo.Scaling = new TGCVector2(.06f * D3DDevice.Instance.Height / equipoRojo.Bitmap.Height,
+                .1f * D3DDevice.Instance.Height / equipoRojo.Bitmap.Height);
+            //equipoRojo.Position = new TGCVector2(D3DDevice.Instance.Width - equipoRojo.Scaling.Y * equipoRojo.Bitmap.Height - .7f * D3DDevice.Instance.Width,
+            //  D3DDevice.Instance.Height - equipoRojo.Scaling.X * equipoRojo.Bitmap.Height - .69f * D3DDevice.Instance.Height);
+            equipoRojo.Position = new TGCVector2(725, 10);
+
+            equipoAzul.Scaling = new TGCVector2(.06f * D3DDevice.Instance.Height / equipoAzul.Bitmap.Height,
+                .1f * D3DDevice.Instance.Height / equipoAzul.Bitmap.Height);
+            //equipoAzul.Position = new TGCVector2(D3DDevice.Instance.Width - equipoAzul.Scaling.Y * equipoAzul.Bitmap.Height - .5f * D3DDevice.Instance.Width,
+            //    D3DDevice.Instance.Height - equipoAzul.Scaling.X * equipoAzul.Bitmap.Height - .69f * D3DDevice.Instance.Height);
+            equipoAzul.Position = new TGCVector2(510, 10);
+
+            contadorTiempo.Scaling = new TGCVector2(.60f * D3DDevice.Instance.Height / contadorTiempo.Bitmap.Height,
+                .60f * D3DDevice.Instance.Height / contadorTiempo.Bitmap.Height);
+            //contadorTiempo.Position = new TGCVector2(D3DDevice.Instance.Width - contadorTiempo.Scaling.X * contadorTiempo.Bitmap.Height - .46f * D3DDevice.Instance.Width,
+            //    D3DDevice.Instance.Height - contadorTiempo.Scaling.X * contadorTiempo.Bitmap.Height - .60f * D3DDevice.Instance.Height);
+            contadorTiempo.Position = new TGCVector2(440,-160);
+
+            gameOver.Scaling = new TGCVector2(.30f * D3DDevice.Instance.Height / gameOver.Bitmap.Height,
+                .30f * D3DDevice.Instance.Height / gameOver.Bitmap.Height);
+            //gameOver.Position = new TGCVector2(D3DDevice.Instance.Width - gameOver.Scaling.X * gameOver.Bitmap.Height - .46f * D3DDevice.Instance.Width,
+            //    D3DDevice.Instance.Height - gameOver.Scaling.X * gameOver.Bitmap.Height - .60f * D3DDevice.Instance.Height);
+            gameOver.Position = new TGCVector2(480, 180);
+
             textoTurbo = new TgcText2D();
             textoTurbo.Align = TgcText2D.TextAlign.CENTER;
             textoTurbo.Size = new Size((int)(250 * medidorTurbo.Scaling.X), (int)(250 * medidorTurbo.Scaling.X));
             textoTurbo.Position = new Point((int)medidorTurbo.Position.X, (int)medidorTurbo.Position.Y + (int)(90 * medidorTurbo.Scaling.X));
             textoTurbo.Color = Color.White;
             textoTurbo.changeFont(new Font("TimesNewRoman", 50, FontStyle.Bold));
+
+            textoGolAzul = new TgcText2D();
+            textoGolAzul.Align = TgcText2D.TextAlign.CENTER;
+            textoGolAzul.Size = new Size((int)(250 *equipoAzul.Scaling.X), (int)(250 * equipoAzul.Scaling.X));
+            //textoGolAzul.Position = new Point((int)medidorTurbo.Position.X, (int)medidorTurbo.Position.Y + (int)(90 * medidorTurbo.Scaling.X));
+            textoGolAzul.Position = new Point(470, 20);
+            textoGolAzul.Color = Color.Black;
+            textoGolAzul.changeFont(new Font("TimesNewRoman", 30, FontStyle.Bold));
+
+            textoGolRojo = new TgcText2D();
+            textoGolRojo.Align = TgcText2D.TextAlign.CENTER;
+            textoGolRojo.Size = new Size((int)(250 * equipoRojo.Scaling.X), (int)(250 * equipoRojo.Scaling.X));
+            //textoGolAzul.Position = new Point((int)medidorTurbo.Position.X, (int)medidorTurbo.Position.Y + (int)(90 * medidorTurbo.Scaling.X));
+            textoGolRojo.Position = new Point(685, 20);
+            textoGolRojo.Color = Color.Black;
+            textoGolRojo.changeFont(new Font("TimesNewRoman", 30, FontStyle.Bold));
+
+            textoConTiempo = new TgcText2D();
+            textoConTiempo.Align = TgcText2D.TextAlign.CENTER;
+            textoConTiempo.Size = new Size((int)(90 * contadorTiempo.Scaling.X), (int)(90 * contadorTiempo.Scaling.X));
+            //textoGolAzul.Position = new Point((int)medidorTurbo.Position.X, (int)medidorTurbo.Position.Y + (int)(90 * medidorTurbo.Scaling.X));
+            textoConTiempo.Position = new Point(620, 40);
+            textoConTiempo.Color = Color.Black;
+            textoConTiempo.changeFont(new Font("TimesNewRoman", 30, FontStyle.Bold));
+
+            System.Timers.Timer objTimer = new System.Timers.Timer();
+            objTimer.Interval = 300;
+            objTimer.Elapsed += new System.Timers.ElapsedEventHandler(objTimer_Elapsed);
+            objTimer.Start();
+            objTimer.BeginInit();
+
+            
+        }
+
+        private void objTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            throw new NotImplementedException();
+            
         }
 
         private void initFisica()
@@ -244,7 +335,14 @@ namespace TGC.Group.Model
                 jugadores.ForEach(jugador => jugador.ReiniciarJugador());
             }
 
+            antElapse += ElapsedTime;
 
+            if (antElapse > 1)
+            {
+                contador -= 1;
+                antElapse = 0;
+            }
+            //contador -= ElapsedTime;
             camara.Update(ElapsedTime);
 
             handleInput();
@@ -252,6 +350,7 @@ namespace TGC.Group.Model
             textoTurbo.Text = jugadorActivo.Turbo.ToString();
             textoTurbo.Color = Color.FromArgb(255, 255 - (int)(jugadorActivo.Turbo * 2.55), 255 - (int)(Math.Min(jugadorActivo.Turbo, 50) * 4.55));
 
+            
             PostUpdate();
         }
 
@@ -280,11 +379,12 @@ namespace TGC.Group.Model
             PreRender();
 
             DrawText.drawText("Turbo: " + jugadorActivo.Turbo, 1800, 20, Color.Red);
-             
+
             skyBox.Render();
 
+            pelota.Mesh.Technique = "DIFFUSE_MAP_AND_LIGHTMAP";
             pelota.Render();
-            
+
             cancha.Transform = new TGCMatrix(floorBody.InterpolationWorldTransform);
             cancha.Render();
 
@@ -296,7 +396,7 @@ namespace TGC.Group.Model
             arcos[0].Render();
             arcos[1].Render();
 
-            DrawText.drawText("posicion del jugador: " + jugadorActivo.Translation.ToString(),0,20,Color.Red);
+            DrawText.drawText("posicion del jugador: " + jugadorActivo.Translation.ToString(), 0, 20, Color.Red);
 
             foreach (var turbo in turbos)
             {
@@ -305,13 +405,43 @@ namespace TGC.Group.Model
 
             paredes.Render();
 
-            DrawText.drawText("GOL Equipo 1: " + golequipo1, 140, 120, Color.DarkRed);
-            DrawText.drawText("GOL Equipo 2: " + golequipo2, 140, 140, Color.DarkRed);
+            //DrawText.drawText("GOL Equipo 1: " + golequipo1, 140, 120, Color.DarkRed);
+            //DrawText.drawText("GOL Equipo 2: " + golequipo2, 140, 140, Color.DarkRed);
+            textoGolAzul.Text = golequipo1.ToString();
+            textoGolRojo.Text = golequipo2.ToString();
+            textoConTiempo.Text = contador.ToString();
 
             drawer2D.BeginDrawSprite();
             drawer2D.DrawSprite(medidorTurbo);
             drawer2D.EndDrawSprite();
 
+            rojo2D.BeginDrawSprite();
+            rojo2D.DrawSprite(equipoRojo);
+            rojo2D.EndDrawSprite();
+
+            azul2D.BeginDrawSprite();
+            azul2D.DrawSprite(equipoAzul);
+            azul2D.EndDrawSprite();
+
+            contador2D.BeginDrawSprite();
+            contador2D.DrawSprite(contadorTiempo);
+            contador2D.EndDrawSprite();
+
+           
+           
+           
+
+            if (contador < 0)
+              { 
+               contador2D.BeginDrawSprite();
+               contador2D.DrawSprite(gameOver);
+               contador2D.EndDrawSprite();
+                
+               }
+
+            textoGolAzul.render();
+            textoGolRojo.render();
+            textoConTiempo.render();
             textoTurbo.render();
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
