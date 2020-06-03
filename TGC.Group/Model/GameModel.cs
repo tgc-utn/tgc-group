@@ -50,8 +50,7 @@ namespace TGC.Group.Model
 
         private int golequipo1 = 0;
         private int golequipo2 = 0;
-        private double contador   = 300;
-        private double i = 0;
+        private double tiempoRestante = 3;
 
         //Objetos de fisica
         protected DiscreteDynamicsWorld             dynamicsWorld;
@@ -72,7 +71,6 @@ namespace TGC.Group.Model
         private TgcText2D textoGolAzul;
         private TgcText2D textoGolRojo;
         private TgcText2D textoConTiempo;
-        private double antElapse;
 
         /// <summary>
         ///     Se llama una sola vez, al principio cuando se ejecuta el ejemplo.
@@ -323,13 +321,7 @@ namespace TGC.Group.Model
                 jugadores.ForEach(jugador => jugador.ReiniciarJugador());
             }
 
-            antElapse += ElapsedTime;
-
-            if (antElapse > 1)
-            {
-                contador -= 1;
-                antElapse = 0;
-            }
+            tiempoRestante -= ElapsedTime;
            
             camara.Update(ElapsedTime);
 
@@ -337,8 +329,10 @@ namespace TGC.Group.Model
 
             textoTurbo.Text = jugadorActivo.Turbo.ToString();
             textoTurbo.Color = Color.FromArgb(255, 255 - (int)(jugadorActivo.Turbo * 2.55), 255 - (int)(Math.Min(jugadorActivo.Turbo, 50) * 4.55));
+            textoGolAzul.Text = golequipo1.ToString();
+            textoGolRojo.Text = golequipo2.ToString();
+            textoConTiempo.Text = String.Format("{0:0}:{1:00}", Math.Floor(tiempoRestante / 60), tiempoRestante % 60);
 
-            
             PostUpdate();
         }
 
@@ -393,25 +387,16 @@ namespace TGC.Group.Model
 
             paredes.Render();
 
-            textoGolAzul.Text = golequipo1.ToString();
-            textoGolRojo.Text = golequipo2.ToString();
-            textoConTiempo.Text = contador.ToString();
-
             drawer2D.BeginDrawSprite();
             drawer2D.DrawSprite(medidorTurbo);
             drawer2D.DrawSprite(equipoRojo);
             drawer2D.DrawSprite(equipoAzul);
             drawer2D.DrawSprite(contadorTiempo);
+
+            if (tiempoRestante < 0)
+                drawer2D.DrawSprite(gameOver);
             drawer2D.EndDrawSprite();
 
-           
-            if (contador < 0)
-              {
-                drawer2D.BeginDrawSprite();
-                drawer2D.DrawSprite(gameOver);
-                drawer2D.EndDrawSprite();
-                
-               }
 
             textoGolAzul.render();
             textoGolRojo.render();
