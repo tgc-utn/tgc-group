@@ -177,9 +177,9 @@ namespace TGC.Group.Model
             textoConTiempo.Align = TgcText2D.TextAlign.CENTER;
             textoConTiempo.Size = new Size((int)(90 * contadorTiempo.Scaling.X), (int)(90 * contadorTiempo.Scaling.X));
             //textoGolAzul.Position = new Point((int)medidorTurbo.Position.X, (int)medidorTurbo.Position.Y + (int)(90 * medidorTurbo.Scaling.X));
-            textoConTiempo.Position = new Point(620, 40);
+            textoConTiempo.Position = new Point(620, 50);
             textoConTiempo.Color = Color.Black;
-            textoConTiempo.changeFont(new Font("TimesNewRoman", 30, FontStyle.Bold));
+            textoConTiempo.changeFont(new Font("TimesNewRoman", 20, FontStyle.Bold));
 
                        
         }
