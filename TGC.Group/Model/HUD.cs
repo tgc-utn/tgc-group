@@ -14,14 +14,16 @@ namespace TGC.Group.Model
     {
         public void Render(int cantidadVida, int cantidadNitro)
         {
-            int posicionXBaseDeBarras = 25;
-            float longitudVida = cantidadVida * 2.5f;
-            int posicionYBarraVida = 800;
+            int coeficienteDeLongitudDeBarras = D3DDevice.Instance.Width / 800;
+            int posicionXBaseDeBarras = Convert.ToInt32(D3DDevice.Instance.Width * 0.01f);
+
+            float longitudVida = cantidadVida * coeficienteDeLongitudDeBarras;
+            int posicionYBarraVida = Convert.ToInt32(D3DDevice.Instance.Height/(1.25f));
             TGCVector2 posicionBaseVida = new TGCVector2(posicionXBaseDeBarras, posicionYBarraVida);
             TGCVector2 posicionFinalVida = new TGCVector2(posicionXBaseDeBarras + longitudVida, posicionYBarraVida);
 
-            float longitudNitro = cantidadNitro * 2.5f;
-            int posicionYBarraNitro = posicionYBarraVida + 50;
+            float longitudNitro = cantidadNitro * coeficienteDeLongitudDeBarras;
+            int posicionYBarraNitro = Convert.ToInt32(D3DDevice.Instance.Height / (1.20f));
             TGCVector2 posicionBaseNitro = new TGCVector2(posicionXBaseDeBarras, posicionYBarraNitro);
             TGCVector2 posicionFinalNitro = new TGCVector2(posicionXBaseDeBarras + longitudNitro, posicionYBarraNitro);
 
@@ -34,7 +36,7 @@ namespace TGC.Group.Model
             Line barra = new Line(D3DDevice.Instance.Device)
             {
                 Antialias = true,
-                Width = 25
+                Width = Convert.ToInt32(0.023f * D3DDevice.Instance.Height),
             };
             barra.Draw(TGCVector2.ToVector2Array(positionList), color);
         }
