@@ -26,9 +26,8 @@ namespace TGC.Group.Model
         private bool estaVivo;
         private TgcText2D textoGameOver;
         private string mediaDir;
-        private DateTime ultimoRoll;
-        private DateTime ultimoTiro;
-        private int cantidadNitro;
+        private float segundosDesdeUltimoRoll;
+        private float segundosDesdeUltimoDisparo;
         private int cantidadVida;
 
         public Nave(string mediaDir, TGCVector3 posicionInicial, InputDelJugador input)
@@ -45,9 +44,8 @@ namespace TGC.Group.Model
             this.velocidadRotacion = 0.008f;
             this.estaRolleando = false;
             this.estaVivo = true;
-            this.ultimoRoll = new DateTime(0);
-            this.ultimoTiro = new DateTime(0);
-            this.cantidadNitro = 100;
+            this.segundosDesdeUltimoRoll = 100;
+            this.segundosDesdeUltimoDisparo = 100;
             this.cantidadVida = 100;
         }
 
@@ -62,7 +60,10 @@ namespace TGC.Group.Model
 
         public void Update(float elapsedTime)
         {
-            if(cantidadVida <= 0)
+            segundosDesdeUltimoRoll += elapsedTime;
+            segundosDesdeUltimoDisparo += elapsedTime;
+
+            if (cantidadVida <= 0)
             {
                 Morir();
             }
@@ -106,6 +107,7 @@ namespace TGC.Group.Model
                 Disparar();
             }
 
+
             MoverseEnDireccion(input.DireccionDelInput(), elapsedTime);
 
         }
@@ -128,7 +130,7 @@ namespace TGC.Group.Model
             new TgcText2D().drawText("Rotacion de la nave:\n" + rotacionActual.ToString(), 5, 130, Color.White);
             */
             //new TgcText2D().drawText(textoControles, 5, 10, Color.White);
-            new HUD().Render(cantidadVida, cantidadNitro);
+            new HUD().Render(cantidadVida, CantidadCombustibleParaRollear());
         }
 
         public void Dispose()
@@ -266,13 +268,18 @@ namespace TGC.Group.Model
             if (SePuedeRollear())
             {
                 estaRolleando = true;
-                ultimoRoll = DateTime.Now;
+                segundosDesdeUltimoRoll = 0;
             }
+        }
+
+        private int CantidadCombustibleParaRollear() //Ponele
+        {
+            return Convert.ToInt32(Math.Min(segundosDesdeUltimoRoll * 20, 100));
         }
 
         private Boolean SePuedeRollear()
         {
-            return (DateTime.Now - ultimoRoll).TotalSeconds > 5;
+            return segundosDesdeUltimoRoll > 5;
         }
 
         private bool TerminoElRoll()
@@ -295,7 +302,7 @@ namespace TGC.Group.Model
 
         private Boolean SePuedeDisparar()
         {
-            return (DateTime.Now - ultimoTiro).TotalSeconds > 0.1f;
+            return segundosDesdeUltimoDisparo > 0.1f;
         }
         private void Disparar()
         {
@@ -304,7 +311,7 @@ namespace TGC.Group.Model
                 TGCVector3 posicionLaser = new TGCVector3(GetPosicion());
                 posicionLaser.Z += 10f;
                 GameManager.Instance.AgregarRenderizable(new LaserDeJugador(mediaDir + "Xwing\\laserBueno-TgcScene.xml", posicionLaser, new TGCVector3(0, 0, 1)));
-                ultimoTiro = DateTime.Now;
+                segundosDesdeUltimoDisparo = 0;
             }
 
 
