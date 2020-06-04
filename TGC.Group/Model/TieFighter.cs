@@ -43,6 +43,8 @@ namespace TGC.Group.Model
         
         public override void Update(float elapsedTime)
         {
+            if (GameManager.Instance.Pause)
+                return;
             base.Update(elapsedTime);
 
             modeloNave.CambiarRotacion(new TGCVector3(0f, Geometry.DegreeToRadian(0f), 0f));

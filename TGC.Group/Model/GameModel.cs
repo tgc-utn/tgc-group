@@ -30,7 +30,9 @@ namespace TGC.Group.Model
 
         public override void Init()
         {
-            /*
+            //Debe empezar pausado
+            GameManager.Instance.PausarJuego();
+
             var posicionInicialDeNave = new TGCVector3(105, -15, -250);
 
             InputDelJugador input = new InputDelJugador(Input);
@@ -50,12 +52,10 @@ namespace TGC.Group.Model
 
             Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
             GameManager.Instance.AgregarRenderizable(skybox);
-            */
+            
+            /*
             //Cursor.Hide();
             Nave naveDelJuego = new Nave(MediaDir, TGCVector3.Empty, new InputDelJugador(Input));
-            Camara camaraDelJuego = new Camara(TGCVector3.Empty, 10, -50, naveDelJuego);
-            Camera = camaraDelJuego;
-            GameManager.Instance.Camara = camaraDelJuego;
             drawer = new Drawer2D();
             menuPrincipalSprite = new CustomSprite();
             menuPrincipalSprite.Bitmap = new CustomBitmap(MediaDir + "InicioMenu.png", D3DDevice.Instance.Device);
@@ -66,15 +66,17 @@ namespace TGC.Group.Model
             //menuPrincipalSprite.Position = new TGCVector2(FastMath.Max(D3DDevice.Instance.Width / 2 - textureSize.Width / 2, 0), FastMath.Max(D3DDevice.Instance.Height / 2 - textureSize.Height / 2, 0));
             menuPrincipalSprite.Position = new TGCVector2(-290,-150);
             FlechitaSeleccion.Position = new TGCVector2(D3DDevice.Instance.Width / 4, FastMath.Max(D3DDevice.Instance.Height / 2,0)+140);
-
+            */
         }
 
         public override void Update()
         {
             PreUpdate();
+            if (Input.keyDown(Key.Escape))
+                GameManager.Instance.ReanudarOPausarJuego();
             GameManager.Instance.Update(ElapsedTime);
-            //escenarioLoader.Update(ElapsedTime);
-            //tieFighterSpawner.Update(ElapsedTime);
+            escenarioLoader.Update(ElapsedTime);
+            tieFighterSpawner.Update(ElapsedTime);
             PostUpdate();
         }
 
@@ -83,11 +85,12 @@ namespace TGC.Group.Model
         {
             PreRender();
             GameManager.Instance.Render();
+            /*
             drawer.BeginDrawSprite();
-            //Dibujar sprite (si hubiese mas, deberian ir todos aquí)
             drawer.DrawSprite(menuPrincipalSprite);
             drawer.DrawSprite(FlechitaSeleccion);
             drawer.EndDrawSprite();
+            */
             PostRender();
         }
 

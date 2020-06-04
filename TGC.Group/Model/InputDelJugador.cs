@@ -109,5 +109,9 @@ namespace TGC.Group.Model
         {
             return input.keyDown(Key.Space);
         }
+        public Boolean HayInputDePausa()
+        {
+            return input.keyDown(Key.Escape);
+        }
     }
 }
