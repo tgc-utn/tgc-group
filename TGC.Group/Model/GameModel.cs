@@ -9,7 +9,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Examples.Camara;
-
+using TGC.Group.Model.Clases2D;
 
 namespace TGC.Group.Model
 {
@@ -17,9 +17,7 @@ namespace TGC.Group.Model
     {
         private EscenarioLoader escenarioLoader;
         private TieFighterSpawner tieFighterSpawner;
-        private Drawer2D drawer;
-        private CustomSprite menuPrincipalSprite;
-        private CustomSprite FlechitaSeleccion;
+        private MenuPrincipal menuPrincipal;
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
@@ -53,20 +51,10 @@ namespace TGC.Group.Model
             Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
             GameManager.Instance.AgregarRenderizable(skybox);
             
-            /*
+            
             //Cursor.Hide();
-            Nave naveDelJuego = new Nave(MediaDir, TGCVector3.Empty, new InputDelJugador(Input));
-            drawer = new Drawer2D();
-            menuPrincipalSprite = new CustomSprite();
-            menuPrincipalSprite.Bitmap = new CustomBitmap(MediaDir + "InicioMenu.png", D3DDevice.Instance.Device);
-            FlechitaSeleccion = new CustomSprite();
-            FlechitaSeleccion.Bitmap = new CustomBitmap(MediaDir + "Flechita.png", D3DDevice.Instance.Device);
-            //Ubicarlo centrado en la pantalla
-            var textureSize = menuPrincipalSprite.Bitmap.Size;
-            //menuPrincipalSprite.Position = new TGCVector2(FastMath.Max(D3DDevice.Instance.Width / 2 - textureSize.Width / 2, 0), FastMath.Max(D3DDevice.Instance.Height / 2 - textureSize.Height / 2, 0));
-            menuPrincipalSprite.Position = new TGCVector2(-290,-150);
-            FlechitaSeleccion.Position = new TGCVector2(D3DDevice.Instance.Width / 4, FastMath.Max(D3DDevice.Instance.Height / 2,0)+140);
-            */
+
+            menuPrincipal = new MenuPrincipal(MediaDir,input);
         }
 
         public override void Update()
@@ -85,19 +73,15 @@ namespace TGC.Group.Model
         {
             PreRender();
             GameManager.Instance.Render();
-            /*
-            drawer.BeginDrawSprite();
-            drawer.DrawSprite(menuPrincipalSprite);
-            drawer.DrawSprite(FlechitaSeleccion);
-            drawer.EndDrawSprite();
-            */
+            menuPrincipal.DibujarMenu();
+            
             PostRender();
         }
 
         public override void Dispose()
         {
             GameManager.Instance.Dispose();
-            menuPrincipalSprite.Dispose();
+            menuPrincipal.Dispose();
         }
     }
 }

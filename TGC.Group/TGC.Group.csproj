@@ -110,9 +110,10 @@
     <Compile Include="Model\Bloque.cs" />
     <Compile Include="Model\BloqueBuilder.cs" />
     <Compile Include="Model\Camara.cs" />
-    <Compile Include="Model\MenuPrincipal\CustomBitmap.cs" />
-    <Compile Include="Model\MenuPrincipal\CustomSprite.cs" />
-    <Compile Include="Model\MenuPrincipal\Drawer2D.cs" />
+    <Compile Include="Model\Clases2D\CustomBitmap.cs" />
+    <Compile Include="Model\Clases2D\CustomSprite.cs" />
+    <Compile Include="Model\Clases2D\Drawer2D.cs" />
+    <Compile Include="Model\Clases2D\MenuPrincipal.cs" />
     <Compile Include="Model\Obstaculo.cs" />
     <Compile Include="Model\Destruible.cs" />
     <Compile Include="Model\Colisionable.cs" />
