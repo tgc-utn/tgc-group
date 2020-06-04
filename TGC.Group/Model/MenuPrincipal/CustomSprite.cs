@@ -8,7 +8,7 @@ namespace TGC.Group.Model
     {
         public CustomSprite()
         {
-            Initialize();
+            initialize();
         }
 
         #region Miembros de IDisposable
@@ -23,7 +23,7 @@ namespace TGC.Group.Model
 
         #endregion Miembros de IDisposable
 
-        private void Initialize()
+        private void initialize()
         {
             //Set the identity matrix.
             TransformationMatrix = TGCMatrix.Identity;

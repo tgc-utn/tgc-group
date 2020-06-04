@@ -17,6 +17,9 @@ namespace TGC.Group.Model
     {
         private EscenarioLoader escenarioLoader;
         private TieFighterSpawner tieFighterSpawner;
+        private Drawer2D drawer;
+        private CustomSprite menuPrincipalSprite;
+        private CustomSprite FlechitaSeleccion;
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
@@ -53,21 +56,23 @@ namespace TGC.Group.Model
             Camara camaraDelJuego = new Camara(TGCVector3.Empty, 10, -50, naveDelJuego);
             Camera = camaraDelJuego;
             GameManager.Instance.Camara = camaraDelJuego;
-
+            drawer = new Drawer2D();
+            menuPrincipalSprite = new CustomSprite();
+            menuPrincipalSprite.Bitmap = new CustomBitmap(MediaDir + "InicioMenu.png", D3DDevice.Instance.Device);
+            FlechitaSeleccion = new CustomSprite();
+            FlechitaSeleccion.Bitmap = new CustomBitmap(MediaDir + "Flechita.png", D3DDevice.Instance.Device);
+            //Ubicarlo centrado en la pantalla
+            var textureSize = menuPrincipalSprite.Bitmap.Size;
+            //menuPrincipalSprite.Position = new TGCVector2(FastMath.Max(D3DDevice.Instance.Width / 2 - textureSize.Width / 2, 0), FastMath.Max(D3DDevice.Instance.Height / 2 - textureSize.Height / 2, 0));
+            menuPrincipalSprite.Position = new TGCVector2(-290,-150);
+            FlechitaSeleccion.Position = new TGCVector2(D3DDevice.Instance.Width / 4, FastMath.Max(D3DDevice.Instance.Height / 2,0)+140);
 
         }
 
         public override void Update()
         {
             PreUpdate();
-            Drawer2D drawer = new Drawer2D();
-            CustomSprite PantallaInicioFondo = new CustomSprite
-            {
-                Bitmap = new CustomBitmap(MediaDir + "InicioMenu.png", D3DDevice.Instance.Device),
-                Position = new TGCVector2(0, 0)
-            };
             GameManager.Instance.Update(ElapsedTime);
-            drawer.DrawSprite(PantallaInicioFondo);
             //escenarioLoader.Update(ElapsedTime);
             //tieFighterSpawner.Update(ElapsedTime);
             PostUpdate();
@@ -78,12 +83,18 @@ namespace TGC.Group.Model
         {
             PreRender();
             GameManager.Instance.Render();
+            drawer.BeginDrawSprite();
+            //Dibujar sprite (si hubiese mas, deberian ir todos aquí)
+            drawer.DrawSprite(menuPrincipalSprite);
+            drawer.DrawSprite(FlechitaSeleccion);
+            drawer.EndDrawSprite();
             PostRender();
         }
 
         public override void Dispose()
         {
             GameManager.Instance.Dispose();
+            menuPrincipalSprite.Dispose();
         }
     }
 }
