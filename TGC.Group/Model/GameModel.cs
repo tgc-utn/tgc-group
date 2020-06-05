@@ -18,6 +18,7 @@ namespace TGC.Group.Model
         private EscenarioLoader escenarioLoader;
         private TieFighterSpawner tieFighterSpawner;
         private MenuPrincipal menuPrincipal;
+        private InputDelJugador input;
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
@@ -33,7 +34,7 @@ namespace TGC.Group.Model
 
             var posicionInicialDeNave = new TGCVector3(105, -15, -250);
 
-            InputDelJugador input = new InputDelJugador(Input);
+            input = new InputDelJugador(Input);
 
             Nave naveDelJuego = new Nave(MediaDir, posicionInicialDeNave, input);
             GameManager.Instance.AgregarRenderizable(naveDelJuego);
@@ -60,7 +61,7 @@ namespace TGC.Group.Model
         public override void Update()
         {
             PreUpdate();
-            if (Input.keyDown(Key.Escape))
+            if (input.HayInputDePausa())
                 GameManager.Instance.ReanudarOPausarJuego();
             GameManager.Instance.Update(ElapsedTime);
             escenarioLoader.Update(ElapsedTime);
