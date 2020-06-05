@@ -329,12 +329,13 @@ namespace TGC.Group.Model
 
         public void Morir()
         {
-            //estaVivo = false;
+            estaVivo = false;
         }
 
         public void Colisionar()
         {
-            Morir();
+            //Morir();
+            PerderVida(5);
         }
 
         public void ChocarConLaser()

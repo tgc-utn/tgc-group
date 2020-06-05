@@ -23,7 +23,7 @@ namespace TGC.Group.Model
 
         public override void Render()
         {
-            //mainMesh.Render();
+            //mainMesh.Render(); Es un mesh transparente
             mainMesh.BoundingBox.Render();
         }
 
