@@ -113,5 +113,18 @@ namespace TGC.Group.Model
         {
             return input.keyDown(Key.Escape);
         }
+        public Boolean HayInputDeSeleccion()
+        {
+            return input.keyDown(Key.P);
+        }
+        public Boolean HayInputArriba()
+        {
+            return input.keyDown(Key.W) || input.keyDown(Key.Up);
+        }
+        public Boolean HayInputABajo()
+        {
+            return input.keyDown(Key.S) || input.keyDown(Key.Down);
+        }
+
     }
 }

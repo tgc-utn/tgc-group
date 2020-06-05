@@ -74,7 +74,7 @@ namespace TGC.Group.Model
             PreRender();
             GameManager.Instance.Render();
             menuPrincipal.DibujarMenu();
-            
+            //Siempre los sprites se dibujan luego de todos los Render
             PostRender();
         }
 
