@@ -34,6 +34,7 @@ namespace TGC.Group.Model
             Scene = new TgcSceneLoader().loadSceneFromFile(mediaDir + nombreMapa);
             ScaleMatrix = TGCMatrix.Scaling(20f, 20f, 20f);
             TranslationMatrix = TGCMatrix.Translation(posicionInicial);
+            instanciarObstaculosMapa();
             instanciarTorretas();
         }
 
@@ -45,16 +46,27 @@ namespace TGC.Group.Model
                     GameManager.Instance.AgregarRenderizable(torreta); 
                 });
         }
+        private void instanciarObstaculosMapa()
+        {
+            for (int i = 3; i < Scene.Meshes.Count; i++)//hardcodeado esto deberia cambiar
+            {
+                var obstaculo = new ObstaculoMapa(nave, Scene.Meshes[i]);
+                GameManager.Instance.AgregarRenderizable(obstaculo);
+            }
+        }
 
         public void Update(float elapsedTime)
         {
-            Scene.Meshes.ForEach(delegate (TgcMesh mesh) { mesh.Transform = ScaleMatrix*TranslationMatrix; });
+            Scene.Meshes.ForEach(delegate (TgcMesh mesh) { 
+                mesh.Transform = ScaleMatrix*TranslationMatrix;
+                mesh.BoundingBox.transform(ScaleMatrix * TranslationMatrix);
+            });
         }
 
         public void Render()
         {
             Scene.RenderAll();
-
+            
         }
         public void Dispose()
         {

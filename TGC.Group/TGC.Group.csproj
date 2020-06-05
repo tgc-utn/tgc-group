@@ -127,6 +127,7 @@
     <Compile Include="Model\IRenderizable.cs" />
     <Compile Include="Model\GameManager.cs" />
     <Compile Include="Model\Nave.cs" />
+    <Compile Include="Model\ObstaculoMapa.cs" />
     <Compile Include="Model\Skybox.cs" />
     <Compile Include="Model\TgcThirdPersonCamera.cs" />
     <Compile Include="Model\GameModel.cs" />
