@@ -48,6 +48,8 @@ namespace TGC.Group.Model
 
         public virtual void Update(float elapsedTime)
         {
+            if (GameManager.Instance.Pause)
+                return;
 
             TGCQuaternion rotation = TGCQuaternion.RotationAxis(new TGCVector3(1.0f, 0.0f, 0.0f), Geometry.DegreeToRadian(90f));
             TGCVector3 direccionDisparo = direccion;

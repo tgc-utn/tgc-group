@@ -44,6 +44,8 @@ namespace TGC.Group.Model
 
         public override void Update(float elapsedTime)
         {
+            if (GameManager.Instance.Pause)
+                return;
             base.Update(elapsedTime);
             TGCMatrix matrizTransformacion;
             TGCQuaternion rotationX = TGCQuaternion.RotationAxis(new TGCVector3(0.0f, 1.0f, 0.0f), Geometry.DegreeToRadian(90f/* + anguloEntreVectores*15*/));

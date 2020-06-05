@@ -24,6 +24,8 @@ namespace TGC.Group.Model
 
         public void Update(float elapsedTime)
         {
+            if (GameManager.Instance.Pause)
+                return;
             Random rnd = new Random();
             tiempoTranscurrido += elapsedTime;
             if(tiempoTranscurrido > tiempoSiguienteSpawn)

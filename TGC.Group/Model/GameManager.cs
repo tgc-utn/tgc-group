@@ -14,12 +14,16 @@ namespace TGC.Group.Model
     {
         private List<IRenderizable> Renderizables = new List<IRenderizable>();
         public Camara Camara { get; set; }
+        public bool Pause { get; set; }
+        private float cooldownPausa;
 
         public void Update(float elapsedTime)
         {
             List<IRenderizable> RenderizablesAuxiliar = new List<IRenderizable>(Renderizables);
             RenderizablesAuxiliar.ForEach(delegate (IRenderizable unRenderizable) { unRenderizable.Update(elapsedTime); });
             Camara.Update(elapsedTime);
+            if (cooldownPausa < 3f)
+                cooldownPausa += elapsedTime;
         }
         public void Render()
         {
@@ -47,7 +51,18 @@ namespace TGC.Group.Model
         {
             return Renderizables.OfType<LaserDeJugador>().Any(laser => TgcCollisionUtils.testAABBAABB(laser.GetMainMesh().BoundingBox, unBoundingBox));
         }
-
+        public void PausarJuego()
+        {
+            this.Pause = true;
+        }
+        public void ReanudarOPausarJuego()
+        {
+            if(cooldownPausa > 0.5f)
+            {
+                this.Pause = !this.Pause;
+                cooldownPausa = 0f;
+            }
+        }
         #region Singleton
 
         private static volatile GameManager instance;

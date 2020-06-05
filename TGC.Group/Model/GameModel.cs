@@ -1,5 +1,6 @@
 using Microsoft.DirectX.DirectInput;
 using System.Drawing;
+using System.Windows.Forms;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 using TGC.Core.Geometry;
@@ -8,7 +9,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Textures;
 using TGC.Examples.Camara;
-
+using TGC.Group.Model.Clases2D;
 
 namespace TGC.Group.Model
 {
@@ -16,6 +17,8 @@ namespace TGC.Group.Model
     {
         private EscenarioLoader escenarioLoader;
         private TieFighterSpawner tieFighterSpawner;
+        private MenuPrincipal menuPrincipal;
+        private InputDelJugador input;
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
@@ -26,9 +29,12 @@ namespace TGC.Group.Model
 
         public override void Init()
         {
+            //Debe empezar pausado
+            GameManager.Instance.PausarJuego();
+
             var posicionInicialDeNave = new TGCVector3(105, -15, -250);
 
-            InputDelJugador input = new InputDelJugador(Input);
+            input = new InputDelJugador(Input);
 
             Nave naveDelJuego = new Nave(MediaDir, posicionInicialDeNave, input);
             GameManager.Instance.AgregarRenderizable(naveDelJuego);
@@ -45,12 +51,18 @@ namespace TGC.Group.Model
 
             Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
             GameManager.Instance.AgregarRenderizable(skybox);
+            
+            
+            //Cursor.Hide();
 
+            menuPrincipal = new MenuPrincipal(MediaDir,input);
         }
 
         public override void Update()
         {
             PreUpdate();
+            if (input.HayInputDePausa())
+                GameManager.Instance.ReanudarOPausarJuego();
             GameManager.Instance.Update(ElapsedTime);
             escenarioLoader.Update(ElapsedTime);
             tieFighterSpawner.Update(ElapsedTime);
@@ -62,12 +74,15 @@ namespace TGC.Group.Model
         {
             PreRender();
             GameManager.Instance.Render();
+            menuPrincipal.DibujarMenu();
+            //Siempre los sprites se dibujan luego de todos los Render
             PostRender();
         }
 
         public override void Dispose()
         {
             GameManager.Instance.Dispose();
+            menuPrincipal.Dispose();
         }
     }
 }
