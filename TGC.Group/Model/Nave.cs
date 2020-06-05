@@ -334,8 +334,7 @@ namespace TGC.Group.Model
 
         public void Colisionar()
         {
-            //Morir();
-            PerderVida(5);
+            Morir();
         }
 
         public void ChocarConLaser()
