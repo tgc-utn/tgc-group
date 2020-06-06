@@ -51,11 +51,6 @@ namespace TGC.Group.Model
         {
             return Renderizables.OfType<Laser>().Any(laser => TgcCollisionUtils.testAABBAABB(laser.GetMainMesh().BoundingBox, unBoundingBox));
         }
-
-        public Boolean HayUnLaserDeJugadorEnBoundingBox(TgcBoundingAxisAlignBox unBoundingBox)
-        {
-            return Renderizables.OfType<LaserDeJugador>().Any(laser => TgcCollisionUtils.testAABBAABB(laser.GetMainMesh().BoundingBox, unBoundingBox));
-        }
         public void PausarJuego()
         {
             this.Pause = true;
@@ -72,6 +67,11 @@ namespace TGC.Group.Model
         public List<Colisionable> GetColisionables()
         {
             return new List<Colisionable>(Renderizables.OfType<Colisionable>());
+        }
+
+        public List<ObstaculoMapa> GetObstaculosMapa()
+        {
+            return new List<ObstaculoMapa>(Renderizables.OfType<ObstaculoMapa>());
         }
 
         #region Singleton

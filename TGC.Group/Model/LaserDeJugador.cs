@@ -16,7 +16,7 @@ namespace TGC.Group.Model
         }
         public override void Update(float elapsedTime)
         {
-            if (SuperoTiempoDeVida(1))
+            if (SuperoTiempoDeVida(1) || ColisionaConMapa())
             {
                 GameManager.Instance.QuitarRenderizable(this);
             }

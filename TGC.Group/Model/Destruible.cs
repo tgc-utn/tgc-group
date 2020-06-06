@@ -35,7 +35,7 @@ namespace TGC.Group.Model
 
         private Boolean LePegaUnLaser()
         {
-           return GameManager.Instance.HayUnLaserDeJugadorEnBoundingBox(GetBoundingBox());
+           return GameManager.Instance.HayUnLaserEnBoundingBox(GetBoundingBox());
         }
 
         public new abstract TgcBoundingAxisAlignBox GetBoundingBox();

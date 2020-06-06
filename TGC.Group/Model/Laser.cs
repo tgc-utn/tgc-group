@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.DirectX.Direct3D;
 using TGC.Core.BoundingVolumes;
+using TGC.Core.Collision;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 
@@ -62,6 +63,11 @@ namespace TGC.Group.Model
             //mainMesh.updateBoundingBox();
             mainMesh.BoundingBox.transform(matrizTransformacion);
 
+        }
+
+        public Boolean ColisionaConMapa()
+        {
+            return GameManager.Instance.GetObstaculosMapa().Any(parteMapa => TgcCollisionUtils.testAABBAABB(parteMapa.GetBoundingBox(), this.GetMainMesh().BoundingBox));
         }
 
         public void Render()
