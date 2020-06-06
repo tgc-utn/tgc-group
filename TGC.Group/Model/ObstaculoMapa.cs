@@ -23,7 +23,7 @@ namespace TGC.Group.Model
             if (EstaColisionandoConNave())
             {
                 mainMesh.BoundingBox.setRenderColor(Color.Red);
-                Logger.Loggear("Colisiono");
+                //Logger.Loggear("Colisiono");
             }
             mainMesh.BoundingBox.Render();
         }
