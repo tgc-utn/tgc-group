@@ -39,6 +39,7 @@ namespace TGC.Group.Model
             matrizPosicion = TGCMatrix.Translation(posicion);
             TGCQuaternion rotacionInicial = TGCQuaternion.RotationAxis(new TGCVector3(0.0f, 1.0f, 0.0f), Geometry.DegreeToRadian(90f));
             matrizRotacion = TGCMatrix.RotationTGCQuaternion(rotacionInicial);
+            mainMesh = modeloNave.GetMesh();
         }
         
         public override void Update(float elapsedTime)

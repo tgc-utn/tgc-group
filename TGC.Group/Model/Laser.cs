@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.DirectX.Direct3D;
 using TGC.Core.BoundingVolumes;
+using TGC.Core.Collision;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 
@@ -30,8 +31,6 @@ namespace TGC.Group.Model
             this.tiempoDeSpawn = DateTime.Now;
         }
 
-
-
         public void Init()
         {
             TgcSceneLoader loader = new TgcSceneLoader();
@@ -41,7 +40,7 @@ namespace TGC.Group.Model
             mainMesh = scene2.Meshes[0];
             mainMesh.Position = posicionInicial;
             baseQuaternionTranslation = TGCMatrix.Translation(posicionInicial);
-            baseScaleRotation = TGCMatrix.Scaling(new TGCVector3(.1f, .1f, .1f));
+            baseScaleRotation = TGCMatrix.Scaling(new TGCVector3(1f, 1f, 1f));
             TGCQuaternion rotation = TGCQuaternion.RotationAxis(new TGCVector3(1.0f, 0.0f, 0.0f), Geometry.DegreeToRadian(90f));
             mainMesh.Transform = TGCMatrix.Scaling(0.1f, 0.1f, 0.1f) * TGCMatrix.RotationTGCQuaternion(rotation) * TGCMatrix.Translation(mainMesh.Position);
         }
@@ -54,15 +53,21 @@ namespace TGC.Group.Model
             TGCQuaternion rotation = TGCQuaternion.RotationAxis(new TGCVector3(1.0f, 0.0f, 0.0f), Geometry.DegreeToRadian(90f));
             TGCVector3 direccionDisparo = direccion;
             direccionDisparo.Normalize();
-            TGCQuaternion giro = QuaternionDireccion(direccionDisparo);
-            TGCVector3 movement = direccionDisparo * 60f * elapsedTime*velocidad;
+            TGCVector3 movement = direccionDisparo * 60f * elapsedTime * velocidad;
             mainMesh.Position += movement;
+
+            TGCQuaternion giro = QuaternionDireccion(direccionDisparo);
             TGCMatrix matrizTransformacion = baseScaleRotation * TGCMatrix.RotationTGCQuaternion(rotation*giro)
                 * TGCMatrix.Translation(mainMesh.Position);
             mainMesh.Transform = matrizTransformacion;
             //mainMesh.updateBoundingBox();
             mainMesh.BoundingBox.transform(matrizTransformacion);
 
+        }
+
+        public Boolean ColisionaConMapa()
+        {
+            return GameManager.Instance.GetObstaculosMapa().Any(parteMapa => TgcCollisionUtils.testAABBAABB(parteMapa.GetBoundingBox(), this.GetMainMesh().BoundingBox));
         }
 
         public void Render()
@@ -76,7 +81,7 @@ namespace TGC.Group.Model
             mainMesh.Dispose();
         }
 
-        private TGCQuaternion QuaternionDireccion(TGCVector3 direccionDisparoNormalizado)
+        public virtual TGCQuaternion QuaternionDireccion(TGCVector3 direccionDisparoNormalizado)
         {
             TGCVector3 DireccionA = new TGCVector3(0, 0, -1);
             TGCVector3 cross = TGCVector3.Cross(DireccionA, direccionDisparoNormalizado);
@@ -89,7 +94,7 @@ namespace TGC.Group.Model
             return mainMesh;
         }
 
-        public Boolean SuperoCiertoTiempoDeVida(float tiempoLimite)
+        public Boolean SuperoTiempoDeVida(float tiempoLimite)
         {
             return (DateTime.Now - tiempoDeSpawn).TotalSeconds > tiempoLimite;
         }

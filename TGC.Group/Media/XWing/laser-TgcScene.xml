@@ -2,7 +2,7 @@
   <name>laser</name>
   <texturesExport enabled="True" dir="Textures" />
   <lightmapExport enabled="False" dir="LightMaps" />
-  <sceneBoundingBox min="[0.1601,-0.0561,-27.7928]" max="[6.1154,79.7016,-19.2767]" />
+  <sceneBoundingBox min="[-0.4522,-0.4896,-0.3126]" max="[0.1433,7.4862,0.539]" />
   <materials count="1">
     <m name="Standardmaterial" type="Standardmaterial">
       <ambient>[0,0,0,0]</ambient>
@@ -15,14 +15,14 @@
   </materials>
   <meshes count="1">
     <mesh name="Box_7" layer="Default" type="Original" matId="0" color="[1,1,1]" visibility="1.0" lightmap="">
-      <boundingBox min="[0.1601,-0.0561,-27.7928]" max="[6.1154,79.7016,-19.2767]" />
+      <boundingBox min="[-0.4522,-0.4896,-0.3126]" max="[0.1433,7.4862,0.539]" />
       <coordinatesIdx count="36">0 1 2 1 3 2 4 5 6 6 5 7 0 5 4 0 2 5 1 6 7 1 7 3 0 6 1 4 6 0 2 3 7 5 2 7 </coordinatesIdx>
       <textCoordsIdx count="36">0 1 2 1 3 2 0 2 1 1 2 3 0 3 1 0 2 3 0 1 3 0 3 2 0 3 1 2 3 0 0 1 3 2 0 3 </textCoordsIdx>
       <colorsIdx count="36">0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 </colorsIdx>
       <matIds count="1">0 </matIds>
       <textCoordsLightMapIdx count="0">
       </textCoordsLightMapIdx>
-      <vertices count="24">0.1601 79.5772 -19.2767 0.1601 -0.0561 -20.6667 6.1154 79.5772 -19.2767 6.1154 -0.0561 -20.6667 0.1601 79.7016 -26.4028 6.1154 79.7016 -26.4028 0.1601 0.0683 -27.7928 6.1154 0.0683 -27.7928 </vertices>
+      <vertices count="24">-0.4522 7.4738 0.539 -0.4522 -0.4896 0.4 0.1433 7.4738 0.539 0.1433 -0.4896 0.4 -0.4522 7.4862 -0.1736 0.1433 7.4862 -0.1736 -0.4522 -0.4771 -0.3126 0.1433 -0.4771 -0.3126 </vertices>
       <normals count="24">0 -0.0175 0.9998 0 -0.0175 0.9998 0 -0.0175 0.9998 0 -0.0175 0.9998 0 0.0175 -0.9998 0 0.0175 -0.9998 0 0.0175 -0.9998 0 0.0175 -0.9998 </normals>
       <texCoords count="8">0 0 0 1 1 0 1 1 </texCoords>
       <colors count="3">255 255 255 </colors>

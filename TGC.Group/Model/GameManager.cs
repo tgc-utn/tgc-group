@@ -47,9 +47,9 @@ namespace TGC.Group.Model
             unRenderizable.Dispose();
         }
 
-        public Boolean HayUnLaserDeJugadorEnBoundingBox(TgcBoundingAxisAlignBox unBoundingBox)
+        public Boolean HayUnLaserEnBoundingBox(TgcBoundingAxisAlignBox unBoundingBox)
         {
-            return Renderizables.OfType<LaserDeJugador>().Any(laser => TgcCollisionUtils.testAABBAABB(laser.GetMainMesh().BoundingBox, unBoundingBox));
+            return Renderizables.OfType<Laser>().Any(laser => TgcCollisionUtils.testAABBAABB(laser.GetMainMesh().BoundingBox, unBoundingBox));
         }
         public void PausarJuego()
         {
@@ -63,6 +63,17 @@ namespace TGC.Group.Model
                 cooldownPausa = 0f;
             }
         }
+
+        public List<Colisionable> GetColisionables()
+        {
+            return new List<Colisionable>(Renderizables.OfType<Colisionable>());
+        }
+
+        public List<ObstaculoMapa> GetObstaculosMapa()
+        {
+            return new List<ObstaculoMapa>(Renderizables.OfType<ObstaculoMapa>());
+        }
+
         #region Singleton
 
         private static volatile GameManager instance;
@@ -85,6 +96,6 @@ namespace TGC.Group.Model
         }
 
         #endregion Singleton
-
+        
     }
 }

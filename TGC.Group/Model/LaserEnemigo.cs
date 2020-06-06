@@ -17,24 +17,16 @@ namespace TGC.Group.Model
             modeloLaser = new Laser(direccionDeScene,posicionInicial,direccionDisparo);
         }
 
-        internal override void ColisionarConNave()
-        {
-            if (EstaColisionandoConNave())
-            {
-                naveDelJugador.ChocarConLaser();
-                Destruirse();
-            }
-        }
-
         public override void Init()
         {
             modeloLaser.Init();
             this.mainMesh = modeloLaser.GetMainMesh();
         }
 
-        public override void Dispose()
+        internal override void ColisionarConNave()
         {
-            
+            naveDelJugador.ChocarConLaser();
+            Destruirse();
         }
 
         private void Destruirse()
@@ -45,28 +37,27 @@ namespace TGC.Group.Model
 
         public override void Update(float elapsedTime)
         {
-            if (modeloLaser.SuperoCiertoTiempoDeVida(5))
+            if (modeloLaser.SuperoTiempoDeVida(5) || modeloLaser.ColisionaConMapa())
             {
                 Destruirse();
             }
             else
             {
                 modeloLaser.Update(elapsedTime);
-                base.Update(elapsedTime);
             }
         }
 
         public override void Render()
         {
-            
-            if (EstaColisionandoConNave())
+            if (ColisionaConNave())
             {
                 mainMesh.BoundingBox.setRenderColor(Color.Red);
             }
 
             modeloLaser.Render();
-
         }
+
+        public override void Dispose() { }
 
     }
 }

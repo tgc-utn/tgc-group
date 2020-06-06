@@ -18,28 +18,21 @@ namespace TGC.Group.Model
             this.naveDelJugador = naveDelJugador;
         }
 
-        public Boolean EstaColisionandoConNave()
+        public Boolean ColisionaConNave()
         {
             return naveDelJugador.ColisionaConColisionable(this);
         }
 
         internal virtual void ColisionarConNave()
         {
-            if (EstaColisionandoConNave())
-            {
-                naveDelJugador.Colisionar();
-            }
-            
+            naveDelJugador.Chocar();
         }
 
         public abstract void Init();
 
         public abstract void Render();
 
-        public virtual void Update(float elapsedTime)
-        {
-            ColisionarConNave();
-        }
+        public abstract void Update(float elapsedTime);
 
         public abstract void Dispose();
 
