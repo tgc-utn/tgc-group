@@ -16,24 +16,18 @@ namespace TGC.Group.Model
         }
         public override void Update(float elapsedTime)
         {
-            if (GameManager.Instance.Pause)
-                return;
-            TGCQuaternion rotation = TGCQuaternion.RotationAxis(new TGCVector3(1.0f, 0.0f, 0.0f), Geometry.DegreeToRadian(90f));
-            TGCVector3 direccionDisparo = direccion;
-            direccionDisparo.Normalize();
-            TGCVector3 movement = direccionDisparo * 80f * elapsedTime*velocidad;
-            mainMesh.Position += movement;
-            TGCMatrix matrizTransformacion = baseScaleRotation * TGCMatrix.RotationTGCQuaternion(rotation)
-                * TGCMatrix.Translation(mainMesh.Position);
-            mainMesh.Transform = matrizTransformacion;
-            //mainMesh.updateBoundingBox();
-            mainMesh.BoundingBox.transform(matrizTransformacion);
-            //base.Update(elapsedTime);
-
             if (SuperoTiempoDeVida(1))
             {
                 GameManager.Instance.QuitarRenderizable(this);
             }
+
+            base.Update(elapsedTime);
+
+        }
+
+        public override TGCQuaternion QuaternionDireccion(TGCVector3 direccionDisparoNormalizado)
+        {
+            return TGCQuaternion.RotationAxis(new TGCVector3(0, 0, 0), 0);
         }
 
     }

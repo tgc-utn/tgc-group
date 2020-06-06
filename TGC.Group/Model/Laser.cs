@@ -52,9 +52,10 @@ namespace TGC.Group.Model
             TGCQuaternion rotation = TGCQuaternion.RotationAxis(new TGCVector3(1.0f, 0.0f, 0.0f), Geometry.DegreeToRadian(90f));
             TGCVector3 direccionDisparo = direccion;
             direccionDisparo.Normalize();
-            TGCQuaternion giro = QuaternionDireccion(direccionDisparo);
-            TGCVector3 movement = direccionDisparo * 60f * elapsedTime*velocidad;
+            TGCVector3 movement = direccionDisparo * 60f * elapsedTime * velocidad;
             mainMesh.Position += movement;
+
+            TGCQuaternion giro = QuaternionDireccion(direccionDisparo);
             TGCMatrix matrizTransformacion = baseScaleRotation * TGCMatrix.RotationTGCQuaternion(rotation*giro)
                 * TGCMatrix.Translation(mainMesh.Position);
             mainMesh.Transform = matrizTransformacion;
@@ -74,7 +75,7 @@ namespace TGC.Group.Model
             mainMesh.Dispose();
         }
 
-        private TGCQuaternion QuaternionDireccion(TGCVector3 direccionDisparoNormalizado)
+        public virtual TGCQuaternion QuaternionDireccion(TGCVector3 direccionDisparoNormalizado)
         {
             TGCVector3 DireccionA = new TGCVector3(0, 0, -1);
             TGCVector3 cross = TGCVector3.Cross(DireccionA, direccionDisparoNormalizado);
