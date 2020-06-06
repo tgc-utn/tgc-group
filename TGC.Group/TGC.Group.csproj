@@ -115,6 +115,7 @@
     <Compile Include="Model\Clases2D\CustomSprite.cs" />
     <Compile Include="Model\Clases2D\Drawer2D.cs" />
     <Compile Include="Model\Clases2D\MenuPrincipal.cs" />
+    <Compile Include="Model\Logger.cs" />
     <Compile Include="Model\Obstaculo.cs" />
     <Compile Include="Model\Destruible.cs" />
     <Compile Include="Model\Colisionable.cs" />

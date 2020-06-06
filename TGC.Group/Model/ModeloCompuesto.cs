@@ -87,6 +87,10 @@ namespace TGC.Group.Model
         {
             return BoundingBoxesDelModelo().Any(bound => TgcCollisionUtils.testAABBAABB(bound, unColisionable.GetBoundingBox()));
         }
+        public TgcMesh GetMesh()
+        {
+            return meshes[0];
+        }
 
     }
 }

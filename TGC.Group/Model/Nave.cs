@@ -109,8 +109,17 @@ namespace TGC.Group.Model
                 Disparar();
             }
 
-
+            CalcularColision();
             MoverseEnDireccion(input.DireccionDelInput(), elapsedTime);
+
+        }
+
+        private void CalcularColision()
+        {
+            var listaColisionables = GameManager.Instance.GetColisionables();
+            if (listaColisionables.Any(colisionable => ColisionaConColisionable(colisionable)))
+                Morir();
+            
 
         }
 
@@ -334,7 +343,7 @@ namespace TGC.Group.Model
 
         public void Colisionar()
         {
-            Morir();
+            // Morir();
         }
 
         public void ChocarConLaser()

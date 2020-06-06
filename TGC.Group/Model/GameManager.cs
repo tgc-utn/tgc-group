@@ -63,6 +63,12 @@ namespace TGC.Group.Model
                 cooldownPausa = 0f;
             }
         }
+
+        public List<Colisionable> GetColisionables()
+        {
+            return new List<Colisionable>(Renderizables.OfType<Colisionable>());
+        }
+
         #region Singleton
 
         private static volatile GameManager instance;
@@ -85,6 +91,6 @@ namespace TGC.Group.Model
         }
 
         #endregion Singleton
-
+        
     }
 }
