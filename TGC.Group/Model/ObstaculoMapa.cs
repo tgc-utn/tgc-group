@@ -20,14 +20,15 @@ namespace TGC.Group.Model
 
         public override void Render()
         {
-            if (EstaColisionandoConNave())
+            if (ColisionaConNave())
             {
                 mainMesh.BoundingBox.setRenderColor(Color.Red);
-                //Logger.Loggear("Colisiono");
             }
             mainMesh.BoundingBox.Render();
         }
 
         public override void Dispose(){}
+
+        public override void Update(float elapsedTime){}
     }
 }

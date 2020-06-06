@@ -47,6 +47,11 @@ namespace TGC.Group.Model
             unRenderizable.Dispose();
         }
 
+        public Boolean HayUnLaserEnBoundingBox(TgcBoundingAxisAlignBox unBoundingBox)
+        {
+            return Renderizables.OfType<Laser>().Any(laser => TgcCollisionUtils.testAABBAABB(laser.GetMainMesh().BoundingBox, unBoundingBox));
+        }
+
         public Boolean HayUnLaserDeJugadorEnBoundingBox(TgcBoundingAxisAlignBox unBoundingBox)
         {
             return Renderizables.OfType<LaserDeJugador>().Any(laser => TgcCollisionUtils.testAABBAABB(laser.GetMainMesh().BoundingBox, unBoundingBox));

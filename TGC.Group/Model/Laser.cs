@@ -30,8 +30,6 @@ namespace TGC.Group.Model
             this.tiempoDeSpawn = DateTime.Now;
         }
 
-
-
         public void Init()
         {
             TgcSceneLoader loader = new TgcSceneLoader();
@@ -41,7 +39,7 @@ namespace TGC.Group.Model
             mainMesh = scene2.Meshes[0];
             mainMesh.Position = posicionInicial;
             baseQuaternionTranslation = TGCMatrix.Translation(posicionInicial);
-            baseScaleRotation = TGCMatrix.Scaling(new TGCVector3(.1f, .1f, .1f));
+            baseScaleRotation = TGCMatrix.Scaling(new TGCVector3(1f, 1f, 1f));
             TGCQuaternion rotation = TGCQuaternion.RotationAxis(new TGCVector3(1.0f, 0.0f, 0.0f), Geometry.DegreeToRadian(90f));
             mainMesh.Transform = TGCMatrix.Scaling(0.1f, 0.1f, 0.1f) * TGCMatrix.RotationTGCQuaternion(rotation) * TGCMatrix.Translation(mainMesh.Position);
         }
@@ -89,7 +87,7 @@ namespace TGC.Group.Model
             return mainMesh;
         }
 
-        public Boolean SuperoCiertoTiempoDeVida(float tiempoLimite)
+        public Boolean SuperoTiempoDeVida(float tiempoLimite)
         {
             return (DateTime.Now - tiempoDeSpawn).TotalSeconds > tiempoLimite;
         }

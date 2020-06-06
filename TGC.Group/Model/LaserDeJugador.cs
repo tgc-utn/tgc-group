@@ -30,7 +30,7 @@ namespace TGC.Group.Model
             mainMesh.BoundingBox.transform(matrizTransformacion);
             //base.Update(elapsedTime);
 
-            if (SuperoCiertoTiempoDeVida(1))
+            if (SuperoTiempoDeVida(1))
             {
                 GameManager.Instance.QuitarRenderizable(this);
             }

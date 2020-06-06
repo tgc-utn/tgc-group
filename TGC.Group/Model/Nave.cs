@@ -116,10 +116,11 @@ namespace TGC.Group.Model
 
         private void CalcularColision()
         {
-            var listaColisionables = GameManager.Instance.GetColisionables();
-            if (listaColisionables.Any(colisionable => ColisionaConColisionable(colisionable)))
-                Morir();
-            
+            List<Colisionable> listaColisionables = GameManager.Instance.GetColisionables();
+            listaColisionables.ForEach(colisionable => {
+                if (colisionable.ColisionaConNave()){
+                    colisionable.ColisionarConNave();
+                } });
 
         }
 
@@ -341,9 +342,9 @@ namespace TGC.Group.Model
             estaVivo = false;
         }
 
-        public void Colisionar()
+        public void Chocar()
         {
-            // Morir();
+            Morir();
         }
 
         public void ChocarConLaser()

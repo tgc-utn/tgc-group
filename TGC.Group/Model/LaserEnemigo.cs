@@ -19,11 +19,8 @@ namespace TGC.Group.Model
 
         internal override void ColisionarConNave()
         {
-            if (EstaColisionandoConNave())
-            {
-                naveDelJugador.ChocarConLaser();
-                Destruirse();
-            }
+            naveDelJugador.ChocarConLaser();
+            Destruirse();
         }
 
         public override void Init()
@@ -45,21 +42,20 @@ namespace TGC.Group.Model
 
         public override void Update(float elapsedTime)
         {
-            if (modeloLaser.SuperoCiertoTiempoDeVida(5))
+            if (modeloLaser.SuperoTiempoDeVida(5))
             {
                 Destruirse();
             }
             else
             {
                 modeloLaser.Update(elapsedTime);
-                base.Update(elapsedTime);
             }
         }
 
         public override void Render()
         {
             
-            if (EstaColisionandoConNave())
+            if (ColisionaConNave())
             {
                 mainMesh.BoundingBox.setRenderColor(Color.Red);
             }
