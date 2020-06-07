@@ -5,50 +5,132 @@ using TGC.Core.Input;
 using TGC.Core.Text;
 using Microsoft.DirectX.DirectInput;
 using TGC.Core.SceneLoader;
-using System.ComponentModel;
-using BulletSharp.Math;
 using TGC.Core.Mathematica;
 using System.Collections.Generic;
+using TGC.Core.Terrain;
+using System;
+using TGC.Group.Model._2D;
 
 namespace TGC.Group.Model
 {
+    class Boton
+    {
+        private HUDSprite menuItem;
+        private HUDSprite menuItemSelec;
+        public HUDTexto texto;
+
+        public Boton(CustomBitmap sprite, CustomBitmap spriteSelec, string texto, int indice, Drawer2D drawer)
+        {
+            CustomSprite menuSprite = new CustomSprite();
+            menuSprite.Bitmap = sprite;
+            CustomSprite menuSpriteSelec = new CustomSprite();
+            menuSpriteSelec.Bitmap = spriteSelec;
+
+            menuItem = new HUDSprite(HUD.AnclajeHorizontal.LEFT, HUD.AnclajeVertical.TOP, new TGCVector2(0.05f, 0.5f + (float)indice / 17), new TGCVector2(1, 1), drawer, menuSprite);
+            menuItemSelec = new HUDSprite(HUD.AnclajeHorizontal.LEFT, HUD.AnclajeVertical.TOP, new TGCVector2(0.05f, 0.5f + (float)indice / 17), new TGCVector2(1, 1), drawer, menuSpriteSelec);
+            menuItem.Init();
+            menuItemSelec.Init();
+
+            TgcText2D texto2D = new TgcText2D();
+            texto2D.Align = TgcText2D.TextAlign.CENTER;
+            texto2D.Size = new Size((int)(menuItem.Sprite.Scaling.X * 350), 20);
+            texto2D.changeFont(new Font("Calibri", D3DDevice.Instance.Width / 96f, FontStyle.Bold));
+            texto2D.Text = texto;
+
+            this.texto = new HUDTexto(HUD.AnclajeHorizontal.LEFT, HUD.AnclajeVertical.TOP, new TGCVector2(0.1f, 0.5175f + (float)indice / 17), drawer, texto2D);
+            this.texto.Init();
+        }
+
+        public void Render(bool seleccionado)
+        {
+            if (seleccionado)
+            {
+                menuItemSelec.Render();
+                texto.Texto2D.Color = Color.FromArgb(0, 101, 225);
+            }
+            else
+            {
+                menuItem.Render();
+                texto.Texto2D.Color = Color.White;
+            }
+            texto.Render();
+        }
+        public void Dispose()
+        {
+            menuItem.Dispose();
+            menuItemSelec.Dispose();
+            texto.Dispose();
+        }
+    }
     class EscenaMenu : Escena
     {
-        private TgcText2D texto;
+        enum Items
+        {
+            INICIAR,
+            CONTROLES,
+            CAMBIARVEHICULO,
+            SALIR
+        }
+
         private TgcMesh cancha;
-        private CustomSprite menuItem;
-        private CustomSprite menuItemSelec;
-        private string[] items = {"Iniciar juego", "< Cambiar vehículo >", "Salir"};
+        private TgcMesh paredes;
+        private TgcSkyBox skyBox;
+        private List<Boton> botones = new List<Boton>();
+        private int botonSeleccionado;
+
+        public int BotonSeleccionado
+        {
+            get => botonSeleccionado;
+            set => botonSeleccionado = Math.Max(0, Math.Min(botones.Count - 1, value));
+        }
 
         private List<Jugador> jugadores = new List<Jugador>();
         private int jugadorActivo = 0;
+
+        private int JugadorActivo
+        {
+            get => jugadorActivo;
+            set
+            {
+                if (value >= jugadores.Count) jugadorActivo = 0;
+                else if (value < 0) jugadorActivo = jugadores.Count - 1;
+                else jugadorActivo = value;
+            }
+        }
+
         public EscenaMenu(TgcCamera Camera, string MediaDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input) : base(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input)
         {
-            texto = new TgcText2D();
-            texto.Align = TgcText2D.TextAlign.CENTER;
-            texto.Position = new Point(0, D3DDevice.Instance.Height / 2);
-            texto.Color = Color.White;
-            texto.changeFont(new Font("Arial", 50, FontStyle.Bold));
-            texto.Text = "Espacio para empezar";
-
-
             TgcScene escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha-TgcScene.xml");
 
             cancha = escena.Meshes[0];
+            paredes = escena.getMeshByName("Box_5");
             Camera.SetCamera(new TGCVector3(20, 10, -20), new TGCVector3(0, 5, -7));
             initJugadores(escena);
-            menuItem = new CustomSprite();
-            menuItem.Bitmap = new CustomBitmap(MediaDir + "\\Textures\\HUD\\menuItem.png", D3DDevice.Instance.Device);
-            menuItem.Position = new TGCVector2(0, 500);
-            menuItemSelec = new CustomSprite();
-            menuItemSelec.Bitmap = new CustomBitmap(MediaDir + "\\Textures\\HUD\\menuItemSelec.png", D3DDevice.Instance.Device);
-            menuItemSelec.Position = new TGCVector2(0, 600);
-        }
 
+            CustomBitmap menuItem = new CustomBitmap(MediaDir + "\\Textures\\HUD\\menuItem.png", D3DDevice.Instance.Device);
+            CustomBitmap menuItemSelec = new CustomBitmap(MediaDir + "\\Textures\\HUD\\menuItemSelec.png", D3DDevice.Instance.Device);
+
+            botones.Add(new Boton(menuItem, menuItemSelec, "Iniciar", 0, drawer2D));
+            botones.Add(new Boton(menuItem, menuItemSelec, "Controles", 1, drawer2D));
+            botones.Add(new Boton(menuItem, menuItemSelec, "< Cambiar vehículo >", 2, drawer2D));
+            botones.Add(new Boton(menuItem, menuItemSelec, "Salir", 3, drawer2D));
+
+            skyBox = new TgcSkyBox();
+            skyBox.Center = new TGCVector3(0, 500, 0);
+            skyBox.Size = new TGCVector3(10000, 10000, 10000);
+            var texturesPath = MediaDir + "Textures\\SkyBox LostAtSeaDay\\";
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Up, texturesPath + "lostatseaday_up.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Down, texturesPath + "lostatseaday_dn.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Left, texturesPath + "lostatseaday_lf.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Right, texturesPath + "lostatseaday_rt.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Front, texturesPath + "lostatseaday_bk.jpg");
+            skyBox.setFaceTexture(TgcSkyBox.SkyFaces.Back, texturesPath + "lostatseaday_ft.jpg");
+            skyBox.Init();
+        }
 
         private void initJugadores(TgcScene escena)
         {
-            Jugador auto = new Jugador("Auto", escena.Meshes[2], new TGCVector3(0 , 5, 0), new TGCVector3(-.5f, 0, 0));
+            Jugador auto = new Jugador("Auto", escena.Meshes[2], new TGCVector3(0, 5, 0), new TGCVector3(-.5f, 0, 0));
             Jugador tractor = new Jugador("Tractor", escena.Meshes[5], new TGCVector3(0, 5, 0), new TGCVector3(-.5f, 0, 0));
             Jugador patrullero = new Jugador("Patrullero", escena.Meshes[3], new TGCVector3(0, 5, 0), new TGCVector3(-.5f, 0, 0));
             Jugador tanque = new Jugador("Tanque", escena.Meshes[4], new TGCVector3(0, 5, 0), new TGCVector3(-.5f, 0, 0));
@@ -60,43 +142,65 @@ namespace TGC.Group.Model
         }
         public override void Dispose()
         {
-            texto.Dispose();
+            botones.ForEach(boton => boton.Dispose());
         }
 
         public override void Render()
         {
-            texto.render();
+            skyBox.Render();
             cancha.Render();
-            drawer2D.BeginDrawSprite();
-            drawer2D.DrawSprite(menuItem);
-            drawer2D.DrawSprite(menuItemSelec);
-            menuItemSelec.Position = new TGCVector2(0, 700);
-            drawer2D.DrawSprite(menuItemSelec);
-            drawer2D.EndDrawSprite();
+            paredes.Render();
+
+            for (int i = 0; i < botones.Count; i++)
+                botones[i].Render(i == botonSeleccionado);
+
             jugadores[jugadorActivo].Render();
         }
 
+        private float tiempoMovido = 0; // Workaround por el evento de las teclas
         public override Escena Update(float ElapsedTime)
         {
-            if (Input.keyDown(Key.Space))
-            {
-                return CambiarEscena(new EscenaJuego(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input, jugadores, jugadores[jugadorActivo]));
-            }
-            if (Input.keyDown(Key.RightArrow))
-            {
-                siguienteJugador();
-            }
-            if (Input.keyDown(Key.T))
-            {
-                return CambiarEscena(new EscenaControles(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input));
-            }
-            return this;
-        }
+            if (Input.keyDown(Key.Return))
+                switch ((Items)botonSeleccionado)
+                {
+                    case Items.INICIAR:
+                        return CambiarEscena(new EscenaJuego(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input, jugadores, jugadores[jugadorActivo]));
+                    case Items.CONTROLES:
+                        return CambiarEscena(new EscenaControles(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input));
+                    case Items.SALIR:
+                        Form.GameForm.ActiveForm.Close();
+                        break;
+                }
 
-        private void siguienteJugador()
-        {
-            if (++jugadorActivo == jugadores.Count)
-                jugadorActivo = 0;
+            if(tiempoMovido <= 0)
+            {
+                if ((Items)botonSeleccionado == Items.CAMBIARVEHICULO)
+                {
+                    if (Input.keyDown(Key.RightArrow))
+                    {
+                        JugadorActivo++;
+                        tiempoMovido = 0.2f;
+                    }
+                    if (Input.keyDown(Key.LeftArrow))
+                    {
+                        JugadorActivo--;
+                        tiempoMovido = 0.2f;
+                    }
+                }
+                if (Input.keyDown(Key.UpArrow))
+                {
+                    BotonSeleccionado--;
+                    tiempoMovido = 0.2f;
+                }
+                if (Input.keyDown(Key.DownArrow))
+                {
+                    BotonSeleccionado++;
+                    tiempoMovido = 0.2f;
+                }
+            }
+            else
+                tiempoMovido -= ElapsedTime;
+            return this;
         }
     }
 }

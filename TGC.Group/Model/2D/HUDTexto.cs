@@ -9,6 +9,8 @@ namespace TGC.Group.Model._2D
         public string Texto { set { texto.Text = value; } }
         public Color Color { set { texto.Color = value; } }
 
+        public TgcText2D Texto2D { get => texto; }
+
         private TgcText2D texto;
 
         public HUDTexto(AnclajeHorizontal anclajeHorizontal, AnclajeVertical anclajeVertical, TGCVector2 desplazamiento, Drawer2D drawer2D, TgcText2D texto) : base(anclajeHorizontal, anclajeVertical, desplazamiento, new TGCVector2(), drawer2D)

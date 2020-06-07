@@ -6,6 +6,8 @@ namespace TGC.Group.Model._2D
     {
         private CustomSprite sprite;
 
+        public CustomSprite Sprite { get => sprite; }
+
         public HUDSprite(AnclajeHorizontal anclajeHorizontal, AnclajeVertical anclajeVertical, TGCVector2 desplazamiento, TGCVector2 escala, Drawer2D drawer2D, CustomSprite sprite) : base(anclajeHorizontal, anclajeVertical, desplazamiento, escala, drawer2D)
         {
             this.sprite = sprite;
