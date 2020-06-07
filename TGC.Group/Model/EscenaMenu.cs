@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using TGC.Core.Terrain;
 using System;
 using TGC.Group.Model._2D;
+using System.Linq;
 
 namespace TGC.Group.Model
 {
@@ -34,7 +35,7 @@ namespace TGC.Group.Model
             TgcText2D texto2D = new TgcText2D();
             texto2D.Align = TgcText2D.TextAlign.CENTER;
             texto2D.Size = new Size((int)(menuItem.Sprite.Scaling.X * 350), 20);
-            texto2D.changeFont(new Font("Calibri", D3DDevice.Instance.Width / 96f, FontStyle.Bold));
+            texto2D.changeFont(new Font("Calibri", D3DDevice.Instance.Width / 96f, FontStyle.Italic | FontStyle.Bold));
             texto2D.Text = texto;
 
             this.texto = new HUDTexto(HUD.AnclajeHorizontal.LEFT, HUD.AnclajeVertical.TOP, new TGCVector2(0.1f, 0.5175f + (float)indice / 17), drawer, texto2D);
@@ -60,6 +61,12 @@ namespace TGC.Group.Model
             menuItem.Dispose();
             menuItemSelec.Dispose();
             texto.Dispose();
+        }
+
+        public bool checkCollision(TGCVector2 posicion)
+        {
+            return posicion.X > menuItem.Sprite.Position.X && posicion.X < menuItem.Sprite.Position.X + menuItem.Sprite.Scaling.X * 512
+                && posicion.Y > menuItem.Sprite.Position.Y && posicion.Y < menuItem.Sprite.Position.Y + menuItem.Sprite.Scaling.Y * 50;
         }
     }
     class EscenaMenu : Escena
@@ -160,7 +167,12 @@ namespace TGC.Group.Model
         private float tiempoMovido = 0; // Workaround por el evento de las teclas
         public override Escena Update(float ElapsedTime)
         {
-            if (Input.keyDown(Key.Return))
+
+            Boton mouse = botones.FirstOrDefault(boton => boton.checkCollision(new TGCVector2(Input.Xpos, Input.Ypos)));
+            if (mouse != null)
+                botonSeleccionado = botones.IndexOf(mouse);
+
+            if (Input.keyDown(Key.Return) || (mouse != null && Input.buttonDown(TgcD3dInput.MouseButtons.BUTTON_LEFT)))
                 switch ((Items)botonSeleccionado)
                 {
                     case Items.INICIAR:
@@ -200,6 +212,7 @@ namespace TGC.Group.Model
             }
             else
                 tiempoMovido -= ElapsedTime;
+
             return this;
         }
     }
