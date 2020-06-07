@@ -38,7 +38,7 @@ namespace TGC.Group.Model
             mainMesh = scene2.Meshes[0];
             mainMesh.Position = posicionInicial;
             baseQuaternionTranslation = TGCMatrix.Translation(posicionInicial);
-            baseScaleRotation = TGCMatrix.Scaling(new TGCVector3(0.14f, 0.14f, 0.14f));
+            baseScaleRotation = TGCMatrix.Scaling(new TGCVector3(0.14f, 0.16f, 0.14f));
             mainMesh.Transform = TGCMatrix.Scaling(0.1f, 0.1f, 0.1f);
         }
 
