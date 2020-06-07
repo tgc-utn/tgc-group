@@ -19,6 +19,7 @@ namespace TGC.Group.Model
         private TieFighterSpawner tieFighterSpawner;
         private MenuPrincipal menuPrincipal;
         private InputDelJugador input;
+        private Barra barra;
         public GameModel(string mediaDir, string shadersDir) : base(mediaDir, shadersDir)
         {
             Category = Game.Default.Category;
@@ -45,17 +46,18 @@ namespace TGC.Group.Model
 
             escenarioLoader = new EscenarioLoader(MediaDir, naveDelJuego);
             tieFighterSpawner = new TieFighterSpawner(MediaDir, naveDelJuego);
-
+            /*
             Obstaculo obstaculo = new Obstaculo(MediaDir, naveDelJuego, new TGCVector3(100, -15, 720));
             GameManager.Instance.AgregarRenderizable(obstaculo);
 
             Skybox skybox = new Skybox(MediaDir, camaraDelJuego);
             GameManager.Instance.AgregarRenderizable(skybox);
-            
+            */
             
             //Cursor.Hide();
 
             menuPrincipal = new MenuPrincipal(MediaDir,input);
+            barra = new Barra(MediaDir);
         }
 
         public override void Update()
@@ -74,6 +76,7 @@ namespace TGC.Group.Model
         {
             PreRender();
             GameManager.Instance.Render();
+            barra.DibujarBarra();
             menuPrincipal.DibujarMenu();
             //Siempre los sprites se dibujan luego de todos los Render
             PostRender();

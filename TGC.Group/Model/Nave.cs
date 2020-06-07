@@ -351,7 +351,7 @@ namespace TGC.Group.Model
         {
             if (!estaRolleando)
             {
-                PerderVida(1);
+                PerderVida(10);
             }
         }
 

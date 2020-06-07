@@ -12,18 +12,20 @@ namespace TGC.Group.Model
 {
     class HUD
     {
+        float valorAgregadoPorBarra = 1.8f;
         public void Render(int cantidadVida, int cantidadNitro)
         {
+            
             int coeficienteDeLongitudDeBarras = D3DDevice.Instance.Width / 800;
-            int posicionXBaseDeBarras = Convert.ToInt32(D3DDevice.Instance.Width * 0.01f);
+            int posicionXBaseDeBarras = Convert.ToInt32(D3DDevice.Instance.Width * 0.02f);//original 0.01f
 
-            float longitudVida = cantidadVida * coeficienteDeLongitudDeBarras;
-            int posicionYBarraVida = Convert.ToInt32(D3DDevice.Instance.Height/(1.25f));
+            float longitudVida = cantidadVida * coeficienteDeLongitudDeBarras * valorAgregadoPorBarra;
+            int posicionYBarraVida = Convert.ToInt32(D3DDevice.Instance.Height/(1.35f));
             TGCVector2 posicionBaseVida = new TGCVector2(posicionXBaseDeBarras, posicionYBarraVida);
             TGCVector2 posicionFinalVida = new TGCVector2(posicionXBaseDeBarras + longitudVida, posicionYBarraVida);
 
-            float longitudNitro = cantidadNitro * coeficienteDeLongitudDeBarras;
-            int posicionYBarraNitro = Convert.ToInt32(D3DDevice.Instance.Height / (1.20f));
+            float longitudNitro = cantidadNitro * coeficienteDeLongitudDeBarras * valorAgregadoPorBarra;
+            int posicionYBarraNitro = Convert.ToInt32(D3DDevice.Instance.Height / (1.25f));
             TGCVector2 posicionBaseNitro = new TGCVector2(posicionXBaseDeBarras, posicionYBarraNitro);
             TGCVector2 posicionFinalNitro = new TGCVector2(posicionXBaseDeBarras + longitudNitro, posicionYBarraNitro);
 
