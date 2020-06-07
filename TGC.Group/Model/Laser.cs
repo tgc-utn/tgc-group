@@ -21,6 +21,7 @@ namespace TGC.Group.Model
         protected TGCMatrix baseQuaternionTranslation;
         protected TgcMesh mainMesh;
         private DateTime tiempoDeSpawn;
+        internal Boolean ImpactoAUnDestruible;
 
         public Laser(string direccionDeScene, TGCVector3 posicionInicial,TGCVector3 direccion)
         {
@@ -29,6 +30,7 @@ namespace TGC.Group.Model
             this.direccion = direccion;
             this.velocidad = 1;
             this.tiempoDeSpawn = DateTime.Now;
+            this.ImpactoAUnDestruible = false;
         }
 
         public void Init()
@@ -69,6 +71,10 @@ namespace TGC.Group.Model
         {
             return GameManager.Instance.GetObstaculosMapa().Any(parteMapa => TgcCollisionUtils.testAABBAABB(parteMapa.GetBoundingBox(), this.GetMainMesh().BoundingBox));
         }
+        public Boolean ColisionaConAlgunDestruible()
+        {
+            return GameManager.Instance.GetDestruibles().Any(destruible => TgcCollisionUtils.testAABBAABB(destruible.GetBoundingBox(), this.GetMainMesh().BoundingBox));
+        }
 
         public void Render()
         {
@@ -97,6 +103,10 @@ namespace TGC.Group.Model
         public Boolean SuperoTiempoDeVida(float tiempoLimite)
         {
             return (DateTime.Now - tiempoDeSpawn).TotalSeconds > tiempoLimite;
+        }
+        public void ImpactoUnDestruible()
+        {
+            this.ImpactoAUnDestruible = true;
         }
     }
 }

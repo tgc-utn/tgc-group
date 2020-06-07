@@ -31,6 +31,7 @@ namespace TGC.Group.Model
         private void Destruirse()
         {
             GameManager.Instance.QuitarRenderizable(this);
+            GameManager.Instance.LaserQueColisiona(GetBoundingBox()).ImpactoUnDestruible();
         }
 
         private Boolean LePegaUnLaser()

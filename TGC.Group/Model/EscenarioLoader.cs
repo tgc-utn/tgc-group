@@ -45,7 +45,9 @@ namespace TGC.Group.Model
             bloques = new List<BloqueBuilder>();
             List<TGCVector3> positions = new List<TGCVector3>();
             positions.Add(new TGCVector3(100, -35, 200));
-            positions.Add(new TGCVector3(80, -35, 1000));
+            positions.Add(new TGCVector3(100, -35, 300));
+            positions.Add(new TGCVector3(120, -35, 350));
+            positions.Add(new TGCVector3(90, -35, 1000));
             List<TGCVector3> positions2 = new List<TGCVector3>();
             positions2.Add(new TGCVector3(100, 0, 300));
 

@@ -137,9 +137,9 @@ namespace TGC.Group.Model
                 textoGameOver.render();
             }
             new TgcText2D().drawText("Pausa activa:\n" +GameManager.Instance.Pause.ToString(), 5, 60, Color.White);
+            new TgcText2D().drawText("Posicion de la nave:\n" + posicion.ToString(), 5, 160, Color.White);
 
             /*
-            new TgcText2D().drawText("Posicion de la nave:\n" + posicion.ToString(), 5, 60, Color.White);
             new TgcText2D().drawText("Velocidad de la nave:\n" + velocidadActual.ToString(), 5, 20, Color.White);
             new TgcText2D().drawText("Rotacion de la nave:\n" + rotacionActual.ToString(), 5, 130, Color.White);
             */
@@ -339,7 +339,7 @@ namespace TGC.Group.Model
 
         public void Morir()
         {
-            estaVivo = false;
+            //estaVivo = false;
         }
 
         public void Chocar()

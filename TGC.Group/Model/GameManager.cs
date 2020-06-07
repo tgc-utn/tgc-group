@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using TGC.Core.BoundingVolumes;
@@ -51,6 +52,12 @@ namespace TGC.Group.Model
         {
             return Renderizables.OfType<Laser>().Any(laser => TgcCollisionUtils.testAABBAABB(laser.GetMainMesh().BoundingBox, unBoundingBox));
         }
+        public Laser LaserQueColisiona(TgcBoundingAxisAlignBox unBoundingBox)
+        {
+            var lista = new List<Laser>(Renderizables.OfType<Laser>().Where(laser => TgcCollisionUtils.testAABBAABB(laser.GetMainMesh().BoundingBox, unBoundingBox)));
+            
+            return lista[0];
+        }
         public void PausarJuego()
         {
             this.Pause = true;
@@ -72,6 +79,10 @@ namespace TGC.Group.Model
         public List<ObstaculoMapa> GetObstaculosMapa()
         {
             return new List<ObstaculoMapa>(Renderizables.OfType<ObstaculoMapa>());
+        }
+        public List<Destruible> GetDestruibles()
+        {
+            return new List<Destruible>(Renderizables.OfType<Destruible>());
         }
 
         #region Singleton
