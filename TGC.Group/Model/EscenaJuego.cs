@@ -10,6 +10,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Terrain;
 using TGC.Core.Text;
+using TGC.Group.Model._2D;
 
 namespace TGC.Group.Model
 {
@@ -42,7 +43,6 @@ namespace TGC.Group.Model
         private RigidBody floorBody;
 
         // 2D
-        private Drawer2D drawer2D;
         private CustomSprite medidorTurbo;
         private CustomSprite equipoRojo;
         private CustomSprite equipoAzul;
@@ -51,6 +51,9 @@ namespace TGC.Group.Model
         private TgcText2D textoGolAzul;
         private TgcText2D textoGolRojo;
         private TgcText2D textoConTiempo;
+
+        private HUD turboHUD;
+        private HUD textoTurboHud;
 
         public EscenaJuego(TgcCamera Camera, string MediaDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input, List<Jugador> jugadores, Jugador jugadorActivo) : base(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input)
         {
@@ -81,7 +84,6 @@ namespace TGC.Group.Model
             camara = new CamaraJugador(jugadorActivo, pelota, Camera, paredes.Mesh.createBoundingBox());
 
 
-            drawer2D = new Drawer2D();
             medidorTurbo = new CustomSprite();
             equipoRojo = new CustomSprite();
             equipoAzul = new CustomSprite();
@@ -91,11 +93,15 @@ namespace TGC.Group.Model
             equipoRojo.Bitmap = new CustomBitmap(MediaDir + "\\Textures\\EquipoRojo.png", D3DDevice.Instance.Device);
             equipoAzul.Bitmap = new CustomBitmap(MediaDir + "\\Textures\\EquipoAzul.png", D3DDevice.Instance.Device);
             contadorTiempo.Bitmap = new CustomBitmap(MediaDir + "\\Textures\\ContadorTiempo.png", D3DDevice.Instance.Device);
-
+            
             medidorTurbo.Scaling = new TGCVector2(.25f * D3DDevice.Instance.Height / medidorTurbo.Bitmap.Height,
                 .25f * D3DDevice.Instance.Height / medidorTurbo.Bitmap.Height);
             medidorTurbo.Position = new TGCVector2(D3DDevice.Instance.Width - medidorTurbo.Scaling.X * medidorTurbo.Bitmap.Height - .05f * D3DDevice.Instance.Width,
                 D3DDevice.Instance.Height - medidorTurbo.Scaling.X * medidorTurbo.Bitmap.Height - .05f * D3DDevice.Instance.Height);
+                
+
+            turboHUD = new HUDSprite(HUD.AnclajeHorizontal.RIGHT, HUD.AnclajeVertical.BOTTOM, new TGCVector2(.05f, .05f), new TGCVector2(1, 1), drawer2D, medidorTurbo);
+            turboHUD.Init();
 
             equipoRojo.Scaling = new TGCVector2(.06f * D3DDevice.Instance.Height / equipoRojo.Bitmap.Height,
                 .1f * D3DDevice.Instance.Height / equipoRojo.Bitmap.Height);
@@ -117,10 +123,15 @@ namespace TGC.Group.Model
 
             textoTurbo = new TgcText2D();
             textoTurbo.Align = TgcText2D.TextAlign.CENTER;
-            textoTurbo.Size = new Size((int)(250 * medidorTurbo.Scaling.X), (int)(250 * medidorTurbo.Scaling.X));
-            textoTurbo.Position = new Point((int)medidorTurbo.Position.X, (int)medidorTurbo.Position.Y + (int)(90 * medidorTurbo.Scaling.X));
+            textoTurbo.Size = new Size((int)(250 * medidorTurbo.Scaling.X), 50);
+            //textoTurbo.Position = new Point((int)medidorTurbo.Position.X, (int)medidorTurbo.Position.Y + (int)(90 * medidorTurbo.Scaling.X));
             textoTurbo.Color = Color.White;
             textoTurbo.changeFont(new Font("TimesNewRoman", 50, FontStyle.Bold));
+            textoTurboHud = new HUDTexto(HUD.AnclajeHorizontal.RIGHT, HUD.AnclajeVertical.BOTTOM, new TGCVector2(.05f, 170f/1080), new TGCVector2(1, 1), drawer2D, textoTurbo);
+            textoTurboHud.Init(); 
+
+
+
 
             textoGolAzul = new TgcText2D();
             textoGolAzul.Align = TgcText2D.TextAlign.CENTER;
@@ -315,17 +326,19 @@ namespace TGC.Group.Model
             paredes.Render();
 
             drawer2D.BeginDrawSprite();
-            drawer2D.DrawSprite(medidorTurbo);
+            //drawer2D.DrawSprite(medidorTurbo);
             drawer2D.DrawSprite(equipoRojo);
             drawer2D.DrawSprite(equipoAzul);
             drawer2D.DrawSprite(contadorTiempo);
             drawer2D.EndDrawSprite();
 
+            turboHUD.Render();
+            textoTurboHud.Render();
 
             textoGolAzul.render();
             textoGolRojo.render();
             textoConTiempo.render();
-            textoTurbo.render();
+            //textoTurbo.render();
         }
         public override void Dispose()
         {

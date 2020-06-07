@@ -43,6 +43,7 @@ namespace TGC.Group.Model
 
         private void UpdateTransformationMatrix()
         {
+
             TransformationMatrix = TGCMatrix.Transformation2D(scalingCenter, 0, scaling, rotationCenter, rotation, position);
         }
 

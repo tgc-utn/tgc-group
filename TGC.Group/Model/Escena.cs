@@ -10,9 +10,11 @@ namespace TGC.Group.Model
         protected TgcCamera Camera;
         protected String MediaDir;
         protected TgcText2D DrawText;
+        protected Drawer2D drawer2D;
 
         protected float TimeBetweenUpdates;
         protected TgcD3dInput Input;
+
 
         public Escena(TgcCamera Camera, String MediaDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input)
         {
@@ -21,6 +23,7 @@ namespace TGC.Group.Model
             this.DrawText = DrawText;
             this.TimeBetweenUpdates = TimeBetweenUpdates;
             this.Input = Input;
+            drawer2D = new Drawer2D();
         }
 
         public abstract Escena Update(float ElapsedTime);

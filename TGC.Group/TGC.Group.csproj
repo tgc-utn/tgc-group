@@ -106,6 +106,8 @@
     <Compile Include="Model\2D\CustomSprite.cs" />
     <Compile Include="Model\2D\Drawer2D.cs" />
     <Compile Include="Model\2D\HUD.cs" />
+    <Compile Include="Model\2D\HUDSprite.cs" />
+    <Compile Include="Model\2D\HUDTexto.cs" />
     <Compile Include="Model\Arco.cs" />
     <Compile Include="Model\CamaraJugador.cs" />
     <Compile Include="Model\Escena.cs" />

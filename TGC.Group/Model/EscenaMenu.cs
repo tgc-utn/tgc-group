@@ -16,6 +16,9 @@ namespace TGC.Group.Model
     {
         private TgcText2D texto;
         private TgcMesh cancha;
+        private CustomSprite menuItem;
+        private CustomSprite menuItemSelec;
+        private string[] items = {"Iniciar juego", "< Cambiar vehículo >", "Salir"};
 
         private List<Jugador> jugadores = new List<Jugador>();
         private int jugadorActivo = 0;
@@ -25,16 +28,21 @@ namespace TGC.Group.Model
             texto.Align = TgcText2D.TextAlign.CENTER;
             texto.Position = new Point(0, D3DDevice.Instance.Height / 2);
             texto.Color = Color.White;
-            texto.changeFont(new Font("TimesNewRoman", 50, FontStyle.Bold));
+            texto.changeFont(new Font("Arial", 50, FontStyle.Bold));
             texto.Text = "Espacio para empezar";
-
 
 
             TgcScene escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha-TgcScene.xml");
 
             cancha = escena.Meshes[0];
-            Camera.SetCamera(new TGCVector3(20, 10, -20), new TGCVector3(0, 5,-10));
+            Camera.SetCamera(new TGCVector3(20, 10, -20), new TGCVector3(0, 5, -7));
             initJugadores(escena);
+            menuItem = new CustomSprite();
+            menuItem.Bitmap = new CustomBitmap(MediaDir + "\\Textures\\HUD\\menuItem.png", D3DDevice.Instance.Device);
+            menuItem.Position = new TGCVector2(0, 500);
+            menuItemSelec = new CustomSprite();
+            menuItemSelec.Bitmap = new CustomBitmap(MediaDir + "\\Textures\\HUD\\menuItemSelec.png", D3DDevice.Instance.Device);
+            menuItemSelec.Position = new TGCVector2(0, 600);
         }
 
 
@@ -59,6 +67,12 @@ namespace TGC.Group.Model
         {
             texto.render();
             cancha.Render();
+            drawer2D.BeginDrawSprite();
+            drawer2D.DrawSprite(menuItem);
+            drawer2D.DrawSprite(menuItemSelec);
+            menuItemSelec.Position = new TGCVector2(0, 700);
+            drawer2D.DrawSprite(menuItemSelec);
+            drawer2D.EndDrawSprite();
             jugadores[jugadorActivo].Render();
         }
 

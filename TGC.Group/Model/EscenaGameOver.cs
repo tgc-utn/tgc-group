@@ -8,12 +8,10 @@ namespace TGC.Group.Model
 {
     class EscenaGameOver : Escena
     {
-        Drawer2D drawer;
         CustomSprite gameOver;
 
         public EscenaGameOver(TgcCamera Camera, string MediaDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input) : base(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input)
         {
-            drawer = new Drawer2D();
             gameOver = new CustomSprite();
             gameOver.Bitmap = new CustomBitmap(MediaDir + "Textures\\GameOver.png", D3DDevice.Instance.Device);
 
@@ -27,9 +25,9 @@ namespace TGC.Group.Model
 
         public override void Render()
         {
-            drawer.BeginDrawSprite();
-            drawer.DrawSprite(gameOver);
-            drawer.EndDrawSprite();
+            drawer2D.BeginDrawSprite();
+            drawer2D.DrawSprite(gameOver);
+            drawer2D.EndDrawSprite();
         }
 
         public override Escena Update(float ElapsedTime)
