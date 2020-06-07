@@ -111,6 +111,7 @@
     <Compile Include="Model\Arco.cs" />
     <Compile Include="Model\CamaraJugador.cs" />
     <Compile Include="Model\Escena.cs" />
+    <Compile Include="Model\EscenaControles.cs" />
     <Compile Include="Model\EscenaGameOver.cs" />
     <Compile Include="Model\EscenaJuego.cs" />
     <Compile Include="Model\EscenaMenu.cs" />

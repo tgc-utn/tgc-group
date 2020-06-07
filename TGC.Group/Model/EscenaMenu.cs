@@ -86,6 +86,10 @@ namespace TGC.Group.Model
             {
                 siguienteJugador();
             }
+            if (Input.keyDown(Key.T))
+            {
+                return CambiarEscena(new EscenaControles(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input));
+            }
             return this;
         }
 
