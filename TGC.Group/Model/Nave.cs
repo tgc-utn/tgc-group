@@ -29,6 +29,7 @@ namespace TGC.Group.Model
         private float segundosDesdeUltimoRoll;
         private float segundosDesdeUltimoDisparo;
         private int cantidadVida;
+        private HUD hud;
 
         public Nave(string mediaDir, TGCVector3 posicionInicial, InputDelJugador input)
         {
@@ -47,6 +48,7 @@ namespace TGC.Group.Model
             this.segundosDesdeUltimoRoll = 100;
             this.segundosDesdeUltimoDisparo = 100;
             this.cantidadVida = 100;
+            this.hud = new HUD(mediaDir);
         }
 
 
@@ -144,7 +146,7 @@ namespace TGC.Group.Model
             new TgcText2D().drawText("Rotacion de la nave:\n" + rotacionActual.ToString(), 5, 130, Color.White);
             */
             //new TgcText2D().drawText(textoControles, 5, 10, Color.White);
-            new HUD().Render(cantidadVida, CantidadCombustibleParaRollear());
+            hud.Render(cantidadVida, CantidadCombustibleParaRollear());
 
         }
 
