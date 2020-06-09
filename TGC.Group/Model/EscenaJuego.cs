@@ -5,11 +5,13 @@ using System.Collections.Generic;
 using System.Drawing;
 using TGC.Core.Camara;
 using TGC.Core.Direct3D;
+using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Terrain;
 using TGC.Core.Text;
+using TGC.Core.Textures;
 using TGC.Group.Model._2D;
 
 namespace TGC.Group.Model
@@ -56,7 +58,7 @@ namespace TGC.Group.Model
             initJugadores();
 
 
-            pelota = new Pelota(escena.getMeshByName("Pelota"), new TGCVector3(0f, 50f, -100f));
+            pelota = new Pelota(escena.getMeshByName("Pelota"), new TGCVector3(0f, 50f, 0f));
             dynamicsWorld.AddRigidBody(pelota.Cuerpo);
 
             paredes = new Paredes(escena.getMeshByName("Box_5"));
@@ -97,6 +99,7 @@ namespace TGC.Group.Model
             RigidBodyConstructionInfo floorInfo = new RigidBodyConstructionInfo(0, floorMotionState, floorShape);
 
             floorBody = new RigidBody(floorInfo);
+            floorBody.Restitution = 1.25f;
             dynamicsWorld.AddRigidBody(floorBody);
         }
 
@@ -125,20 +128,20 @@ namespace TGC.Group.Model
 
             turbos = new List<Turbo>()
             {
-                new Turbo(meshTurbo, new TGCVector3(80, 0, 100)),
-                new Turbo(meshTurbo, new TGCVector3(-80, 0, -100)),
-                new Turbo(meshTurbo, new TGCVector3(80, 0, -100)),
-                new Turbo(meshTurbo, new TGCVector3(-80, 0, 100)),
-                new Turbo(meshTurbo, new TGCVector3(0, 0, 130)),
-                new Turbo(meshTurbo, new TGCVector3(0, 0, -130)),
-                new Turbo(meshTurbo, new TGCVector3(0, 0, 250)),
-                new Turbo(meshTurbo, new TGCVector3(0, 0, -250)),
-                new Turbo(meshTurbo, new TGCVector3(220, 0, 0), 100),
-                new Turbo(meshTurbo, new TGCVector3(-220, 0, 0), 100),
-                new Turbo(meshTurbo, new TGCVector3(220, 0, 300), 100),
-                new Turbo(meshTurbo, new TGCVector3(-220, 0, -300), 100),
-                new Turbo(meshTurbo, new TGCVector3(-220, 0, 300), 100),
-                new Turbo(meshTurbo, new TGCVector3(220, 0, -300), 100)
+                new Turbo(meshTurbo, new TGCVector3(80, -.2f, 100)),
+                new Turbo(meshTurbo, new TGCVector3(-80, -.2f, -100)),
+                new Turbo(meshTurbo, new TGCVector3(80, -.2f, -100)),
+                new Turbo(meshTurbo, new TGCVector3(-80, -.2f, 100)),
+                new Turbo(meshTurbo, new TGCVector3(0, -.2f, 130)),
+                new Turbo(meshTurbo, new TGCVector3(0, -.2f, -130)),
+                new Turbo(meshTurbo, new TGCVector3(0, -.2f, 250)),
+                new Turbo(meshTurbo, new TGCVector3(0, -.2f, -250)),
+                new Turbo(meshTurbo, new TGCVector3(220, -.2f, 0), 100),
+                new Turbo(meshTurbo, new TGCVector3(-220, -.2f, 0), 100),
+                new Turbo(meshTurbo, new TGCVector3(220, -.2f, 300), 100),
+                new Turbo(meshTurbo, new TGCVector3(-220, -.2f, -300), 100),
+                new Turbo(meshTurbo, new TGCVector3(-220, -.2f, 300), 100),
+                new Turbo(meshTurbo, new TGCVector3(220, -.2f, -300), 100)
             };
 
         }
@@ -150,6 +153,13 @@ namespace TGC.Group.Model
             jugadores[2].Reubicar(new TGCVector3(0, 0, 30), new TGCVector3(0, 0, 0));
             jugadores[3].Reubicar(new TGCVector3(20, 0, -100), new TGCVector3(FastMath.PI, 0, 0));
             jugadores.ForEach(jugador => dynamicsWorld.AddRigidBody(jugador.Cuerpo));
+        }
+
+        private void Reubicar()
+        {
+            pelota.ReiniciarPelota();
+            jugadores.ForEach(jugador => jugador.ReiniciarJugador());
+            turbos.ForEach(turbo => turbo.Reiniciar());
         }
 
         public override Escena Update(float ElapsedTime)
@@ -186,15 +196,13 @@ namespace TGC.Group.Model
             if (pelota.CheckCollideWith(arcos[0]))
             {
                 golequipo1++;
-                pelota.ReiniciarPelota();
-                jugadores.ForEach(jugador => jugador.ReiniciarJugador());
+                Reubicar();
             }
 
             if (pelota.CheckCollideWith(arcos[1]))
             {
                 golequipo2++;
-                pelota.ReiniciarPelota();
-                jugadores.ForEach(jugador => jugador.ReiniciarJugador());
+                Reubicar();
             }
 
 
@@ -217,11 +225,8 @@ namespace TGC.Group.Model
 
         public override void Render()
         {
-            DrawText.drawText("Turbo: " + jugadorActivo.Turbo, 1800, 20, Color.Red);
-
             skyBox.Render();
 
-            pelota.Mesh.Technique = "DIFFUSE_MAP_AND_LIGHTMAP";
             pelota.Render();
 
             cancha.Transform = new TGCMatrix(floorBody.InterpolationWorldTransform);

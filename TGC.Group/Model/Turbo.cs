@@ -19,20 +19,18 @@ namespace TGC.Group.Model
             cuerpo.CollisionFlags = BulletSharp.CollisionFlags.NoContactResponse | BulletSharp.CollisionFlags.StaticObject;
         }
 
+        public void Reiniciar()
+        {
+            time = 0;
+            Activo = true;
+        }
+
         public override void Update(float ElapsedTime)
         {
-            // TODO: Si esta inactivo, cuando pase TIEMPO_INACTIVO se debe volver a activar
             if (Activo) // Si no esta activo, no actualizamos.
                 base.Update(ElapsedTime);
-            else
-            {
-                time += ElapsedTime;
-                if(time >= TIEMPO_INACTIVO)
-                {
-                    time = 0;
-                    Activo = true;
-                }
-            }
+            else if((time += ElapsedTime) >= TIEMPO_INACTIVO)
+                    Reiniciar();
         }
 
         public override void Render()

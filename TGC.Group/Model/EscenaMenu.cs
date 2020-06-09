@@ -167,9 +167,8 @@ namespace TGC.Group.Model
         private float tiempoMovido = 0; // Workaround por el evento de las teclas
         public override Escena Update(float ElapsedTime)
         {
-
             Boton mouse = botones.FirstOrDefault(boton => boton.checkCollision(new TGCVector2(Input.Xpos, Input.Ypos)));
-            if (mouse != null)
+            if (Input.XposRelative != 0 && Input.YposRelative != 0)
                 botonSeleccionado = botones.IndexOf(mouse);
 
             if (Input.keyDown(Key.Return) || (mouse != null && Input.buttonDown(TgcD3dInput.MouseButtons.BUTTON_LEFT)))
@@ -188,7 +187,7 @@ namespace TGC.Group.Model
             {
                 if ((Items)botonSeleccionado == Items.CAMBIARVEHICULO)
                 {
-                    if (Input.keyDown(Key.RightArrow))
+                    if (Input.keyDown(Key.RightArrow) || Input.buttonDown(TgcD3dInput.MouseButtons.BUTTON_LEFT))
                     {
                         JugadorActivo++;
                         tiempoMovido = 0.2f;

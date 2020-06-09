@@ -1,7 +1,11 @@
-﻿using BulletSharp.Math;
+﻿using BulletSharp;
+using BulletSharp.Math;
+using System.Runtime.Remoting.Messaging;
 using TGC.Core.BulletPhysics;
+using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Core.Textures;
 
 namespace TGC.Group.Model
 {
@@ -14,7 +18,10 @@ namespace TGC.Group.Model
         {
             scaleFactor = 0.5f;
 
-			cuerpo = BulletRigidBodyFactory.Instance.CreateBall(17f * scaleFactor, 1f, new TGCVector3(translation));
+            cuerpo = BulletRigidBodyFactory.Instance.CreateBall(17f * scaleFactor, .01f, new TGCVector3(translation));
+            cuerpo.RollingFriction = 1f;
+            cuerpo.Friction = 10f;
+            cuerpo.Restitution = .5f;
         }
 
         public override void Render()

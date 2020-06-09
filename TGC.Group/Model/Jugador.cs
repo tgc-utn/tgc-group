@@ -1,6 +1,8 @@
 ﻿using BulletSharp.Math;
 using Microsoft.DirectX.DirectInput;
 using System;
+using System.CodeDom;
+using System.Security.Cryptography;
 using TGC.Core.BulletPhysics;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
@@ -15,8 +17,13 @@ namespace TGC.Group.Model
         private Key inputAvanzar;
         private TGCVector3 posicionInicial;
         private TGCVector3 rotacionInicial;
+        private const float VELOCIDAD_LINEAL_MAX = 100;
+        private const float VELOCIDAD_ANGULAR_MAX = 5;
 
-        private Boolean EnElAire => translation.Y > 3; // TODO: Capaz se puede mejorar
+        private Boolean EnElAire => translation.Y - (AABB.calculateSize().Y / 2f) > .1f;
+
+        public Vector3 Frente => Vector3.Transform(new Vector3(0, 0, -1), rotation); // Vector que apunta siempre al frente del auto
+        public Vector3 Normal => Vector3.Transform(new Vector3(0, 1, 0), rotation); // Vector que apunta siempre al techo del auto
 
         private int turbo = 100;
         public int Turbo
@@ -44,6 +51,7 @@ namespace TGC.Group.Model
             cuerpo.WorldTransform = TGCMatrix.RotationYawPitchRoll(rotacionInicial.X, rotacionInicial.Y, rotacionInicial.Z).ToBulletMatrix() * TGCMatrix.Translation(posicionInicial).ToBulletMatrix();
             cuerpo.LinearVelocity = Vector3.Zero;
             cuerpo.AngularVelocity = Vector3.Zero;
+            turbo = 100;
         }
 
         public void Reubicar(TGCVector3 translation, TGCVector3 rotation)
@@ -55,30 +63,33 @@ namespace TGC.Group.Model
 
         private void HandleInputSuelo(TgcD3dInput input)
         {
-            cuerpo.AngularVelocity = Vector3.Zero;
-            Vector3 frente = Vector3.Transform(new Vector3(0, 0, -1), rotation); // Vector que apunta siempre al frente del auto
+            cuerpo.AngularVelocity = new Vector3(cuerpo.AngularVelocity.X, 0, cuerpo.AngularVelocity.Z);
             Vector3 velocidadLineal = cuerpo.LinearVelocity;
-            cuerpo.LinearVelocity = (velocidadLineal.Dot(frente) / frente.LengthSquared) * frente;
+            Vector3 nuevaVel = velocidadLineal;
+            nuevaVel.Y = 0;
+            nuevaVel = (nuevaVel.Dot(Frente) / Frente.LengthSquared) * Frente;
+            nuevaVel.Y = velocidadLineal.Y;
+            cuerpo.LinearVelocity = nuevaVel;
             if (input.keyDown(inputAvanzar))
             {
-                cuerpo.ApplyCentralForce(frente * 50);
+                cuerpo.ApplyCentralForce(Frente * 50);
             }
             if (input.keyDown(Key.DownArrow))
             {
-                cuerpo.ApplyCentralForce(frente * -50);
+                cuerpo.ApplyCentralForce(Frente * -50);
             }
             if (velocidadLineal.Length > 1)
             {
-                Vector3 rotacion = Vector3.Transform(new Vector3(1, 0, 0), rotation) * Math.Min(5000f / (velocidadLineal.Length * .2f), 1000f);
+                Vector3 rotacion = Vector3.Transform(new Vector3(1, 0, 0), rotation) * Math.Min(5000f / (velocidadLineal.Length * .2f), 1000f) * Math.Sign(velocidadLineal.Dot(Frente));
                 if (input.keyDown(Key.RightArrow))
                 {
-                    cuerpo.ApplyForce(rotacion, frente * -5);
-                    cuerpo.ApplyForce(-rotacion, frente * 5);
+                    cuerpo.ApplyForce(rotacion, Frente * -5);
+                    cuerpo.ApplyForce(-rotacion, Frente * 5);
                 }
                 if (input.keyDown(Key.LeftArrow))
                 {
-                    cuerpo.ApplyForce(rotacion, frente * 5);
-                    cuerpo.ApplyForce(-rotacion, frente * -5);
+                    cuerpo.ApplyForce(rotacion, Frente * 5);
+                    cuerpo.ApplyForce(-rotacion, Frente * -5);
                 }
             }
             if (input.keyDown(Key.Space))
@@ -125,11 +136,16 @@ namespace TGC.Group.Model
 
         public void HandleInput(TgcD3dInput input)
         {
-            if (EnElAire)
+            if (EnElAire || Math.Abs(Frente.Y) > .2f || Normal.Dot(Vector3.UnitY) < 0.9f)
                 HandleInputAire(input);
             else
                 HandleInputSuelo(input);
             HandleInputTurbo(input);
+
+            if (cuerpo.AngularVelocity.Length > VELOCIDAD_ANGULAR_MAX)
+                cuerpo.AngularVelocity = VELOCIDAD_ANGULAR_MAX * cuerpo.AngularVelocity / cuerpo.AngularVelocity.Length;
+            if (cuerpo.LinearVelocity.Length > VELOCIDAD_LINEAL_MAX)
+                cuerpo.LinearVelocity = VELOCIDAD_LINEAL_MAX * cuerpo.LinearVelocity / cuerpo.LinearVelocity.Length;
         }
 
         public void RecogerTurbo(Turbo turbo)
