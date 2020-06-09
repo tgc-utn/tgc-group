@@ -1,3 +1,4 @@
+using System.Drawing;
 using TGC.Core.Direct3D;
 using TGC.Core.Example;
 
@@ -33,7 +34,7 @@ namespace TGC.Group.Model
             FixedTickEnable = true;
 
             //escenaActiva = new EscenaJuego(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input);
-            escenaActiva = new EscenaMenu(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input);              
+            escenaActiva = new EscenaMenu(Camera, MediaDir, ShadersDir, DrawText, TimeBetweenUpdates, Input);              
         }
 
         /// <summary>
@@ -58,6 +59,8 @@ namespace TGC.Group.Model
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
             PreRender();
             escenaActiva.Render();
+            DrawText.drawText("FPS: " + 1 / ElapsedTime, 0, 80, Color.Red);
+            DrawText.drawText("Frametime " + ElapsedTime, 0, 90, Color.Red);
 
             //Finaliza el render y presenta en pantalla, al igual que el preRender se debe para casos puntuales es mejor utilizar a mano las operaciones de EndScene y PresentScene
             PostRender();

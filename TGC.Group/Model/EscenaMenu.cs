@@ -11,6 +11,7 @@ using TGC.Core.Terrain;
 using System;
 using TGC.Group.Model._2D;
 using System.Linq;
+using TGC.Core.Shaders;
 
 namespace TGC.Group.Model
 {
@@ -79,7 +80,7 @@ namespace TGC.Group.Model
             SALIR
         }
 
-        private TgcMesh cancha;
+        private Pasto pasto;
         private TgcMesh paredes;
         private TgcSkyBox skyBox;
         private List<Boton> botones = new List<Boton>();
@@ -105,11 +106,11 @@ namespace TGC.Group.Model
             }
         }
 
-        public EscenaMenu(TgcCamera Camera, string MediaDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input) : base(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input)
+        public EscenaMenu(TgcCamera Camera, string MediaDir, string ShadersDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input) : base(Camera, MediaDir, ShadersDir, DrawText, TimeBetweenUpdates, Input)
         {
             TgcScene escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha-TgcScene.xml");
 
-            cancha = escena.Meshes[0];
+            pasto = new Pasto(escena.Meshes[0], TGCShaders.Instance.LoadEffect(ShadersDir + "CustomShaders.fx"), 32, .5f);
             paredes = escena.getMeshByName("Box_5");
             Camera.SetCamera(new TGCVector3(20, 10, -20), new TGCVector3(0, 5, -7));
             initJugadores(escena);
@@ -155,7 +156,7 @@ namespace TGC.Group.Model
         public override void Render()
         {
             skyBox.Render();
-            cancha.Render();
+            pasto.Render();
             paredes.Render();
 
             for (int i = 0; i < botones.Count; i++)
@@ -175,9 +176,9 @@ namespace TGC.Group.Model
                 switch ((Items)botonSeleccionado)
                 {
                     case Items.INICIAR:
-                        return CambiarEscena(new EscenaJuego(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input, jugadores, jugadores[jugadorActivo]));
+                        return CambiarEscena(new EscenaJuego(Camera, MediaDir, ShadersDir, DrawText, TimeBetweenUpdates, Input, jugadores, jugadores[jugadorActivo]));
                     case Items.CONTROLES:
-                        return CambiarEscena(new EscenaControles(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input));
+                        return CambiarEscena(new EscenaControles(Camera, MediaDir, ShadersDir, DrawText, TimeBetweenUpdates, Input));
                     case Items.SALIR:
                         Form.GameForm.ActiveForm.Close();
                         break;
@@ -211,6 +212,8 @@ namespace TGC.Group.Model
             }
             else
                 tiempoMovido -= ElapsedTime;
+
+            pasto.Update(ElapsedTime);
 
             return this;
         }

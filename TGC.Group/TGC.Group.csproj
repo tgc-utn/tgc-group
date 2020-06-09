@@ -121,6 +121,7 @@
     <Compile Include="Model\Jugador.cs" />
     <Compile Include="Model\ObjetoJuego.cs" />
     <Compile Include="Model\Paredes.cs" />
+    <Compile Include="Model\Pasto.cs" />
     <Compile Include="Model\Turbo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -195,6 +196,7 @@
   <ItemGroup>
     <Content Include="Media\cajaMadera4.jpg" />
     <Content Include="Media\LogoTGC-TgcScene.xml" />
+    <Content Include="Shaders\CustomShaders.fx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

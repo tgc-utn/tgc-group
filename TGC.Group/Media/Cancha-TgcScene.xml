@@ -162,7 +162,7 @@
       </textCoordsLightMapIdx>
       <vertices count="12">-224.3625 0 -406.3374 248.6716 0 -406.3374 248.6716 0 380.2994 -224.3625 0 380.2994 </vertices>
       <normals count="12">0 -1 0 0 -1 0 0 -1 0 0 -1 0 </normals>
-      <texCoords count="8">10 10 0 10 0 0 10 0 </texCoords>
+      <texCoords count="8">50 50 0 50 0 0 50 0 </texCoords>
       <colors count="3">255 255 255 </colors>
       <texCoordsLightMap count="0">
       </texCoordsLightMap>

@@ -17,7 +17,7 @@ namespace TGC.Group.Model
 
         CustomSprite unSprite;
 
-        public EscenaControles(TgcCamera Camera, string MediaDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input) : base(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input)
+        public EscenaControles(TgcCamera Camera, string MediaDir, string ShadersDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input) : base(Camera, MediaDir, ShadersDir, DrawText, TimeBetweenUpdates, Input)
         {
             unSprite = new CustomSprite();
             unSprite.Bitmap = new CustomBitmap(MediaDir + "Textures\\Controles2.png", D3DDevice.Instance.Device);
@@ -43,7 +43,7 @@ namespace TGC.Group.Model
             
             if (Input.keyDown(Key.Escape))
             {
-                return CambiarEscena(new EscenaMenu(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input));
+                return CambiarEscena(new EscenaMenu(Camera, MediaDir, ShadersDir, DrawText, TimeBetweenUpdates, Input));
             }
 
             return this;

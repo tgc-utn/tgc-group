@@ -9,6 +9,7 @@ namespace TGC.Group.Model
     {
         protected TgcCamera Camera;
         protected String MediaDir;
+        protected String ShadersDir;
         protected TgcText2D DrawText;
         protected Drawer2D drawer2D;
 
@@ -16,10 +17,11 @@ namespace TGC.Group.Model
         protected TgcD3dInput Input;
 
 
-        public Escena(TgcCamera Camera, String MediaDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input)
+        public Escena(TgcCamera Camera, String MediaDir, String ShadersDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input)
         {
             this.Camera = Camera;
             this.MediaDir = MediaDir;
+            this.ShadersDir = ShadersDir;
             this.DrawText = DrawText;
             this.TimeBetweenUpdates = TimeBetweenUpdates;
             this.Input = Input;

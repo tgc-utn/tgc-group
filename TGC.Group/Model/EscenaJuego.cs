@@ -9,6 +9,7 @@ using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
+using TGC.Core.Shaders;
 using TGC.Core.Terrain;
 using TGC.Core.Text;
 using TGC.Core.Textures;
@@ -20,7 +21,7 @@ namespace TGC.Group.Model
     {
         //Objetos de escena
         private TgcScene escena;
-        private TgcMesh cancha;
+        private Pasto pasto;
         private TgcSkyBox skyBox;
 
         //Objetos de juego
@@ -35,6 +36,7 @@ namespace TGC.Group.Model
         private int golequipo1 = 0;
         private int golequipo2 = 0;
         private double tiempoRestante = 300;
+        private float ElapsedTime;
 
         //Objetos de fisica
         protected DiscreteDynamicsWorld dynamicsWorld;
@@ -47,7 +49,7 @@ namespace TGC.Group.Model
         // 2D
         private UIEscenaJuego ui;
 
-        public EscenaJuego(TgcCamera Camera, string MediaDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input, List<Jugador> jugadores, Jugador jugadorActivo) : base(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input)
+        public EscenaJuego(TgcCamera Camera, string MediaDir, string ShadersDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input, List<Jugador> jugadores, Jugador jugadorActivo) : base(Camera, MediaDir, ShadersDir, DrawText, TimeBetweenUpdates, Input)
         {
             initFisica();
 
@@ -122,7 +124,7 @@ namespace TGC.Group.Model
             //cargar escena
             escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha-TgcScene.xml");
 
-            cancha = escena.Meshes[0];
+            pasto = new Pasto(escena.Meshes[0], TGCShaders.Instance.LoadEffect(ShadersDir + "CustomShaders.fx"), 32, .5f);
 
             TgcMesh meshTurbo = escena.getMeshByName("Turbo");
 
@@ -168,7 +170,7 @@ namespace TGC.Group.Model
 
             if (tiempoRestante <= 0)
             {
-                return CambiarEscena(new EscenaGameOver(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input));
+                return CambiarEscena(new EscenaGameOver(Camera, MediaDir, ShadersDir, DrawText, TimeBetweenUpdates, Input));
             }
 
             dynamicsWorld.StepSimulation(ElapsedTime, 10, TimeBetweenUpdates);
@@ -205,13 +207,14 @@ namespace TGC.Group.Model
                 Reubicar();
             }
 
+            pasto.Update(ElapsedTime);
 
             camara.Update(ElapsedTime);
 
             jugadorActivo.HandleInput(Input);
             if (Input.keyDown(Key.Escape))
             {
-                return CambiarEscena(new EscenaMenu(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input));
+                return CambiarEscena(new EscenaMenu(Camera, MediaDir, ShadersDir, DrawText, TimeBetweenUpdates, Input));
             }
 
             ui.TextoTurbo = jugadorActivo.Turbo.ToString();
@@ -219,6 +222,8 @@ namespace TGC.Group.Model
             ui.TextoGolAzul = golequipo1.ToString();
             ui.TextoGolRojo = golequipo2.ToString();
             ui.TextoReloj = String.Format("{0:0}:{1:00}", Math.Floor(tiempoRestante / 60), tiempoRestante % 60);
+
+            this.ElapsedTime = ElapsedTime;
 
             return this;
         }
@@ -229,8 +234,7 @@ namespace TGC.Group.Model
 
             pelota.Render();
 
-            cancha.Transform = new TGCMatrix(floorBody.InterpolationWorldTransform);
-            cancha.Render();
+            pasto.Render();
 
             foreach (var jugador in jugadores)
             {
