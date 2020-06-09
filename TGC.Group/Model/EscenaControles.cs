@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.DirectX.DirectInput;
 using TGC.Core.Camara;
 using TGC.Core.Direct3D;
 using TGC.Core.Input;
@@ -19,7 +20,7 @@ namespace TGC.Group.Model
         public EscenaControles(TgcCamera Camera, string MediaDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input) : base(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input)
         {
             unSprite = new CustomSprite();
-            unSprite.Bitmap = new CustomBitmap(MediaDir + "Textures\\GameOver.png", D3DDevice.Instance.Device);
+            unSprite.Bitmap = new CustomBitmap(MediaDir + "Textures\\Controles2.png", D3DDevice.Instance.Device);
 
             unSprite.Scaling = new TGCVector2((float)D3DDevice.Instance.Width / unSprite.Bitmap.Width, (float)D3DDevice.Instance.Height / unSprite.Bitmap.Height);
             unSprite.Position = new TGCVector2(0, 0);
@@ -27,7 +28,7 @@ namespace TGC.Group.Model
 
         public override void Dispose()
         {
-            throw new NotImplementedException();
+       
         }
 
         public override void Render()
@@ -39,6 +40,12 @@ namespace TGC.Group.Model
 
         public override Escena Update(float ElapsedTime)
         {
+            
+            if (Input.keyDown(Key.Escape))
+            {
+                return CambiarEscena(new EscenaMenu(Camera, MediaDir, DrawText, TimeBetweenUpdates, Input));
+            }
+
             return this;
         }
     }
