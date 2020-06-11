@@ -1,4 +1,5 @@
 ﻿using BulletSharp;
+using Microsoft.DirectX.Direct3D;
 using Microsoft.DirectX.DirectInput;
 using System;
 using System.Collections.Generic;
@@ -240,6 +241,7 @@ namespace TGC.Group.Model
         {
             skyBox.Render();
 
+            pelota.Mesh.Effect.SetValue("normal_map", TextureLoader.FromFile(D3DDevice.Instance.Device, MediaDir + "Textures\\pelotaNormalMap.png"));
             pelota.Render(sol);
 
             pasto.Render();

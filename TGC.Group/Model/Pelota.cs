@@ -1,7 +1,9 @@
 ﻿using BulletSharp;
 using BulletSharp.Math;
+using Microsoft.DirectX.Direct3D;
 using System.Runtime.Remoting.Messaging;
 using TGC.Core.BulletPhysics;
+using TGC.Core.Direct3D;
 using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
@@ -26,7 +28,7 @@ namespace TGC.Group.Model
             Ka = .7f;
             Kd = .005f;
             Ks = .01f;
-            shininess = 200;
+            shininess = 100;            
         }
 
         public override void Render()

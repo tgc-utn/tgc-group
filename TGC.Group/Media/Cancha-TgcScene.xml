@@ -124,7 +124,7 @@
       <specular>[0,0,0,0]</specular>
       <opacity>1</opacity>
       <alphaBlendEnable>False</alphaBlendEnable>
-      <bitmap uvTiling="[1,1]" uvOffset="[1,1]">Pelota.jpg</bitmap>
+      <bitmap uvTiling="[1,1]" uvOffset="[1,1]">pelota.png</bitmap>
     </m>
     <m name="Standardmaterial" type="Standardmaterial">
       <ambient>[0,0,0,0]</ambient>

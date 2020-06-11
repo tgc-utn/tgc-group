@@ -36,6 +36,7 @@ struct VS_INPUT_BLINN
     float3 Normal : NORMAL0;
     float4 Color : COLOR;
     float2 Texcoord : TEXCOORD0;
+    float2 NormalCoord : TEXCOORD1;
 };
 
 //Output del Vertex Shader
@@ -50,6 +51,15 @@ struct VS_OUTPUT_BLINN
 
 float3 eyePosition; // Posicion camara
 float3 lightPosition; // Posicion luz
+texture normal_map;
+sampler2D normalMap =
+sampler_state
+{
+    Texture = <normal_map>;
+    MINFILTER = LINEAR;
+    MAGFILTER = LINEAR;
+    MIPFILTER = LINEAR;
+};
 
 //Vertex Shader
 VS_OUTPUT_BLINN vs_BlinnPhong(VS_INPUT_BLINN input)
@@ -61,7 +71,7 @@ VS_OUTPUT_BLINN vs_BlinnPhong(VS_INPUT_BLINN input)
 
 	//Enviar Texcoord directamente
     output.Texcoord = input.Texcoord;
-
+    
 	/* Pasar normal a World-Space
 	Solo queremos rotarla, no trasladarla ni escalarla.
 	Por eso usamos matInverseTransposeWorld en vez de matWorld */
@@ -99,7 +109,7 @@ float shininess;
 float4 ps_BlinnPhong(PS_BLINN input) : COLOR0
 {     
 	//Normalizar vectores
-    float3 Nn = normalize(input.WorldNormal);
+    float3 Nn = normalize(input.WorldNormal + tex2D(normalMap, input.Texcoord).xyz);
     float3 Ln = normalize(input.LightVec);
     float3 Hn = normalize(input.HalfAngleVec);
 
