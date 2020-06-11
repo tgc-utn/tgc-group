@@ -119,6 +119,7 @@
     <Compile Include="Model\GameModel.cs" />
     <Compile Include="Model\IObjetoJuego.cs" />
     <Compile Include="Model\Jugador.cs" />
+    <Compile Include="Model\Luz.cs" />
     <Compile Include="Model\ObjetoJuego.cs" />
     <Compile Include="Model\Paredes.cs" />
     <Compile Include="Model\Pasto.cs" />

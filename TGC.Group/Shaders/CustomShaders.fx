@@ -23,6 +23,115 @@ sampler2D diffuseMap = sampler_state
 //Factor de translucidez
 float alphaValue = 1;
 
+
+
+/**************************************************************************************/
+/* BlinnPhong */
+/**************************************************************************************/
+
+//Input del Vertex Shader
+struct VS_INPUT_BLINN
+{
+    float4 Position : POSITION0;
+    float3 Normal : NORMAL0;
+    float4 Color : COLOR;
+    float2 Texcoord : TEXCOORD0;
+};
+
+//Output del Vertex Shader
+struct VS_OUTPUT_BLINN
+{
+    float4 Position : POSITION0;
+    float2 Texcoord : TEXCOORD0;
+    float3 WorldNormal : TEXCOORD1;
+    float3 LightVec : TEXCOORD2;
+    float3 HalfAngleVec : TEXCOORD3;
+};
+
+float3 eyePosition; // Posicion camara
+float3 lightPosition; // Posicion luz
+
+//Vertex Shader
+VS_OUTPUT_BLINN vs_BlinnPhong(VS_INPUT_BLINN input)
+{    
+    VS_OUTPUT_BLINN output;
+
+	//Proyectar posicion
+    output.Position = mul(input.Position, matWorldViewProj);
+
+	//Enviar Texcoord directamente
+    output.Texcoord = input.Texcoord;
+
+	/* Pasar normal a World-Space
+	Solo queremos rotarla, no trasladarla ni escalarla.
+	Por eso usamos matInverseTransposeWorld en vez de matWorld */
+    output.WorldNormal = mul(input.Normal, matInverseTransposeWorld).xyz;
+
+	//LightVec (L): vector que va desde el vertice hacia la luz. Usado en Diffuse y Specular
+    float3 worldPosition = output.Position.xyz;
+    output.LightVec = lightPosition - worldPosition;
+
+	//ViewVec (V): vector que va desde el vertice hacia la camara.
+    float3 viewVector = eyePosition.xyz - worldPosition;
+
+	//HalfAngleVec (H): vector de reflexion simplificado de Phong-Blinn (H = |V + L|). Usado en Specular
+    output.HalfAngleVec = viewVector + output.LightVec;
+
+    return output;
+}
+
+//Input del Pixel Shader
+struct PS_BLINN
+{
+    float2 Texcoord : TEXCOORD0;
+    float3 WorldNormal : TEXCOORD1;
+    float3 LightVec : TEXCOORD2;
+    float3 HalfAngleVec : TEXCOORD3;
+};
+
+float3 lightColor;
+float Ka;
+float Kd;
+float Ks;
+float shininess;
+
+//Pixel Shader
+float4 ps_BlinnPhong(PS_BLINN input) : COLOR0
+{     
+	//Normalizar vectores
+    float3 Nn = normalize(input.WorldNormal);
+    float3 Ln = normalize(input.LightVec);
+    float3 Hn = normalize(input.HalfAngleVec);
+
+	//Obtener texel de la textura
+    float4 texelColor = tex2D(diffuseMap, input.Texcoord);
+
+	//Componente Diffuse: N dot L
+    float3 n_dot_l = dot(Nn, Ln);
+    float3 diffuseLight = lightColor * max(0.0, n_dot_l); //Controlamos que no de negativo
+
+	//Componente Specular: (N dot H)^exp
+    float3 n_dot_h = dot(Nn, Hn);
+    float3 specularLight = n_dot_l <= 0.0
+			? float3(0.0, 0.0, 0.0)
+			: lightColor * pow(max(0.0, n_dot_h), shininess);
+
+    return float4(texelColor.xyz * Ka + diffuseLight * Kd + specularLight * Ks, texelColor.a);
+}
+
+/*
+* Technique DIFFUSE_MAP
+*/
+technique BlinnPhong
+{
+    pass Pass_0
+    {
+        VertexShader = compile vs_3_0 vs_BlinnPhong();
+        PixelShader = compile ps_3_0 ps_BlinnPhong();
+    }
+}
+
+
 /**************************************************************************************/
 /* Pasto */
 /**************************************************************************************/
@@ -30,35 +139,35 @@ float alphaValue = 1;
 //Input del Vertex Shader
 struct VS_INPUT_Pasto
 {
-	float4 Position : POSITION0;
-	float2 Texcoord : TEXCOORD0;
+    float4 Position : POSITION0;
+    float2 Texcoord : TEXCOORD0;
 };
 
 //Output del Vertex Shader
 struct VS_OUTPUT_Pasto
 {
-	float4 Position : POSITION0;
-	float2 Texcoord : TEXCOORD0;
+    float4 Position : POSITION0;
+    float2 Texcoord : TEXCOORD0;
 };
 
 //Vertex Shader
 VS_OUTPUT_Pasto vs_Pasto(VS_INPUT_Pasto input)
 {
-	VS_OUTPUT_Pasto output;
+    VS_OUTPUT_Pasto output;
 
 	//Proyectar posicion
-	output.Position = mul(input.Position, matWorldViewProj);
+    output.Position = mul(input.Position, matWorldViewProj);
 
 	//Enviar Texcoord directamente
-	output.Texcoord = input.Texcoord;
+    output.Texcoord = input.Texcoord;
 
-	return output;
+    return output;
 }
 
 //Input del Pixel Shader
 struct PS_INPUT_Pasto
 {
-	float2 Texcoord : TEXCOORD0;
+    float2 Texcoord : TEXCOORD0;
 };
 
 float nivel = 0; // Altura del pasto. Va del 0 la capa mas baja, al 1 la capa mas alta
@@ -80,9 +189,10 @@ float4 ps_Pasto(PS_INPUT_Pasto input) : COLOR0
 */
 technique Pasto
 {
-	pass Pass_0
-	{
-		VertexShader = compile vs_3_0 vs_Pasto();
-		PixelShader = compile ps_3_0 ps_Pasto();
-	}
+    pass Pass_0
+    {
+        VertexShader = compile vs_3_0 vs_BlinnPhong();
+        //VertexShader = compile vs_3_0 vs_Pasto();
+        PixelShader = compile ps_3_0 ps_Pasto();
+    }
 }

@@ -106,6 +106,8 @@ namespace TGC.Group.Model
             }
         }
 
+        private Luz sol;
+
         public EscenaMenu(TgcCamera Camera, string MediaDir, string ShadersDir, TgcText2D DrawText, float TimeBetweenUpdates, TgcD3dInput Input) : base(Camera, MediaDir, ShadersDir, DrawText, TimeBetweenUpdates, Input)
         {
             TgcScene escena = new TgcSceneLoader().loadSceneFromFile(MediaDir + "Cancha-TgcScene.xml");
@@ -114,6 +116,8 @@ namespace TGC.Group.Model
             paredes = escena.getMeshByName("Box_5");
             Camera.SetCamera(new TGCVector3(20, 10, -20), new TGCVector3(0, 5, -7));
             initJugadores(escena);
+
+            sol = new Luz(Color.FromArgb(50, 50, 50), new TGCVector3(0, 30, -50));
 
             CustomBitmap menuItem = new CustomBitmap(MediaDir + "\\Textures\\HUD\\menuItem.png", D3DDevice.Instance.Device);
             CustomBitmap menuItemSelec = new CustomBitmap(MediaDir + "\\Textures\\HUD\\menuItemSelec.png", D3DDevice.Instance.Device);
@@ -147,6 +151,12 @@ namespace TGC.Group.Model
             jugadores.Add(tractor);
             jugadores.Add(patrullero);
             jugadores.Add(tanque);
+
+            foreach(var jugador in jugadores)
+            {
+                jugador.Mesh.Effect = TGCShaders.Instance.LoadEffect(ShadersDir + "CustomShaders.fx");
+                jugador.Mesh.Technique = "BlinnPhong";
+            }
         }
         public override void Dispose()
         {
@@ -162,7 +172,9 @@ namespace TGC.Group.Model
             for (int i = 0; i < botones.Count; i++)
                 botones[i].Render(i == botonSeleccionado);
 
-            jugadores[jugadorActivo].Render();
+
+            jugadores[jugadorActivo].Mesh.Effect.SetValue("eyePosition", TGCVector3.TGCVector3ToFloat3Array(Camera.Position));
+            jugadores[jugadorActivo].Render(sol);
         }
 
         private float tiempoMovido = 0; // Workaround por el evento de las teclas

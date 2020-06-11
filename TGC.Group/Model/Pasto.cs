@@ -41,6 +41,7 @@ namespace TGC.Group.Model
         {
             foreach(var capa in capas)
             {
+                capa.Technique = "Pasto";
                 capa.Effect.SetValue("nivel", capa.Position.Y / altura);
                 capa.Effect.SetValue("time", time);
                 capa.Render();

@@ -23,6 +23,7 @@ namespace TGC.Group.Model
         private TgcScene escena;
         private Pasto pasto;
         private TgcSkyBox skyBox;
+        private Luz sol;
 
         //Objetos de juego
         private List<Jugador> jugadores = new List<Jugador>();
@@ -59,8 +60,12 @@ namespace TGC.Group.Model
             this.jugadorActivo = jugadorActivo;
             initJugadores();
 
+            sol = new Luz(Color.FromArgb(50, 50, 50), new TGCVector3(0, 30, -50));
+
 
             pelota = new Pelota(escena.getMeshByName("Pelota"), new TGCVector3(0f, 50f, 0f));
+            pelota.Mesh.Effect = TGCShaders.Instance.LoadEffect(ShadersDir + "CustomShaders.fx");
+            pelota.Mesh.Technique = "BlinnPhong";
             dynamicsWorld.AddRigidBody(pelota.Cuerpo);
 
             paredes = new Paredes(escena.getMeshByName("Box_5"));
@@ -154,7 +159,10 @@ namespace TGC.Group.Model
             jugadores[1].Reubicar(new TGCVector3(0, 0, -30), new TGCVector3(FastMath.PI, 0, 0));
             jugadores[2].Reubicar(new TGCVector3(0, 0, 30), new TGCVector3(0, 0, 0));
             jugadores[3].Reubicar(new TGCVector3(20, 0, -100), new TGCVector3(FastMath.PI, 0, 0));
-            jugadores.ForEach(jugador => dynamicsWorld.AddRigidBody(jugador.Cuerpo));
+            foreach(var jugador in jugadores)
+            {
+                dynamicsWorld.AddRigidBody(jugador.Cuerpo);
+            }
         }
 
         private void Reubicar()
@@ -232,13 +240,14 @@ namespace TGC.Group.Model
         {
             skyBox.Render();
 
-            pelota.Render();
+            pelota.Render(sol);
 
             pasto.Render();
 
             foreach (var jugador in jugadores)
             {
-                jugador.Render();
+                jugador.Mesh.Effect.SetValue("eyePosition", TGCVector3.TGCVector3ToFloat3Array(Camera.Position));
+                jugador.Render(sol);
             }
 
             arcos[0].Render();
@@ -254,6 +263,7 @@ namespace TGC.Group.Model
             paredes.Render();
 
             ui.Render();
+            sol.Render();
         }
         public override void Dispose()
         {

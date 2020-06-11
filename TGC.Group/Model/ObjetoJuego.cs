@@ -4,6 +4,7 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Collision;
+using TGC.Core.Shaders;
 
 namespace TGC.Group.Model
 {
@@ -24,6 +25,11 @@ namespace TGC.Group.Model
         protected BulletSharp.Math.Quaternion rotation;
         protected RigidBody cuerpo;
 
+        public float Ka { get; set; }
+        public float Kd { get; set; }
+        public float Ks { get; set; }
+        public float shininess { get; set; }
+
         public ObjetoJuego(TgcMesh mesh, TGCVector3 translation=new TGCVector3(), TGCVector3 rotation=new TGCVector3(), float angle=0)
         {
             this.mesh = mesh;
@@ -32,9 +38,12 @@ namespace TGC.Group.Model
 
             scale = new BulletSharp.Math.Vector3();
 
-            this.rotation = new BulletSharp.Math.Quaternion( new BulletSharp.Math.Vector3(rotation.X,rotation.Y,rotation.Z), angle);
+            this.rotation = new BulletSharp.Math.Quaternion(new BulletSharp.Math.Vector3(rotation.X,rotation.Y,rotation.Z), angle);
 
             AABB = new TgcBoundingAxisAlignBox();
+
+            //mesh.Effect = TGCShaders.Instance.LoadEffect(@"C:\Users\jakss\Documents\TGC\2020_1C_3051_GroutingLeague\TGC.Group\Shaders\CustomShaders.fx");
+            //mesh.Technique = "SOL";
         }
 
         public virtual void Update(float elapsedTime)
@@ -62,11 +71,21 @@ namespace TGC.Group.Model
         {
             Mesh.Transform = new TGCMatrix(cuerpo.WorldTransform);
             Mesh.Render();
-            
+
             Mesh.BoundingBox.transform(Mesh.Transform);
             Mesh.BoundingBox.Render();
 
             RenderRigidBodyBoundingBox();
+        }
+        public virtual void Render(Luz luz)
+        {
+            Mesh.Effect.SetValue("lightColor", TGCVector3.TGCVector3ToFloat3Array(new TGCVector3(luz.Color.R, luz.Color.G, luz.Color.B)));
+            Mesh.Effect.SetValue("lightPosition", TGCVector3.TGCVector3ToFloat3Array(luz.Translation));
+            Mesh.Effect.SetValue("Ka", Ka);
+            Mesh.Effect.SetValue("Kd", Kd);
+            Mesh.Effect.SetValue("Ks", Ks);
+            Mesh.Effect.SetValue("shininess", shininess);
+            Render();
         }
 
         public void RenderRigidBodyBoundingBox()

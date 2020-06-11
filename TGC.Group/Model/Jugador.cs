@@ -44,6 +44,11 @@ namespace TGC.Group.Model
 
             posicionInicial = new TGCVector3(translation);
             rotacionInicial = new TGCVector3(rotation);
+
+            Ka = .7f;
+            Kd = .005f;
+            Ks = .01f;
+            shininess = 200;
         }
 
         public void ReiniciarJugador()

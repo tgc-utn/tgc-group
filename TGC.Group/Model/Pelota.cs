@@ -22,6 +22,11 @@ namespace TGC.Group.Model
             cuerpo.RollingFriction = 1f;
             cuerpo.Friction = 10f;
             cuerpo.Restitution = .5f;
+
+            Ka = .7f;
+            Kd = .005f;
+            Ks = .01f;
+            shininess = 200;
         }
 
         public override void Render()
