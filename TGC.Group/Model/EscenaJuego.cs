@@ -6,14 +6,12 @@ using System.Collections.Generic;
 using System.Drawing;
 using TGC.Core.Camara;
 using TGC.Core.Direct3D;
-using TGC.Core.Geometry;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.Shaders;
 using TGC.Core.Terrain;
 using TGC.Core.Text;
-using TGC.Core.Textures;
 using TGC.Group.Model._2D;
 
 namespace TGC.Group.Model
@@ -38,7 +36,6 @@ namespace TGC.Group.Model
         private int golequipo1 = 0;
         private int golequipo2 = 0;
         private double tiempoRestante = 300;
-        private float ElapsedTime;
 
         //Objetos de fisica
         protected DiscreteDynamicsWorld dynamicsWorld;
@@ -61,7 +58,7 @@ namespace TGC.Group.Model
             this.jugadorActivo = jugadorActivo;
             initJugadores();
 
-            sol = new Luz(Color.FromArgb(50, 50, 50), new TGCVector3(0, 30, -50));
+            sol = new Luz(Color.FromArgb(50, 50, 50), new TGCVector3(0, 70, -130));
 
 
             pelota = new Pelota(escena.getMeshByName("Pelota"), new TGCVector3(0f, 50f, 0f));
@@ -231,8 +228,6 @@ namespace TGC.Group.Model
             ui.TextoGolAzul = golequipo1.ToString();
             ui.TextoGolRojo = golequipo2.ToString();
             ui.TextoReloj = String.Format("{0:0}:{1:00}", Math.Floor(tiempoRestante / 60), tiempoRestante % 60);
-
-            this.ElapsedTime = ElapsedTime;
 
             return this;
         }

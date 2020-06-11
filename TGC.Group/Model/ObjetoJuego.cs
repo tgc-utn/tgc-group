@@ -4,7 +4,6 @@ using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 using TGC.Core.BoundingVolumes;
 using TGC.Core.Collision;
-using TGC.Core.Shaders;
 
 namespace TGC.Group.Model
 {

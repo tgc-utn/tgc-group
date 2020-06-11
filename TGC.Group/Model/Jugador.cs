@@ -1,8 +1,6 @@
 ﻿using BulletSharp.Math;
 using Microsoft.DirectX.DirectInput;
 using System;
-using System.CodeDom;
-using System.Security.Cryptography;
 using TGC.Core.BulletPhysics;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;

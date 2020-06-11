@@ -1,13 +1,7 @@
-﻿using BulletSharp;
-using BulletSharp.Math;
-using Microsoft.DirectX.Direct3D;
-using System.Runtime.Remoting.Messaging;
+﻿using BulletSharp.Math;
 using TGC.Core.BulletPhysics;
-using TGC.Core.Direct3D;
-using TGC.Core.Geometry;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
-using TGC.Core.Textures;
 
 namespace TGC.Group.Model
 {
