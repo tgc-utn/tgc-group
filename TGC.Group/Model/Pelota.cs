@@ -20,8 +20,8 @@ namespace TGC.Group.Model
             cuerpo.Restitution = .5f;
 
             Ka = .7f;
-            Kd = .005f;
-            Ks = .01f;
+            Kd = .5f;
+            Ks = 1f;
             shininess = 100;            
         }
 

@@ -58,7 +58,7 @@ namespace TGC.Group.Model
             this.jugadorActivo = jugadorActivo;
             initJugadores();
 
-            sol = new Luz(Color.FromArgb(50, 50, 50), new TGCVector3(0, 70, -130));
+            sol = new Luz(Color.White, new TGCVector3(0, 70, -130));
 
 
             pelota = new Pelota(escena.getMeshByName("Pelota"), new TGCVector3(0f, 50f, 0f));

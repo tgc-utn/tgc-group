@@ -43,9 +43,9 @@ namespace TGC.Group.Model
             posicionInicial = new TGCVector3(translation);
             rotacionInicial = new TGCVector3(rotation);
 
-            Ka = .7f;
-            Kd = .005f;
-            Ks = .01f;
+            Ka = .65f;
+            Kd = .3f;
+            Ks = .5f;
             shininess = 200;
         }
 

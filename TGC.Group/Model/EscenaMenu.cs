@@ -117,7 +117,7 @@ namespace TGC.Group.Model
             Camera.SetCamera(new TGCVector3(20, 10, -20), new TGCVector3(0, 5, -7));
             initJugadores(escena);
 
-            sol = new Luz(Color.FromArgb(50, 50, 50), new TGCVector3(0, 30, -50));
+            sol = new Luz(Color.White, new TGCVector3(0, 30, -50));
 
             CustomBitmap menuItem = new CustomBitmap(MediaDir + "\\Textures\\HUD\\menuItem.png", D3DDevice.Instance.Device);
             CustomBitmap menuItemSelec = new CustomBitmap(MediaDir + "\\Textures\\HUD\\menuItemSelec.png", D3DDevice.Instance.Device);

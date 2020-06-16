@@ -109,9 +109,10 @@ float shininess;
 float4 ps_BlinnPhong(PS_BLINN input) : COLOR0
 {     
 	//Normalizar vectores
-    float3 Nn = normalize(input.WorldNormal + tex2D(normalMap, input.Texcoord).xyz);
+    float3 Nn = normalize(input.WorldNormal + tex2D(normalMap, input.Texcoord).xyz); // Esto no es asi, pero bueno...
     float3 Ln = normalize(input.LightVec);
     float3 Hn = normalize(input.HalfAngleVec);
+    lightColor = normalize(lightColor);
 
 	//Obtener texel de la textura
     float4 texelColor = tex2D(diffuseMap, input.Texcoord);
