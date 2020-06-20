@@ -36,6 +36,7 @@ namespace TGC.Group.Model
         private int golequipo1 = 0;
         private int golequipo2 = 0;
         private double tiempoRestante = 300;
+        private AnimacionGol animacionGol;
 
         //Objetos de fisica
         protected DiscreteDynamicsWorld dynamicsWorld;
@@ -61,7 +62,7 @@ namespace TGC.Group.Model
             sol = new Luz(Color.White, new TGCVector3(0, 70, -130));
 
 
-            pelota = new Pelota(escena.getMeshByName("Pelota"), new TGCVector3(0f, 50f, 0f));
+            pelota = new Pelota(escena.getMeshByName("Pelota"), new TGCVector3(0f, 50f, -250f));
             pelota.Mesh.Effect = TGCShaders.Instance.LoadEffect(ShadersDir + "CustomShaders.fx");
             pelota.Mesh.Technique = "BlinnPhong";
             dynamicsWorld.AddRigidBody(pelota.Cuerpo);
@@ -81,6 +82,8 @@ namespace TGC.Group.Model
 
             ui = new UIEscenaJuego();
             ui.Init(MediaDir,drawer2D);
+
+            animacionGol = new AnimacionGol();
         }
 
         private void initFisica()
@@ -110,7 +113,6 @@ namespace TGC.Group.Model
 
         private void initMeshes()
         {
-
             //Crear SkyBox
             skyBox = new TgcSkyBox();
             skyBox.Center = new TGCVector3(0, 500, 0);
@@ -170,6 +172,7 @@ namespace TGC.Group.Model
             turbos.ForEach(turbo => turbo.Reiniciar());
         }
 
+
         public override Escena Update(float ElapsedTime)
         {
             tiempoRestante -= ElapsedTime;
@@ -196,26 +199,14 @@ namespace TGC.Group.Model
                     jugador.RecogerTurbo(turboEnContacto);
             }
 
-            pelota.Update(ElapsedTime);
 
             arcos[0].Update(ElapsedTime);
             arcos[1].Update(ElapsedTime);
 
-            if (pelota.CheckCollideWith(arcos[0]))
-            {
-                golequipo1++;
-                Reubicar();
-            }
-
-            if (pelota.CheckCollideWith(arcos[1]))
-            {
-                golequipo2++;
-                Reubicar();
-            }
-
             pasto.Update(ElapsedTime);
 
             camara.Update(ElapsedTime);
+            pelota.Update(ElapsedTime);
 
             jugadorActivo.HandleInput(Input);
             if (Input.keyDown(Key.Escape))
@@ -228,6 +219,28 @@ namespace TGC.Group.Model
             ui.TextoGolAzul = golequipo1.ToString();
             ui.TextoGolRojo = golequipo2.ToString();
             ui.TextoReloj = String.Format("{0:0}:{1:00}", Math.Floor(tiempoRestante / 60), tiempoRestante % 60);
+
+            if (animacionGol.Activo)
+            {
+                pelota.Cuerpo.ActivationState = ActivationState.IslandSleeping;
+                animacionGol.Update(ElapsedTime);
+                if (!animacionGol.Activo)
+                    Reubicar();
+            }
+            else
+            {
+                if (arcos[0].CheckCollideWith(pelota))
+                {
+                    golequipo1++;
+                    animacionGol.AnimarGol(jugadores, pelota.Translation);
+                }
+
+                if (arcos[1].CheckCollideWith(pelota))
+                {
+                    golequipo2++;
+                    animacionGol.AnimarGol(jugadores, pelota.Translation);
+                }
+            }
 
             return this;
         }

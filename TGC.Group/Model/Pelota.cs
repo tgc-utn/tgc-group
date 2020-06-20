@@ -40,6 +40,7 @@ namespace TGC.Group.Model
             cuerpo.WorldTransform = TGCMatrix.Translation(new TGCVector3(0f, 50f, 0f)).ToBulletMatrix();
             cuerpo.LinearVelocity = Vector3.Zero;
             cuerpo.AngularVelocity = Vector3.Zero;
+            cuerpo.Activate();
         }
     }
 }

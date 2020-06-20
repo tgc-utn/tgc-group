@@ -109,6 +109,7 @@
     <Compile Include="Model\2D\HUDSprite.cs" />
     <Compile Include="Model\2D\HUDTexto.cs" />
     <Compile Include="Model\2D\UIEscenaJuego.cs" />
+    <Compile Include="Model\AnimacionGol.cs" />
     <Compile Include="Model\Arco.cs" />
     <Compile Include="Model\CamaraJugador.cs" />
     <Compile Include="Model\Escena.cs" />

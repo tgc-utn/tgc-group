@@ -51,7 +51,7 @@ namespace TGC.Group.Model
             UpdateAABB();
         }
 
-        protected void UpdateAABB()
+        protected virtual void UpdateAABB()
         {
             BulletSharp.Math.Vector3 aabbMin = new BulletSharp.Math.Vector3();
             BulletSharp.Math.Vector3 aabbMax = new BulletSharp.Math.Vector3();
@@ -64,7 +64,7 @@ namespace TGC.Group.Model
             AABB = new TgcBoundingAxisAlignBox(new TGCVector3(aabbMin), new TGCVector3(aabbMax), new TGCVector3(translation), new TGCVector3(scale));
         }
 
-        public bool CheckCollideWith(ObjetoJuego objeto) => TgcCollisionUtils.testAABBAABB(this.AABB, objeto.AABB);
+        public virtual bool CheckCollideWith(ObjetoJuego objeto) => TgcCollisionUtils.testAABBAABB(this.AABB, objeto.AABB);
 
         public virtual void Render()
         {
