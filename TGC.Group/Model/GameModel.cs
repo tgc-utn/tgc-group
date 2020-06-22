@@ -57,7 +57,7 @@ namespace TGC.Group.Model
         public override void Render()
         {
             //Inicio el render de la escena, para ejemplos simples. Cuando tenemos postprocesado o shaders es mejor realizar las operaciones según nuestra conveniencia.
-            PreRender();
+            //PreRender();
             escenaActiva.Render();
             DrawText.drawText("FPS: " + 1 / ElapsedTime, 0, 80, Color.Red);
             DrawText.drawText("Frametime " + ElapsedTime, 0, 90, Color.Red);

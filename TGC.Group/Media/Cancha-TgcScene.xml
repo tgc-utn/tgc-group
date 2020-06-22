@@ -148,7 +148,7 @@
       <specular>[0,0,0,0]</specular>
       <opacity>1</opacity>
       <alphaBlendEnable>False</alphaBlendEnable>
-      <bitmap uvTiling="[1,1]" uvOffset="[1,1]">gettyimages-529810576-640x640.jpg</bitmap>
+      <bitmap uvTiling="[1,1]" uvOffset="[1,1]">turbo.png</bitmap>
     </m>
   </materials>
   <meshes count="10">

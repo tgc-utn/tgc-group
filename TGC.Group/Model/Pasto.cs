@@ -1,5 +1,6 @@
 ﻿using Microsoft.DirectX.Direct3D;
 using System.Collections.Generic;
+using System.Linq;
 using TGC.Core.Mathematica;
 using TGC.Core.SceneLoader;
 
@@ -32,14 +33,18 @@ namespace TGC.Group.Model
             time += elapsedTime;
         }
 
-        public override void Render()
+        public void Render(bool lod = false)
         {
-            foreach(var capa in capas)
+            if (lod)
+                capas.First().Render();
+            else
             {
-                capa.Technique = "Pasto";
-                capa.Effect.SetValue("nivel", capa.Position.Y / altura);
-                capa.Effect.SetValue("time", time);
-                capa.Render();
+                capas.First().Effect.SetValue("time", time);
+                foreach (var capa in capas)
+                {
+                    capa.Effect.SetValue("nivel", capa.Position.Y / altura);
+                    capa.Render();
+                }
             }
         }
     }

@@ -165,6 +165,10 @@ namespace TGC.Group.Model
 
         public override void Render()
         {
+            D3DDevice.Instance.Device.Clear(Microsoft.DirectX.Direct3D.ClearFlags.Target | Microsoft.DirectX.Direct3D.ClearFlags.ZBuffer, Color.White, 1.0f, 0);
+            D3DDevice.Instance.Device.BeginScene();
+            //TexturesManager.Instance.clearAll();
+
             skyBox.Render();
             pasto.Render();
             paredes.Render();

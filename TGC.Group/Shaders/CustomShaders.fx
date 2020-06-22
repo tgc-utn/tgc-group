@@ -12,12 +12,23 @@ float4x4 matInverseTransposeWorld; //Matriz Transpose(Invert(World))
 texture texDiffuseMap;
 sampler2D diffuseMap = sampler_state
 {
-	Texture = (texDiffuseMap);
-	ADDRESSU = WRAP;
-	ADDRESSV = WRAP;
-	MINFILTER = LINEAR;
-	MAGFILTER = LINEAR;
-	MIPFILTER = LINEAR;
+    Texture = (texDiffuseMap);
+    ADDRESSU = WRAP;
+    ADDRESSV = WRAP;
+    MINFILTER = LINEAR;
+    MAGFILTER = LINEAR;
+    MIPFILTER = LINEAR;
+};
+
+texture g_txCubeMap;
+samplerCUBE cubeMap = sampler_state
+{
+    Texture = (g_txCubeMap);
+    ADDRESSU = WRAP;
+    ADDRESSV = WRAP;
+    MINFILTER = LINEAR;
+    MAGFILTER = LINEAR;
+    MIPFILTER = LINEAR;
 };
 
 //Factor de translucidez
@@ -47,6 +58,8 @@ struct VS_OUTPUT_BLINN
     float3 WorldNormal : TEXCOORD1;
     float3 LightVec : TEXCOORD2;
     float3 HalfAngleVec : TEXCOORD3;
+    float3 ViewVec : TEXCOORD4;
+    float3 WorldPosition : TEXCOORD5;
 };
 
 float3 eyePosition; // Posicion camara
@@ -82,10 +95,13 @@ VS_OUTPUT_BLINN vs_BlinnPhong(VS_INPUT_BLINN input)
     output.LightVec = lightPosition - worldPosition;
 
 	//ViewVec (V): vector que va desde el vertice hacia la camara.
-    float3 viewVector = eyePosition.xyz - worldPosition;
+    output.ViewVec = eyePosition.xyz - worldPosition;
 
 	//HalfAngleVec (H): vector de reflexion simplificado de Phong-Blinn (H = |V + L|). Usado en Specular
-    output.HalfAngleVec = viewVector + output.LightVec;
+    output.HalfAngleVec = output.ViewVec + output.LightVec;
+    
+	//Posicion pasada a World-Space
+    output.WorldPosition = mul(input.Position, matWorld).xyz;
 
     return output;
 }
@@ -97,6 +113,8 @@ struct PS_BLINN
     float3 WorldNormal : TEXCOORD1;
     float3 LightVec : TEXCOORD2;
     float3 HalfAngleVec : TEXCOORD3;
+    float3 ViewVec : TEXCOORD4;
+    float3 WorldPosition : TEXCOORD5;
 };
 
 float3 lightColor;
@@ -112,10 +130,17 @@ float4 ps_BlinnPhong(PS_BLINN input) : COLOR0
     float3 Nn = normalize(input.WorldNormal + tex2D(normalMap, input.Texcoord).xyz); // Esto no es asi, pero bueno...
     float3 Ln = normalize(input.LightVec);
     float3 Hn = normalize(input.HalfAngleVec);
+    float3 Vn = normalize(input.ViewVec);
     lightColor = normalize(lightColor);
 
 	//Obtener texel de la textura
     float4 texelColor = tex2D(diffuseMap, input.Texcoord);
+    
+	//Obtener texel de CubeMap
+    float3 R = reflect(Vn, Nn);
+    float3 reflectionColor = texCUBE(cubeMap, R).rgb;
+    texelColor.rgb = texelColor.rgb * 1 + reflectionColor.rgb * .3;
+    //return reflectionColor.xyzz;
 
 	//Componente Diffuse: N dot L
     float3 n_dot_l = dot(Nn, Ln);
