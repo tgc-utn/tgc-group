@@ -139,7 +139,7 @@ float4 ps_BlinnPhong(PS_BLINN input) : COLOR0
 	//Obtener texel de CubeMap
     float3 R = reflect(Vn, Nn);
     float3 reflectionColor = texCUBE(cubeMap, R).rgb;
-    texelColor.rgb = texelColor.rgb * 1 + reflectionColor.rgb * .3;
+    texelColor.rgb = texelColor.rgb * 1 + reflectionColor.rgb * .2;
     //return reflectionColor.xyzz;
 
 	//Componente Diffuse: N dot L

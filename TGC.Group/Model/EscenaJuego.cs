@@ -254,7 +254,7 @@ namespace TGC.Group.Model
                 pelota.Mesh.Effect.SetValue("normal_map", TextureLoader.FromFile(D3DDevice.Instance.Device, MediaDir + "Textures\\pelotaNormalMap.png"));
             pelota.Render(sol);
 
-            pasto.Render(false);
+            pasto.Render(cubemap);
 
             if(!cubemap)
             foreach (var jugador in jugadores)
@@ -273,6 +273,7 @@ namespace TGC.Group.Model
             {
                 turbo.Render();
             }
+
 
             paredes.Render();
 
@@ -355,12 +356,15 @@ namespace TGC.Group.Model
         public override void Render()
         {
             var pOldRT = D3DDevice.Instance.Device.GetRenderTarget(0);
-            foreach(var jugador in jugadores)
+            var g_pCubeMap = cubemap(jugadorActivo.Translation); // Solo hago un cubemap del jugador activo y lo uso en los demas por performance
+            foreach (var jugador in jugadores)
             {
-                var g_pCubeMap = cubemap(jugador.Translation);
+                //var g_pCubeMap = cubemap(jugador.Translation);
                 jugador.Mesh.Effect.SetValue("g_txCubeMap", g_pCubeMap);
-                g_pCubeMap.Dispose();
+                //g_pCubeMap.Dispose();
             }
+            g_pCubeMap.Dispose();
+
             // restauro el render target
             D3DDevice.Instance.Device.SetRenderTarget(0, pOldRT);
 
