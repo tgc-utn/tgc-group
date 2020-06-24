@@ -262,7 +262,7 @@ namespace TGC.Group.Model
                 if (jugador.Translation != Camera.Position)
                 {
                     jugador.Mesh.Effect.SetValue("eyePosition", TGCVector3.TGCVector3ToFloat3Array(Camera.Position));
-                    jugador.Render(sol); // TODO: Se puede evitar usar phong cuando estamos haciendo el cubemap
+                    jugador.Render(sol);
                 }
             }
 
@@ -292,57 +292,39 @@ namespace TGC.Group.Model
                 var pFace = g_pCubeMap.GetCubeMapSurface(nFace, 0);
                 D3DDevice.Instance.Device.SetRenderTarget(0, pFace);
                 TGCVector3 Dir, VUP;
-                Color color;
                 switch (nFace)
                 {
                     default:
                     case CubeMapFace.PositiveX:
-                        // Left
                         Dir = new TGCVector3(1, 0, 0);
                         VUP = TGCVector3.Up;
-                        color = Color.Black;
                         break;
-
                     case CubeMapFace.NegativeX:
-                        // Right
                         Dir = new TGCVector3(-1, 0, 0);
                         VUP = TGCVector3.Up;
-                        color = Color.Red;
                         break;
-
                     case CubeMapFace.PositiveY:
-                        // Up
                         Dir = TGCVector3.Up;
                         VUP = new TGCVector3(0, 0, -1);
-                        color = Color.Gray;
                         break;
-
                     case CubeMapFace.NegativeY:
-                        // Down
                         Dir = TGCVector3.Down;
                         VUP = new TGCVector3(0, 0, 1);
-                        color = Color.Yellow;
                         break;
-
                     case CubeMapFace.PositiveZ:
-                        // Front
                         Dir = new TGCVector3(0, 0, 1);
                         VUP = TGCVector3.Up;
-                        color = Color.Green;
                         break;
-
                     case CubeMapFace.NegativeZ:
-                        // Back
                         Dir = new TGCVector3(0, 0, -1);
                         VUP = TGCVector3.Up;
-                        color = Color.Blue;
                         break;
                 }
 
                 //como queremos usar la camara rotacional pero siguendo a un objetivo comentamos el seteo del view.
                 D3DDevice.Instance.Device.Transform.View = TGCMatrix.LookAtLH(worldPos, Dir, VUP);
 
-                D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, color, 1.0f, 0);
+                D3DDevice.Instance.Device.Clear(ClearFlags.Target | ClearFlags.ZBuffer, Color.LightBlue, 1.0f, 0);
                 D3DDevice.Instance.Device.BeginScene();
 
                 //Renderizar

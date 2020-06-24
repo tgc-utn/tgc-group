@@ -1,4 +1,5 @@
-﻿using TGC.Core.Camara;
+﻿using System.Drawing;
+using TGC.Core.Camara;
 using TGC.Core.Direct3D;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
@@ -25,6 +26,8 @@ namespace TGC.Group.Model
 
         public override void Render()
         {
+            D3DDevice.Instance.Device.Clear(Microsoft.DirectX.Direct3D.ClearFlags.Target | Microsoft.DirectX.Direct3D.ClearFlags.ZBuffer, Color.White, 1.0f, 0);
+            D3DDevice.Instance.Device.BeginScene();
             drawer2D.BeginDrawSprite();
             drawer2D.DrawSprite(gameOver);
             drawer2D.EndDrawSprite();

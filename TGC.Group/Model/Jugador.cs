@@ -1,6 +1,7 @@
 ﻿using BulletSharp.Math;
 using Microsoft.DirectX.DirectInput;
 using System;
+using System.Reflection;
 using TGC.Core.BulletPhysics;
 using TGC.Core.Input;
 using TGC.Core.Mathematica;
@@ -47,6 +48,7 @@ namespace TGC.Group.Model
             Kd = .3f;
             Ks = .5f;
             shininess = 200;
+            reflection = .2f;
         }
 
         public void ReiniciarJugador()

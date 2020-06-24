@@ -122,6 +122,7 @@ float Ka;
 float Kd;
 float Ks;
 float shininess;
+float reflection;
 
 //Pixel Shader
 float4 ps_BlinnPhong(PS_BLINN input) : COLOR0
@@ -139,8 +140,6 @@ float4 ps_BlinnPhong(PS_BLINN input) : COLOR0
 	//Obtener texel de CubeMap
     float3 R = reflect(Vn, Nn);
     float3 reflectionColor = texCUBE(cubeMap, R).rgb;
-    texelColor.rgb = texelColor.rgb * 1 + reflectionColor.rgb * .2;
-    //return reflectionColor.xyzz;
 
 	//Componente Diffuse: N dot L
     float3 n_dot_l = dot(Nn, Ln);
@@ -152,7 +151,7 @@ float4 ps_BlinnPhong(PS_BLINN input) : COLOR0
 			? float3(0.0, 0.0, 0.0)
 			: lightColor * pow(max(0.0, n_dot_h), shininess);
 
-    return float4(texelColor.xyz * Ka + diffuseLight * Kd + specularLight * Ks, texelColor.a);
+    return float4(texelColor.rgb * Ka + texelColor.rgb * diffuseLight * Kd + specularLight * Ks + texelColor.rgb * reflectionColor * reflection, texelColor.a);
 }
 
 /*

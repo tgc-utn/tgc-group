@@ -28,6 +28,7 @@ namespace TGC.Group.Model
         public float Kd { get; set; }
         public float Ks { get; set; }
         public float shininess { get; set; }
+        public float reflection { get; set; }
 
         public ObjetoJuego(TgcMesh mesh, TGCVector3 translation=new TGCVector3(), TGCVector3 rotation=new TGCVector3(), float angle=0)
         {
@@ -84,6 +85,7 @@ namespace TGC.Group.Model
             Mesh.Effect.SetValue("Kd", Kd);
             Mesh.Effect.SetValue("Ks", Ks);
             Mesh.Effect.SetValue("shininess", shininess);
+            Mesh.Effect.SetValue("reflection", reflection);
             Render();
         }
 
